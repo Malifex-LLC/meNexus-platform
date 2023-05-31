@@ -1,0 +1,50 @@
+.user-post {
+    display: inline-block;
+    justify-content: left;
+    width: 40%;
+    margin-left: 13%;
+    margin-right: 13%;
+    margin-top: 65px;
+    border: 10px solid black;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: black;
+}
+
+.user-identity {
+    text-align: left;
+    padding: 0;
+    margin-top: -25px;
+    line-height: 0.20;
+}
+
+.user-identity-username {
+    font-size: 20px;
+}
+
+.user-identity-handle {
+    font-size: 15px;
+    color: #eb34e5;
+}
+
+.user-post-content {
+    font-size: 25px;
+    text-align: left;
+}
+
+.user-post-stats {
+    display: flex;
+    margin-bottom: -30px;
+    font-size: 15px;
+}
+
+.user-post-stats-likes {
+    padding-right: 10px;
+}
+
+
+.user-post-date {
+    font-size: 11px;
+    text-align: left;
+    margin-top: -10px;
+}
