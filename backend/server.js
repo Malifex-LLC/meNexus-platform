@@ -148,7 +148,6 @@ server.post('/createUser', async (req, res) => {
     }
 });
 
-
 // Server call to handle login request
 server.post('/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
@@ -168,13 +167,14 @@ server.post('/login', (req, res, next) => {
                 return res.status(500).json({ error: 'An error occurred' });
             }
             // Authentication successful
-            return res.json({ message: 'Login successful' });
+
+            console.log('req.user returns the following:')
+            console.log(req.user);
+            const handle = user.handle;
+            return res.json({ message: 'Login successful', handle: handle });
         });
     })(req, res, next);
 });
-
-
-
 
 //Server call that queries meNexus database for all user accounts
 server.get('/getUsers', (req, res) => {
@@ -189,8 +189,7 @@ server.get('/getUsers', (req, res) => {
     })
 });
 
-// Server call that queries meNexus database for a profile from specified user_id
-// TODO Calls to getProfile use a hardcoded URL to specify the user_id instead of using a variable
+// Server call that queries meNexus database for a profile from specified handle
 server.get('/getProfile/:handle', (req, res) => {
     const handle = req.params.handle;
     let sql = `
@@ -210,9 +209,7 @@ server.get('/getProfile/:handle', (req, res) => {
     });
 });
 
-
-
-//Server call that queries database for all posts from a specified user_id
+//Server call that queries database for all posts from a specified handle
 //TODO Creating a request in Postman does not generate a URL that matches this style. Why?
 server.get('/getUserPosts/:handle', (req, res) => {
     const handle = req.params.handle || req.query.handle;
@@ -235,29 +232,71 @@ server.get('/getUserPosts/:handle', (req, res) => {
 });
 
 
-// Server call to gather and render all posts from a friends lists tied to specified user_id
-server.get('/getFriendsPosts/:userID', (req, res) => {
-    const userID = req.params.userID;
+// Server call to gather and render all posts from a friends lists tied to specified handle
+// TODO Implement logic for this function as its just boilerplate
+server.get('/getFriendsPosts/:handle', (req, res) => {
+    const userID = req.params.handle;
 })
 
 
 // API endpoint for submitting a post
 //TODO Write api call for submitting a post, below is barely above boilerplate
-server.post("/submitPost", (req, res) => {
-    const { text } = req.body;
+// API endpoint for submitting a post
+server.post("/createPost", (req, res) => {
+    const { content, handle } = req.body;
 
-    // Insert the post into the database
-    const sql = "INSERT INTO Posts (content) VALUES (?)";
-    meNexus.query(sql, [text], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Failed to submit the post." });
+    // Fetch the user_id based on the handle
+    const userSql = "SELECT user_id FROM Users WHERE handle = ?";
+    meNexus.query(userSql, [handle], (userErr, userResult) => {
+        if (userErr) {
+            console.error(userErr);
+            return res.status(500).json({ error: "Failed to fetch user data." });
+        }
+
+        if (userResult.length === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        const user_id = userResult[0].user_id;
+
+        // Insert the post into the database
+        const postSql = "INSERT INTO Posts (content, user_id) VALUES (?, ?)";
+        meNexus.query(postSql, [content, user_id], (postErr, postResult) => {
+            if (postErr) {
+                console.error(postErr);
+                return res.status(500).json({ error: "Failed to submit the post." });
+            }
+
+            // Return a success response
+            return res.json({ message: "Post submitted successfully." });
+        });
+    });
+});
+
+// Api endpoint for deleting a post given a specified postId
+server.delete("/deletePost/:post_id", (req, res) => {
+    const postId = req.params.post_id;
+
+    // Delete the post from the database
+    const deleteSql = "DELETE FROM Posts WHERE post_id = ?";
+    meNexus.query(deleteSql, [postId], (deleteErr, deleteResult) => {
+        if (deleteErr) {
+            console.error(deleteErr);
+            return res.status(500).json({ error: "Failed to delete the post." });
+        }
+
+        // Check if any rows were affected
+        if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ error: "Post not found." });
         }
 
         // Return a success response
-        return res.json({ message: "Post submitted successfully." });
+        return res.json({ message: "Post deleted successfully." });
     });
 });
+
+
+
 
 
 

@@ -1,7 +1,7 @@
 import React from "react";
-import './Post.css'
+import "./Post.css";
 
-const Post = ({ username, handle, date, content, likes, comments }) => {
+const Post = ({ username, handle, date, content, likes, comments, onEdit, onDelete }) => {
     return (
         <div className="user-post">
             <div className="user-post-header">
@@ -19,6 +19,10 @@ const Post = ({ username, handle, date, content, likes, comments }) => {
             <div className="user-post-stats">
                 <p className="user-post-stats-likes">{likes} likes </p>
                 <p className="user-post-stats-comments">{comments} comments</p>
+            </div>
+            <div className="user-post-actions">
+                <button onClick={onEdit}>Edit</button>
+                <button onClick={onDelete}>Delete</button>
             </div>
         </div>
     );
