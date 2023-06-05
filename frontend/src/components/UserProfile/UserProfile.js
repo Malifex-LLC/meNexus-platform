@@ -8,6 +8,9 @@ import "./UserProfile.css";
 const UserProfile = () => {
     const [profile, setProfile] = useState({});
     const [posts, setPosts] = useState([]);
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [editedPostContent, setEditedPostContent] = useState("");
+
 
     const { handle } = useParams();
 
@@ -27,6 +30,31 @@ const UserProfile = () => {
             setPosts(data);
             console.log(response.data);
         });
+    }
+
+    function handleEdit(postId) {
+        console.log("Editing post:", postId);
+        setEditingPostId(postId);
+
+        // Fetch the current post content and set it as the initial value for editing
+        const postToEdit = posts.find((post) => post.post_id === postId);
+        if (postToEdit) {
+            setEditedPostContent(postToEdit.content);
+        }
+    }
+
+    function handleSave() {
+        // Update the post in the database with the edited content
+        axios
+            .put(`/updatePost/${editingPostId}`, {
+                content: editedPostContent,
+            })
+            .then((response) => {
+                console.log(response.data);
+                setEditingPostId(null);
+                setEditedPostContent("");
+                getUserPosts(); // Refresh the posts after editing the post
+            });
     }
 
     function handleDelete(post_id) {
@@ -68,7 +96,14 @@ const UserProfile = () => {
                                 content={post.content}
                                 comments={post.comment_count}
                                 likes={post.likes}
-                                onDelete={() => handleDelete(post.post_id)} // Use post.post_id instead of post.id
+                                onDelete={() => handleDelete(post.post_id)}
+                                onEdit={() => handleEdit(post.post_id)} // Pass the handleEdit function as prop
+                                isEditing={editingPostId === post.post_id} // Pass a flag to indicate if the post is being edited
+                                editedContent={editedPostContent}
+                                onContentChange={(event) =>
+                                    setEditedPostContent(event.target.value)
+                                }
+                                onSave={handleSave}
                             />
                         ))
                 ) : (
