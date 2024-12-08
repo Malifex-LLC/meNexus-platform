@@ -2,6 +2,7 @@ import useAxios from './useAxios.js';
 import { ENDPOINTS } from "../config.js";
 import { replaceParams } from "../../utils/apiUtils";
 
+
 const useGetProfile = () => {
     const { data, loading, error, sendRequest } = useAxios();
 
