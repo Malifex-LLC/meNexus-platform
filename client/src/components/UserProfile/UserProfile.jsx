@@ -1,33 +1,23 @@
+import "./UserProfile.css";
 import React, { useEffect, useState } from "react";
-import useAxios from '../../api/hooks/useAxios.jsx'
-import useGetProfile from '../../api/hooks/useGetProfile.jsx';
-import axios from 'axios';
 import { useParams } from "react-router-dom";
+import axios from 'axios';
+import useGetProfile from '../../api/hooks/useGetProfile.jsx';
+import useGetUserPosts from '../../api/hooks/useGetUserPosts.jsx'
 import Post from "../Post/Post";
 import PostForm from "../PostForm/PostForm";
-import "./UserProfile.css";
+
 
 const UserProfile = () => {
     const [profile, setProfile] = useState({});
     const [posts, setPosts] = useState([]);
     const [editingPostId, setEditingPostId] = useState(null);
     const [editedPostContent, setEditedPostContent] = useState("");
-
-
     const { handle } = useParams();
 
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
-
-
-
-    function getUserPosts() {
-        axios.get(`/api/getUserPosts/${handle}`).then((response) => {
-            let data = response.data;
-            setPosts(data);
-            console.log(response.data);
-        });
-    }
 
     function handleEdit(postId) {
         console.log("Editing post:", postId);
@@ -71,7 +61,16 @@ const UserProfile = () => {
                 console.log(error);
             }
         }
-        getUserPosts();
+        const fetchUserPosts = async () => {
+            try {
+                const userPostsData = await getUserPosts(handle);
+                setPosts(userPostsData);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchProfile();
+        fetchUserPosts();
     }, []);
 
     return (
