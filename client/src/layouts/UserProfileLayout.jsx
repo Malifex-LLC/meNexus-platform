@@ -1,7 +1,6 @@
 import './UserProfileLayout.css'
-import React from "react";
-import Header from "../Header/Header.jsx";
-import Navigation from "../Navigation/Navigation.jsx";
+import Header from "../components/Header/Header.jsx";
+import Navigation from "../components/Navigation/Navigation.jsx";
 
 
 const UserProfileLayout = ({ children }) => {

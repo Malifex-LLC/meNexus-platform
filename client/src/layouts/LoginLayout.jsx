@@ -1,10 +1,11 @@
-import './RegisterLayout.css'
+import './LoginLayout.css'
 
-const RegisterLayout = ({children}) => {
+
+const LoginLayout = ({children}) => {
     return (
-        <div className='LayoutRegister'>
+        <div className='LayoutLogin'>
             <header>
-                enkitheymystik.com
+                meNexus
             </header>
             <main className='MainContentLogin'>
                 {children}
@@ -13,6 +14,6 @@ const RegisterLayout = ({children}) => {
     );
 }
 
-export default RegisterLayout;
+export default LoginLayout;
 
 

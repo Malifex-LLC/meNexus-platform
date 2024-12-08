@@ -1,10 +1,9 @@
 import './App.css';
-import { BrowserRouter, Router, Routes, Route} from 'react-router-dom';
-import HomePage from './components/Pages/HomePage.jsx';
-import RegisterPage from "./components/Pages/RegisterPage.jsx";
-import LoginPage from "./components/Pages/LoginPage.jsx";
-import UserProfilePage from "./components/Pages/UserProfilePage.jsx";
-
+import { BrowserRouter, Routes, Route} from 'react-router-dom';
+import HomePage from './pages/Home/HomePage.jsx';
+import RegisterPage from "./pages/Register/RegisterPage.jsx";
+import LoginPage from "./pages/Login/LoginPage.jsx";
+import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 
 
 function App() {
@@ -21,7 +20,6 @@ function App() {
             </BrowserRouter>
         </div>
     );
-
 }
 
 export default App;

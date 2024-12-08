@@ -1,6 +1,6 @@
 import './Navigation.css'
 import {NavLink} from "react-router-dom";
-import React, {useState} from "react";
+
 
 const Navigation = ({color, textColor, fontSize}) => {
     return (
