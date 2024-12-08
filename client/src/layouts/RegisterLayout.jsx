@@ -1,5 +1,6 @@
 import './RegisterLayout.css'
 
+
 const RegisterLayout = ({children}) => {
     return (
         <div className='LayoutRegister'>

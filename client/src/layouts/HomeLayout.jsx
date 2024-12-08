@@ -4,7 +4,6 @@ import Navigation from "../components/Navigation/Navigation.jsx";
 import Activity from "../components/Activity/Activity.jsx";
 
 
-
 const HomeLayout = ({children}) => {
     return (
         <div className='LayoutHome'>
