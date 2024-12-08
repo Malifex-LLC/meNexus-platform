@@ -14,7 +14,7 @@ function App() {
                 <Routes>
                     <Route path="/register" element={<RegisterPage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
-                    <Route path="/home" element={<HomePage/>}/>
+                    <Route path="/home/:handle" element={<HomePage/>}/>
                     <Route path='/profile/:handle' element={<UserProfilePage/>}/>
                 </Routes>
             </BrowserRouter>
