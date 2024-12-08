@@ -1,77 +1,75 @@
 import "./UserProfile.css";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from 'axios';
-import useGetProfile from '../../api/hooks/useGetProfile.jsx';
-import useGetUserPosts from '../../api/hooks/useGetUserPosts.jsx'
-import Post from "../Post/Post";
-import PostForm from "../PostForm/PostForm";
+import useGetProfile from '../../api/hooks/useGetProfile.js';
+import useGetUserPosts from '../../api/hooks/useGetUserPosts.js'
+import useEditPost from "../../api/hooks/useEditPost.js";
+import useDeletePost from "../../api/hooks/useDeletePost.js";
+import Post from "../../components/Post/Post.jsx";
+import PostForm from "../../components/PostForm/PostForm.jsx";
 
 
 const UserProfile = () => {
+    const { handle } = useParams();
     const [profile, setProfile] = useState({});
     const [posts, setPosts] = useState([]);
-    const [editingPostId, setEditingPostId] = useState(null);
-    const [editedPostContent, setEditedPostContent] = useState("");
-    const { handle } = useParams();
 
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
-
-    function handleEdit(postId) {
-        console.log("Editing post:", postId);
-        setEditingPostId(postId);
-
-        // Fetch the current post content and set it as the initial value for editing
-        const postToEdit = posts.find((post) => post.post_id === postId);
-        if (postToEdit) {
-            setEditedPostContent(postToEdit.content);
+    const refreshPosts = async () => {
+        try {
+            const userPostsData = await getUserPosts(handle);
+            setPosts(userPostsData);
+        } catch (error) {
+            console.log("Error refreshing posts:", error);
         }
-    }
+    };
 
-    function handleSave() {
-        // Update the post in the database with the edited content
-        axios
-            .put(`/api/updatePost/${editingPostId}`, {
-                content: editedPostContent,
-            })
-            .then((response) => {
-                console.log(response.data);
-                setEditingPostId(null);
-                setEditedPostContent("");
-                getUserPosts(); // Refresh the posts after editing the post
-            });
-    }
+    const {
+        editingPostId,
+        editedPostContent,
+        setEditedPostContent,
+        handleEdit,
+        handleSave,
+    } = useEditPost(refreshPosts);
 
-    function handleDelete(post_id) {
-        console.log("Deleting post:", post_id);
-        axios.delete(`/api/deletePost/${post_id}`).then((response) => {
-            console.log(response.data);
-            getUserPosts(); // Refresh the posts after deleting the post
-        });
-    }
+    const { handleDelete } = useDeletePost(refreshPosts);
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
-                const profileData = await getProfile(handle);
+                const [profileData, userPostsData] = await Promise.all([
+                    getProfile(handle),
+                    getUserPosts(handle),
+                ]);
                 setProfile(profileData);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        const fetchUserPosts = async () => {
-            try {
-                const userPostsData = await getUserPosts(handle);
                 setPosts(userPostsData);
             } catch (error) {
-                console.log(error);
+                console.error("Error fetching data:", error);
             }
-        }
-        fetchProfile();
-        fetchUserPosts();
+        };
+
+        fetchData();
     }, []);
+
+    // Handle loading and error states for profile
+    if (profileLoading) {
+        return <div>Loading profile...</div>;
+    }
+
+    if (profileError) {
+        return <div>Error loading profile: {profileError.message}</div>;
+    }
+
+    // Handle loading and error states for posts
+    if (userPostsLoading) {
+        return <div>Loading posts...</div>;
+    }
+
+    if (userPostsError) {
+        return <div>Error loading posts: {userPostsError.message}</div>;
+    }
 
     return (
         <div className="profile-container">
@@ -86,7 +84,7 @@ const UserProfile = () => {
                 </div>
             </div>
             <div className="profile-posts">
-                <PostForm handle={handle} />
+                <PostForm handle={handle} refreshPosts={refreshPosts} />
                 {posts.length > 0 ? (
                     posts
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -100,13 +98,14 @@ const UserProfile = () => {
                                 comments={post.comment_count}
                                 likes={post.likes}
                                 onDelete={() => handleDelete(post.post_id)}
-                                onEdit={() => handleEdit(post.post_id)} // Pass the handleEdit function as prop
-                                isEditing={editingPostId === post.post_id} // Pass a flag to indicate if the post is being edited
+                                onEdit={() => handleEdit(post.post_id, posts)}
+                                isEditing={editingPostId === post.post_id}
                                 editedContent={editedPostContent}
                                 onContentChange={(event) =>
                                     setEditedPostContent(event.target.value)
                                 }
                                 onSave={handleSave}
+
                             />
                         ))
                 ) : (

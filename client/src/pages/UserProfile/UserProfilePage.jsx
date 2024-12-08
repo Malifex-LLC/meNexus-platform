@@ -1,7 +1,6 @@
 // UserProfilePage.jsx
-import React from "react";
-import UserProfile from "../UserProfile/UserProfile.jsx";
-import UserProfileLayout from "../Layouts/UserProfileLayout.jsx";
+import UserProfile from "./UserProfile.jsx";
+import UserProfileLayout from "../../layouts/UserProfileLayout.jsx";
 
 const UserProfilePage = () => {
     return (

@@ -1,35 +1,28 @@
-import HomeLayout from "../Layouts/HomeLayout.jsx";
-import Post from "../Post/Post.jsx";
-import PostForm from "../PostForm/PostForm.jsx";
-
-import axios from "axios";
+import HomeLayout from '../../layouts/HomeLayout.jsx';
+import Post from '../../components/Post/Post.jsx';
+import PostForm from '../../components/PostForm/PostForm.jsx';
+import useGetUserPosts from '../../api/hooks/useGetUserPosts.js'
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const HomePage = () => {
     const [posts, setPosts] = useState([]);
     const { handle } = useParams();
+    const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
+
 
     useEffect(() => {
-        const getUserPosts = async () => {
-            try {
-                const userResponse = await axios.get('/getCurrentUser');
-                const handle = userResponse.data.handle;
-                console.log('Retrieved handle:', handle);
-
-                if (handle) {
-                    const postsResponse = await axios.get(`/getUserPosts/${handle}`);
-                    const postsData = postsResponse.data;
-                    setPosts(postsData);
-                    console.log('Retrieved posts:', postsData);
-                }
-            } catch (error) {
-                console.error('Error fetching user posts:', error);
-            }
-        };
-
         getUserPosts();
     }, []);
+
+    // Handle loading and error states for posts
+    if (userPostsLoading) {
+        return <div>Loading posts...</div>;
+    }
+
+    if (userPostsError) {
+        return <div>Error loading posts: {userPostsError.message}</div>;
+    }
 
 
     return (

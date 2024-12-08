@@ -1,5 +1,5 @@
-import LoginLayout from "../Layouts/LoginLayout.jsx";
-import LoginForm from "../LoginForm/LoginForm.jsx";
+import LoginLayout from "../../layouts/LoginLayout.jsx";
+import LoginForm from "../../components/LoginForm/LoginForm.jsx";
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 

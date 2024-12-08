@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
-import './PostForm.css'
-import axios from "axios";
+import './PostForm.css';
+import { useState } from "react";
+import useCreatePost from '../../api/hooks/useCreatePost.js';
 
-const PostForm = ({handle}) => {
+const PostForm = ({ handle, refreshPosts }) => {
     const [text, setText] = useState(`What's on your mind?`);
-    const [posts, setPosts] = useState([]);
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
+    const { createPost, loading, error } = useCreatePost(refreshPosts);
 
     const styles = {
         textarea: {
@@ -16,40 +16,15 @@ const PostForm = ({handle}) => {
         },
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const post = {
             handle: handle,
             content: text,
         };
-        console.log(post);
-        axios
-            .post("http://localhost:3001/createPost", post)
-            .then((response) => {
-                console.log(response.data);
-                setText("");
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        console.log("Submitting post:", post);
+        await createPost(post); // Use the custom hook to create the post
+        setText(""); // Reset the text field after submission
     };
-
-
-    const fetchPosts = () => {
-        axios
-            .get(`http://localhost:3001/getUserPosts/${handle}`)
-            .then((response) => {
-                console.log(response.data);
-                setPosts(response.data); // Update the 'posts' state with the fetched posts
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    };
-
-    useEffect(() => {
-        fetchPosts(); // Fetch posts when the component mounts
-    }, [handle]); // Fetch posts when the 'handle' prop changes
-
 
     const handleFormClick = () => {
         if (!formClicked && text === `What's on your mind?`) {
@@ -58,13 +33,9 @@ const PostForm = ({handle}) => {
         setFormClicked(true);
     };
 
-
-
-
     return (
         <div>
             <div onClick={handleFormClick}>
-                {!formClicked }
                 <textarea
                     className="TextEntryField"
                     style={styles.textarea}
@@ -72,10 +43,12 @@ const PostForm = ({handle}) => {
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button onClick={handleSubmit}>Post</button>
-
+            <button onClick={handleSubmit} disabled={loading}>
+                {loading ? "Posting..." : "Post"}
+            </button>
+            {error && <div className="error">Error: {error}</div>}
         </div>
     );
-}
+};
 
 export default PostForm;
