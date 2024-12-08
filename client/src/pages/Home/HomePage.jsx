@@ -5,11 +5,11 @@ import useGetUserPosts from '../../api/hooks/useGetUserPosts.js'
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+
 const HomePage = () => {
     const [posts, setPosts] = useState([]);
     const { handle } = useParams();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
-
 
     useEffect(() => {
         getUserPosts();
@@ -23,7 +23,6 @@ const HomePage = () => {
     if (userPostsError) {
         return <div>Error loading posts: {userPostsError.message}</div>;
     }
-
 
     return (
         <HomeLayout>

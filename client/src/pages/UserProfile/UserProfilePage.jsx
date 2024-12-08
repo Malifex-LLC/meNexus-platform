@@ -2,6 +2,7 @@
 import UserProfile from "./UserProfile.jsx";
 import UserProfileLayout from "../../layouts/UserProfileLayout.jsx";
 
+
 const UserProfilePage = () => {
     return (
         <UserProfileLayout>

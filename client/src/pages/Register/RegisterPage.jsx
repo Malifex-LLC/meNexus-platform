@@ -8,9 +8,6 @@ const RegisterPage = () => {
         <LoginLayout>
             <RegisterForm/>
         </LoginLayout>
-
-
-
     );
 }
 

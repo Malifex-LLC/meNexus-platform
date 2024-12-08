@@ -6,7 +6,6 @@ import LoginPage from "./pages/Login/LoginPage.jsx";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 
 
-
 function App() {
 
     return (
@@ -21,7 +20,6 @@ function App() {
             </BrowserRouter>
         </div>
     );
-
 }
 
 export default App;
