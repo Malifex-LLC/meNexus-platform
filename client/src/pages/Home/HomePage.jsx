@@ -11,8 +11,29 @@ const HomePage = () => {
     const { handle } = useParams();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
+
+    const refreshPosts = async () => {
+        try {
+            const userPostsData = await getUserPosts(handle);
+            setPosts(userPostsData);
+        } catch (error) {
+            console.log("Error refreshing posts:", error);
+        }
+    };
+
     useEffect(() => {
-        getUserPosts();
+        const fetchData = async () => {
+            try {
+                const [userPostsData] = await Promise.all([
+                    getUserPosts(handle),
+                ]);
+                setPosts(userPostsData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
     }, []);
 
     // Handle loading and error states for posts
@@ -26,7 +47,7 @@ const HomePage = () => {
 
     return (
         <HomeLayout>
-            <PostForm />
+            <PostForm handle={handle} refreshPosts={refreshPosts} />
             {posts.length > 0 ? (
                 posts
                     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

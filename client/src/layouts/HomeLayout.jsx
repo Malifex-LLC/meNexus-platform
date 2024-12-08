@@ -7,8 +7,8 @@ import Activity from "../components/Activity/Activity.jsx";
 const HomeLayout = ({children}) => {
     return (
         <div className='LayoutHome'>
-            <Header color={'black'}/>
-            <Navigation color={'black'}/>
+            <Header/>
+            <Navigation/>
             <main className='MainContentHome'>
                 {children}
             </main>
