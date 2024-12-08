@@ -1,0 +1,32 @@
+.LayoutHome {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: yellow;
+    color: white;
+}
+
+header {
+    position: fixed;
+    width: 100%;
+    height: 65px;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center ;
+    text-align: left;
+
+}
+
+
+
+.MainContentHome {
+    flex-grow: 1;
+    margin-top: 65px;
+    padding-bottom: 10px;
+    background-color: white;
+    color: white;
+}
+
+
+
