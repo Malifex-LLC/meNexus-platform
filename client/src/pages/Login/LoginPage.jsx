@@ -1,7 +1,5 @@
 import LoginLayout from "../../layouts/LoginLayout.jsx";
 import LoginForm from "../../components/LoginForm/LoginForm.jsx";
-import React, { useState, useEffect } from 'react';
-import axios from "axios";
 
 
 const LoginPage = () => {
@@ -10,9 +8,6 @@ const LoginPage = () => {
         <LoginLayout>
             <LoginForm/>
         </LoginLayout>
-
-
-
     );
 }
 
