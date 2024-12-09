@@ -1,6 +1,7 @@
 import "./UserProfile.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {refreshPosts} from '../../utils/apiUtils.js'
 import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js'
 import useEditPost from "../../api/hooks/useEditPost.js";
@@ -18,24 +19,15 @@ const UserProfile = () => {
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
-    const refreshPosts = async () => {
-        try {
-            const userPostsData = await getUserPosts(handle);
-            setPosts(userPostsData);
-        } catch (error) {
-            console.log("Error refreshing posts:", error);
-        }
-    };
-
     const {
         editingPostId,
         editedPostContent,
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(refreshPosts);
+    } = useEditPost(() => refreshPosts(getUserPosts, handle, setPosts));
 
-    const { handleDelete } = useDeletePost(refreshPosts);
+    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, handle, setPosts));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,7 +78,7 @@ const UserProfile = () => {
             </div>
             <div className="user-profile__post-container">
                 <div className="user-profile__post-form">
-                    <PostForm handle={handle} refreshPosts={refreshPosts}/>
+                    <PostForm handle={handle} refreshPosts={() => refreshPosts(getUserPosts, handle, setPosts)} />
                 </div>
                 <div className="user-profile__posts">
                     {posts.length > 0 ? (
