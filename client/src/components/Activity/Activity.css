@@ -4,6 +4,7 @@
     padding: 20px;
     background-color: white; /* Consistent with props default */
     color: black;
+    font-family: 'Roboto Light', sans-serif;
     box-sizing: border-box;
     overflow-y: auto; /* Enables scrolling if content overflows */
 }
