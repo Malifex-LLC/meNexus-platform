@@ -2,26 +2,24 @@ import './Navigation.css'
 import {NavLink} from "react-router-dom";
 
 
-const Navigation = ({color, textColor, fontSize}) => {
+const Navigation = () => {
     return (
-        <header className='NavigationPanel' style={{backgroundColor:color, color:textColor, fontSize: fontSize}}>
-            <nav>
-                <ul>
-                    <li>
-                        <NavLink to="/home">Home</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/profile">Profile</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/messages">Messages</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/settings">Settings</NavLink>
-                    </li>
-                </ul>
-            </nav>
-        </header>
+        <nav className='navigation' aria-label="Primary Navigation">
+            <ul>
+                <li>
+                    <NavLink to="/home" activeClassName="active">Home</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/profile" activeClassName="active">Profile</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/messages" activeClassName="active">Messages</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/settings" activeClassName="active">Settings</NavLink>
+                </li>
+            </ul>
+        </nav>
     )
 };
 

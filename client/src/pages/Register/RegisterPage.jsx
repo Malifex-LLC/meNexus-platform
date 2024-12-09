@@ -3,7 +3,6 @@ import LoginLayout from "../../layouts/LoginLayout.jsx";
 
 
 const RegisterPage = () => {
-
     return(
         <LoginLayout>
             <RegisterForm/>

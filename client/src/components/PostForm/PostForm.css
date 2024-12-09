@@ -1,3 +1,20 @@
-.TextEntryField {
-    margin-top: 3vh;
+.post-form {
+    text-align: center;
+}
+
+.post-form__entry-field {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #2d2e2e;
+    color: white;
+    text-align: center;
+}
+
+.post-form__button{
+    color: black;
+    font-size: 16px;
 }

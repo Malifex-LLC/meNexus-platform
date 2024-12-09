@@ -1,8 +1,7 @@
-.LayoutLogin {
+.login-layout {
 
 }
 
-.MainContentLogin {
+.login-layout__main-content {
     padding-top: 20%;
-
 }

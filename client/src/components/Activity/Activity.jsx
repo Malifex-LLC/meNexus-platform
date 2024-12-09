@@ -1,21 +1,20 @@
 import './Activity.css'
-import {NavLink} from "react-router-dom";
-import React, {useState} from "react";
 
-const Activity = ({color, textColor, fontSize}) => {
+
+const Activity = () => {
     return (
-        <header className='ActivityPanel' style={{backgroundColor:color, color:textColor, fontSize: fontSize}}>
+        <aside className='activity'>
             <nav>
                 <ul>
                     <li>
                         <h1>ACTIVITY</h1>
-                        <p>myNexus has been initiated! </p>
+                        <p>myNexus has been initiated!</p>
                         <p>@enki is trending</p>
                         <p>@heavenlyyart is beautiful</p>
                     </li>
                 </ul>
             </nav>
-        </header>
+        </aside>
     )
 };
 

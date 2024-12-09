@@ -5,22 +5,19 @@ import Navigation from "../components/Navigation/Navigation.jsx";
 
 const UserProfileLayout = ({ children }) => {
     return (
-        <div>
-            {/* Common Header & Navigation panel*/}
-            <Header color={'black'}/>
-            <Navigation color={'black'}/>
-            {/* User profile content */}
-            <div className="MainContentUserProfile clearfix">
-                {/* User profile content */}
-                <div>{children}</div>
-            </div>
-
-            {/* Common footer */}
-            <footer>
-                {/* Footer content */}
-            </footer>
+        <div className='user-profile-layout'>
+            <Header />
+            <Navigation />
+            <main className='user-profile-layout__main-content'>
+                <div className="user-profile-layout__container">
+                    <div className="user-profile-layout__user-profile">
+                        {/* User Profile Content */}
+                        {children}
+                    </div>
+                </div>
+            </main>
         </div>
-    );
+);
 };
 
 export default UserProfileLayout;

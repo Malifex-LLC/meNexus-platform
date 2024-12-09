@@ -23,7 +23,7 @@ const PostForm = ({ handle, refreshPosts }) => {
             content: text,
         };
         console.log("Submitting post:", post);
-        await createPost(post); // Use the custom hook to create the post
+        await createPost(post);
         setText(""); // Reset the text field after submission
     };
 
@@ -35,16 +35,16 @@ const PostForm = ({ handle, refreshPosts }) => {
     };
 
     return (
-        <div>
+        <div className="post-form">
             <div onClick={handleFormClick}>
                 <textarea
-                    className="TextEntryField"
+                    className="post-form__entry-field"
                     style={styles.textarea}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button onClick={handleSubmit} disabled={loading}>
+            <button className="post-form__button" onClick={handleSubmit} disabled={loading}>
                 {loading ? "Posting..." : "Post"}
             </button>
             {error && <div className="error">Error: {error}</div>}

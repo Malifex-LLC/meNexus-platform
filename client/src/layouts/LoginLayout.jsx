@@ -3,11 +3,11 @@ import './LoginLayout.css'
 
 const LoginLayout = ({children}) => {
     return (
-        <div className='LayoutLogin'>
+        <div className='login-layout'>
             <header>
                 meNexus
             </header>
-            <main className='MainContentLogin'>
+            <main className='login-layout__main-content'>
                 {children}
             </main>
         </div>

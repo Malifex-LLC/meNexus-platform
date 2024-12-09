@@ -1,51 +1,115 @@
+/* Base Block */
 .user-post {
-    display: inline-block;
-    justify-content: left;
-    width: 40%;
-    margin-left: 13%;
-    margin-right: 13%;
-    margin-top: 65px;
-    border: 10px solid black;
-    border-radius: 5px;
+    position: relative;
     padding: 20px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
     background-color: black;
     color: white;
+    transition: background-color 0.3s ease;
 }
 
-.user-identity {
-    text-align: left;
+/* Modifier: Editing State */
+.user-post--editing {
+    background-color: gray;
+    border-color: #007bff;
+}
+
+/* Elements */
+.user-post__identity {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0;
     padding: 0;
-    margin-top: -25px;
-    line-height: 0.20;
+    position: relative;
 }
 
-.user-identity-username {
-    font-size: 20px;
+.user-post__username {
+    font-weight: bold;
+    margin: 0;
 }
 
-.user-identity-handle {
-    font-size: 15px;
+.user-post__handle {
+    margin: 0;
     color: #eb34e5;
 }
 
-.user-post-content {
-    font-size: 25px;
-    text-align: left;
+.user-post__content {
+    margin: 10px 0;
+    font-size: 24px;
+    text-align: center;
 }
 
-.user-post-stats {
+.user-post__textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.user-post__date {
+    text-align: left;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.user-post__stats {
     display: flex;
-    margin-bottom: -30px;
-    font-size: 15px;
+    justify-content: space-between;
+    margin: 10px 0;
 }
 
-.user-post-stats-likes {
-    padding-right: 10px;
+.user-post__likes,
+.user-post__comments {
+    font-size: 0.9rem;
+    color: white;
 }
 
+.user-post__actions {
+    display: flex;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    gap: 20px;
+}
 
-.user-post-date {
-    font-size: 11px;
-    text-align: left;
-    margin-top: -10px;
+.user-post__button {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.user-post__button--save {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.user-post__button--save:hover {
+    background-color: #218838;
+}
+
+.user-post__button--edit {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.user-post__button--edit:hover {
+    background-color: #0056b3;
+}
+
+.user-post__button--delete {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.user-post__button--delete:hover {
+    background-color: #c82333;
 }

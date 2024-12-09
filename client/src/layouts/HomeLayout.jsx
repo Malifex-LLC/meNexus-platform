@@ -4,19 +4,17 @@ import Navigation from "../components/Navigation/Navigation.jsx";
 import Activity from "../components/Activity/Activity.jsx";
 
 
-const HomeLayout = ({children}) => {
+const HomeLayout = ({ children }) => {
     return (
-        <div className='LayoutHome'>
-            <Header/>
-            <Navigation/>
-            <main className='MainContentHome'>
+        <div className='home-layout'>
+            <Header />
+            <Navigation />
+            <main className='home-layout__main-content'>
                 {children}
             </main>
-            <Activity color={"white"}/>
+            <Activity />
         </div>
     );
 }
 
 export default HomeLayout;
-
-
