@@ -1,6 +1,5 @@
-// UserProfilePage.jsx
-import UserProfile from "./UserProfile.jsx";
 import UserProfileLayout from "../../layouts/UserProfileLayout.jsx";
+import UserProfile from "./UserProfile.jsx";
 
 
 const UserProfilePage = () => {

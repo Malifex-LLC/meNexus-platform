@@ -16,34 +16,51 @@ const Post = ({
                   onSave,
               }) => {
     return (
-        <div className="user-post">
-            <div className="user-post-header">
-                <div className="user-identity">
-                    <h3 className="user-identity-username">{username}</h3>
-                    <h4 className="user-identity-handle">{handle}</h4>
-                </div>
-                <div className="user-post-date">
+        <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
+            <div className="user-post__identity">
+                <h3 className="user-post__username">{username}</h3>
+                <h4 className="user-post__handle">{handle}</h4>
+                <div className="user-post__date">
                     <p>{date}</p>
                 </div>
             </div>
-            <div className="user-post-content">
+            <div className="user-post__content">
                 {isEditing ? (
-                    <textarea value={editedContent} onChange={onContentChange} />
+                    <textarea
+                        className="user-post__textarea"
+                        value={editedContent}
+                        onChange={onContentChange}
+                    />
                 ) : (
                     <p>{content}</p>
                 )}
             </div>
-            <div className="user-post-stats">
-                <p className="user-post-stats-likes">{likes} likes </p>
-                <p className="user-post-stats-comments">{comments} comments</p>
+            <div className="user-post__stats">
+                <p className="user-post__likes">{likes} likes</p>
+                <p className="user-post__comments">{comments} comments</p>
             </div>
-            <div className="user-post-actions">
+            <div className="user-post__actions">
                 {isEditing ? (
-                    <button onClick={onSave}>Save</button>
+                    <button
+                        className="user-post__button user-post__button--save"
+                        onClick={onSave}
+                    >
+                        Save
+                    </button>
                 ) : (
-                    <button onClick={onEdit}>Edit</button>
+                    <button
+                        className="user-post__button user-post__button--edit"
+                        onClick={onEdit}
+                    >
+                        Edit
+                    </button>
                 )}
-                <button onClick={onDelete}>Delete</button>
+                <button
+                    className="user-post__button user-post__button--delete"
+                    onClick={onDelete}
+                >
+                    Delete
+                </button>
             </div>
         </div>
     );

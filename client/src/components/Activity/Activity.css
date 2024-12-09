@@ -1,47 +1,29 @@
-.ActivityPanel {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    right: 0;
-    top: 65px;
-    width: 16%;
+.activity {
+    grid-area: activity;
     height: 100%;
+    padding: 20px;
+    background-color: white; /* Consistent with props default */
     color: black;
-    font-size: 16px;
+    box-sizing: border-box;
+    overflow-y: auto; /* Enables scrolling if content overflows */
 }
 
-.ActivityPanel nav {
-    flex: 1;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-}
-
-.ActivityPanel ul {
+.activity nav ul {
     list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
 }
 
-.ActivityPanel li {
-    margin-top: 25px;
+.activity nav li {
+    margin-bottom: 20px;
 }
 
-.ActivityPanel a {
-    margin-right: 20px;
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: left;
-    text-align: left;
-    text-decoration: none;
-    color: black;
+.activity nav h1 {
+    margin-bottom: 10px;
     font-size: 20px;
 }
 
-.ActivityPanel a:hover,
-.ActivityPanel a:active {
-    transform: scale(1.25);
+.activity nav p {
+    margin: 5px 0;
+    font-size: 16px;
 }

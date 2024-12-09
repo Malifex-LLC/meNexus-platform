@@ -7,7 +7,6 @@ import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 
 
 function App() {
-
     return (
         <div className="App">
             <BrowserRouter>

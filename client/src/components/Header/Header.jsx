@@ -1,11 +1,15 @@
-import './Header.css'; // Import Header-specific CSS
+import './Header.css';
+
 
 const Header = () => {
     return (
-    <header className='meNexusHeader' >
-        {/* Header content */}
-        meNexus
-    </header>
+        <header
+            className='header'
+            role='banner'
+            aria-label='Main Navigation Header'
+        >
+            <h1>meNexus</h1>
+        </header>
     )
 };
 

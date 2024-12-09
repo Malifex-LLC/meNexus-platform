@@ -7,6 +7,7 @@ import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
 import Post from "../../components/Post/Post.jsx";
 import PostForm from "../../components/PostForm/PostForm.jsx";
+import profilePic from '../../assets/profile_pic.jpg'
 
 
 const UserProfile = () => {
@@ -43,13 +44,13 @@ const UserProfile = () => {
                     getProfile(handle),
                     getUserPosts(handle),
                 ]);
-                setProfile(profileData);
+                console.log("Profile Data:", profileData);
+                setProfile(profileData[0]); //profileData is an array with one object so we access it with [0]
                 setPosts(userPostsData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-
         fetchData();
     }, []);
 
@@ -72,45 +73,48 @@ const UserProfile = () => {
     }
 
     return (
-        <div className="profile-container">
-            <div className="profile-header">
-                <div className="profile-picture">
-                    <img src={profile.profile_picture} alt="Profile" />
+        <div className="user-profile__container">
+            <div className="user-profile__data">
+                <div className="user-profile__picture">
+                    <img src={profilePic} alt="Profile Picture" />
                 </div>
-                <div className="profile-info">
-                    <h2 className="profile-name">{profile.name}</h2>
-                    <p className="profile-bio">{profile.bio}</p>
-                    <p className="profile-location">{profile.location}</p>
+                <div className="user-profile__info">
+                    <h2 className="user-profile__name">{profile.name}</h2>
+                    <p className="user-profile__bio">{profile.bio}</p>
+                    <p className="user-profile__location">{profile.location}</p>
                 </div>
             </div>
-            <div className="profile-posts">
-                <PostForm handle={handle} refreshPosts={refreshPosts} />
-                {posts.length > 0 ? (
-                    posts
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                        .map((post, index) => (
-                            <Post
-                                key={index}
-                                handle={post.handle}
-                                username={post.username}
-                                date={post.created_at}
-                                content={post.content}
-                                comments={post.comment_count}
-                                likes={post.likes}
-                                onDelete={() => handleDelete(post.post_id)}
-                                onEdit={() => handleEdit(post.post_id, posts)}
-                                isEditing={editingPostId === post.post_id}
-                                editedContent={editedPostContent}
-                                onContentChange={(event) =>
-                                    setEditedPostContent(event.target.value)
-                                }
-                                onSave={handleSave}
-
-                            />
-                        ))
-                ) : (
-                    <div>Loading...</div>
-                )}
+            <div className="user-profile__post-container">
+                <div className="user-profile__post-form">
+                    <PostForm handle={handle} refreshPosts={refreshPosts}/>
+                </div>
+                <div className="user-profile__posts">
+                    {posts.length > 0 ? (
+                        posts
+                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                            .map((post, index) => (
+                                <Post
+                                    key={index}
+                                    handle={post.handle}
+                                    username={post.username}
+                                    date={post.created_at}
+                                    content={post.content}
+                                    comments={post.comment_count}
+                                    likes={post.likes}
+                                    onDelete={() => handleDelete(post.post_id)}
+                                    onEdit={() => handleEdit(post.post_id, posts)}
+                                    isEditing={editingPostId === post.post_id}
+                                    editedContent={editedPostContent}
+                                    onContentChange={(event) =>
+                                        setEditedPostContent(event.target.value)
+                                    }
+                                    onSave={handleSave}
+                                />
+                            ))
+                    ) : (
+                        <div>Loading...</div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -3,7 +3,6 @@ import LoginForm from "../../components/LoginForm/LoginForm.jsx";
 
 
 const LoginPage = () => {
-
     return(
         <LoginLayout>
             <LoginForm/>
