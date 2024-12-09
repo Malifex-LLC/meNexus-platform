@@ -19,7 +19,7 @@ const Post = ({
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
             <div className="user-post__identity">
                 <h3 className="user-post__username">{username}</h3>
-                <h4 className="user-post__handle">{handle}</h4>
+                <h4 className="user-post__handle">@{handle}</h4>
                 <div className="user-post__date">
                     <p>{date}</p>
                 </div>
