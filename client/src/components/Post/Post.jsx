@@ -1,4 +1,5 @@
 import "./Post.css";
+import {formatDate} from "../../utils/dateUtils.js";
 
 
 const Post = ({
@@ -21,7 +22,7 @@ const Post = ({
                 <h3 className="user-post__username">{username}</h3>
                 <h4 className="user-post__handle">@{handle}</h4>
                 <div className="user-post__date">
-                    <p>{date}</p>
+                    <p>{formatDate(date)}</p>
                 </div>
             </div>
             <div className="user-post__content">
