@@ -2,38 +2,46 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    function handleSubmit(event) {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Checking to make sure all fields have been filled out
+
+        // Validate fields
         if (!email || !password) {
             setError('All fields are required');
             return;
         }
 
-        const userData = { email, password };
-        axios
-            .post('http://localhost:3001/login', userData)
-            .then((res) => {
-                if (res.status === 200) {
-                    // Login successful, navigate to the home page
-                    console.log(res.data.handle);
-                    navigate(`/profile/${res.data.handle}`);
+        try {
+            // Attempt to login
+            const loginResponse = await axios.post('http://localhost:3001/login', { email, password }, {withCredentials: true});
+            console.log('Login Response:', loginResponse);
+            if (loginResponse.status === 200) {
+                console.log("Login successful. Fetching session data...");
+
+                // Fetch current user session from the server
+                console.log('Making request to getCurrentUser');
+                const sessionResponse = await axios.get('http://localhost:3001/getCurrentUser', { withCredentials: true });
+                console.log('Session Response:', sessionResponse);
+                if (sessionResponse.status === 200 && sessionResponse.data.handle) {
+                    // Navigate to the user's home page based on session data
+                    navigate(`/home/${sessionResponse.data.handle}`);
                 } else {
-                    // Login failed, display error message
-                    setError('Incorrect email or password');
+                    setError('Failed to retrieve session data.');
                 }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
+            } else {
+                setError('Incorrect email or password');
+            }
+        } catch (error) {
+            console.error("Error during login or session retrieval:", error);
+            setError('Login failed. Please try again.');
+        }
+    };
 
     return (
         <div className="LoginWindow">
