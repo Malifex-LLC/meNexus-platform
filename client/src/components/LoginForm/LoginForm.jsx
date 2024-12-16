@@ -1,3 +1,4 @@
+import './LoginForm.css'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
@@ -49,8 +50,8 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="LoginWindow">
-            <form onSubmit={handleSubmit}>
+        <div className="login__main-content">
+            <form className='login__form' onSubmit={handleSubmit}>
                 <label>
                     Email:
                     <input

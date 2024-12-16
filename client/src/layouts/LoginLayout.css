@@ -1,7 +1,44 @@
 .login-layout {
+    display: grid;
+    grid-template-rows: auto 1fr; /* Header takes only as much space as needed, main takes the rest */
+    grid-template-areas:
+        "header"
+        "main";
+    min-height: 100vh; /* Ensures the layout spans the full height of the viewport */
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f7f9fc;
 
 }
 
 .login-layout__main-content {
-    padding-top: 20%;
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    margin: auto; /* Centers the form */
+}
+
+.login-layout__main-content h1 {
+    text-align: center;
+}
+
+.login-layout__register-redirect {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #6c757d;
+}
+
+.login-layout__register-redirect a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-layout__register-redirect a:hover {
+    text-decoration: underline;
 }
