@@ -2,7 +2,6 @@ import useAxios from "./useAxios.js";
 import {ENDPOINTS} from '../config.js'
 import { replaceParams } from "../../utils/apiUtils";
 
-
 const useDeletePost = (refreshPosts) => {
     const { sendRequest, loading, error } = useAxios();
 
@@ -13,6 +12,7 @@ const useDeletePost = (refreshPosts) => {
                 method: "DELETE",
                 url: url,
             });
+
             refreshPosts(); // Refresh posts after deletion
         } catch (error) {
             console.error("Error deleting post:", error);
