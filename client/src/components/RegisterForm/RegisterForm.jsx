@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import './RegisterForm.css'
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
@@ -19,6 +19,7 @@ const RegisterForm = () => {
             return;
         }
 
+        // TODO this needs to be updated to use custom hooks like useAxios or useCreateUser
         const userData = { email, password, handle, username };
         axios
             .post('http://localhost:3001/createUser', userData)
@@ -36,26 +37,38 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="RegisterWindow">
-            <form onSubmit={handleSubmit}>
+        <div className="register__main-content">
+            <form className='register__form' onSubmit={handleSubmit}>
                 <label>
                     Email:
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)} />
                 </label>
                 <br />
                 <label>
                     Password:
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)} />
                 </label>
                 <br />
                 <label>
                     Handle:
-                    <input type="text" value={handle} onChange={(e) => setHandle(e.target.value)} />
+                    <input
+                        type="text"
+                        value={handle}
+                        onChange={(e) => setHandle(e.target.value)} />
                 </label>
                 <br />
                 <label>
                     Username:
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)} />
                 </label>
                 <br />
                 {error && <p>{error}</p>}
