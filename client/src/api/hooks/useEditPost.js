@@ -3,7 +3,6 @@ import useAxios from "./useAxios.js";
 import { ENDPOINTS } from "../config.js";
 import { replaceParams } from "../../utils/apiUtils";
 
-
 const useEditPost = (refreshPosts) => {
     const [editingPostId, setEditingPostId] = useState(null);
     const [editedPostContent, setEditedPostContent] = useState("");
@@ -25,6 +24,7 @@ const useEditPost = (refreshPosts) => {
                 url: url,
                 data: { content: editedPostContent }, // Use the updated content
             });
+
             setEditingPostId(null);
             setEditedPostContent("");
             refreshPosts(); // Refresh posts after saving
@@ -34,11 +34,11 @@ const useEditPost = (refreshPosts) => {
     };
 
     return {
+        handleEdit,
+        handleSave,
         editingPostId,
         editedPostContent,
         setEditedPostContent,
-        handleEdit,
-        handleSave,
         loading,
         error,
     };

@@ -2,13 +2,12 @@ import './Home.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts } from '../../utils/apiUtils.js';
+import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import Post from '../../components/Post/Post.jsx';
 import PostForm from '../../components/PostForm/PostForm.jsx';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import axios from "axios";
-
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
@@ -16,6 +15,8 @@ const Home = () => {
     const [posts, setPosts] = useState([]); // State for user posts
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
     const navigate = useNavigate(); // React Router navigate
+
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
     // Hooks for editing and deleting posts
@@ -26,7 +27,6 @@ const Home = () => {
         handleEdit,
         handleSave,
     } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
-
     const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
 
     // Redirect from /home to /home/:handle if no handle is provided
@@ -35,7 +35,9 @@ const Home = () => {
             if (!handle && !isHandleSet) {
                 try {
                     console.log("Fetching current user session...");
-                    const response = await axios.get('http://localhost:3001/getCurrentUser', { withCredentials: true });
+                    const response = await getSessionUser();
+                    console.log(response);
+
                     if (response.status === 200 && response.data.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle); // Set the handle
@@ -70,6 +72,7 @@ const Home = () => {
                     console.error("Error fetching posts:", error);
                 }
             };
+
             fetchPosts();
         }
     }, [currentHandle, isHandleSet]); // Trigger fetching posts only when `currentHandle` and `isHandleSet` are ready
@@ -83,10 +86,20 @@ const Home = () => {
         return <div>Error loading posts: {userPostsError.message}</div>;
     }
 
+    if (sessionUserLoading) {
+        return <div>Loading session...</div>;
+    }
+
+    if (sessionUserError) {
+        return <div>Error loading session user...</div>;
+    }
+
     return currentHandle ? (
         <div className="home__post-container">
             <div className="home__post-form">
-                <PostForm handle={currentHandle} refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                <PostForm
+                    handle={currentHandle}
+                    refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
             </div>
             <div className="home__posts">
                 {posts.length > 0 ? (

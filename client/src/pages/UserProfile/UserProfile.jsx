@@ -2,6 +2,7 @@ import "./UserProfile.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts } from '../../utils/apiUtils.js';
+import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
@@ -9,8 +10,6 @@ import useDeletePost from "../../api/hooks/useDeletePost.js";
 import Post from "../../components/Post/Post.jsx";
 import PostForm from "../../components/PostForm/PostForm.jsx";
 import profilePic from '../../assets/profile_pic.jpg';
-import axios from "axios";
-
 
 const UserProfile = () => {
     const { handle } = useParams();
@@ -20,6 +19,7 @@ const UserProfile = () => {
     const [isHandleSet, setIsHandleSet] = useState(false);
     const navigate = useNavigate();
 
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
 
@@ -39,7 +39,8 @@ const UserProfile = () => {
             if (!handle && !isHandleSet) {
                 try {
                     console.log("Fetching current user session...");
-                    const response = await axios.get('http://localhost:3001/getCurrentUser', { withCredentials: true });
+                    const response = await getSessionUser();
+
                     if (response.status === 200 && response.data.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle);
@@ -78,6 +79,7 @@ const UserProfile = () => {
                     console.error("Error fetching data:", error);
                 }
             };
+
             fetchData();
         }
     }, [currentHandle, isHandleSet]);
@@ -114,7 +116,9 @@ const UserProfile = () => {
             </div>
             <div className="user-profile__post-container">
                 <div className="user-profile__post-form">
-                    <PostForm handle={currentHandle} refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                    <PostForm
+                        handle={currentHandle}
+                        refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
                 </div>
                 <div className="user-profile__posts">
                     {posts.length > 0 ? (

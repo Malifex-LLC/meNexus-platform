@@ -10,7 +10,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
-
 //Instantiate Express app
 const app = express()
 app.use(cors({
@@ -50,6 +49,16 @@ app.use((req, res, next) => {
     });
     next();
 });
+
+// Middleware function to check session data
+const checkSessionData = (req, res, next) => {
+    console.log('Session Data:');
+    console.log(req.session);
+    next(); // Move to the next middleware or route handler
+};
+
+// Use the checkSessionData middleware
+app.use(checkSessionData);
 
 // Assigning port number for the express server
 const port = process.env.EXPRESS_PORT;
@@ -126,16 +135,6 @@ passport.deserializeUser((email, done) => {
         .then((user) => done(null, user))
         .catch((err) => done(err, null));
 });
-
-// Middleware function to check session data
-const checkSessionData = (req, res, next) => {
-    console.log('Session Data:');
-    console.log(req.session);
-    next(); // Move to the next middleware or route handler
-};
-
-// Use the checkSessionData middleware
-app.use(checkSessionData);
 
 
 ///////////////////////////////////////////API endpoints///////////////////////////////////////////

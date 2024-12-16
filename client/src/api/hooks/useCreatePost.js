@@ -1,7 +1,6 @@
 import useAxios from './useAxios.js';
 import {ENDPOINTS} from '../config.js'
 
-
 const useCreatePost = (refreshPosts) => {
     console.log("useCreatePost called");
     const { sendRequest, loading, error } = useAxios();
@@ -22,7 +21,11 @@ const useCreatePost = (refreshPosts) => {
         }
     };
 
-    return { createPost, loading, error };
+    return {
+        createPost,
+        loading,
+        error
+    };
 };
 
 export default useCreatePost;
