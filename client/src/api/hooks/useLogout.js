@@ -1,33 +1,31 @@
 import useAxios from './useAxios.js'
 import { ENDPOINTS } from '../config.js';
 
-const useLogin = () => {
-    console.log('useLogin called');
+const useLogout = () => {
+    console.log('useLogout called');
     const { data, loading, error, sendRequest } = useAxios();
 
-    const login = async (email, password) => {
+    const logout = async () => {
         try {
-            const url = ENDPOINTS.LOGIN;
+            const url = ENDPOINTS.LOGOUT;
             const response = await sendRequest( {
                 method: 'POST',
                 url: url,
-                data: { email, password },
-                withCredentials: true,
+                withCredentials: true
             });
 
             return response;
         } catch (err) {
-            console.error('Error in useLogin:', err);
+            console.log('Error in useLogout', err);
             throw err;
         }
     }
-
     return {
-        login,
-        loginData: data,
+        logout,
+        logoutData: data,
         loading,
         error
     };
 }
 
-export default useLogin;
+export default useLogout;
