@@ -1,0 +1,65 @@
+.account-settings__container {
+    width: 100%; /* Full width of the parent area */
+    height: 100%; /* Full height of the parent area */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+    background: #fff;
+    border-radius: 0 12px 12px 0; /* Rounded corners on the right side */
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.account-settings__form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spacing between form elements */
+}
+
+.account-settings__form label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.account-settings__form input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.account-settings__form input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+.account-settings__form button {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #eb34e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.account-settings__form button:hover {
+    background-color: #801c7c;
+}
+
+.account-settings__header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 20px;
+}

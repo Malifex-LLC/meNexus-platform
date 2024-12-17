@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts } from '../../utils/apiUtils.js';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
-import Post from '../../components/Post/Post.jsx';
-import PostForm from '../../components/PostForm/PostForm.jsx';
+import Post from '../../components/Posts/Post/Post.jsx';
+import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
