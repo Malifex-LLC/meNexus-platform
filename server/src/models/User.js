@@ -13,19 +13,43 @@ let meNexus = mysql.createConnection({
 meNexus.connect();
 
 const createUser = async (email, password, handle, username) => {
+    console.log('createUser called for handle: ', handle);
     try {
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Insert the new user into the database
         const query = 'INSERT INTO Users (email, password, handle, username) VALUES (?, ?, ?, ?)';
         const params = [email, hashedPassword, handle, username];
 
         const result = await executeQuery(query, params);
+        const userID = result.insertId;
+        console.log('User created with ID:', userID);
 
-        console.log('User created with ID:', result.insertId);
+        // Create a default profile for the new user
+        await createProfile(userID, handle);
+
         return result.insertId;
     } catch (error) {
         console.error("Error creating user:", error.message);
         throw new Error('Failed to create user');
+    }
+};
+
+const createProfile = async (userID, handle) => {
+    console.log('createProfile called for handle: ', handle);
+    try {
+        const query = 'INSERT INTO Profiles (user_id, name, bio, location, created_at) VALUES (?, ?, ?, ?, NOW())';
+        const defaultName = handle;
+        const defaultBio = 'Update your bio!';
+        const defaultLocation = 'Update your location';
+
+        const result = await executeQuery(query, [userID, defaultName, defaultBio, defaultLocation]);
+        console.log('Default profile created with ID: ', result.insertId);
+        return result.insertId;
+    } catch (err) {
+        console.error("Error creating default profile: ", err.message);
+        throw new Error('Failed to create default profile');
     }
 };
 
@@ -83,6 +107,7 @@ const executeQuery = (query, params) => {
 
 module.exports = {
     createUser,
+    createProfile,
     getUserByEmail,
     getUserByHandle,
     getUserById
