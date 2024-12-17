@@ -1,5 +1,5 @@
 import "./Post.css";
-import {formatDate} from "../../utils/dateUtils.js";
+import {formatDate} from "../../../utils/dateUtils.js";
 
 
 const Post = ({

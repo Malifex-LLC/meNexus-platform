@@ -1,6 +1,5 @@
-import HomeLayout from '../../layouts/HomeLayout.jsx';
+import HomeLayout from '../../layouts/HomeLayout/HomeLayout.jsx';
 import Home from '../Home/Home.jsx';
-
 
 const HomePage = () => {
     return (

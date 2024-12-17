@@ -1,4 +1,4 @@
-import LoginLayout from "../../layouts/LoginLayout.jsx";
+import LoginLayout from "../../layouts/LoginLayout/LoginLayout.jsx";
 import LoginForm from "../../components/LoginForm/LoginForm.jsx";
 
 const LoginPage = () => {

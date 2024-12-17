@@ -185,7 +185,7 @@ app.post('/createUser', async (req, res) => {
 });
 
 // API endpoint to reset password
-app.post('/resetPassword', async (req, res) => {
+app.put('/updatePassword', async (req, res) => {
     const { userId, newPassword } = req.body;
     if (!userId || !newPassword) {
         return res.status(400).json({ error: "User ID and new password are required" });

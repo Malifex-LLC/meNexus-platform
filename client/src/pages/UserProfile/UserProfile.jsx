@@ -7,8 +7,8 @@ import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import Post from "../../components/Post/Post.jsx";
-import PostForm from "../../components/PostForm/PostForm.jsx";
+import Post from "../../components/Posts/Post/Post.jsx";
+import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 import profilePic from '../../assets/profile_pic.jpg';
 
 const UserProfile = () => {
