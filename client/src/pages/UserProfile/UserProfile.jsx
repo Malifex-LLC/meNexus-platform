@@ -73,7 +73,8 @@ const UserProfile = () => {
                         getProfile(currentHandle),
                         getUserPosts(currentHandle),
                     ]);
-                    setProfile(profileData[0]);
+                    console.log("Profile Data after getProfile() fetching is:", profileData);
+                    setProfile(profileData);
                     setPosts(userPostsData);
                 } catch (error) {
                     console.error("Error fetching data:", error);
@@ -109,9 +110,9 @@ const UserProfile = () => {
                     <img src={profilePic} alt="Profile Picture" />
                 </div>
                 <div className="user-profile__info">
-                    <h2 className="user-profile__name">{profile.name}</h2>
-                    <p className="user-profile__bio">{profile.bio}</p>
-                    <p className="user-profile__location">{profile.location}</p>
+                    <h2 className="user-profile__name">{profile.profile_name}</h2>
+                    <p className="user-profile__bio">{profile.profile_bio}</p>
+                    <p className="user-profile__location">{profile.profile_location}</p>
                 </div>
             </div>
             <div className="user-profile__post-container">
@@ -128,7 +129,7 @@ const UserProfile = () => {
                                 <Post
                                     key={index}
                                     handle={post.handle}
-                                    username={post.username}
+                                    display_name={post.display_name}
                                     date={post.created_at}
                                     content={post.content}
                                     comments={post.comment_count}

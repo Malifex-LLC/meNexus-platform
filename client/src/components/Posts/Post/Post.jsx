@@ -3,7 +3,7 @@ import {formatDate} from "../../../utils/dateUtils.js";
 
 
 const Post = ({
-                  username,
+                  display_name,
                   handle,
                   date,
                   content,
@@ -19,7 +19,7 @@ const Post = ({
     return (
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
             <div className="user-post__identity">
-                <h3 className="user-post__username">{username}</h3>
+                <h3 className="user-post__display-name">{display_name}</h3>
                 <h4 className="user-post__handle">@{handle}</h4>
                 <div className="user-post__date">
                     <p>{formatDate(date)}</p>

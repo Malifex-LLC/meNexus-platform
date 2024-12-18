@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `menexus_schema` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `menexus_schema`;
--- MySQL dump 10.13  Distrib 8.0.33, for macos13 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for macos14 (x86_64)
 --
 -- Host: localhost    Database: menexus_schema
 -- ------------------------------------------------------
--- Server version	8.0.32
+-- Server version	9.0.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -18,93 +18,96 @@ USE `menexus_schema`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `Comments`
+-- Table structure for table `Authentication`
 --
 
-DROP TABLE IF EXISTS `Comments`;
+DROP TABLE IF EXISTS `Authentication`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Comments` (
-  `comment_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `post_id` int NOT NULL,
-  `content` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`comment_id`),
-  KEY `user_id` (`user_id`),
-  KEY `post_id` (`post_id`),
-  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
-  CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `Posts` (`post_id`)
+CREATE TABLE `Authentication` (
+                                  `auth_id` int NOT NULL AUTO_INCREMENT,
+                                  `user_id` int unsigned NOT NULL,
+                                  `email` varchar(255) NOT NULL,
+                                  `hashed_password` varchar(255) DEFAULT NULL,
+                                  `auth_provider` varchar(50) DEFAULT 'local',
+                                  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                                  PRIMARY KEY (`auth_id`),
+                                  UNIQUE KEY `email_UNIQUE` (`email`),
+                                  KEY `fk_authentication_user_idx` (`user_id`),
+                                  CONSTRAINT `fk_authentication_user` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Authentication`
+--
+
+LOCK TABLES `Authentication` WRITE;
+/*!40000 ALTER TABLE `Authentication` DISABLE KEYS */;
+INSERT INTO `Authentication` VALUES (1,1,'menexus@mail.com','$2b$10$obUDhrFqItVqnqN0LxMaZOYEMej3QdhVWZRox5ZayGlRebEKUvIYe','local','2024-12-18 03:53:11'),(2,2,'jacobwileyross@mail.com','$2b$10$ID81InZ7UTAQkDAOiLUPS.Jk1w5dI4cpWpuG1/Z3hUAh5yLB0Nh46','local','2024-12-18 04:30:55'),(3,3,'heavenlyy@mail.com','$2b$10$ITtWqP3dBuyChNmnwpabSugeu6G2a4VpI2gGtx.4x96X4XkeyuVBS','local','2024-12-18 04:32:51');
+/*!40000 ALTER TABLE `Authentication` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Followers`
+--
+
+DROP TABLE IF EXISTS `Followers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Followers` (
+                             `follow_id` int NOT NULL AUTO_INCREMENT,
+                             `follower_id` int unsigned NOT NULL,
+                             `followed_id` int unsigned NOT NULL,
+                             `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                             PRIMARY KEY (`follow_id`),
+                             KEY `fk_follower_user_id_idx` (`follower_id`),
+                             KEY `fk_followed_user_id_idx` (`followed_id`),
+                             CONSTRAINT `fk_followed_user_id` FOREIGN KEY (`followed_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                             CONSTRAINT `fk_follower_user_id` FOREIGN KEY (`follower_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Comments`
+-- Dumping data for table `Followers`
 --
 
-LOCK TABLES `Comments` WRITE;
-/*!40000 ALTER TABLE `Comments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Comments` ENABLE KEYS */;
+LOCK TABLES `Followers` WRITE;
+/*!40000 ALTER TABLE `Followers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Followers` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Friends`
+-- Table structure for table `Messages`
 --
 
-DROP TABLE IF EXISTS `Friends`;
+DROP TABLE IF EXISTS `Messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Friends` (
-  `friend_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `friend_user_id` int NOT NULL,
-  `status` enum('pending','accepted','declined','blocked') DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`friend_id`),
-  KEY `user_id` (`user_id`),
-  KEY `friend_user_id` (`friend_user_id`),
-  CONSTRAINT `friends_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
-  CONSTRAINT `friends_ibfk_2` FOREIGN KEY (`friend_user_id`) REFERENCES `Users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Friends`
---
-
-LOCK TABLES `Friends` WRITE;
-/*!40000 ALTER TABLE `Friends` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Friends` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `Likes`
---
-
-DROP TABLE IF EXISTS `Likes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Likes` (
-  `like_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `post_id` int NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`like_id`),
-  KEY `user_id` (`user_id`),
-  KEY `post_id` (`post_id`),
-  CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
-  CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `Posts` (`post_id`)
+CREATE TABLE `Messages` (
+                            `message_id` int unsigned NOT NULL AUTO_INCREMENT,
+                            `sender_id` int unsigned NOT NULL,
+                            `receiver_id` int unsigned NOT NULL,
+                            `content` text,
+                            `media_url` varchar(255) DEFAULT NULL,
+                            `is_read` tinyint DEFAULT '0',
+                            `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                            `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`message_id`),
+                            KEY `fk_sender_user_id_idx` (`sender_id`),
+                            KEY `fk_receiver_user_id_idx` (`receiver_id`),
+                            CONSTRAINT `fk_receiver_user_id` FOREIGN KEY (`receiver_id`) REFERENCES `Users` (`user_id`),
+                            CONSTRAINT `fk_sender_user_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Likes`
+-- Dumping data for table `Messages`
 --
 
-LOCK TABLES `Likes` WRITE;
-/*!40000 ALTER TABLE `Likes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Likes` ENABLE KEYS */;
+LOCK TABLES `Messages` WRITE;
+/*!40000 ALTER TABLE `Messages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -115,14 +118,15 @@ DROP TABLE IF EXISTS `Notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Notifications` (
-  `notification_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `is_read` tinyint(1) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`notification_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+                                 `notification_id` int unsigned NOT NULL AUTO_INCREMENT,
+                                 `user_id` int unsigned NOT NULL,
+                                 `type` varchar(50) NOT NULL,
+                                 `resource_id` int NOT NULL,
+                                 `is_read` tinyint DEFAULT '0',
+                                 `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                                 PRIMARY KEY (`notification_id`),
+                                 KEY `fk_notification_user_id_idx` (`user_id`),
+                                 CONSTRAINT `fk_notification_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -143,15 +147,16 @@ DROP TABLE IF EXISTS `Posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Posts` (
-  `post_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `content` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`post_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                         `post_id` int unsigned NOT NULL AUTO_INCREMENT,
+                         `user_id` int unsigned NOT NULL,
+                         `content` text,
+                         `media_url` varchar(255) DEFAULT NULL,
+                         `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                         `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         PRIMARY KEY (`post_id`),
+                         KEY `fk_post_user_id_idx` (`user_id`),
+                         CONSTRAINT `fk_post_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,7 +165,7 @@ CREATE TABLE `Posts` (
 
 LOCK TABLES `Posts` WRITE;
 /*!40000 ALTER TABLE `Posts` DISABLE KEYS */;
-INSERT INTO `Posts` VALUES (50,1,'meNexus v0.89 is live!!!','2023-06-05 05:40:29','2023-06-05 05:40:29'),(51,1,'Does meNexus v0.89 let you edit your posts?\n\nIT DOES!!!','2023-06-05 05:41:37','2023-06-05 05:41:50');
+INSERT INTO `Posts` VALUES (1,1,'The migration to the new database schema has been completed! Everything appears to be operational!',NULL,'2024-12-18 03:57:46','2024-12-18 04:55:25'),(3,2,'New database schema seems to be up and running!',NULL,'2024-12-18 04:31:22','2024-12-18 04:31:22'),(4,3,'My first post on meNexus! I\'m excited to share my art with you all :D',NULL,'2024-12-18 04:33:11','2024-12-18 04:33:11'),(6,1,'Welcome to meNexus! This is the admin account where you can find everything related to meNexus!',NULL,'2024-12-18 04:55:30','2024-12-18 04:55:30'),(7,3,'Testing the new database schema! Editing!',NULL,'2024-12-18 05:01:19','2024-12-18 05:01:24');
 /*!40000 ALTER TABLE `Posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,18 +177,22 @@ DROP TABLE IF EXISTS `Profiles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Profiles` (
-  `profile_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `bio` varchar(255) DEFAULT NULL,
-  `location` varchar(255) DEFAULT NULL,
-  `profile_picture` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`profile_id`),
-  KEY `user_id` (`user_id`,`profile_id`),
-  CONSTRAINT `profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                            `profile_id` int unsigned NOT NULL AUTO_INCREMENT,
+                            `user_id` int unsigned NOT NULL,
+                            `profile_name` varchar(255) DEFAULT NULL,
+                            `profile_bio` varchar(255) DEFAULT NULL,
+                            `profile_location` varchar(255) DEFAULT NULL,
+                            `profile_picture` varchar(255) DEFAULT NULL,
+                            `profile_banner` varchar(255) DEFAULT NULL,
+                            `custom_css` text,
+                            `background_music` varchar(255) DEFAULT NULL,
+                            `animations` json DEFAULT NULL,
+                            `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                            `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`profile_id`),
+                            KEY `fk_profile_user_idx` (`user_id`),
+                            CONSTRAINT `fk_profile_user` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,8 +201,68 @@ CREATE TABLE `Profiles` (
 
 LOCK TABLES `Profiles` WRITE;
 /*!40000 ALTER TABLE `Profiles` DISABLE KEYS */;
-INSERT INTO `Profiles` VALUES (6,1,'Jacob Wiley Ross','Musician / Programmer','St. Louis','https://scontent-ord5-1.xx.fbcdn.net/v/t1.6435-9/36930975_10211339094787264_7403401579572756480_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=LnT7MwQwrU0AX-CdihF&_nc_ht=scontent-ord5-1.xx&oh=00_AfB5DCw2sRkgFxtO6rjwcD3qkJzPwjAvYkDbCldHjIhpSQ&oe=64A4E579','2023-06-05 05:39:28','2023-06-05 05:39:29');
+INSERT INTO `Profiles` VALUES (1,1,'meNexus','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 03:53:11','2024-12-18 03:53:11'),(2,2,'JacobWileyRoss','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 04:30:55','2024-12-18 04:30:55'),(3,3,'heavenlyy_art','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 04:32:51','2024-12-18 04:32:51');
 /*!40000 ALTER TABLE `Profiles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Reactions`
+--
+
+DROP TABLE IF EXISTS `Reactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Reactions` (
+                             `reaction_id` int unsigned NOT NULL AUTO_INCREMENT,
+                             `user_id` int unsigned NOT NULL,
+                             `resource_id` int NOT NULL,
+                             `resource_type` varchar(50) NOT NULL,
+                             `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                             PRIMARY KEY (`reaction_id`),
+                             KEY `fk_reaction_user_id_idx` (`user_id`),
+                             CONSTRAINT `fk_reaction_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Reactions`
+--
+
+LOCK TABLES `Reactions` WRITE;
+/*!40000 ALTER TABLE `Reactions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Reactions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Themes`
+--
+
+DROP TABLE IF EXISTS `Themes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Themes` (
+                          `theme_id` int NOT NULL AUTO_INCREMENT,
+                          `name` varchar(100) NOT NULL,
+                          `description` text,
+                          `css` text,
+                          `animations` json DEFAULT NULL,
+                          `created_by` int unsigned NOT NULL,
+                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                          PRIMARY KEY (`theme_id`),
+                          UNIQUE KEY `name_UNIQUE` (`name`),
+                          KEY `fk_theme_created_by_user_idx` (`created_by`),
+                          CONSTRAINT `fk_theme_created_by_user` FOREIGN KEY (`created_by`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Themes`
+--
+
+LOCK TABLES `Themes` WRITE;
+/*!40000 ALTER TABLE `Themes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Themes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -204,17 +273,16 @@ DROP TABLE IF EXISTS `Users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Users` (
-  `user_id` int NOT NULL AUTO_INCREMENT,
-  `handle` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` longtext NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `handle_UNIQUE` (`handle`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                         `user_id` int unsigned NOT NULL AUTO_INCREMENT,
+                         `handle` varchar(50) NOT NULL,
+                         `display_name` varchar(100) NOT NULL,
+                         `is_online` tinyint DEFAULT '0',
+                         `last_active_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                         `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                         `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         PRIMARY KEY (`user_id`),
+                         UNIQUE KEY `handle_UNIQUE` (`handle`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -223,8 +291,38 @@ CREATE TABLE `Users` (
 
 LOCK TABLES `Users` WRITE;
 /*!40000 ALTER TABLE `Users` DISABLE KEYS */;
-INSERT INTO `Users` VALUES (1,'jacob','JacobWileyRoss','jacob@mail.com','$2b$10$6vZ1ZntGfkNCI7CAIHNHZe6e8FITyZcwcfHI2wjWxtS/ylQgjstFC','2023-06-05 05:33:46','2023-06-05 05:38:58');
+INSERT INTO `Users` VALUES (1,'meNexus','meNexus',0,'2024-12-18 03:53:11','2024-12-18 03:53:11','2024-12-18 03:53:26'),(2,'JacobWileyRoss','Jacob Ross',0,'2024-12-18 04:30:55','2024-12-18 04:30:55','2024-12-18 04:57:29'),(3,'heavenlyy_art','Heaven',0,'2024-12-18 04:32:51','2024-12-18 04:32:51','2024-12-18 04:57:52');
 /*!40000 ALTER TABLE `Users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `UserSettings`
+--
+
+DROP TABLE IF EXISTS `UserSettings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `UserSettings` (
+                                `user_id` int unsigned NOT NULL,
+                                `theme_id` int DEFAULT NULL,
+                                `use_custom_css` tinyint unsigned NOT NULL DEFAULT '0',
+                                `autoplay_music` tinyint unsigned DEFAULT '0',
+                                `show_online_status` tinyint unsigned DEFAULT '1',
+                                `notifications_json` json DEFAULT NULL,
+                                `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                                `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                PRIMARY KEY (`user_id`),
+                                CONSTRAINT `fk_user_settings_user` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UserSettings`
+--
+
+LOCK TABLES `UserSettings` WRITE;
+/*!40000 ALTER TABLE `UserSettings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `UserSettings` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -236,4 +334,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-05  0:43:43
+-- Dump completed on 2024-12-17 23:08:45

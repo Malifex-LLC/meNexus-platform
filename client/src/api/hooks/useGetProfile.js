@@ -3,6 +3,7 @@ import { ENDPOINTS } from "../config.js";
 import { replaceParams } from "../../utils/apiUtils";
 
 const useGetProfile = () => {
+    console.log('useGetProfile called');
     const { data, loading, error, sendRequest } = useAxios();
 
     const getProfile = async (handle) => {
@@ -12,6 +13,7 @@ const useGetProfile = () => {
             url: url
         });
 
+        console.log(response);
         return response.data;
     };
 
