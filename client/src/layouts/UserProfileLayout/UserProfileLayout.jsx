@@ -2,7 +2,6 @@ import './UserProfileLayout.css'
 import Header from "../../components/Header/Header.jsx";
 import Navigation from "../../components/Navigation/Navigation.jsx";
 
-
 const UserProfileLayout = ({ children }) => {
     return (
         <div className='user-profile-layout'>

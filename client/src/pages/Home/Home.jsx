@@ -109,7 +109,7 @@ const Home = () => {
                             <Post
                                 key={index}
                                 handle={post.handle}
-                                username={post.username}
+                                display_name={post.display_name}
                                 date={post.created_at}
                                 content={post.content}
                                 comments={post.comment_count}

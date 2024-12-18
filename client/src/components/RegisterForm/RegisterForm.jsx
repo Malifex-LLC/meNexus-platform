@@ -7,20 +7,20 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [handle, setHandle] = useState('');
-    const [username, setUsername] = useState('');
+    const [display_name, setDisplay_name] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     function handleSubmit(event) {
         event.preventDefault();
         // Checking to make sure all fields have been filled out
-        if (!email || !password || !handle || !username) {
+        if (!email || !password || !handle || !display_name) {
             setError('All fields are required');
             return;
         }
 
         // TODO this needs to be updated to use custom hooks like useAxios or useCreateUser
-        const userData = { email, password, handle, username };
+        const userData = { email, password, handle, display_name };
         axios
             .post('http://localhost:3001/createUser', userData)
             .then((res) => {
@@ -64,11 +64,11 @@ const RegisterForm = () => {
                 </label>
                 <br />
                 <label>
-                    Username:
+                    Display Name:
                     <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)} />
+                        value={display_name}
+                        onChange={(e) => setDisplay_name(e.target.value)} />
                 </label>
                 <br />
                 {error && <p>{error}</p>}

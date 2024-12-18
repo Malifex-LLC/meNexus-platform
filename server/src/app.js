@@ -94,46 +94,58 @@ passport.use(new LocalStrategy(
     },
     async (email, password, done) => {
         try {
-            // Find the user by their email
-            const user = await User.getUserByEmail(email);
-            console.log('Strategy User object: ', user);
+            // Fetch user and authentication details by email
+            const auth = await User.getAuthByEmail(email);
 
-            // If the user doesn't exist, return an error
-            if (!user) {
+            if (!auth) {
                 return done(null, false, { message: 'Incorrect email or password' });
             }
 
-            // Compare the provided password with the hashed password in the database
-            console.log(".compare prefire...");
-            console.log(user.password);
-            console.log(password);
-            const isMatch = await bcrypt.compare(password, user.password);
-            console.log(".compare FIRED!");
-
-            // If the passwords don't match, return an error
+            // Verify the password
+            const isMatch = await bcrypt.compare(password, auth.hashed_password);
             if (!isMatch) {
                 return done(null, false, { message: 'Incorrect email or password' });
             }
 
-            // If the passwords match, return the user
-            return done(null, user);
+            // Fetch user details from Users table
+            const user = await User.getUserById(auth.user_id);
+            if (!user) {
+                return done(null, false, { message: 'User not found' });
+            }
+
+            // Merge user and authentication data
+            const completeUser = {
+                user_id: user.user_id,
+                handle: user.handle,
+                display_name: user.display_name,
+                email: auth.email,
+            };
+
+            return done(null, completeUser);
         } catch (error) {
             return done(error);
         }
     }
 ));
 
-// Serialize the user into a session
+// Serialize user into session
 passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user);
-    done(null, user.email);
+    done(null, user.user_id); // Use user_id as the identifier
 });
 
-passport.deserializeUser((email, done) => {
-    console.log('Deserializing user with email:', email);
-    User.getUserByEmail(email)
-        .then((user) => done(null, user))
-        .catch((err) => done(err, null));
+// Deserialize user from session
+passport.deserializeUser(async (user_id, done) => {
+    try {
+        // Fetch user details
+        const user = await User.getUserById(user_id);
+        if (user) {
+            done(null, user);
+        } else {
+            done(null, false);
+        }
+    } catch (error) {
+        done(error, null);
+    }
 });
 
 
@@ -149,14 +161,19 @@ app.get('/ping', (req, res) => {
 app.post('/createUser', async (req, res) => {
     console.log('/createUser FIRED');
     try {
-        const { email, password, handle, username } = req.body;
-        console.log("Received data:", { email, password, handle, username });
+        const { email, password, handle, display_name } = req.body;
+        console.log("Received data:", { email, password, handle, display_name });
+
+        // Validate required fields
+        if (!email || !password || !handle || !display_name) {
+            console.log("Missing required fields.");
+            return res.status(400).json({ error: 'All fields are required' });
+        }
 
         // Check if the email is already used by another user
         const existingUserByEmail = await User.getUserByEmail(email);
         console.log("Existing user by email:", existingUserByEmail);
 
-        // If a user with the same email exists, return an error
         if (existingUserByEmail) {
             console.log("Email is already taken.");
             return res.status(400).json({ error: 'Email is already taken' });
@@ -166,44 +183,52 @@ app.post('/createUser', async (req, res) => {
         const existingUserByHandle = await User.getUserByHandle(handle);
         console.log("Existing user by handle:", existingUserByHandle);
 
-        // If a user with the same handle exists, return an error
         if (existingUserByHandle) {
             console.log("Handle is already taken.");
             return res.status(400).json({ error: 'Handle is already taken' });
         }
 
-        // Call the createUser function from the User model with 'username' parameter
-        const newUser = await User.createUser(email, password, handle, username);
-        console.log("New user created:", newUser);
+        // Call the createUser function from the User model
+        const newUserId = await User.createUser(email, password, handle, display_name);
+        console.log("New user created with ID:", newUserId);
 
         // Return a success response
-        return res.json({ message: 'User created successfully' });
+        return res.status(201).json({ message: 'User created successfully', user_id: newUserId });
     } catch (error) {
         console.error("Error in /createUser:", error.message);
         return res.status(500).json({ error: 'Failed to create user' });
     }
 });
 
-// API endpoint to reset password
+// API endpoint to update password
 app.put('/updatePassword', async (req, res) => {
-    const { userId, newPassword } = req.body;
-    if (!userId || !newPassword) {
+    const { user_id, newPassword } = req.body;
+    if (!user_id || !newPassword) {
         return res.status(400).json({ error: "User ID and new password are required" });
     }
+
     try {
+        // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        const sql = 'UPDATE Users SET password = ? WHERE user_id = ?';
-        meNexus.query(sql, [hashedPassword, userId], (err, result) => {
+
+        // Update the password in the Authentication table
+        const sql = 'UPDATE Authentication SET hashed_password = ? WHERE user_id = ?';
+        meNexus.query(sql, [hashedPassword, user_id], (err, result) => {
             if (err) {
                 console.error("Error updating password:", err);
                 return res.status(500).json({ error: "Error updating password" });
             }
-            console.log("Password updated successfully for user:", userId);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            console.log("Password updated successfully for user:", user_id);
             res.json({ message: "Password updated successfully" });
         });
     } catch (error) {
-        console.error("Error resetting password:", error);
-        res.status(500).json({ error: "Error resetting password" });
+        console.error("Error updating password:", error.message);
+        res.status(500).json({ error: "Error updating password" });
     }
 });
 
@@ -213,35 +238,56 @@ app.post('/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             // Handle error
-            return res.status(500).json({ error: 'An error occurred' });
+            console.error('Error during login authentication:', err);
+            return res.status(500).json({ error: 'An error occurred during login' });
         }
         if (!user) {
             // Authentication failed
-            return res.status(401).json({ error: 'Incorrect email or password' });
+            return res.status(401).json({ error: info ? info.message : 'Incorrect email or password' });
         }
         // Log in the user
         req.login(user, (err) => {
             if (err) {
                 // Handle error
-                console.error(err);
-                return res.status(500).json({ error: 'An error occurred' });
+                console.error('Error during session login:', err);
+                return res.status(500).json({ error: 'Failed to log in' });
             }
-            // Authentication successful
-            req.session.user = { handle: user.handle, email: user.email };
-            console.log('Session Data: ', req.session.user);
-            return res.json({ message: 'Login successful', handle: user.handle });
-        });
+            // Authentication successful, attach session data
+            req.session.user = {
+                user_id: user.user_id,
+                handle: user.handle,
+                display_name: user.display_name,
+            };
+            console.log('Session Data:', req.session.user);
 
+            return res.json({
+                message: 'Login successful',
+                handle: user.handle,
+                display_name: user.display_name,
+            });
+        });
     })(req, res, next);
 });
 
 // API endpoint to handle logout request and destroy session
 app.post('/logout', (req, res) => {
+    console.log('/logout called');
     req.logout((err) => {
-        if (err) return res.status(500).send('Logout failed');
-        req.session.destroy(() => {
-            res.clearCookie('connect.sid'); // Clear session cookie
-            res.status(200).send('Logged out');
+        if (err) {
+            console.error('Error during logout:', err);
+            return res.status(500).json({ error: 'Logout failed' });
+        }
+
+        req.session.destroy((destroyErr) => {
+            if (destroyErr) {
+                console.error('Error destroying session:', destroyErr);
+                return res.status(500).json({ error: 'Failed to destroy session' });
+            }
+
+            // Clear the session cookie
+            res.clearCookie('connect.sid', { path: '/' });
+            console.log('User successfully logged out and session cleared.');
+            return res.status(200).json({ message: 'Logged out successfully' });
         });
     });
 });
@@ -259,33 +305,59 @@ app.get('/getUsers', (req, res) => {
     })
 });
 
-// API endpoint that queries meNexus database for a profile from specified handle
+// API endpoint to fetch a user's profile by handle
 app.get('/getProfile/:handle', (req, res) => {
     const handle = req.params.handle;
-    let sql = `
-        SELECT Profiles.*, Users.username, Users.handle
+
+    const sql = `
+        SELECT
+            Profiles.profile_name,
+            Profiles.profile_bio,
+            Profiles.profile_location,
+            Profiles.profile_picture,
+            Profiles.profile_banner,
+            Profiles.custom_css,
+            Users.display_name,
+            Users.handle
         FROM Profiles
                  INNER JOIN Users ON Profiles.user_id = Users.user_id
         WHERE Users.handle = ?;
     `;
+
     meNexus.query(sql, [handle], (err, results) => {
         if (err) {
-            console.log(err);
-            res.status(500).send('Error fetching user profile');
+            console.error('Error fetching user profile:', err);
+            res.status(500).json({ error: 'Error fetching user profile' });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: 'Profile not found' });
         } else {
-            res.send(results);
+            res.json(results[0]); // Send the first (and only) result
         }
     });
 });
 
-// API endpoint that queries meNexus session for current user object
+// API endpoint to fetch the current user from the session
 app.get('/getCurrentUser', (req, res) => {
     console.log('getCurrentUser called');
     console.log('Session ID:', req.sessionID);
     console.log('Session Data:', req.session);
+
     if (req.session && req.session.user) {
+        const { user_id, handle, display_name } = req.session.user;
+
+        // Ensure the session data contains all necessary fields
+        if (!user_id || !handle || !display_name) {
+            console.error('Incomplete session data');
+            return res.status(400).json({ error: 'Incomplete session data' });
+        }
+
+        // Send the user data stored in the session
         console.log('User found in session:', req.session.user);
-        return res.json(req.session.user); // Send the user data stored in the session
+        return res.json({
+            user_id,
+            handle,
+            display_name
+        });
     } else {
         console.log('User not authenticated');
         return res.status(401).json({ error: 'User not authenticated' });
@@ -298,7 +370,7 @@ app.get('/getUserPosts/:handle', (req, res) => {
     console.log(`GetPostsFired for ${handle}`)
     // SQL is performing an inner join on Posts and Users tables where post.user_id == users.user_id
     let sql = `
-        SELECT Posts.*, Users.username, Users.handle
+        SELECT Posts.*, Users.display_name, Users.handle
         FROM Posts
         INNER JOIN Users ON Posts.user_id = Users.user_id
         WHERE Users.handle = ?
@@ -312,12 +384,6 @@ app.get('/getUserPosts/:handle', (req, res) => {
         }
     });
 });
-
-// API endpoint to gather and render all posts from a friends list tied to specified handle
-// TODO Implement logic for this function as its just boilerplate
-app.get('/getFriendsPosts/:handle', (req, res) => {
-    const userID = req.params.handle;
-})
 
 // API endpoint for submitting a post
 app.post("/createPost", (req, res) => {
@@ -384,7 +450,6 @@ app.delete("/deletePost/:post_id", (req, res) => {
         return res.json({ message: "Post deleted successfully." });
     });
 });
-
 
 
 
