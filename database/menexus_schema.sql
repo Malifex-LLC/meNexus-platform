@@ -44,7 +44,7 @@ CREATE TABLE `Authentication` (
 
 LOCK TABLES `Authentication` WRITE;
 /*!40000 ALTER TABLE `Authentication` DISABLE KEYS */;
-INSERT INTO `Authentication` VALUES (1,1,'menexus@mail.com','$2b$10$obUDhrFqItVqnqN0LxMaZOYEMej3QdhVWZRox5ZayGlRebEKUvIYe','local','2024-12-18 03:53:11'),(2,2,'jacobwileyross@mail.com','$2b$10$ID81InZ7UTAQkDAOiLUPS.Jk1w5dI4cpWpuG1/Z3hUAh5yLB0Nh46','local','2024-12-18 04:30:55'),(3,3,'heavenlyy@mail.com','$2b$10$ITtWqP3dBuyChNmnwpabSugeu6G2a4VpI2gGtx.4x96X4XkeyuVBS','local','2024-12-18 04:32:51');
+INSERT INTO `Authentication` VALUES (1,1,'menexus@mail.com','$2b$10$obUDhrFqItVqnqN0LxMaZOYEMej3QdhVWZRox5ZayGlRebEKUvIYe','local','2024-12-18 03:53:11');
 /*!40000 ALTER TABLE `Authentication` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -165,7 +165,7 @@ CREATE TABLE `Posts` (
 
 LOCK TABLES `Posts` WRITE;
 /*!40000 ALTER TABLE `Posts` DISABLE KEYS */;
-INSERT INTO `Posts` VALUES (1,1,'The migration to the new database schema has been completed! Everything appears to be operational!',NULL,'2024-12-18 03:57:46','2024-12-18 04:55:25'),(3,2,'New database schema seems to be up and running!',NULL,'2024-12-18 04:31:22','2024-12-18 04:31:22'),(4,3,'My first post on meNexus! I\'m excited to share my art with you all :D',NULL,'2024-12-18 04:33:11','2024-12-18 04:33:11'),(6,1,'Welcome to meNexus! This is the admin account where you can find everything related to meNexus!',NULL,'2024-12-18 04:55:30','2024-12-18 04:55:30'),(7,3,'Testing the new database schema! Editing!',NULL,'2024-12-18 05:01:19','2024-12-18 05:01:24');
+INSERT INTO `Posts` VALUES (1,1,'The migration to the new database schema has been completed! Everything appears to be operational!',NULL,'2024-12-18 03:57:46','2024-12-18 04:55:25'),(2,1,'Welcome to meNexus! This is the admin account where you can find everything related to meNexus!',NULL,'2024-12-18 04:55:30','2024-12-18 04:55:30');
 /*!40000 ALTER TABLE `Posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -201,7 +201,7 @@ CREATE TABLE `Profiles` (
 
 LOCK TABLES `Profiles` WRITE;
 /*!40000 ALTER TABLE `Profiles` DISABLE KEYS */;
-INSERT INTO `Profiles` VALUES (1,1,'meNexus','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 03:53:11','2024-12-18 03:53:11'),(2,2,'JacobWileyRoss','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 04:30:55','2024-12-18 04:30:55'),(3,3,'heavenlyy_art','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 04:32:51','2024-12-18 04:32:51');
+INSERT INTO `Profiles` VALUES (1,1,'meNexus','Update your bio!','Update your location','/assets/default_profile_picture.jpg','/assets/default_profile_banner.jpg','',NULL,NULL,'2024-12-18 03:53:11','2024-12-18 03:53:11');
 /*!40000 ALTER TABLE `Profiles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -291,7 +291,7 @@ CREATE TABLE `Users` (
 
 LOCK TABLES `Users` WRITE;
 /*!40000 ALTER TABLE `Users` DISABLE KEYS */;
-INSERT INTO `Users` VALUES (1,'meNexus','meNexus',0,'2024-12-18 03:53:11','2024-12-18 03:53:11','2024-12-18 03:53:26'),(2,'JacobWileyRoss','Jacob Ross',0,'2024-12-18 04:30:55','2024-12-18 04:30:55','2024-12-18 04:57:29'),(3,'heavenlyy_art','Heaven',0,'2024-12-18 04:32:51','2024-12-18 04:32:51','2024-12-18 04:57:52');
+INSERT INTO `Users` VALUES (1,'meNexus','meNexus',0,'2024-12-18 03:53:11','2024-12-18 03:53:11','2024-12-18 03:53:26');
 /*!40000 ALTER TABLE `Users` ENABLE KEYS */;
 UNLOCK TABLES;
 
