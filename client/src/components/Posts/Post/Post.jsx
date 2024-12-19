@@ -1,7 +1,10 @@
 import "./Post.css";
+import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
+import useFollowActions from "../../../api/hooks/useFollowActions.js";
 
 const Post = ({
+                  user_id,
                   display_name,
                   handle,
                   date,
@@ -15,6 +18,42 @@ const Post = ({
                   onContentChange,
                   onSave,
               }) => {
+    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    const handleFollow = async () => {
+        console.log("handleFollow for followed_id: ", user_id);
+        try {
+            await followUser(user_id);
+            setIsFollowing(true);
+        } catch (err) {
+            console.log('Error following user', err);
+        }
+    };
+
+    const handleUnfollow = async () => {
+        console.log("handleUnFollow for followed_id: ", user_id);
+        try {
+            await unfollowUser(user_id);
+            setIsFollowing(false);
+        } catch (err) {
+            console.error('Error unfollowing user:', err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchFollowStatus = async () => {
+            try {
+                const isCurrentlyFollowing = await followCheck(user_id);
+                setIsFollowing(isCurrentlyFollowing);
+            } catch (error) {
+                console.error("Error fetching follow status:", error);
+            }
+        };
+
+        fetchFollowStatus();
+    }, [user_id]);
+
     return (
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
             <div className="user-post__identity">
@@ -25,7 +64,12 @@ const Post = ({
                 </div>
             </div>
             <div className="user-post__follow-actions">
-                <button className="user-post__follow-button">Follow</button>
+                <button
+                    className="user-post__follow-button"
+                    onClick={isFollowing ? handleUnfollow : handleFollow}
+                >
+                    {isFollowing ? "Unfollow" : "Follow"}
+                </button>
             </div>
             <div className="user-post__content">
                 {isEditing ? (

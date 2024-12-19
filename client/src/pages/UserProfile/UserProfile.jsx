@@ -7,6 +7,7 @@ import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useFollowActions from "../../api/hooks/useFollowActions.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 
@@ -16,11 +17,13 @@ const UserProfile = () => {
     const [profile, setProfile] = useState({});
     const [posts, setPosts] = useState([]);
     const [isHandleSet, setIsHandleSet] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
     const navigate = useNavigate();
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
+    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
 
     const {
         editingPostId,
@@ -31,6 +34,26 @@ const UserProfile = () => {
     } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
 
     const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+
+    const handleFollow = async () => {
+        console.log("handleFollow for followed_id: ", profile.user_id);
+        try {
+            await followUser(profile.user_id);
+            setIsFollowing(true);
+        } catch (err) {
+            console.log('Error following user', err);
+        }
+    };
+
+    const handleUnfollow = async () => {
+        console.log("handleUnFollow for followed_id: ", profile.user_id);
+        try {
+            await unfollowUser(profile.user_id);
+            setIsFollowing(false);
+        } catch (err) {
+            console.error('Error unfollowing user:', err);
+        }
+    };
 
     // Redirect from /profile to /profile/:handle if no handle is provided
     useEffect(() => {
@@ -75,6 +98,10 @@ const UserProfile = () => {
                     console.log("Profile Data after getProfile() fetching is:", profileData);
                     setProfile(profileData);
                     setPosts(userPostsData);
+
+                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
+                    console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
+                    setIsFollowing(isCurrentlyFollowing);
                 } catch (error) {
                     console.error("Error fetching data:", error);
                 }
@@ -108,7 +135,11 @@ const UserProfile = () => {
                 <div className="user-profile__picture">
                     <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
                 </div>
-                <button className="user-profile__follow-button">Follow</button>
+                <button
+                    className="user-profile__follow-button"
+                    onClick={isFollowing ? handleUnfollow : handleFollow}                >
+                    {isFollowing ? "Unfollow" : "Follow"}
+                </button>
                 <div className="user-profile__info">
                     <h2 className="user-profile__name">{profile.profile_name}</h2>
                     <p className="user-profile__bio">{profile.profile_bio}</p>
@@ -128,6 +159,7 @@ const UserProfile = () => {
                             .map((post, index) => (
                                 <Post
                                     key={index}
+                                    user_id={post.user_id}
                                     handle={post.handle}
                                     display_name={post.display_name}
                                     date={post.created_at}
