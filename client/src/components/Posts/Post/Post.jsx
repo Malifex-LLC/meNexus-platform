@@ -1,6 +1,5 @@
 import "./Post.css";
-import {formatDate} from "../../../utils/dateUtils.js";
-
+import { formatDate } from "../../../utils/dateUtils.js";
 
 const Post = ({
                   display_name,
@@ -25,6 +24,9 @@ const Post = ({
                     <p>{formatDate(date)}</p>
                 </div>
             </div>
+            <div className="user-post__follow-actions">
+                <button className="user-post__follow-button">Follow</button>
+            </div>
             <div className="user-post__content">
                 {isEditing ? (
                     <textarea
@@ -36,11 +38,7 @@ const Post = ({
                     <p>{content}</p>
                 )}
             </div>
-            <div className="user-post__stats">
-                <p className="user-post__likes">{likes} likes</p>
-                <p className="user-post__comments">{comments} comments</p>
-            </div>
-            <div className="user-post__actions">
+            <div className="user-post__content-actions">
                 {isEditing ? (
                     <button
                         className="user-post__button user-post__button--save"
@@ -63,6 +61,11 @@ const Post = ({
                     Delete
                 </button>
             </div>
+            <div className="user-post__stats">
+                <p className="user-post__likes">{likes} likes</p>
+                <p className="user-post__comments">{comments} comments</p>
+            </div>
+
         </div>
     );
 };
