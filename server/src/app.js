@@ -357,6 +357,7 @@ app.get('/getProfile/:handle', (req, res) => {
 
     const sql = `
         SELECT
+            Profiles.user_id,
             Profiles.profile_name,
             Profiles.profile_bio,
             Profiles.profile_location,
@@ -533,7 +534,71 @@ app.delete("/deletePost/:post_id", (req, res) => {
     });
 });
 
+// API endpoint for following a user
+app.post('/followUser', async (req, res) => {
+    const { user_id } = req.session.user; // Get the follower's user ID from the session
+    const { followed_id } = req.body;
+    console.log("handle Follow user: ", followed_id, " for user: ", user_id);
 
+
+    if (!user_id || !followed_id) {
+        return res.status(400).json({ error: 'Invalid request data' });
+    }
+
+    const sql = 'INSERT INTO Followers (follower_id, followed_id) VALUES (?, ?)';
+    meNexus.query(sql, [user_id, followed_id], (err, result) => {
+        if (err) {
+            console.error('Error adding follow:', err.message);
+            return res.status(500).json({ error: 'Failed to follow user' });
+        }
+        res.json({ message: 'Follow successful' });
+    });
+});
+
+//API endpoint for unfollowing a user
+app.delete('/unfollowUser', async (req, res) => {
+    const { user_id } = req.session.user; // Get the follower's user ID from the session
+    const { followed_id } = req.body;
+
+    if (!user_id || !followed_id) {
+        return res.status(400).json({ error: 'Invalid request data' });
+    }
+
+    const sql = 'DELETE FROM Followers WHERE follower_id = ? AND followed_id = ?';
+    meNexus.query(sql, [user_id, followed_id], (err, result) => {
+        if (err) {
+            console.error('Error removing follow:', err.message);
+            return res.status(500).json({ error: 'Failed to unfollow user' });
+        }
+        res.json({ message: 'Unfollow successful' });
+    });
+});
+
+// API endpoint to check is a user is being followed
+app.get('/followCheck', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+    const { followed_id } = req.query; // ID of the user being checked
+    console.log("server handling followCheck for followed_id: ", followed_id, "for user_id: ", user_id);
+
+    if (!user_id || !followed_id) {
+        return res.status(400).json({ error: 'Invalid data' });
+    }
+
+    const sql = `
+        SELECT * FROM Followers WHERE follower_id = ? AND followed_id = ?
+    `;
+
+    meNexus.query(sql, [user_id, followed_id], (err, results) => {
+        if (err) {
+            console.error('Error checking follow status:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        const isFollowing = results.length > 0; // If a record exists, the user is following
+        console.log("isFollowing: ", isFollowing);
+        res.json({ isFollowing });
+    });
+});
 
 
 
