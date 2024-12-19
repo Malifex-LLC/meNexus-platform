@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
+// TODO is this a duplicate mySQL connection? Do I need to pass the connection from app.js ?
 // Database connection
 let meNexus = mysql.createConnection({
     socketPath  : process.env.DB_SOCKETPATH,
@@ -53,10 +54,11 @@ const createProfile = async (userID, handle) => {
             INSERT INTO Profiles (user_id, profile_name, profile_bio, profile_location, profile_picture, profile_banner, custom_css, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
         `;
+
         const defaultProfileName = handle;
         const defaultProfileBio = 'Update your bio!';
         const defaultProfileLocation = 'Update your location';
-        const defaultProfilePicture = '/assets/default_profile_picture.jpg';
+        const defaultProfilePicture = '/uploads/profile_pictures/default_avatar.jpeg';
         const defaultProfileBanner = '/assets/default_profile_banner.jpg';
         const defaultCSS = '';
 

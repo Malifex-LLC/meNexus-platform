@@ -9,6 +9,8 @@ require('dotenv').config();
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
 
 //Instantiate Express app
 const app = express()
@@ -81,6 +83,50 @@ meNexus.connect((err) => {
         console.log("Connected to myNexus!");
     }
 });
+
+// Configure Multer storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // Determine the upload folder based on the uploadType
+        const uploadType = req.body.uploadType || req.query.uploadType;
+
+        let folderPath;
+        if (uploadType === 'profilePicture') {
+            folderPath = path.join(__dirname, 'uploads/profile_pictures');
+        } else if (uploadType === 'postMedia') {
+            folderPath = path.join(__dirname, 'uploads/post_media');
+        } else {
+            folderPath = path.join(__dirname, 'uploads/others'); // Fallback folder
+        }
+
+        cb(null, folderPath); // Set the folder path
+    },
+    filename: (req, file, cb) => {
+        // Create a unique filename with a timestamp
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+
+// Initialize Multer with the storage configuration
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    fileFilter: (req, file, cb) => {
+        // Allow only certain file types
+        const fileTypes = /jpeg|jpg|png/;
+        const extName = fileTypes.test(file.originalname.toLowerCase());
+        const mimeType = fileTypes.test(file.mimetype);
+
+        if (extName && mimeType) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Only images (JPEG, JPG, PNG) are allowed!'));
+        }
+    },
+});
+
+// Serve static files from /uploads directory
+app.use('/uploads', express.static('uploads'));
 
 
 ///////////////////////////////////////////Passportjs///////////////////////////////////////////
@@ -361,6 +407,42 @@ app.get('/getCurrentUser', (req, res) => {
     } else {
         console.log('User not authenticated');
         return res.status(401).json({ error: 'User not authenticated' });
+    }
+});
+
+// Endpoint to upload profile picture
+app.post('/settings/uploadProfilePicture', upload.single('profile_picture'), async (req, res) => {
+    const uploadType = req.body.uploadType;
+    console.log('uploadType: ', req.body.uploadType)
+    try {
+        // Validate session user
+        const { user_id } = req.session.user // Extract user ID from the session
+        if (!user_id) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
+
+        // Validate uploaded file
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const profilePicturePath = `/uploads/profile_pictures/${req.file.filename}`;
+        console.log('Profile Picture Path:', profilePicturePath);
+
+        // Update the database with the new profile picture path
+        const sql = 'UPDATE Profiles SET profile_picture = ? WHERE user_id = ?';
+        const query = meNexus.query(sql, [profilePicturePath, user_id], (err, result) => {
+            if (err) {
+                console.error('Error updating profile picture:', err.message);
+                return res.status(500).json({ error: 'Failed to update profile picture' });
+            }
+
+            console.log('Database Update Result:', result);
+            res.json({ message: 'Profile picture uploaded successfully', profile_picture: profilePicturePath });
+        });
+    } catch (error) {
+        console.error('Error in profile picture upload:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
