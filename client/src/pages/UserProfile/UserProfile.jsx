@@ -106,8 +106,9 @@ const UserProfile = () => {
         <div className="user-profile__container">
             <div className="user-profile__data">
                 <div className="user-profile__picture">
-                    <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture" />
+                    <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
                 </div>
+                <button className="user-profile__follow-button">Follow</button>
                 <div className="user-profile__info">
                     <h2 className="user-profile__name">{profile.profile_name}</h2>
                     <p className="user-profile__bio">{profile.profile_bio}</p>
@@ -115,7 +116,7 @@ const UserProfile = () => {
                 </div>
             </div>
             <div className="user-profile__post-container">
-                <div className="user-profile__post-form">
+            <div className="user-profile__post-form">
                     <PostForm
                         handle={currentHandle}
                         refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
