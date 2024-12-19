@@ -1,41 +1,57 @@
 import "./ProfileSettings.css";
 import { useState } from "react";
+import useUploadProfilePicture from "../../../api/hooks/useUploadProfilePicture.js";
 
 const ProfileSettings = () => {
-    const [profilePicture, setProfilePicture] = useState(null);
     const [username, setUsername] = useState("");
     const [handle, setHandle] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProfilePicture(URL.createObjectURL(file));
+    const { uploadProfilePicture, profilePictureloading, profilePictureError } = useUploadProfilePicture();
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        event.preventDefault();
+        if (!selectedFile) {
+            console.log('Please select a file to upload.');
+            return;
+        }
+
+        try {
+            const response = await uploadProfilePicture(selectedFile);
+
+            if(response.status === 200) {
+                console.log('Profile picture uploaded successfully!');
+            }
+        } catch (error) {
+            console.error('Error uploading profile picture:', error.message);
+            console.log('Failed to upload profile picture.');
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Profile Updated:", { username, handle, profilePicture });
-    };
+    // Handle loading and error states for posts
+    if (profilePictureloading) {
+        return <div>Loading posts...</div>;
+    }
+
+    if (profilePictureError) {
+        return <div>Error loading posts: {profilePictureError.message}</div>;
+    }
 
     return (
         <div className="profile-settings__container">
             <h2 className="profile-settings__header">Profile Settings</h2>
-            <form className="profile-settings__form" onSubmit={handleSubmit}>
+            <form className="profile-settings__form" onSubmit={handleUpload}>
                 {/* Profile Picture */}
-                {profilePicture && (
-                    <img
-                        src={profilePicture}
-                        alt="Profile Preview"
-                        className="profile-settings__image-preview"
-                    />
-                )}
                 <label>
                     Profile Picture:
                     <input
                         type="file"
                         accept="image/*"
-                        onChange={handleImageChange}
+                        onChange={handleFileChange}
                     />
                 </label>
 
@@ -94,7 +110,12 @@ const ProfileSettings = () => {
                     />
                 </label>
 
-                <button type="submit">Save Changes</button>
+                <button
+                    type="submit"
+                    onSubmit={handleUpload}
+                >
+                    Save Changes
+                </button>
             </form>
         </div>
     );

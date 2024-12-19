@@ -9,4 +9,5 @@ export const ENDPOINTS = {
     DELETE_POST: `${API_BASE_URL}/deletePost/:postId`,
     GET_PROFILE: `${API_BASE_URL}/getProfile/:handle`,
     GET_USER_POSTS: `${API_BASE_URL}/getUserPosts/:handle`,
+    UPLOAD_PROFILE_PICTURE: `${API_BASE_URL}/settings/uploadProfilePicture`,
 };
