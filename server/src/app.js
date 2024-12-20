@@ -631,6 +631,81 @@ app.get('/followCheck', (req, res) => {
     });
 });
 
+// API endpoint for search functionality
+app.get('/search', async (req, res) => {
+    const { query, type } = req.query;
+
+    if (!query || query.trim() === "") {
+        return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    let sql = "";
+    const params = [`%${query}%`];
+
+    switch (type) {
+        case "users":
+            sql = `
+                SELECT handle, display_name
+                FROM Users
+                WHERE handle LIKE ? OR display_name LIKE ?
+            `;
+            params.push(`%${query}%`);
+            break;
+
+        case "posts":
+            sql = `
+                SELECT content, post_id, user_id, created_at
+                FROM Posts
+                WHERE content LIKE ?
+            `;
+            break;
+
+        default: // Handle both users and posts
+            const userQuery = `
+                SELECT
+                    'user' AS type,
+                    handle,
+                    display_name,
+                    NULL AS content,
+                    NULL AS post_id,
+                    NULL AS user_id,
+                    NULL AS created_at
+                FROM Users
+                WHERE handle LIKE ? OR display_name LIKE ?
+            `;
+            const postQuery = `
+                SELECT
+                    'post' AS type,
+                    NULL AS handle,
+                    NULL AS display_name,
+                    content,
+                    post_id,
+                    user_id,
+                    created_at
+                FROM Posts
+                WHERE content LIKE ?
+            `;
+            sql = `(${userQuery}) UNION ALL (${postQuery})`;
+            params.push(`%${query}%`, `%${query}%`);
+            break;
+    }
+
+    try {
+        const results = await new Promise((resolve, reject) => {
+            meNexus.query(sql, params, (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+
+        res.json({ type, results });
+    } catch (err) {
+        console.error("Error executing search:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
 
 
 
