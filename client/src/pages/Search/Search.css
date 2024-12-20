@@ -1,0 +1,18 @@
+.search-results {
+    padding: 20px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.search-results__filters button {
+    margin-right: 10px;
+    padding: 8px 16px;
+    background-color: #eb34e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search-results__filters button.active {
+    background-color: #801c7c;
+}

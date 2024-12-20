@@ -14,4 +14,5 @@ export const ENDPOINTS = {
     FOLLOW_USER: `${API_BASE_URL}/followUser`,
     UNFOLLOW_USER: `${API_BASE_URL}/unfollowUser`,
     FOLLOW_CHECK: `${API_BASE_URL}/followCheck`,
+    SEARCH: `${API_BASE_URL}/search`,
 };

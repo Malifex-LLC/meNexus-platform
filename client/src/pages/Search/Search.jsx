@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import {NavLink, useLocation} from "react-router-dom";
-import axios from "axios";
 import "./Search.css";
+import "../../api/hooks/useSearch.js"
+import useSearch from "../../api/hooks/useSearch.js";
 
 const Search = () => {
     const location = useLocation();
@@ -11,16 +12,15 @@ const Search = () => {
     const [filter, setFilter] = useState("all"); // Options: all, users, posts
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const {search} = useSearch();
 
     useEffect(() => {
         const fetchResults = async () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`http://localhost:3001/search`, {
-                    params: { query, type: filter === "all" ? null : filter },
-                });
-                setResults(response.data.results);
+                const response = await search({ query, type: filter === "all" ? null : filter });
+                setResults(response.results);
             } catch (err) {
                 setError("Failed to fetch search results.");
                 throw err;
