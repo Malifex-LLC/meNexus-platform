@@ -1,13 +1,14 @@
-import './PostForm.css';
+import './CommentForm.css';
 import { useState } from "react";
-import useCreatePost from '../../../api/hooks/useCreatePost.js';
+import useCreateComment from "../../../api/hooks/useCreateComment.js";
 
-const PostForm = ({ handle, refreshPosts }) => {
-    const [text, setText] = useState(`What's on your mind?`);
+const CommentForm = ({handle, refreshComments}) => {
+    const [text, setText] = useState("Add a comment...");
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const { createPost, loading, error } = useCreatePost(refreshPosts);
+    const { createComment, loading, error } = useCreateComment(refreshComments);
+
 
     const styles = {
         textarea: {
@@ -17,12 +18,12 @@ const PostForm = ({ handle, refreshPosts }) => {
     };
 
     const handleSubmit = async () => {
-        const post = {
+        const comment = {
             handle: handle,
             content: text,
         };
-        console.log("Submitting post:", post);
-        await createPost(post);
+        console.log("Submitting comment:", comment);
+        await createComment(comment);
         setText(""); // Reset the text field after submission
     };
 
@@ -34,21 +35,21 @@ const PostForm = ({ handle, refreshPosts }) => {
     };
 
     return (
-        <div className="post-form">
+        <div className="comment-form">
             <div onClick={handleFormClick}>
                 <textarea
-                    className="post-form__entry-field"
+                    className="comment-form__entry-field"
                     style={styles.textarea}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button className="post-form__button" onClick={handleSubmit} disabled={loading}>
-                {loading ? "Posting..." : "Post"}
+            <button className="comment-form__button" onClick={handleSubmit} disabled={loading}>
+                {loading ? "Commenting..." : "Comment"}
             </button>
             {error && <div className="error">Error: {error}</div>}
         </div>
     );
 };
 
-export default PostForm;
+export default CommentForm;
