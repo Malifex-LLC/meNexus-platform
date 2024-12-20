@@ -692,9 +692,11 @@ app.get('/search', async (req, res) => {
 
         case "posts":
             sql = `
-                SELECT content, post_id, user_id, created_at
+                SELECT Posts.content, Posts.post_id, Posts.user_id, Posts.created_at,
+                       Users.handle, Users.display_name
                 FROM Posts
-                WHERE content LIKE ?
+                         INNER JOIN Users ON Posts.user_id = Users.user_id
+                WHERE Posts.content LIKE ?
             `;
             break;
 
@@ -704,9 +706,9 @@ app.get('/search', async (req, res) => {
                     'user' AS type,
                     handle,
                     display_name,
+                    user_id,
                     NULL AS content,
                     NULL AS post_id,
-                    NULL AS user_id,
                     NULL AS created_at
                 FROM Users
                 WHERE handle LIKE ? OR display_name LIKE ?
@@ -714,14 +716,15 @@ app.get('/search', async (req, res) => {
             const postQuery = `
                 SELECT
                     'post' AS type,
-                    NULL AS handle,
-                    NULL AS display_name,
-                    content,
-                    post_id,
-                    user_id,
-                    created_at
+                    Users.handle,
+                    Users.display_name,
+                    Posts.user_id,
+                    Posts.content,
+                    Posts.post_id,
+                    Posts.created_at
                 FROM Posts
-                WHERE content LIKE ?
+                         INNER JOIN Users ON Posts.user_id = Users.user_id
+                WHERE Posts.content LIKE ?
             `;
             sql = `(${userQuery}) UNION ALL (${postQuery})`;
             params.push(`%${query}%`, `%${query}%`);
