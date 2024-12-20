@@ -5,7 +5,7 @@ import { refreshPosts } from '../../utils/apiUtils.js';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import Post from '../../components/Posts/Post/Post.jsx';
 import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
-import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
+import useGetPosts from "../../api/hooks/useGetPosts";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
 
@@ -17,7 +17,7 @@ const Home = () => {
     const navigate = useNavigate(); // React Router navigate
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
+    const { getPosts, loading: postsLoading, error: postsError } = useGetPosts();
 
     // Hooks for editing and deleting posts
     const {
@@ -26,8 +26,8 @@ const Home = () => {
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
-    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+    } = useEditPost(() => refreshPosts(getPosts, currentHandle, setPosts));
+    const { handleDelete } = useDeletePost(() => refreshPosts(getPosts, currentHandle, setPosts));
 
     // Redirect from /home to /home/:handle if no handle is provided
     useEffect(() => {
@@ -66,8 +66,10 @@ const Home = () => {
             const fetchPosts = async () => {
                 try {
                     console.log("Fetching posts for handle:", currentHandle);
-                    const userPostsData = await getUserPosts(currentHandle);
+                    const userPostsData = await getPosts();
                     setPosts(userPostsData); // Set the posts
+
+
                 } catch (error) {
                     console.error("Error fetching posts:", error);
                 }
@@ -78,12 +80,12 @@ const Home = () => {
     }, [currentHandle, isHandleSet]); // Trigger fetching posts only when `currentHandle` and `isHandleSet` are ready
 
     // Handle loading and error states for posts
-    if (userPostsLoading) {
+    if (postsLoading) {
         return <div>Loading posts...</div>;
     }
 
-    if (userPostsError) {
-        return <div>Error loading posts: {userPostsError.message}</div>;
+    if (postsError) {
+        return <div>Error loading posts: {postsError.message}</div>;
     }
 
     if (sessionUserLoading) {
@@ -99,7 +101,7 @@ const Home = () => {
             <div className="home__post-form">
                 <PostForm
                     handle={currentHandle}
-                    refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                    refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)} />
             </div>
             <div className="home__posts">
                 {posts.length > 0 ? (
@@ -108,6 +110,7 @@ const Home = () => {
                         .map((post, index) => (
                             <Post
                                 key={index}
+                                user_id={post.user_id}
                                 handle={post.handle}
                                 display_name={post.display_name}
                                 date={post.created_at}

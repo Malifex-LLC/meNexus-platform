@@ -468,6 +468,37 @@ app.get('/getUserPosts/:handle', (req, res) => {
     });
 });
 
+// API endpoint to aggregate posts
+app.get('/getPosts', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+
+    if (!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT Posts.*, Users.display_name, Users.handle
+        FROM Posts
+        INNER JOIN Users ON Posts.user_id = Users.user_id
+        WHERE Posts.user_id = ?
+        OR Posts.user_id IN (
+            SELECT followed_id
+            FROM Followers
+            WHERE follower_id = ?
+        )
+        ORDER BY Posts.created_at DESC
+    `;
+
+    meNexus.query(sql, [user_id, user_id], (err, results) => {
+        if (err) {
+            console.error('Error fetching posts:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json(results); // Return posts in descending order of creation time
+    });
+});
+
 // API endpoint for submitting a post
 app.post("/createPost", (req, res) => {
     const { content, handle } = req.body;
