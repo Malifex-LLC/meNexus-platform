@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
 import {NavLink} from "react-router-dom";
+import Comment from '../../Comments/Comment/Comment.jsx'
 
 const Post = ({
                   user_id,
@@ -117,10 +118,12 @@ const Post = ({
                 </button>
             </div>
             <div className="user-post__stats">
-                <p className="user-post__likes">{likes} likes</p>
-                <p className="user-post__comments">{comments} comments</p>
+                <p className="user-post__stats-likes">{likes} likes</p>
+                <p className="user-post__stats-comments">{comments} comments</p>
             </div>
+            <div className="user-post__comments">
 
+            </div>
         </div>
     );
 };

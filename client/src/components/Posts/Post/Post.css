@@ -138,12 +138,12 @@
     margin: 10px 0px;
 }
 
-.user-post__likes {
+.user-post__stats-likes {
     font-size: 0.9rem;
     color: #aaa;
 }
 
-.user-post__comments {
+.user-post__stats-comments {
     margin-left: 20px;
     font-size: 0.9rem;
     color: #aaa;
