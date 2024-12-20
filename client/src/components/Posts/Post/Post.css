@@ -10,21 +10,12 @@
     transition: background-color 0.3s ease;
 }
 
-/* Modifier: Editing State */
-.user-post--editing {
-    background-color: gray;
-    border-color: #007bff;
-}
-
 /* Elements */
 .user-post__identity {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
     margin: 0;
     padding: 0;
-    position: relative;
     font-family: 'Montserrat', sans-serif;
 }
 
@@ -38,8 +29,34 @@
     color: #eb34e5;
 }
 
+.user-post__date {
+    text-align: left;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.user-post__follow-actions {
+
+}
+
+.user-post__follow-button {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    background-color: #eb34e5;
+    color: white;
+    border-radius: 4px;
+}
+
+.user-post__follow-button:hover {
+    background-color: #801c7c;
+}
+
 .user-post__content {
-    margin: 10px 0;
+    padding-top: 10px;
     font-family: 'Inter', sans-serif;
     font-size: 24px;
     text-align: left;
@@ -54,33 +71,10 @@
     border-radius: 3px;
 }
 
-.user-post__date {
-    text-align: left;
-    font-size: 0.9rem;
-    color: #aaa;
-}
-
-.user-post__stats {
-    font-family: 'Inter', sans-serif;
+.user-post__content-actions {
+    padding-top: 10px;
     display: flex;
-    justify-content: left;
-    margin: 10px 0px;
-}
-
-.user-post__likes {
-    font-size: 0.9rem;
-    color: white;
-}
-
-.user-post__comments {
-    margin-left: 20px;
-    font-size: 0.9rem;
-    color: white;
-}
-
-.user-post__actions {
-    display: flex;
-    position: absolute;
+    justify-content: flex-end;
     top: 10px;
     right: 10px;
     gap: 20px;
@@ -88,11 +82,10 @@
 
 .user-post__button {
     font-family: 'Inter', sans-serif;
-    padding: 5px 10px;
     border: none;
     cursor: pointer;
     border-radius: 3px;
-    font-size: 1rem;
+    font-size: 0.75rem;
     transition: background-color 0.3s ease;
 }
 
@@ -106,7 +99,7 @@
 }
 
 .user-post__button--edit {
-    background-color: #007bff;
+    background-color: #aaaa;
     color: #fff;
 }
 
@@ -121,4 +114,28 @@
 
 .user-post__button--delete:hover {
     background-color: #c82333;
+}
+
+/* Modifier: Editing State */
+.user-post--editing {
+    background-color: darkgray;
+    border-color: #007bff;
+}
+
+.user-post__stats {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: left;
+    margin: 10px 0px;
+}
+
+.user-post__likes {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.user-post__comments {
+    margin-left: 20px;
+    font-size: 0.9rem;
+    color: #aaa;
 }
