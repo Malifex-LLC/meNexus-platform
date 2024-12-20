@@ -499,6 +499,44 @@ app.get('/getPosts', (req, res) => {
     });
 });
 
+// API to get a single post by post_id
+app.get('/getPost', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+    const { post_id } = req.query; // Get the post ID from the route
+
+    if (!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT Posts.*, Users.display_name, Users.handle
+        FROM Posts
+        INNER JOIN Users ON Posts.user_id = Users.user_id
+        WHERE Posts.post_id = ?
+        AND (
+            Posts.user_id = ?
+            OR Posts.user_id IN (
+                SELECT followed_id
+                FROM Followers
+                WHERE follower_id = ?
+            )
+        )
+        LIMIT 1
+    `;
+
+    meNexus.query(sql, [post_id, user_id, user_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching post details:", err);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Post not found or access denied" });
+        }
+        res.json(results[0]); // Return the single post with user details
+    });
+});
+
+
 // API endpoint for submitting a post
 app.post("/createPost", (req, res) => {
     const { content, handle } = req.body;
@@ -630,6 +668,84 @@ app.get('/followCheck', (req, res) => {
         res.json({ isFollowing });
     });
 });
+
+// API endpoint for search functionality
+app.get('/search', async (req, res) => {
+    const { query, type } = req.query;
+
+    if (!query || query.trim() === "") {
+        return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    let sql = "";
+    const params = [`%${query}%`];
+
+    switch (type) {
+        case "users":
+            sql = `
+                SELECT handle, display_name
+                FROM Users
+                WHERE handle LIKE ? OR display_name LIKE ?
+            `;
+            params.push(`%${query}%`);
+            break;
+
+        case "posts":
+            sql = `
+                SELECT Posts.content, Posts.post_id, Posts.user_id, Posts.created_at,
+                       Users.handle, Users.display_name
+                FROM Posts
+                         INNER JOIN Users ON Posts.user_id = Users.user_id
+                WHERE Posts.content LIKE ?
+            `;
+            break;
+
+        default: // Handle both users and posts
+            const userQuery = `
+                SELECT
+                    'user' AS type,
+                    handle,
+                    display_name,
+                    user_id,
+                    NULL AS content,
+                    NULL AS post_id,
+                    NULL AS created_at
+                FROM Users
+                WHERE handle LIKE ? OR display_name LIKE ?
+            `;
+            const postQuery = `
+                SELECT
+                    'post' AS type,
+                    Users.handle,
+                    Users.display_name,
+                    Posts.user_id,
+                    Posts.content,
+                    Posts.post_id,
+                    Posts.created_at
+                FROM Posts
+                         INNER JOIN Users ON Posts.user_id = Users.user_id
+                WHERE Posts.content LIKE ?
+            `;
+            sql = `(${userQuery}) UNION ALL (${postQuery})`;
+            params.push(`%${query}%`, `%${query}%`);
+            break;
+    }
+
+    try {
+        const results = await new Promise((resolve, reject) => {
+            meNexus.query(sql, params, (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+
+        res.json({ type, results });
+    } catch (err) {
+        console.error("Error executing search:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 
 
 

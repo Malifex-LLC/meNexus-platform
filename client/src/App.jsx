@@ -5,6 +5,7 @@ import RegisterPage from "./pages/Register/RegisterPage.jsx";
 import LoginPage from "./pages/Login/LoginPage.jsx";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 import SettingsPage from "./pages/Settings/SettingsPage.jsx";
+import SearchPage from "./pages/Search/SearchPage.jsx";
 
 function App() {
     return (
@@ -23,6 +24,8 @@ function App() {
                     <Route path="/profile/:handle" element={<UserProfilePage />} />
 
                     <Route path='/settings' element={<SettingsPage />} />
+
+                    <Route path='/search' element={<SearchPage />} />
 
                     {/* Default fallback */}
                     <Route path="*" element={<Navigate to="/login" replace />} />
