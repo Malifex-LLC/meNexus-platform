@@ -164,8 +164,8 @@ const UserProfile = () => {
                                     display_name={post.display_name}
                                     date={post.created_at}
                                     content={post.content}
-                                    comments={post.comment_count}
-                                    likes={post.likes}
+                                    comments={0}
+                                    likes={0}
                                     onDelete={() => handleDelete(post.post_id)}
                                     onEdit={() => handleEdit(post.post_id, posts)}
                                     isEditing={editingPostId === post.post_id}
