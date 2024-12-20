@@ -2,6 +2,7 @@ import "./Post.css";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
+import {NavLink} from "react-router-dom";
 
 const Post = ({
                   user_id,
@@ -57,8 +58,18 @@ const Post = ({
     return (
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
             <div className="user-post__identity">
-                <h3 className="user-post__display-name">{display_name}</h3>
-                <h4 className="user-post__handle">@{handle}</h4>
+                <NavLink
+                    className="user-post__display-name"
+                    to={`/profile/${handle}`}
+                >
+                    {display_name}
+                </NavLink>
+                <NavLink
+                    className="user-post__handle"
+                    to={`/profile/${handle}`}
+                >
+                    @{handle}
+                </NavLink>
                 <div className="user-post__date">
                     <p>{formatDate(date)}</p>
                 </div>

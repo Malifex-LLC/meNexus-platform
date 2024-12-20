@@ -20,11 +20,20 @@
 }
 
 .user-post__display-name {
+    color: white;
+    text-decoration: none;
     font-weight: bold;
+    font-size: 20px;
     margin: 0;
 }
 
+.user-post__display-name:hover {
+    text-decoration: underline;
+}
+
 .user-post__handle {
+    text-decoration: none;
+    font-weight: bold;
     margin: 0;
     color: #eb34e5;
 }
