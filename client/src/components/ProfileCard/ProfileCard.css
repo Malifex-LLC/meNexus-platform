@@ -1,0 +1,59 @@
+.profile-card {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: black;
+    color: white;
+}
+
+.profile-card__profile-picture img {
+    height: 100px;
+    width: 100px;
+}
+
+.profile-card__identity {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.profile-card__display-name {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 0;
+}
+
+.profile-card__display-name:hover {
+    text-decoration: underline;
+}
+
+.profile-card__handle {
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0;
+    color: #eb34e5;
+}
+
+.profile-card__follow-actions {
+    margin-top: 10px;
+
+}
+
+.profile-card__follow-button {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    background-color: #eb34e5;
+    color: white;
+    border-radius: 4px;
+}
+
+.profile-card__follow-button:hover {
+    background-color: #801c7c;
+}

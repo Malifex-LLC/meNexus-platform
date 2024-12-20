@@ -3,6 +3,10 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.search-results h1 {
+    font-size: 20px;
+}
+
 .search-results__filters button {
     margin-right: 10px;
     padding: 8px 16px;
@@ -15,4 +19,17 @@
 
 .search-results__filters button.active {
     background-color: #801c7c;
+}
+
+.search-results__content {
+    padding: 20px;
+}
+
+.search-results__users-container  {
+    width: 25%;
+
+}
+
+.search-results__posts-container {
+    width: 50%
 }
