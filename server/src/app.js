@@ -499,6 +499,44 @@ app.get('/getPosts', (req, res) => {
     });
 });
 
+// API to get a single post by post_id
+app.get('/getPost', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+    const { post_id } = req.query; // Get the post ID from the route
+
+    if (!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT Posts.*, Users.display_name, Users.handle
+        FROM Posts
+        INNER JOIN Users ON Posts.user_id = Users.user_id
+        WHERE Posts.post_id = ?
+        AND (
+            Posts.user_id = ?
+            OR Posts.user_id IN (
+                SELECT followed_id
+                FROM Followers
+                WHERE follower_id = ?
+            )
+        )
+        LIMIT 1
+    `;
+
+    meNexus.query(sql, [post_id, user_id, user_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching post details:", err);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Post not found or access denied" });
+        }
+        res.json(results[0]); // Return the single post with user details
+    });
+});
+
+
 // API endpoint for submitting a post
 app.post("/createPost", (req, res) => {
     const { content, handle } = req.body;
