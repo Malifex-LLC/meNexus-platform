@@ -603,6 +603,118 @@ app.delete("/deletePost/:post_id", (req, res) => {
     });
 });
 
+// API endpoint for creating a new comment
+app.post("/createComment", (req, res) => {
+    const { user_id } = req.session.user
+    const { resource_type, resource_id, content } = req.body;
+
+    const sql = `
+        INSERT INTO Comments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
+    `;
+    meNexus.query(sql, [user_id, resource_type, resource_id, content], (commentErr, commentResult) => {
+        if (commentErr) {
+            console.error(commentErr);
+            return res.status(500).json({ error: "Failed to create a comment." });
+        }
+        return res.json({ message: "Comment submitted successfully." });
+    })
+});
+
+// API endpoint for updating a comment
+app.put("/updateComment/:comment_id", (req, res) => {
+    const comment_id = req.params.comment_id;
+    const updatedContent = req.body.content;
+    // Update the Comment in database
+    const sql = 'UPDATE Comments SET content = ? WHERE comment_id = ?';
+    meNexus.query(sql, [updatedContent, comment_id], (commentErr, commentResult) => {
+        if (commentErr) {
+            console.error(commentErr);
+            return res.status(500).json({ error: "Failed to update the comment." });
+        }
+        // Check if any rows were affected
+        if (commentResult.affectedRows === 0) {
+            return res.status(404).json({ error: "Comment not found." });
+        }
+        return res.json({ message: "Comment updated successfully." });
+    });
+});
+
+// API endpoint for deleting a comment
+app.delete("/deleteComment/:comment_id", (req, res) => {
+    const comment_id = req.params.comment_id;
+    // Delete the comment from the database
+    const deleteSql = "DELETE FROM Comments WHERE comment_id = ?";
+    meNexus.query(deleteSql, [comment_id], (deleteErr, deleteResult) => {
+        if (deleteErr) {
+            console.error(deleteErr);
+            return res.status(500).json({ error: "Failed to delete the comment." });
+        }
+        // Check if any rows were affected
+        if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ error: "Comment not found." });
+        }
+        // Return a success response
+        return res.json({ message: "Comment submitted successfully." });
+    })
+});
+
+// API endpoint for getting comments
+app.get("/getComments", (req, res) => {
+    const {resource_type, resource_id } = req.query;
+
+    console.log('/getComments called for query: ', req.query);
+
+    if (!resource_id || resource_id.trim() === "") {
+        return res.status(400).json({ error: "Invalid getComments query." });
+    }
+
+    let sql = "";
+    const params = [`%${resource_id}%`];
+
+    switch (resource_type) {
+        case "post":
+            sql = `
+                SELECT
+                    Comments.comment_id,
+                    Comments.user_id AS comment_user_id,
+                    Comments.resource_id,
+                    Comments.resource_type,
+                    Comments.content AS comment_content,
+                    Comments.created_at AS comment_created_at,
+                    Comments.updated_at AS comment_updated_at,
+                    Posts.post_id,
+                    Posts.content AS post_content,
+                    Posts.user_id AS post_user_id,
+                    Posts.media_url,
+                    Posts.created_at AS post_created_at,
+                    Users.display_name,
+                    Users.handle
+                FROM Comments
+                         INNER JOIN Posts ON Comments.resource_id = Posts.post_id
+                         INNER JOIN Users ON Comments.user_id = Users.user_id
+                WHERE Posts.post_id = ?
+            `;
+            meNexus.query(sql, [resource_id], (err, results) => {
+                if (err) {
+                    console.error("Error getting post comments", err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                const comments = results;
+                console.log('getComments for post results:', results);
+                res.json(comments);
+            })
+            break;
+
+        default:
+                sql = `
+                SELECT * FROM Comments WHERE post_id = ?;
+                `;
+            break;
+
+
+    }
+});
+
 // API endpoint for following a user
 app.post('/followUser', async (req, res) => {
     const { user_id } = req.session.user; // Get the follower's user ID from the session

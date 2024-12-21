@@ -1,7 +1,7 @@
 import "./UserProfile.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { refreshPosts } from '../../utils/apiUtils.js';
+import {refreshComments, refreshPosts} from '../../utils/apiUtils.js';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
@@ -159,6 +159,7 @@ const UserProfile = () => {
                             .map((post, index) => (
                                 <Post
                                     key={index}
+                                    post_id={post.post_id}
                                     user_id={post.user_id}
                                     handle={post.handle}
                                     display_name={post.display_name}
@@ -174,6 +175,7 @@ const UserProfile = () => {
                                         setEditedPostContent(event.target.value)
                                     }
                                     onSave={handleSave}
+                                    refreshComments={refreshComments}
                                 />
                             ))
                     ) : (

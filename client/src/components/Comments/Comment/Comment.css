@@ -1,0 +1,132 @@
+/* Base Block */
+.user-comment {
+    margin-left: 10%;
+    position: relative;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #333333;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+/* Elements */
+.user-comment__identity {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.user-comment__display-name {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+}
+
+.user-comment__display-name:hover {
+    text-decoration: underline;
+}
+
+.user-comment__handle {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0;
+    color: #eb34e5;
+}
+
+.user-comment__date {
+    text-align: left;
+    font-size: 0.6rem;
+    color: #aaa;
+}
+
+.user-comment__content {
+
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    text-align: left;
+}
+
+.user-comment__textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.user-comment__content-actions {
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    top: 10px;
+    right: 10px;
+    gap: 20px;
+}
+
+.user-comment__button {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    transition: background-color 0.3s ease;
+}
+
+.user-comment__button--save {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.user-comment__button--save:hover {
+    background-color: #218838;
+}
+
+.user-comment__button--edit {
+    background-color: #aaaa;
+    color: #fff;
+}
+
+.user-comment__button--edit:hover {
+    background-color: #eb34e5;
+}
+
+.user-comment__button--delete {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.user-comment__button--delete:hover {
+    background-color: #c82333;
+}
+
+/* Modifier: Editing State */
+.user-comment--editing {
+    background-color: darkgray;
+    border-color: #007bff;
+}
+
+.user-comment__stats {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: left;
+    margin: 10px 0px;
+}
+
+.user-comment__stats-likes {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.user-comment__stats-comments {
+    margin-left: 20px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
