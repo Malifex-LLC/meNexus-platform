@@ -5,6 +5,11 @@ import "../../api/hooks/useSearch.js"
 import useSearch from "../../api/hooks/useSearch.js";
 import ProfileCard from "../../components/ProfileCard/ProfileCard.jsx";
 import Post from "../../components/Posts/Post/Post.jsx"
+import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import useGetPosts from "../../api/hooks/useGetPosts.js";
+import useEditPost from "../../api/hooks/useEditPost.js";
+import useDeletePost from "../../api/hooks/useDeletePost.js";
 
 const Search = () => {
     const location = useLocation();
@@ -15,6 +20,19 @@ const Search = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const {search} = useSearch();
+
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getPosts, loading: postsLoading, error: postsError } = useGetPosts();
+
+    // Hooks for editing and deleting posts
+    const {
+        editingPostId,
+        editedPostContent,
+        setEditedPostContent,
+        handleEdit,
+        handleSave,
+    } = useEditPost(() => refreshPosts(getPosts, currentHandle, setPosts));
+    const { handleDelete } = useDeletePost(() => refreshPosts(getPosts, currentHandle, setPosts));
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -70,7 +88,9 @@ const Search = () => {
                         {postResults.length > 0 && (
                             <div className="search-results__posts-container">
                                 <h1>Posts Found:</h1>
-                                {postResults.map((post, index) => (
+                                {postResults
+                                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                    .map((post, index) => (
                                     <Post
                                         key={index}
                                         post_id={post.post_id}
@@ -81,6 +101,15 @@ const Search = () => {
                                         content={post.content}
                                         comments={0}
                                         likes={0}
+                                        onDelete={() => handleDelete(post.post_id)}
+                                        onEdit={() => handleEdit(post.post_id, postResults)}
+                                        isEditing={editingPostId === post.post_id}
+                                        editedContent={editedPostContent}
+                                        onContentChange={(event) =>
+                                            setEditedPostContent(event.target.value)
+                                        }
+                                        onSave={handleSave}
+                                        refreshComments={refreshComments}
                                     />
                                 ))}
                             </div>
