@@ -1,7 +1,7 @@
 import './Home.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { refreshPosts } from '../../utils/apiUtils.js';
+import { refreshPosts, refreshComments } from '../../utils/apiUtils.js';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import Post from '../../components/Posts/Post/Post.jsx';
 import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
@@ -101,7 +101,8 @@ const Home = () => {
             <div className="home__post-form">
                 <PostForm
                     handle={currentHandle}
-                    refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)} />
+                    refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
+                />
             </div>
             <div className="home__posts">
                 {posts.length > 0 ? (
@@ -110,13 +111,14 @@ const Home = () => {
                         .map((post, index) => (
                             <Post
                                 key={index}
+                                post_id={post.post_id}
                                 user_id={post.user_id}
                                 handle={post.handle}
                                 display_name={post.display_name}
                                 date={post.created_at}
                                 content={post.content}
-                                comments={post.comment_count}
-                                likes={post.likes}
+                                comments={0}
+                                likes={0}
                                 onDelete={() => handleDelete(post.post_id)}
                                 onEdit={() => handleEdit(post.post_id, posts)}
                                 isEditing={editingPostId === post.post_id}
@@ -125,6 +127,7 @@ const Home = () => {
                                     setEditedPostContent(event.target.value)
                                 }
                                 onSave={handleSave}
+                                refreshComments={refreshComments}
                             />
                         ))
                 ) : (

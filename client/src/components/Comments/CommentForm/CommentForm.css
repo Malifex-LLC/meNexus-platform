@@ -1,0 +1,32 @@
+.comment-form {
+    text-align: center;
+
+}
+
+.comment-form__entry-field {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: lightgray;
+    color: black;
+    text-align: center;
+}
+
+.comment-form__button{
+    font-family: 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    background-color: #aaaa;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.comment-form__button:hover{
+    background-color: #eb34e5;
+}

@@ -3,24 +3,44 @@ import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
 import {NavLink} from "react-router-dom";
+import useGetComments from "../../../api/hooks/useGetComments.js"
+import Comment from '../../Comments/Comment/Comment.jsx'
+import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
+import useEditComment from "../../../api/hooks/useEditComment.js"
+import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 
 const Post = ({
+                  post_id,
                   user_id,
                   display_name,
                   handle,
                   date,
                   content,
                   likes,
-                  comments,
                   onEdit,
                   onDelete,
                   isEditing,
                   editedContent,
                   onContentChange,
                   onSave,
+                  refreshComments,
               }) => {
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+    const { getComments, commentsData } = useGetComments();
+    const resource_type = "post";
+
     const [isFollowing, setIsFollowing] = useState(false);
+    const [comments, setComments] = useState([]);
+
+    const {
+        handleCommentEdit,
+        handleCommentSave,
+        editingCommentId,
+        editedCommentContent,
+        setEditedCommentContent,
+    } = useEditComment(() => refreshComments(resource_type, post_id, getComments, setComments));
+
+    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, post_id, getComments, setComments));
 
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", user_id);
@@ -54,6 +74,19 @@ const Post = ({
 
         fetchFollowStatus();
     }, [user_id]);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const newComments = await getComments(resource_type, post_id);
+                setComments(newComments);
+
+            } catch (err) {
+                console.error("Error fetching comments for post_id: ", post_id, err);
+            }
+        }
+        fetchComments();
+    },[])
 
     return (
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
@@ -117,10 +150,44 @@ const Post = ({
                 </button>
             </div>
             <div className="user-post__stats">
-                <p className="user-post__likes">{likes} likes</p>
-                <p className="user-post__comments">{comments} comments</p>
+                <p className="user-post__stats-likes">{likes} likes</p>
+                <p className="user-post__stats-comments">{comments.length} comments</p>
             </div>
-
+            <div className="user-post__comments">
+                {comments.length > 0 ? (
+                    comments
+                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        .map((comment, index) => (
+                            <Comment
+                            key={index}
+                            user_id={comment.user_id}
+                            display_name={comment.display_name}
+                            handle={comment.handle}
+                            date={comment.comment_created_at}
+                            content={comment.comment_content}
+                            isEditing={editingCommentId === comment.comment_id}
+                            onEdit={() => handleCommentEdit(comment.comment_id, comments)}
+                            onDelete={() => handleDeleteComment(comment.comment_id)}
+                            editedContent={editedCommentContent}
+                            onContentChange={(event) =>
+                                setEditedCommentContent(event.target.value)
+                            }
+                            onSave={handleCommentSave}
+                            />
+                        ))
+                ) : (
+                    <div>No comments</div>
+                )}
+            </div>
+            <div className="user-post__comment-form">
+                <CommentForm
+                    resource_type={resource_type}
+                    resource_id={post_id}
+                    getComments={getComments}
+                    setComments={setComments}
+                    refreshComments={refreshComments}
+                />
+            </div>
         </div>
     );
 };
