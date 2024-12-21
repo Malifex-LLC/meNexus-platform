@@ -37,7 +37,6 @@ const Search = () => {
     const userResults = results.filter((result) => result.type === "user");
     const postResults = results.filter((result) => result.type === "post");
 
-
     return (
         <div className="search-results">
             <h1>Search Results for "{query}"</h1>
@@ -74,13 +73,14 @@ const Search = () => {
                                 {postResults.map((post, index) => (
                                     <Post
                                         key={index}
+                                        post_id={post.post_id}
                                         user_id={post.user_id}
-                                        display_name={post.display_name}
                                         handle={post.handle}
-                                        content={post.content}
+                                        display_name={post.display_name}
                                         date={post.created_at}
-                                        likes={post.likes || 0} // Assuming likes is a field
-                                        comments={post.comments || 0} // Assuming comments is a field
+                                        content={post.content}
+                                        comments={0}
+                                        likes={0}
                                     />
                                 ))}
                             </div>

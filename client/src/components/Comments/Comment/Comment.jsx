@@ -1,5 +1,4 @@
 import './Comment.css';
-import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import {NavLink} from "react-router-dom";
 

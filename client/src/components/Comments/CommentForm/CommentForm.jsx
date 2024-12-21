@@ -2,13 +2,18 @@ import './CommentForm.css';
 import { useState } from "react";
 import useCreateComment from "../../../api/hooks/useCreateComment.js";
 
-const CommentForm = ({handle, refreshComments}) => {
+const CommentForm = ({
+                         resource_type,
+                         resource_id,
+                         getComments,
+                         setComments,
+                         refreshComments,
+                     }) => {
     const [text, setText] = useState("Add a comment...");
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const { createComment, loading, error } = useCreateComment(refreshComments);
-
+    const { createComment, loading, error } = useCreateComment(() => refreshComments(resource_type, resource_id, getComments, setComments));
 
     const styles = {
         textarea: {
@@ -19,7 +24,8 @@ const CommentForm = ({handle, refreshComments}) => {
 
     const handleSubmit = async () => {
         const comment = {
-            handle: handle,
+            resource_type: resource_type,
+            resource_id: resource_id,
             content: text,
         };
         console.log("Submitting comment:", comment);
@@ -28,7 +34,7 @@ const CommentForm = ({handle, refreshComments}) => {
     };
 
     const handleFormClick = () => {
-        if (!formClicked && text === `What's on your mind?`) {
+        if (!formClicked && text === `Add a comment...`) {
             setText("");
         }
         setFormClicked(true);
