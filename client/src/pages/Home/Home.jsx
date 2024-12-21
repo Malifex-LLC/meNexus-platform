@@ -11,6 +11,7 @@ import useDeletePost from "../../api/hooks/useDeletePost.js";
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
+    const [session_user_id, setSession_user_id] = useState(null);
     const [currentHandle, setCurrentHandle] = useState(handle || null); // State for the current handle
     const [posts, setPosts] = useState([]); // State for user posts
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
@@ -42,6 +43,7 @@ const Home = () => {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle); // Set the handle
                         setIsHandleSet(true); // Mark handle as set
+                        setSession_user_id(response.data.user_id);
                         navigate(`/home/${response.data.handle}`); // Redirect to /home/:handle
                     } else {
                         console.error("Invalid session, redirecting to login.");
@@ -53,6 +55,8 @@ const Home = () => {
                 }
             } else if (handle) {
                 setCurrentHandle(handle); // If handle exists in URL, set it as current
+                const response = await getSessionUser();
+                setSession_user_id(response.data.user_id);
                 setIsHandleSet(true);
             }
         };
@@ -113,6 +117,7 @@ const Home = () => {
                                 key={index}
                                 post_id={post.post_id}
                                 user_id={post.user_id}
+                                session_user_id={session_user_id}
                                 handle={post.handle}
                                 display_name={post.display_name}
                                 date={post.created_at}
