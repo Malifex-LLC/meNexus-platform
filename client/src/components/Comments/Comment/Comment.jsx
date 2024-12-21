@@ -4,6 +4,7 @@ import {NavLink} from "react-router-dom";
 
 const Comment = ({
     user_id,
+    session_user_id,
     display_name,
     handle,
     date,
@@ -15,6 +16,8 @@ const Comment = ({
     onContentChange,
     onSave,
 }) => {
+    const isOwner = user_id === session_user_id;
+    console.log("isOwner for comment: ", isOwner);
 
     return (
         <div className={`user-comment ${isEditing ? "user-comment--editing" : ""}`}>
@@ -47,29 +50,31 @@ const Comment = ({
                     <p>{content}</p>
                 )}
             </div>
-            <div className="user-comment__content-actions">
-                {isEditing ? (
+            {isOwner && (
+                <div className="user-comment__content-actions">
+                    {isEditing ? (
+                        <button
+                            className="user-comment__button user-comment__button--save"
+                            onClick={onSave}
+                        >
+                            Save
+                        </button>
+                    ) : (
+                        <button
+                            className="user-comment__button user-comment__button--edit"
+                            onClick={onEdit}
+                        >
+                            Edit
+                        </button>
+                    )}
                     <button
-                        className="user-comment__button user-comment__button--save"
-                        onClick={onSave}
+                        className="user-comment__button user-comment__button--delete"
+                        onClick={onDelete}
                     >
-                        Save
+                        Delete
                     </button>
-                ) : (
-                    <button
-                        className="user-comment__button user-comment__button--edit"
-                        onClick={onEdit}
-                    >
-                        Edit
-                    </button>
-                )}
-                <button
-                    className="user-comment__button user-comment__button--delete"
-                    onClick={onDelete}
-                >
-                    Delete
-                </button>
-            </div>
+                </div>
+            )}
         </div>
     )
 }

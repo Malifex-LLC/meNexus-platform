@@ -14,6 +14,8 @@ import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 const UserProfile = () => {
     const { handle } = useParams();
     const [currentHandle, setCurrentHandle] = useState(handle || null);
+    const [session_user_id, setSession_user_id] = useState(null);
+    const [session_user_handle, setSession_user_handle] = useState(null);
     const [profile, setProfile] = useState({});
     const [posts, setPosts] = useState([]);
     const [isHandleSet, setIsHandleSet] = useState(false);
@@ -67,6 +69,8 @@ const UserProfile = () => {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle);
                         setIsHandleSet(true);
+                        setSession_user_id(response.data.user_id);
+                        setSession_user_handle(response.data.handle);
                         navigate(`/profile/${response.data.handle}`);
                     } else {
                         console.error("Invalid session, redirecting to login.");
@@ -77,7 +81,10 @@ const UserProfile = () => {
                     navigate('/login');
                 }
             } else if (handle) {
+                const response = await getSessionUser();
+                setSession_user_id(response.data.user_id);
                 setCurrentHandle(handle);
+                setSession_user_handle(response.data.handle);
                 setIsHandleSet(true);
             }
         };
@@ -129,17 +136,21 @@ const UserProfile = () => {
         return <div>Error loading posts: {userPostsError.message}</div>;
     }
 
+    const isOwner = currentHandle === session_user_handle;
+
     return currentHandle ? (
         <div className="user-profile__container">
             <div className="user-profile__data">
                 <div className="user-profile__picture">
                     <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
                 </div>
-                <button
-                    className="user-profile__follow-button"
-                    onClick={isFollowing ? handleUnfollow : handleFollow}                >
-                    {isFollowing ? "Unfollow" : "Follow"}
-                </button>
+                {!isOwner && (
+                    <button
+                        className="user-profile__follow-button"
+                        onClick={isFollowing ? handleUnfollow : handleFollow}>
+                        {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                )}
                 <div className="user-profile__info">
                     <h2 className="user-profile__name">{profile.profile_name}</h2>
                     <p className="user-profile__bio">{profile.profile_bio}</p>
@@ -161,6 +172,7 @@ const UserProfile = () => {
                                     key={index}
                                     post_id={post.post_id}
                                     user_id={post.user_id}
+                                    session_user_id={session_user_id}
                                     handle={post.handle}
                                     display_name={post.display_name}
                                     date={post.created_at}

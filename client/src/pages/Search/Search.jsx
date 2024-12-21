@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import "./Search.css";
 import "../../api/hooks/useSearch.js"
 import useSearch from "../../api/hooks/useSearch.js";
@@ -20,6 +20,9 @@ const Search = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const {search} = useSearch();
+    const navigate = useNavigate();
+    const [session_user_id, setSession_user_id] = useState(null);
+
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getPosts, loading: postsLoading, error: postsError } = useGetPosts();
@@ -51,6 +54,24 @@ const Search = () => {
 
         fetchResults();
     }, [query, filter]);
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await getSessionUser();
+
+                if (response.status === 200 && response.data.user_id) {
+                    setSession_user_id(response.data.user_id);
+                } else {
+                    console.error("Invalid session, redirecting to login.");
+                    navigate ("/login");
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchSessionUser();
+    }, [])
 
     const userResults = results.filter((result) => result.type === "user");
     const postResults = results.filter((result) => result.type === "post");
@@ -95,6 +116,7 @@ const Search = () => {
                                         key={index}
                                         post_id={post.post_id}
                                         user_id={post.user_id}
+                                        session_user_id={session_user_id}
                                         handle={post.handle}
                                         display_name={post.display_name}
                                         date={post.created_at}

@@ -12,6 +12,7 @@ import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 const Post = ({
                   post_id,
                   user_id,
+                  session_user_id,
                   display_name,
                   handle,
                   date,
@@ -25,6 +26,9 @@ const Post = ({
                   onSave,
                   refreshComments,
               }) => {
+    const isOwner = user_id === session_user_id;
+    console.log("isOwner for post: ", isOwner);
+
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { getComments, commentsData } = useGetComments();
     const resource_type = "post";
@@ -107,14 +111,16 @@ const Post = ({
                     <p>{formatDate(date)}</p>
                 </div>
             </div>
-            <div className="user-post__follow-actions">
-                <button
-                    className="user-post__follow-button"
-                    onClick={isFollowing ? handleUnfollow : handleFollow}
-                >
-                    {isFollowing ? "Unfollow" : "Follow"}
-                </button>
-            </div>
+            {!isOwner && (
+                <div className="user-post__follow-actions">
+                    <button
+                        className="user-post__follow-button"
+                        onClick={isFollowing ? handleUnfollow : handleFollow}
+                    >
+                        {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                </div>
+            )}
             <div className="user-post__content">
                 {isEditing ? (
                     <textarea
@@ -126,29 +132,31 @@ const Post = ({
                     <p>{content}</p>
                 )}
             </div>
-            <div className="user-post__content-actions">
-                {isEditing ? (
+            {isOwner && (
+                <div className="user-post__content-actions">
+                    {isEditing ? (
+                        <button
+                            className="user-post__button user-post__button--save"
+                            onClick={onSave}
+                        >
+                            Save
+                        </button>
+                    ) : (
+                        <button
+                            className="user-post__button user-post__button--edit"
+                            onClick={onEdit}
+                        >
+                            Edit
+                        </button>
+                    )}
                     <button
-                        className="user-post__button user-post__button--save"
-                        onClick={onSave}
+                        className="user-post__button user-post__button--delete"
+                        onClick={onDelete}
                     >
-                        Save
+                        Delete
                     </button>
-                ) : (
-                    <button
-                        className="user-post__button user-post__button--edit"
-                        onClick={onEdit}
-                    >
-                        Edit
-                    </button>
-                )}
-                <button
-                    className="user-post__button user-post__button--delete"
-                    onClick={onDelete}
-                >
-                    Delete
-                </button>
-            </div>
+                </div>
+            )}
             <div className="user-post__stats">
                 <p className="user-post__stats-likes">{likes} likes</p>
                 <p className="user-post__stats-comments">{comments.length} comments</p>
@@ -159,12 +167,13 @@ const Post = ({
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                         .map((comment, index) => (
                             <Comment
-                            key={index}
-                            user_id={comment.user_id}
-                            display_name={comment.display_name}
-                            handle={comment.handle}
-                            date={comment.comment_created_at}
-                            content={comment.comment_content}
+                                key={index}
+                                user_id={comment.comment_user_id}
+                                session_user_id={session_user_id}
+                                display_name={comment.display_name}
+                                handle={comment.handle}
+                                date={comment.comment_created_at}
+                                content={comment.comment_content}
                             isEditing={editingCommentId === comment.comment_id}
                             onEdit={() => handleCommentEdit(comment.comment_id, comments)}
                             onDelete={() => handleDeleteComment(comment.comment_id)}
