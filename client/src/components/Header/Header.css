@@ -8,6 +8,8 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Space between main header and actions */
+
     position: relative;
 }
 
@@ -23,8 +25,42 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.header__notifications {
+    position: relative;
+}
+
+.header__notifications-tray {
+    position: absolute;
+    top: 65px; /* Push the tray below the header */
+    right: 0;
+    width: 300px; /* Adjust width as needed */
+    background-color: black;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it is above other elements */
+}
+
+.header__notifications-tray-toggle {
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.header__notifications-tray-toggle--has-notifications {
+    font-weight: bold;
+    color: white;
+}
+
+.header__notifications-tray-toggle--expanded {
+
+}
+
 .header__search {
-    display: flex;
+    margin-right: 30px;
     margin-left: auto;
     align-items: center;
 }

@@ -21,6 +21,10 @@ export const ENDPOINTS = {
     DELETE_COMMENT: `${API_BASE_URL}/deleteComment/:comment_id`,
     GET_COMMENTS: `${API_BASE_URL}/getComments`,
 
+    CREATE_NOTIFICATION: `${API_BASE_URL}/createNotification`,
+    UPDATE_NOTIFICATION: `${API_BASE_URL}/updateNotification`,
+    GET_NOTIFICATIONS: `${API_BASE_URL}/getNotifications`,
+
     UPLOAD_PROFILE_PICTURE: `${API_BASE_URL}/settings/uploadProfilePicture`,
 
     SEARCH: `${API_BASE_URL}/search`,
