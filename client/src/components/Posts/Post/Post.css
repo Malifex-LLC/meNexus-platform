@@ -148,3 +148,13 @@
     font-size: 0.9rem;
     color: #aaa;
 }
+
+.user-post__stats-comments--active {
+    font-weight: bold;
+    color: white;
+}
+
+.user-post__stats-comments:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
