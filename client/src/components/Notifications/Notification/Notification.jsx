@@ -13,7 +13,7 @@ const Notification = ({
 
     return (
         <div className="notification">
-            <p>Test Notification</p>
+            <p>{summary}</p>
         </div>
     )
 }

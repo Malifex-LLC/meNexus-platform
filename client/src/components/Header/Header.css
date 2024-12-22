@@ -40,8 +40,6 @@
     z-index: 1000; /* Ensure it is above other elements */
 }
 
-
-
 .header__notifications-tray-toggle {
     cursor: pointer;
     font-size: 16px;
@@ -52,9 +50,13 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-.header__notifications-tray-toggle--active {
+.header__notifications-tray-toggle--has-notifications {
     font-weight: bold;
     color: white;
+}
+
+.header__notifications-tray-toggle--expanded {
+
 }
 
 .header__search {

@@ -672,7 +672,7 @@ app.get("/getComments", (req, res) => {
     const params = [`%${resource_id}%`];
 
     switch (resource_type) {
-        case "post":
+        case "POST":
             sql = `
                 SELECT
                     Comments.comment_id,
@@ -858,6 +858,113 @@ app.get('/search', async (req, res) => {
     }
 });
 
+// API endpoint for creating notifications
+app.post('/createNotification', async (req, res) => {
+    const { user_id, actor_id, resource_type, resource_id, action } = req.body;
+    console.log("createNotification req: ", req);
+
+    if(!user_id || !actor_id || !resource_type || !resource_id || !action) {
+        return res.status(400).json({ error: 'Invalid request data' });
+    }
+
+    // Fetch actor's handle from Users table
+    const actorQuery = `
+        SELECT handle FROM Users WHERE user_id = ?
+    `;
+
+    meNexus.query(actorQuery, [actor_id], (actorErr, actorResult) => {
+        if (actorErr) {
+            console.error("Error fetching actor handle:", actorErr);
+            return res.status(500).json({error: "Failed to fetch actor details."});
+        }
+
+        if (actorResult.length === 0) {
+            return res.status(404).json({error: "Actor not found."});
+        }
+
+        const actorHandle = actorResult[0].handle;
+        // Generate notification summary based on resource_type
+        let summary = "";
+        switch (resource_type) {
+            case "POST":
+                if (action === "COMMENT") {
+                    summary = `${actorHandle} commented on your post!`;
+                } else if (action === "LIKE") {
+                    summary = `${actorHandle} liked your post!`;
+                }
+                break;
+            case "COMMENT":
+                if (action === "LIKE") {
+                    summary = `${actorHandle} liked your comment!`;
+                }
+                break;
+            case "FOLLOW":
+                summary = `${actorHandle} followed you!`;
+                break;
+            default:
+                return res.status(400).json({ error: 'Unsupported resource_type or action' });
+
+        }
+
+        const sql = `
+        INSERT INTO Notifications (user_id, actor_id, resource_type, resource_id, action, summary)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+        meNexus.query(sql, [user_id, actor_id, resource_type, resource_id, action, summary], (err, result) => {
+            if (err) {
+                console.error("Error creating notification:", err);
+                return res.status(500).json({ error: "Failed to create notification." });
+            }
+
+            res.json({ message: "Notification created successfully." });
+        });
+    });
+});
+
+// API endpoint for updating notification
+app.put('/updateNotification', async (req, res) => {
+    const { notification_id } = req.body;
+
+    if (!notification_id) {
+        return res.status(400).json({ error: "Notification ID is required." });
+    }
+
+    let sql = `UPDATE Notifications SET is_read = 1 WHERE notification_id = ?`;
+    meNexus.query(sql, [notification_id], (err, result) => {
+        if (err) {
+            console.error("Error updating notification:", err);
+            return res.status(500).json({ error: "Failed to update notification." });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Notification not found or already updated." });
+        }
+
+        return res.status(200).json({ message: "Notification updated successfully." });
+    });
+});
+
+// API endpoint for getting notifications
+app.get("/getNotifications", (req, res) => {
+    const { user_id } = req.session.user;
+    console.log("/getNotifications called for user_id: ", user_id);
+
+    if (!user_id) {
+        return res.status(400).json({ error: 'No authorized user' });
+    }
+
+    let sql = `
+    SELECT * FROM Notifications WHERE user_id = ? AND is_read = false
+    `;
+    meNexus.query(sql, [user_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching notifications for user_id: ", user_id);
+            res.status(500).json({ error: 'Error fetching notifications' });
+        } else {
+            res.json({ notifications: results });
+        }
+    })
+});
 
 
 
@@ -868,4 +975,4 @@ app.get('/search', async (req, res) => {
 //Express server listening on port number specified
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
-})
+});

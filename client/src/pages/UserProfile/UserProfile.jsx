@@ -8,10 +8,26 @@ import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
+import useCreateNotification from "../../api/hooks/useCreateNotification.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 
 const UserProfile = () => {
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
+    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+    const { createNotification } = useCreateNotification();
+    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+
+    const {
+        editingPostId,
+        editedPostContent,
+        setEditedPostContent,
+        handleEdit,
+        handleSave,
+    } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+
     const { handle } = useParams();
     const [currentHandle, setCurrentHandle] = useState(handle || null);
     const [session_user_id, setSession_user_id] = useState(null);
@@ -22,26 +38,19 @@ const UserProfile = () => {
     const [isFollowing, setIsFollowing] = useState(false);
     const navigate = useNavigate();
 
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
-    const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
-    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
-
-    const {
-        editingPostId,
-        editedPostContent,
-        setEditedPostContent,
-        handleEdit,
-        handleSave,
-    } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
-
-    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
-
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", profile.user_id);
+        const notification = {
+            user_id: profile.user_id,
+            actor_id: session_user_id,
+            resource_type: "FOLLOW",
+            resource_id: session_user_id,
+            action: "FOLLOW",
+        }
         try {
             await followUser(profile.user_id);
             setIsFollowing(true);
+            await createNotification(notification);
         } catch (err) {
             console.log('Error following user', err);
         }
