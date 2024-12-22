@@ -35,6 +35,7 @@ const Post = ({
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
 
     const {
         handleCommentEdit,
@@ -89,8 +90,12 @@ const Post = ({
                 console.error("Error fetching comments for post_id: ", post_id, err);
             }
         }
-        fetchComments();
+        fetchComments(); // Only fetchComments if they are displayed
     },[])
+
+    const toggleComments = () => {
+        setShowComments((prev) => !prev); // Toggle visibility
+    };
 
     return (
         <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
@@ -159,35 +164,41 @@ const Post = ({
             )}
             <div className="user-post__stats">
                 <p className="user-post__stats-likes">{likes} likes</p>
-                <p className="user-post__stats-comments">{comments.length} comments</p>
+                <p className={`user-post__stats-comments ${
+                    comments.length > 0 ? "user-post__stats-comments--active" : ""
+                    }`} onClick={toggleComments}>
+                    {showComments ? "Hide Comments" : `${comments.length} Comments`}
+                </p>
             </div>
-            <div className="user-post__comments">
-                {comments.length > 0 ? (
-                    comments
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                        .map((comment, index) => (
-                            <Comment
-                                key={index}
-                                user_id={comment.comment_user_id}
-                                session_user_id={session_user_id}
-                                display_name={comment.display_name}
-                                handle={comment.handle}
-                                date={comment.comment_created_at}
-                                content={comment.comment_content}
-                            isEditing={editingCommentId === comment.comment_id}
-                            onEdit={() => handleCommentEdit(comment.comment_id, comments)}
-                            onDelete={() => handleDeleteComment(comment.comment_id)}
-                            editedContent={editedCommentContent}
-                            onContentChange={(event) =>
-                                setEditedCommentContent(event.target.value)
-                            }
-                            onSave={handleCommentSave}
-                            />
-                        ))
-                ) : (
-                    <div>No comments</div>
-                )}
-            </div>
+            { showComments && (
+                <div className="user-post__comments">
+                    {comments.length > 0 ? (
+                        comments
+                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                            .map((comment, index) => (
+                                <Comment
+                                    key={index}
+                                    user_id={comment.comment_user_id}
+                                    session_user_id={session_user_id}
+                                    display_name={comment.display_name}
+                                    handle={comment.handle}
+                                    date={comment.comment_created_at}
+                                    content={comment.comment_content}
+                                    isEditing={editingCommentId === comment.comment_id}
+                                    onEdit={() => handleCommentEdit(comment.comment_id, comments)}
+                                    onDelete={() => handleDeleteComment(comment.comment_id)}
+                                    editedContent={editedCommentContent}
+                                    onContentChange={(event) =>
+                                        setEditedCommentContent(event.target.value)
+                                    }
+                                    onSave={handleCommentSave}
+                                />
+                            ))
+                    ) : (
+                        <div>No comments</div>
+                    )}
+                </div>
+            )}
             <div className="user-post__comment-form">
                 <CommentForm
                     resource_type={resource_type}
