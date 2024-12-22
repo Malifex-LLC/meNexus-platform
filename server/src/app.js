@@ -11,13 +11,96 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
+const ws = require('ws')
 
-//Instantiate Express app
+// Instantiate Express app
 const app = express()
+
+// Configure Express app for CORS
 app.use(cors({
     origin: 'http://localhost:5173', // client's origin
     credentials: true, // Allow credentials (cookies) to be sent
 }));
+
+// Assigning port number for the express server
+const port = process.env.EXPRESS_PORT;
+
+// Express server listening on port number specified
+const httpServer = app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+});
+
+// Instantiate WebSocket Server
+const wss = new ws.Server({ noServer: true })
+
+// Store connected clients
+const clients = new Map();
+
+// Configure WebSocket Server for CORS
+wss.on('headers', (headers, req) => {
+    headers.push('Access-Control-Allow-Origin: http://localhost:5173');
+    headers.push('Access-Control-Allow-Credentials: true');
+});
+
+
+wss.on('connection', (ws, request) => {
+    const urlParams = new URLSearchParams(request.url.split('?')[1]);
+    const user_id = urlParams.get('user_id'); // Extract user_id from the query string
+    ws.isAlive = true;
+
+    if (!user_id) {
+        console.error("WebSocket connection attempted without user_id.");
+        ws.close();
+        return;
+    }
+
+    console.log(`WebSocket connection established for user_id: ${user_id}`);
+    clients.set(user_id, ws);
+
+    ws.on('pong', () => {
+        ws.isAlive = true; // Reset isAlive when a pong is received
+    });
+
+    ws.on('message', (message) => {
+        console.log(`Received message from user ${user_id}: ${message}`);
+    });
+
+    ws.on('close', () => {
+        console.log(`WebSocket connection closed for user_id: ${user_id}`);
+        clients.delete(user_id);
+    });
+});
+
+httpServer.on('upgrade', (req, socket, head) => {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const user_id = url.searchParams.get('user_id'); // Extract user_id from the query params
+
+    if (!user_id) {
+        console.error("No user_id provided in WebSocket connection");
+        socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
+        socket.destroy();
+        return;
+    }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+        ws.user_id = user_id; // Attach user_id to the WebSocket instance
+        wss.emit('connection', ws, req);
+    });
+});
+
+// Periodically ping clients to check activity
+setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (!ws.isAlive) {
+            console.log(`Terminating inactive connection for user: ${ws.user_id}`);
+            return ws.terminate();
+        }
+
+        ws.isAlive = false; // Reset and send ping
+        ws.ping();
+    });
+}, 10000); // Run every 10 seconds
+
 
 app.use(morgan('combined'));
 
@@ -61,9 +144,6 @@ const checkSessionData = (req, res, next) => {
 
 // Use the checkSessionData middleware
 app.use(checkSessionData);
-
-// Assigning port number for the express server
-const port = process.env.EXPRESS_PORT;
 
 //Create mySQL Connection using data stored in .env file
 let meNexus = mysql.createConnection({
@@ -858,6 +938,28 @@ app.get('/search', async (req, res) => {
     }
 });
 
+// Helper to send notifications
+const sendNotification = (userId, notification) => {
+    console.log(`sendNotification called with userId: ${userId} (type: ${typeof userId})`);
+    console.log("Current WebSocket clients:", Array.from(clients.keys()));
+
+    const client = clients.get(String(userId)); // Ensure type consistency
+    if (!client) {
+        console.log(`No WebSocket client found for user_id: ${userId}`);
+        return;
+    }
+
+    if (client.readyState !== WebSocket.OPEN) {
+        console.log(`WebSocket client for user_id: ${userId} is not open. Current state: ${client.readyState}`);
+        return;
+    }
+
+    console.log(`Sending notification to user_id: ${userId}`, notification);
+    client.send(JSON.stringify(notification));
+};
+
+
+
 // API endpoint for creating notifications
 app.post('/createNotification', async (req, res) => {
     const { user_id, actor_id, resource_type, resource_id, action } = req.body;
@@ -916,6 +1018,11 @@ app.post('/createNotification', async (req, res) => {
                 return res.status(500).json({ error: "Failed to create notification." });
             }
 
+            // Broadcast via WebSocket
+            console.log("Preparing to call sendNotification")
+            console.log("Current WebSocket clients:", Array.from(clients.keys()));
+            sendNotification(user_id, { summary, is_read: 0, created_at: new Date() });
+
             res.json({ message: "Notification created successfully." });
         });
     });
@@ -954,7 +1061,7 @@ app.get("/getNotifications", (req, res) => {
     }
 
     let sql = `
-    SELECT * FROM Notifications WHERE user_id = ? AND is_read = false
+    SELECT * FROM Notifications WHERE user_id = ? AND is_read = false;
     `;
     meNexus.query(sql, [user_id], (err, results) => {
         if (err) {
@@ -972,7 +1079,3 @@ app.get("/getNotifications", (req, res) => {
 
 
 
-//Express server listening on port number specified
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-});

@@ -1,6 +1,9 @@
 export const API_BASE_URL = "http://localhost:3001";
 
 export const ENDPOINTS = {
+
+    WEBSOCKET: "ws://localhost:3001?user_id=",
+
     LOGIN: `${API_BASE_URL}/login`,
     LOGOUT: `${API_BASE_URL}/logout`,
     GET_CURRENT_USER: `${API_BASE_URL}/getCurrentUser`,
