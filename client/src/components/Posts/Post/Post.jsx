@@ -8,6 +8,7 @@ import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
 import useEditComment from "../../../api/hooks/useEditComment.js"
 import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
+import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
 
 const Post = ({
                   post_id,
@@ -31,11 +32,8 @@ const Post = ({
 
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { getComments, commentsData } = useGetComments();
-    const resource_type = "post";
-
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [comments, setComments] = useState([]);
-    const [showComments, setShowComments] = useState(false);
+    const { createNotification } = useCreateNotification();
+    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, post_id, getComments, setComments));
 
     const {
         handleCommentEdit,
@@ -45,13 +43,24 @@ const Post = ({
         setEditedCommentContent,
     } = useEditComment(() => refreshComments(resource_type, post_id, getComments, setComments));
 
-    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, post_id, getComments, setComments));
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
+    const resource_type = "POST";
 
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", user_id);
+        const notification = {
+            user_id: user_id,
+            actor_id: session_user_id,
+            resource_type: "FOLLOW",
+            resource_id: session_user_id,
+            action: "FOLLOW",
+        }
         try {
             await followUser(user_id);
             setIsFollowing(true);
+            await createNotification(notification);
         } catch (err) {
             console.log('Error following user', err);
         }
@@ -201,6 +210,8 @@ const Post = ({
             )}
             <div className="user-post__comment-form">
                 <CommentForm
+                    user_id={user_id}
+                    session_user_id={session_user_id}
                     resource_type={resource_type}
                     resource_id={post_id}
                     getComments={getComments}

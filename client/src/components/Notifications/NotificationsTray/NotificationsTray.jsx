@@ -1,11 +1,9 @@
 import './NotificationsTray.css'
-import {useState} from 'react'
 import Notification from '../Notification/Notification.jsx'
 
-const NotificationsTray = () => {
-
-    const [notifications, setNotifications] = useState([])
-
+const NotificationsTray = ({
+                                notifications,
+                           }) => {
 
     return (
         <div className="notifications-tray">
@@ -15,18 +13,22 @@ const NotificationsTray = () => {
                     .map((notification, index) => (
                         <Notification
                             key={index}
-                            user={user_id}
-                            actor_id={actor_id}
-                            resource_type={resource_type}
-                            resource_id={resource_id}
-                            summary={summary}
-                            is_read={is_read}
-                            created_at={created_at}
+                            user_id={notification.user_id}
+                            actor_id={notification.actor_id}
+                            resource_type={notification.resource_type}
+                            resource_id={notification.resource_id}
+                            summary={notification.summary}
+                            is_read={notification.is_read}
+                            created_at={notification.created_at}
 
                         />
                     ))
             ) : (
-                <div>No New Notifications</div>
+                <div className="notifications-tray__default-notification">
+                    <p>
+                        No New Notifications
+                    </p>
+                </div>
             )}
         </div>
     )

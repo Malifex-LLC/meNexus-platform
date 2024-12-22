@@ -2,15 +2,21 @@ import './ProfileCard.css';
 import '../../api/hooks/useGetProfile.js';
 import useGetProfile from "../../api/hooks/useGetProfile.js";
 import {useEffect, useState} from "react";
-import {NavLink} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import useFollowActions from "../../api/hooks/useFollowActions.js"
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js"
+import useCreateNotification from "../../api/hooks/useCreateNotification.js"
 
 const ProfileCard = ({handle}) => {
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getProfile, data, loading, error} = useGetProfile();
+    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+    const { createNotification } = useCreateNotification();
+
     const [profile, setProfile] = useState({});
     const [isFollowing, setIsFollowing] = useState(false);
-
-    const {getProfile, data, loading, error} = useGetProfile();
-    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+    const [session_user_id, setSession_user_id] = useState(null);
+    const navigate = useNavigate();
 
     useEffect( () => {
         const fetchProfile = async () => {
@@ -26,11 +32,38 @@ const ProfileCard = ({handle}) => {
 
     }, []);
 
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                const response = await getSessionUser();
+
+                if (response.status === 200 && response.data.user_id) {
+                    setSession_user_id(response.data.user_id);
+                } else {
+                    console.error("Invalid session, redirecting to login.");
+                    navigate ("/login");
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchSessionUser();
+    }, [])
+
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", profile.user_id);
+
+        const notification = {
+            user_id: profile.user_id,
+            actor_id: session_user_id,
+            resource_type: "FOLLOW",
+            resource_id: session_user_id,
+            action: "FOLLOW",
+        }
         try {
             await followUser(profile.user_id);
             setIsFollowing(true);
+            await createNotification(notification);
         } catch (err) {
             console.log('Error following user', err);
         }
@@ -86,7 +119,6 @@ const ProfileCard = ({handle}) => {
                     {isFollowing ? "Unfollow" : "Follow"}
                 </button>
             </div>
-
         </div>
     )
 };
