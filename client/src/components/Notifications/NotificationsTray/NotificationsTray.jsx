@@ -1,19 +1,33 @@
 import './NotificationsTray.css'
+import {useState} from 'react'
+import Notification from '../Notification/Notification.jsx'
 
 const NotificationsTray = () => {
+
+    const [notifications, setNotifications] = useState([])
+
+
     return (
         <div className="notifications-tray">
-            <ul className="notifications-tray--list">
-                <li className="notifications-tray--list-item">
-                    <p>Notification 1</p>
-                </li>
-                <li className="notifications-tray--list-item">
-                    <p>Notification 2</p>
-                </li>
-                <li className="notifications-tray--list-item">
-                    <p>Notification 3</p>
-                </li>
-            </ul>
+            {notifications.length > 0 ? (
+                notifications
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .map((notification, index) => (
+                        <Notification
+                            key={index}
+                            user={user_id}
+                            actor_id={actor_id}
+                            resource_type={resource_type}
+                            resource_id={resource_id}
+                            summary={summary}
+                            is_read={is_read}
+                            created_at={created_at}
+
+                        />
+                    ))
+            ) : (
+                <div>No New Notifications</div>
+            )}
         </div>
     )
 }
