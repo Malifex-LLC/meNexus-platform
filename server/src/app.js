@@ -689,7 +689,7 @@ app.post("/createComment", (req, res) => {
     const { resource_type, resource_id, content } = req.body;
 
     const sql = `
-        INSERT INTO Comments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
+        INSERT INTO PostComments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
     `;
     meNexus.query(sql, [user_id, resource_type, resource_id, content], (commentErr, commentResult) => {
         if (commentErr) {
@@ -705,7 +705,7 @@ app.put("/updateComment/:comment_id", (req, res) => {
     const comment_id = req.params.comment_id;
     const updatedContent = req.body.content;
     // Update the Comment in database
-    const sql = 'UPDATE Comments SET content = ? WHERE comment_id = ?';
+    const sql = 'UPDATE PostComments SET content = ? WHERE comment_id = ?';
     meNexus.query(sql, [updatedContent, comment_id], (commentErr, commentResult) => {
         if (commentErr) {
             console.error(commentErr);
@@ -723,7 +723,7 @@ app.put("/updateComment/:comment_id", (req, res) => {
 app.delete("/deleteComment/:comment_id", (req, res) => {
     const comment_id = req.params.comment_id;
     // Delete the comment from the database
-    const deleteSql = "DELETE FROM Comments WHERE comment_id = ?";
+    const deleteSql = "DELETE FROM PostComments WHERE comment_id = ?";
     meNexus.query(deleteSql, [comment_id], (deleteErr, deleteResult) => {
         if (deleteErr) {
             console.error(deleteErr);
@@ -755,13 +755,13 @@ app.get("/getComments", (req, res) => {
         case "POST":
             sql = `
                 SELECT
-                    Comments.comment_id,
-                    Comments.user_id AS comment_user_id,
-                    Comments.resource_id,
-                    Comments.resource_type,
-                    Comments.content AS comment_content,
-                    Comments.created_at AS comment_created_at,
-                    Comments.updated_at AS comment_updated_at,
+                    PostComments.comment_id,
+                    PostComments.user_id AS comment_user_id,
+                    PostComments.resource_id,
+                    PostComments.resource_type,
+                    PostComments.content AS comment_content,
+                    PostComments.created_at AS comment_created_at,
+                    PostComments.updated_at AS comment_updated_at,
                     Posts.post_id,
                     Posts.content AS post_content,
                     Posts.user_id AS post_user_id,
@@ -769,9 +769,9 @@ app.get("/getComments", (req, res) => {
                     Posts.created_at AS post_created_at,
                     Users.display_name,
                     Users.handle
-                FROM Comments
-                         INNER JOIN Posts ON Comments.resource_id = Posts.post_id
-                         INNER JOIN Users ON Comments.user_id = Users.user_id
+                FROM PostComments
+                         INNER JOIN Posts ON PostComments.resource_id = Posts.post_id
+                         INNER JOIN Users ON PostComments.user_id = Users.user_id
                 WHERE Posts.post_id = ?
             `;
             meNexus.query(sql, [resource_id], (err, results) => {
@@ -787,7 +787,7 @@ app.get("/getComments", (req, res) => {
 
         default:
                 sql = `
-                SELECT * FROM Comments WHERE post_id = ?;
+                SELECT * FROM PostComments WHERE post_id = ?;
                 `;
             break;
 
