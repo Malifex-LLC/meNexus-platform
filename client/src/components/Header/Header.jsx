@@ -1,18 +1,49 @@
 import './Header.css';
 import '../Search/Search.jsx'
 import {useEffect, useState} from "react";
+import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import NotificationsTray from '../Notifications/NotificationsTray/NotificationsTray.jsx'
 import Search from "../Search/Search.jsx";
 import useGetNotifications from "../../api/hooks/useGetNotifications.js";
+import useNotificationsWebSocket from '../../api/hooks/useNotificationsWebSocket.js'
 import useSetNotificationAsRead from "../../api/hooks/useSetNotificationAsRead.js";
 
 const Header = () => {
 
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getNotifications, loading, error } = useGetNotifications()
     const { setNotificationAsRead } = useSetNotificationAsRead()
+    const { connectNotificationsWebSocket } = useNotificationsWebSocket();
 
+    const [sessionUserId, setSessionUserId] = useState(null);
+    const [isSessionUserIdSet, setIsSessionUserIdSet] = useState(null);
     const [showNotificationsTray, setShowNotificationsTray] = useState(false);
     const [notifications, setNotifications] = useState([])
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            if (!sessionUserId && !isSessionUserIdSet) {
+                try {
+                    console.log("Fetching current user session...");
+                    const response = await getSessionUser();
+                    console.log(response);
+
+                    if (response.status === 200 && response.data.user_id) {
+                        console.log("Session user handle:", response.data.handle);
+                        setSessionUserId(response.data.user_id);
+                    } else {
+                        console.error("Invalid session");
+                    }
+                } catch (error) {
+                    console.error("Error fetching current user session:", error);
+                }
+            } else if (sessionUserId) {
+                setSessionUserId(sessionUserId);
+            }
+        };
+
+        fetchSessionUser();
+    }, [sessionUserId, isSessionUserIdSet]);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -27,14 +58,33 @@ const Header = () => {
         fetchNotifications();
     }, []);
 
+    const handleNewNotification = (notification) => {
+        setNotifications((prev) => [notification, ...prev]);
+    };
+
+    // TODO This seems atrocious but its working idk
     const toggleNotificationsTray = () => {
         setShowNotificationsTray((prevState) => !prevState);
-        if (showNotificationsTray === false) {
+        if (showNotificationsTray === true) {
             notifications.map((notification) => {
                 setNotificationAsRead(notification.notification_id);
             })
+            notifications.length = 0;
+        }
+        if (!showNotificationsTray) {
+            getNotifications().then((fetchedNotifications) => {
+                setNotifications(fetchedNotifications);
+                notifications.map((notification) => {
+                    setNotificationAsRead(notification.notification_id);
+                })
+            });
         }
     }
+
+    // TODO This cause WebSocket to connect on any page regardless of being logged in
+    // Just saw WebSocket connected while on the login page after user logout
+    console.log("useNotificationsWebSocket attempting to connect for user_id: ", sessionUserId);
+    connectNotificationsWebSocket(sessionUserId, handleNewNotification);
 
     return (
         <div className="header__container">
@@ -60,7 +110,8 @@ const Header = () => {
                 {showNotificationsTray && (
                     <div className="header__notifications-tray">
                         <NotificationsTray
-                        notifications={notifications}
+                            user_id={sessionUserId}
+                            existingNotifications={notifications}
                         />
                     </div>
                 )}

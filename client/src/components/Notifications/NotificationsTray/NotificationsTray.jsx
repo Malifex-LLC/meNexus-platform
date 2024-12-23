@@ -1,9 +1,12 @@
 import './NotificationsTray.css'
+import {useEffect, useState} from "react";
 import Notification from '../Notification/Notification.jsx'
 
 const NotificationsTray = ({
-                                notifications,
+                                user_id,
+                                existingNotifications,
                            }) => {
+    const [notifications, setNotifications] = useState(existingNotifications);
 
     return (
         <div className="notifications-tray">
