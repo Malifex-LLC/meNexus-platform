@@ -463,6 +463,103 @@ app.get('/getProfile/:handle', (req, res) => {
     });
 });
 
+// API endpoint to update User and Profile fields based on field data sent from client
+app.put('/updateProfileSettings/:handle', async (req, res) => {
+    const { handle } = req.params; // Get the current user handle from the request
+    const updatedFields = req.body; // Get the fields to update from the request body
+
+    console.log('updateProfileSettings called for handle: ', handle);
+
+    if (!handle || Object.keys(updatedFields).length === 0) {
+        return res.status(400).json({ error: "Invalid request data" });
+    }
+
+    // Separate fields for Users and Profiles tables
+    const userFields = [];
+    const userValues = [];
+    const profileFields = [];
+    const profileValues = [];
+
+    // Classify updates into Users and Profiles fields
+    for (const [key, value] of Object.entries(updatedFields)) {
+        if (key === 'handle' || key === 'display_name') {
+            userFields.push(`${key} = ?`);
+            userValues.push(value);
+        } else if (
+            key === 'profile_name' ||
+            key === 'profile_bio' ||
+            key === 'profile_location'
+        ) {
+            profileFields.push(`${key} = ?`);
+            profileValues.push(value);
+        } else {
+            console.warn(`Unknown field: ${key} - Ignoring`);
+        }
+    }
+
+    // Tracks updates to handle, used for subsequent queries to Profiles table if needed
+    let newHandle = handle;
+
+    // Update Users table if necessary
+    if (userFields.length > 0) {
+        const userSql = `UPDATE Users SET ${userFields.join(', ')} WHERE handle = ?`;
+        userValues.push(handle); // Add current handle for WHERE clause
+
+        const userUpdate = new Promise((resolve, reject) => {
+            meNexus.query(userSql, userValues, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        try {
+            const userResult = await userUpdate;
+            if (userResult.affectedRows === 0) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            // Update newHandle if handle was updated
+            if (updatedFields.handle && updatedFields.handle !== handle) {
+                newHandle = updatedFields.handle;
+                req.session.user.handle = newHandle; // Update session data
+            }
+
+            if (updatedFields.display_name) {
+                req.session.user.display_name = updatedFields.display_name;
+            }
+        } catch (err) {
+            console.error("Error updating Users table:", err.message);
+            return res.status(500).json({ error: "Failed to update user information" });
+        }
+    }
+
+    // Update Profiles table if necessary
+    if (profileFields.length > 0) {
+        const profileSql = `UPDATE Profiles SET ${profileFields.join(', ')} WHERE user_id = (SELECT user_id FROM Users WHERE handle = ?)`;
+        profileValues.push(newHandle); // Use the updated handle for WHERE clause
+
+        const profileUpdate = new Promise((resolve, reject) => {
+            meNexus.query(profileSql, profileValues, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        try {
+            const profileResult = await profileUpdate;
+            if (profileResult.affectedRows === 0) {
+                return res.status(404).json({ error: "Profile not found" });
+            }
+        } catch (err) {
+            console.error("Error updating Profiles table:", err.message);
+            return res.status(500).json({ error: "Failed to update profile information" });
+        }
+    }
+
+    // Success response
+    return res.status(200).json({message: "Profile updated successfully"})
+});
+
 // API endpoint to fetch the current user from the session
 app.get('/getCurrentUser', (req, res) => {
     console.log('getCurrentUser called');
@@ -1072,10 +1169,3 @@ app.get("/getNotifications", (req, res) => {
         }
     })
 });
-
-
-
-
-
-
-
