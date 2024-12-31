@@ -16,7 +16,7 @@ const useUpdateProfileSettings = () => {
                 data: updatedFields,
                 withCredentials: true
         });
-            return response.data;
+            return response;
 
         } catch (error) {
             console.error('Error updating profile settings: ', error);
