@@ -463,6 +463,62 @@ app.get('/getProfile/:handle', (req, res) => {
     });
 });
 
+// API endpoint to update Authentication fields
+app.put('/updateAccountSettings', async (req, res) => {
+    const { user_id } = req.session.user;
+    const updatedFields = req.body;
+
+    console.log('updateAccountSettings called for user_id: ', user_id);
+
+    if (!user_id || Object.keys(updatedFields).length === 0) {
+        return res.status(400).json({ error: "Invalid request data" });
+    }
+
+    // Separate fields from values
+    const authFields = [];
+    const authValues = [];
+
+    for ( [key, value] of Object.entries(updatedFields)) {
+        if (key === 'password') {
+            key = 'hashed_password';
+            hashed_password = await bcrypt.hash(value, 10);
+            authFields.push(`${key} = ?`);
+            authValues.push(hashed_password);
+        } else if (key === 'email') {
+            authFields.push(`${key} = ?`);
+            authValues.push(value);
+        } else {
+            console.warn(`Unknown field: ${key} - Ignoring`);
+        }
+
+    }
+
+    if (authFields.length > 0) {
+        const authSql = `UPDATE Authentication SET ${authFields.join(', ')} WHERE user_id = ?;`;
+        authValues.push(user_id) // Add current user_id for WHERE clause
+
+        const authUpdate = new Promise((resolve, reject) => {
+            meNexus.query(authSql, authValues, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        try {
+            const authResult = await authUpdate;
+            if (authResult.affectedRows === 0) {
+                return res.status(404).json({ error: "Authentication not found" });
+            }
+        } catch (err) {
+            console.error("Error updating Authentication table:", err.message);
+            return res.status(500).json({ error: "Failed to update Authentication" });
+        }
+    }
+
+    // Success response
+    return res.status(200).json({message: "Authentication updated successfully"})
+});
+
 // API endpoint to update User and Profile fields based on field data sent from client
 app.put('/updateProfileSettings/:handle', async (req, res) => {
     const { handle } = req.params; // Get the current user handle from the request
