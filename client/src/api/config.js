@@ -10,6 +10,7 @@ export const ENDPOINTS = {
     GET_CURRENT_USER: `${API_BASE_URL}/getCurrentUser`,
     GET_PROFILE: `${API_BASE_URL}/getProfile/:handle`,
 
+    UPDATE_ACCOUNT_SETTINGS: `${API_BASE_URL}/updateAccountSettings`,
     UPDATE_PROFILE_SETTINGS: `${API_BASE_URL}/updateProfileSettings/:handle`,
 
     FOLLOW_USER: `${API_BASE_URL}/followUser`,
