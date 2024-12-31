@@ -21,6 +21,8 @@ const ProfileSettings = () => {
     const [isHandleSet, setIsHandleSet] = useState(false);
     const [profile, setProfile] = useState({});
     const [selectedFile, setSelectedFile] = useState(null);
+    const [ isUpdateSuccess, setIsUpdateSuccess ] = useState(false);
+    const [ isUpdateError, setIsUpdateError ] = useState(false);
     const navigate = useNavigate();
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
@@ -30,6 +32,7 @@ const ProfileSettings = () => {
 
     const handleProfileUpdate = async () => {
         event.preventDefault(); // Prevent form submission reload
+        setIsUpdateError(false);
 
         const updatedFields = {};
 
@@ -55,9 +58,19 @@ const ProfileSettings = () => {
             return;
         }
 
-        const response = updateProfileSettings(sessionUserHandle, updatedFields);
+        const response = await updateProfileSettings(sessionUserHandle, updatedFields);
         if (response.status === 200) {
-            console.log("Profile updated successfully");
+            console.log("Profile settings updated successfully");
+            setIsUpdateSuccess(true);
+            setIsUpdateError(false);
+            setNewDisplayName("");
+            setNewHandle("");
+            setNewProfileName("");
+            setNewProfileBio("");
+            setNewProfileBio("");
+        } else if (response.status === 401) {
+            setIsUpdateSuccess(false);
+            setIsUpdateError(true);
         }
 
     }
@@ -223,6 +236,16 @@ const ProfileSettings = () => {
                     Save Changes
                 </button>
             </form>
+            {isUpdateSuccess && (
+                <p className="profile-settings__updated-successfully">
+                    Profile settings updated successfully
+                </p>
+            )}
+            {isUpdateError && (
+                <p className="profile-settings__updated-error">
+                    Profile settings failed to update
+                </p>
+            )}
         </div>
     );
 };
