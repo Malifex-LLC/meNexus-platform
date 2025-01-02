@@ -644,6 +644,29 @@ app.get('/getCurrentUser', (req, res) => {
     }
 });
 
+// API endpoint to fetch user info from provided user_id
+app.get('/getUser', (req, res) => {
+    console.log('/getUser called');
+    const { user_id } = req.query;
+
+    if(!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT * FROM Users WHERE user_id = ?;
+    `
+
+    meNexus.query(sql, [user_id], (err, result) => {
+        if (err) {
+            console.error('Error fetching user', err);
+            return res.status(500).json({ error: 'Failed to fetch user' });
+        }
+
+        res.json(result)
+    })
+});
+
 // Endpoint to upload profile picture
 app.post('/settings/uploadProfilePicture', upload.single('profile_picture'), async (req, res) => {
     const uploadType = req.body.uploadType;
@@ -948,12 +971,251 @@ app.get("/getComments", (req, res) => {
     }
 });
 
+// API endpoint for creating a new conversation
+app.post('/createConversation', (req, res) => {
+    const { user_id } = req.session.user;
+    let newConversationId;
+    console.log("/createConversation called for participants");
+
+    const newConversationSql = `
+        INSERT INTO Conversations () VALUES ();
+    `;
+
+    meNexus.query(newConversationSql, (err, results) => {
+        if (err) {
+            console.error('Error creating conversation', err);
+            return res.status(500).json({ error: 'Failed to create conversation' });
+        }
+
+        newConversationId = results.insertId;
+        console.log('newConversationId', newConversationId);
+
+        const addSenderParticipantSql = `
+        INSERT INTO ConversationParticipants (conversation_id, user_id) VALUES (?, ?);
+    `;
+
+        meNexus.query(addSenderParticipantSql, [newConversationId, user_id], (err, results) => {
+            if (err) {
+                console.error('Error adding sender to  ConversationParticipants', err);
+                return res.status(500).json({ error: 'Failed to add sender to ConversationParticipants' });
+            }
+
+            res.json({message: "Created Conversation and added sender to ConversationParticipants", conversation_id: newConversationId});
+        });
+    });
+});
+
+// API endpoint for adding participants to a Conversation
+app.put(/updateConversationParticipants/, (req, res) => {
+    const newParticipantsHandle = req.body.participants;
+    const conversation_id = req.body.conversation_id;
+    console.log("/updateConversationParticipants called for participant: ", newParticipantsHandle, ' and conversation_id: ', conversation_id);
+
+    const getParticipantUserIdSql = `
+    SELECT user_id from Users WHERE handle = ?;
+    `;
+
+    meNexus.query(getParticipantUserIdSql, [newParticipantsHandle], (err, results) => {
+        if (err) {
+            console.error(`Error getting new participant's user_id`, err);
+        }
+        console.log('getParticipantUserIdSql results: ', results);
+        if (results.length === 0) {
+            return res.status(500).json({error: "Could not find valid user_id"})
+        }
+        const newParticipantsUserId = results[0].user_id;
+
+        const addParticipantsSql = `
+            INSERT INTO ConversationParticipants (conversation_id, user_id) VALUES (?, ?);
+        `;
+
+        meNexus.query(addParticipantsSql, [conversation_id, newParticipantsUserId], (err, results) => {
+            if (err) {
+                console.error('Error updating conversation participants', err);
+                return res.status(500).json({ error: 'Failed to update conversation participants' });
+            }
+
+            res.status(200).json({message: "Updated ConversationParticipants"});
+        })
+    });
+});
+
+// API endpoint for getting all Conversations for a user
+app.get('/getConversations', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+    console.log('/getConversations called for user_id: ', user_id);
+
+    if(!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT
+            c.conversation_id,
+            u.user_id AS participant_id,
+            u.handle AS participant_handle,
+            EXISTS (
+                       SELECT 1
+                       FROM Messages m
+                       WHERE m.conversation_id = c.conversation_id AND m.is_read = FALSE
+                   ) AS has_unread_messages
+        
+        FROM
+            Conversations c
+                JOIN
+            ConversationParticipants cp ON c.conversation_id = cp.conversation_id
+                JOIN
+            Users u ON cp.user_id = u.user_id
+                LEFT JOIN
+            Messages m ON c.conversation_id = m.conversation_id
+        WHERE
+            cp.conversation_id IN (
+                SELECT conversation_id
+                FROM ConversationParticipants
+                WHERE user_id = ?
+            )
+          AND u.user_id != ?
+        GROUP BY
+            c.conversation_id, participant_id
+    `
+
+    meNexus.query(sql, [user_id, user_id], (err, results) => {
+        if (err) {
+            console.error('Error fetching conversations', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json(results);
+        console.log('/getConversations results:', results);
+    });
+});
+
+// Helper to send messages
+const sendMessage = (userId, message) => {
+    console.log(`sendMessage called with userId: ${userId} (type: ${typeof userId})`);
+    console.log("Current WebSocket clients:", Array.from(clients.keys()));
+
+    const client = clients.get(String(userId)); // Ensure type consistency
+    if (!client) {
+        console.log(`No WebSocket client found for user_id: ${userId}`);
+        return;
+    }
+
+    if (client.readyState !== WebSocket.OPEN) {
+        console.log(`WebSocket client for user_id: ${userId} is not open. Current state: ${client.readyState}`);
+        return;
+    }
+
+    console.log(`Sending message to user_id: ${userId}`, message);
+    client.send(JSON.stringify(message));
+};
+
+// API endpoint for creating a new Message
+app.post('/createMessage', (req, res) => {
+    console.log('/createMessage called');
+    console.log('/createMessage req.body:', req.body);
+    console.log('/createMessage req.query:', req.query);
+
+    const { user_id } = req.session.user; // Get the current user's ID
+    const { conversation_id } = req.body;
+    const { message } = req.body;
+    const participant_id = message.participant_id;
+    const content = message.content;
+
+    if(!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    if (!conversation_id || !content) {
+        return res.status(400).json({ error: 'Missing conversation_id or content' });
+    }
+
+    const sql = `
+        INSERT INTO Messages (conversation_id, sender_id, receiver_id, content, created_at)
+        VALUES (?, ?, ?, ?, NOW())
+    `;
+
+    meNexus.query(sql, [conversation_id, user_id, participant_id, content], (err, results) => {
+        if (err) {
+            console.error('Error creating message', err);
+            return res.status(500).json({error: 'Failed to create message'});
+        }
+
+        console.log('/createMessage results:', results);
+        // Fetch the inserted message with the generated timestamp
+        const fetchSql = `
+            SELECT *
+            FROM Messages
+            WHERE message_id = ?;
+        `;
+        const messageId = results.insertId;
+
+        meNexus.query(fetchSql, [messageId], (fetchErr, fetchedResults) => {
+            if (fetchErr) {
+                console.error('Error fetching the created message:', fetchErr);
+                return res.status(500).json({error: 'Failed to fetch created message'});
+            }
+
+            const fullMessage = fetchedResults[0];
+            console.log('Fetched full message:', fullMessage);
+
+            // Send the full message via WebSocket
+            sendMessage(participant_id, fullMessage);
+
+            // Respond to the sender
+            res.json({message: "Message created successfully.", fullMessage});
+        });
+    });
+});
+
+// API endpoint for getting Messages
+app.get('/getMessages', (req, res) => {
+    const { user_id } = req.session.user; // Get the current user's ID
+    const { conversation_id } = req.query;
+
+    if(!user_id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const sql = `
+        SELECT * FROM Messages WHERE conversation_id = ?;
+    `
+    meNexus.query(sql, [conversation_id], (err, results) => {
+        if (err) {
+            console.error('Error fetching messages', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json(results);
+    })
+
+});
+
+// API endpoint to set messages in a conversation as read
+app.put('/setMessagesAsRead', (req, res) => {
+    console.log('/setMessagesAsRead called for: ', req.body);
+    const { conversation_id } = req.body;
+
+    const sql = `
+        UPDATE Messages SET is_read = TRUE where conversation_id = ?;
+    `;
+
+    meNexus.query(sql, [conversation_id], (err, results) => {
+        if (err) {
+            console.error('Error updating messages as read', err);
+            return res.status(500).json({ error: 'Failed to update messages as read' });
+        }
+
+        console.log('Messages marked as read for conversation_id:', conversation_id);
+        res.status(200).json({ message: 'Messages marked as read', affectedRows: results.affectedRows });
+    });
+})
+
 // API endpoint for following a user
 app.post('/followUser', async (req, res) => {
     const { user_id } = req.session.user; // Get the follower's user ID from the session
     const { followed_id } = req.body;
     console.log("handle Follow user: ", followed_id, " for user: ", user_id);
-
 
     if (!user_id || !followed_id) {
         return res.status(400).json({ error: 'Invalid request data' });

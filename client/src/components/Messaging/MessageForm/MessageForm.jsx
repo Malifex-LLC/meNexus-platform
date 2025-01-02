@@ -2,27 +2,29 @@ import './MessageForm.css';
 import { useState } from "react";
 import useCreateMessage from '../../../api/hooks/useCreateMessage.js';
 
-const MessageForm = () => {
+const MessageForm = ({
+                         conversation_id,
+                         participant_id,
+                         getMessages,
+                         setMessages,
+                         refreshMessages
+}) => {
     const [text, setText] = useState(`New Message`);
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const { createMessage, loading, error } = useCreateMessage();
-
-    const styles = {
-        textarea: {
-            width: expanded ? '43%' : '43%',
-            height: expanded ? '200%' : '100%',
-        },
-    };
+    const { createMessage, loading, error } = useCreateMessage(() => refreshMessages());
 
     const handleSubmit = async () => {
+        if (!text.trim()) return; // Avoid sending empty messages
         const message = {
+            participant_id: participant_id,
             content: text,
         };
-        console.log("Submitting post:", message);
-        await createMessage(message);
+        console.log("Submitting message:", message);
+        await createMessage(conversation_id, message);
         setText(""); // Reset the text field after submission
+        await refreshMessages(getMessages, conversation_id, setMessages); // Refresh messages
     };
 
     const handleFormClick = () => {
@@ -37,7 +39,6 @@ const MessageForm = () => {
             <div onClick={handleFormClick}>
                 <textarea
                     className="message-form__entry-field"
-                    style={styles.textarea}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />

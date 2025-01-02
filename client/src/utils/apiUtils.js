@@ -25,3 +25,13 @@ export const refreshComments = async (resource_type, resource_id, getComments, s
         console.log("Error refreshing posts:", error);
     }
 };
+
+// Refreshes rendered messages, commonly after a message is created or deleted
+export const refreshMessages = async (getMessages, conversation_id, setMessages) => {
+    try {
+        const messagesData = await getMessages(conversation_id);
+        setMessages(messagesData);
+    } catch (error) {
+        console.log("Error refreshing messages:", error);
+    }
+};
