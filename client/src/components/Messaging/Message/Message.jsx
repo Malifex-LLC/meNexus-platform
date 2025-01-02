@@ -1,21 +1,26 @@
 import './Message.css';
+import { formatDate } from '../../../utils/dateUtils.js';
 
 const Message = ({
+                    session_user_id,
+                    conversation_id,
                     message_id,
-                    date,
+                    sender_id,
                     content,
-                    onEdit,
-                    onDelete,
-                    isEditing,
-                    editedContent,
-                    onContentChange,
-                    onSave,
+                    is_read,
+                    created_at,
                  }) => {
-    const isOwner = user_id === session_user_id;
+    console.log(`session_user_id: ${session_user_id}, sender_id: ${sender_id}, isOwner: ${session_user_id === sender_id}`);
+    const isOwner = session_user_id === sender_id;
 
     return (
-        <div className={`message ${isEditing ? "message--editing" : ""}`}>
-            <p>{content}</p>
+        <div className={`message ${isOwner ? 'message--owner' : 'message--other'}`}>
+            <div className="message__date">
+                <p>{formatDate(created_at)}</p>
+            </div>
+            <div className="message__main-content">
+                <p>{content}</p>
+            </div>
         </div>
     )
 }

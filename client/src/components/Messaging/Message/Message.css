@@ -1,0 +1,49 @@
+.message {
+    position: relative;
+    display: inline-block;
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin: 20px;
+    border-radius: 5px;
+    background-color: black;
+    color: white;
+    transition: background-color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Styles for messages sent by the current user */
+.message--owner {
+    align-self: flex-end;
+    background-color: #f7adf4;
+    color: #000;
+    text-align: right;
+    width: 55%;
+}
+
+.message--owner .message__date {
+    color: black;
+}
+
+/* Styles for messages received from others */
+.message--other {
+    align-self: flex-start;
+    background-color: black;
+    color: white;
+    text-align: left;
+    width: 55%;
+}
+
+.message--other .message__date {
+    color: #aaa;
+
+}
+
+.message__date {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.message__main-content {
+    font-size: 1rem;
+}
