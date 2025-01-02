@@ -1,13 +1,13 @@
--- MySQL dump 10.13  Distrib 8.0.40, for macos14 (x86_64)
+-- MySQL dump 10.13  Distrib 9.0.1, for macos14.7 (x86_64)
 --
--- Host: localhost    Database: menexus_schema
+-- Host: 127.0.0.1    Database: menexus_schema
 -- ------------------------------------------------------
 -- Server version	9.0.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -33,7 +33,7 @@ CREATE TABLE `Authentication` (
                                   UNIQUE KEY `email_UNIQUE` (`email`),
                                   KEY `fk_authentication_user_id_idx` (`user_id`),
                                   CONSTRAINT `fk_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,6 +44,56 @@ LOCK TABLES `Authentication` WRITE;
 /*!40000 ALTER TABLE `Authentication` DISABLE KEYS */;
 INSERT INTO `Authentication` VALUES (1,1,'menexus@mail.com','$2b$10$obUDhrFqItVqnqN0LxMaZOYEMej3QdhVWZRox5ZayGlRebEKUvIYe','local','2024-12-18 03:53:11');
 /*!40000 ALTER TABLE `Authentication` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ConversationParticipants`
+--
+
+DROP TABLE IF EXISTS `ConversationParticipants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ConversationParticipants` (
+                                            `conversation_id` bigint unsigned NOT NULL,
+                                            `user_id` bigint unsigned NOT NULL,
+                                            PRIMARY KEY (`conversation_id`,`user_id`),
+                                            KEY `ConversationParticipants_Users_user_id_fk` (`user_id`),
+                                            CONSTRAINT `ConversationParticipants_Conversations_conversation_id_fk` FOREIGN KEY (`conversation_id`) REFERENCES `Conversations` (`conversation_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                            CONSTRAINT `ConversationParticipants_Users_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ConversationParticipants`
+--
+
+LOCK TABLES `ConversationParticipants` WRITE;
+/*!40000 ALTER TABLE `ConversationParticipants` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ConversationParticipants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Conversations`
+--
+
+DROP TABLE IF EXISTS `Conversations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Conversations` (
+                                 `conversation_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+                                 `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                 `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                 PRIMARY KEY (`conversation_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Conversations`
+--
+
+LOCK TABLES `Conversations` WRITE;
+/*!40000 ALTER TABLE `Conversations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Conversations` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -82,6 +132,7 @@ DROP TABLE IF EXISTS `Messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Messages` (
+                            `conversation_id` bigint unsigned NOT NULL,
                             `message_id` bigint unsigned NOT NULL AUTO_INCREMENT,
                             `sender_id` bigint unsigned NOT NULL,
                             `receiver_id` bigint unsigned NOT NULL,
@@ -93,9 +144,11 @@ CREATE TABLE `Messages` (
                             PRIMARY KEY (`message_id`),
                             KEY `fk_sender_user_id_idx` (`sender_id`),
                             KEY `fk_receiver_user_id_idx` (`receiver_id`),
+                            KEY `Messages_Conversations_conversation_id_fk` (`conversation_id`),
                             CONSTRAINT `fk_receiver_user_id` FOREIGN KEY (`receiver_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                            CONSTRAINT `fk_sender_user_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                            CONSTRAINT `fk_sender_user_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                            CONSTRAINT `Messages_Conversations_conversation_id_fk` FOREIGN KEY (`conversation_id`) REFERENCES `Conversations` (`conversation_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,7 +182,7 @@ CREATE TABLE `Notifications` (
                                  KEY `fk_notification_actor_id_idx` (`actor_id`),
                                  CONSTRAINT `fk_notification_actor_id` FOREIGN KEY (`actor_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                  CONSTRAINT `fk_notification_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=199 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=216 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -161,7 +214,7 @@ CREATE TABLE `PostComments` (
                                 KEY `fk_post_id_idx` (`resource_id`),
                                 CONSTRAINT `fk_comment_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `fk_post_id` FOREIGN KEY (`resource_id`) REFERENCES `Posts` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -190,7 +243,7 @@ CREATE TABLE `Posts` (
                          PRIMARY KEY (`post_id`),
                          KEY `fk_post_user_id_idx` (`user_id`),
                          CONSTRAINT `fk_post_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -199,7 +252,7 @@ CREATE TABLE `Posts` (
 
 LOCK TABLES `Posts` WRITE;
 /*!40000 ALTER TABLE `Posts` DISABLE KEYS */;
-INSERT INTO `Posts` VALUES (1,1,'The migration to the new database schema has been completed! Everything appears to be operational!',NULL,'2024-12-18 03:57:46','2024-12-18 04:55:25'),(6,1,'Welcome to meNexus! This is the admin account where you can find everything related to meNexus!',NULL,'2024-12-18 04:55:30','2024-12-18 04:55:30'),(11,1,'meNexus has been updated to support custom profile pictures! You can update yours under Settings -> Profile -> Profile Picture!',NULL,'2024-12-19 02:43:21','2024-12-19 02:43:21'),(15,1,'meNexus database schema has been updated to use BIGINTs instead of INTs. This will support exponentially more users and interactions!',NULL,'2024-12-19 20:28:17','2024-12-19 20:28:17'),(18,1,'meNexus now supports Followers! Follow your favorite meNexus users to stay up-to-date with their most recent posts!',NULL,'2024-12-19 23:33:01','2024-12-19 23:33:01'),(28,1,'I\'m sure you\'ve noticed, but meNexus now supports comments! This is a huge step forward into making this a more social experience!',NULL,'2024-12-21 09:15:55','2024-12-21 09:16:01'),(29,1,'We have a long road ahead, but I genuinely believe that meNexus can blossom into something truly exciting.',NULL,'2024-12-21 09:17:08','2024-12-21 09:17:08'),(30,1,'meNexus now supports Notifications! Get notified on new followers, post comments, and more coming soon. While there is still development to be done to improve notifications, we hope you enjoy the new feature!',NULL,'2024-12-22 09:40:00','2024-12-22 09:40:00');
+INSERT INTO `Posts` VALUES (1,1,'The migration to the new database schema has been completed! Everything appears to be operational!',NULL,'2024-12-18 03:57:46','2024-12-18 04:55:25'),(6,1,'Welcome to meNexus! This is the admin account where you can find everything related to meNexus!',NULL,'2024-12-18 04:55:30','2024-12-18 04:55:30'),(11,1,'meNexus has been updated to support custom profile pictures! You can update yours under Settings -> Profile -> Profile Picture!',NULL,'2024-12-19 02:43:21','2024-12-19 02:43:21'),(15,1,'meNexus database schema has been updated to use BIGINTs instead of INTs. This will support exponentially more users and interactions!',NULL,'2024-12-19 20:28:17','2024-12-19 20:28:17'),(18,1,'meNexus now supports Followers! Follow your favorite meNexus users to stay up-to-date with their most recent posts!',NULL,'2024-12-19 23:33:01','2024-12-19 23:33:01'),(28,1,'I\'m sure you\'ve noticed, but meNexus now supports comments! This is a huge step forward into making this a more social experience!',NULL,'2024-12-21 09:15:55','2024-12-21 09:16:01'),(29,1,'We have a long road ahead, but I genuinely believe that meNexus can blossom into something truly exciting.',NULL,'2024-12-21 09:17:08','2024-12-21 09:17:08'),(30,1,'meNexus now supports Notifications! Get notified on new followers, post comments, and more coming soon. While there is still development to be done to improve notifications, we hope you enjoy the new feature!',NULL,'2024-12-22 09:40:00','2024-12-22 09:40:00'),(42,1,'You are now able to update your account and profile information! Navigate to the Settings page...there you will find options for Account and Profile where you can update your email, password, display name, handle, and more!',NULL,'2025-01-01 00:57:57','2025-01-01 00:58:16'),(43,1,'MeNexus has just launched its new messaging system! You can now chat in realtime with anyone on meNexus! We are very excited about this feature and we will continue to develop the messaging system to support more features soon!',NULL,'2025-01-02 23:03:01','2025-01-02 23:03:01');
 /*!40000 ALTER TABLE `Posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -226,7 +279,7 @@ CREATE TABLE `Profiles` (
                             PRIMARY KEY (`profile_id`),
                             KEY `fk_profile_use_id_idx` (`user_id`),
                             CONSTRAINT `fk_profile_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,7 +288,7 @@ CREATE TABLE `Profiles` (
 
 LOCK TABLES `Profiles` WRITE;
 /*!40000 ALTER TABLE `Profiles` DISABLE KEYS */;
-INSERT INTO `Profiles` VALUES (1,1,'meNexus','meNexus Admin Account','Network',NULL,NULL,NULL,NULL,NULL,'2024-12-24 01:04:40','2024-12-24 01:04:40');
+INSERT INTO `Profiles` VALUES (1,1,'meNexus','meNexus Admin Account','Network','/uploads/profile_pictures/1735003403353-menexus_logo.jpeg',NULL,NULL,NULL,NULL,'2024-12-24 01:04:40','2024-12-24 01:23:23');
 /*!40000 ALTER TABLE `Profiles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,7 +369,7 @@ CREATE TABLE `Users` (
                          `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`user_id`),
                          UNIQUE KEY `handle_UNIQUE` (`handle`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -368,4 +421,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-23 19:10:23
+-- Dump completed on 2025-01-02 17:28:24
