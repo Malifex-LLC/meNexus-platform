@@ -1,0 +1,22 @@
+.messages-layout {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "nav conversation-menu conversation";
+    grid-template-columns: 250px 225px 1fr; /*Navigation width and main content width */
+    grid-template-rows: 65px 1fr; /* Header height and main content */
+    min-height: 100vh;
+    background-color: white;
+    color: black;
+}
+
+.messages-layout__conversation-menu {
+    grid-area: conversation-menu;
+    background-color: #e9ecef;
+}
+
+.messages-layout__conversation-content {
+    background-color: white;
+    color: black;
+    overflow-y: auto;
+}
