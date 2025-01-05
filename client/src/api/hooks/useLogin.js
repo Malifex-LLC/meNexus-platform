@@ -7,10 +7,9 @@ const useLogin = () => {
 
     const login = async (email, password) => {
         try {
-            const url = ENDPOINTS.LOGIN;
             const response = await sendRequest( {
                 method: 'POST',
-                url: url,
+                url: ENDPOINTS.LOGIN,
                 data: { email, password },
                 withCredentials: true,
             });

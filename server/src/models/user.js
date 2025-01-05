@@ -1,21 +1,13 @@
-const mysql = require('mysql2');
+// Import database connection
+const meNexus = require('../config/db');
+
+// Import bcrypt
 const bcrypt = require('bcrypt');
 
-// TODO is this a duplicate mySQL connection? Do I need to pass the connection from app.js ?
-// Database connection
-let meNexus = mysql.createConnection({
-    socketPath  : process.env.DB_SOCKETPATH,
-    host        : process.env.DB_HOST,
-    port        : process.env.DB_PORT,
-    user        : process.env.DB_USER,
-    password    : process.env.DB_PASSWORD,
-    database    : process.env.DB_DATABASE
-});
-
-meNexus.connect();
+// TODO not all functions are written in the return new Promise() format
 
 // Function to create a new user
-const createUser = async (email, password, handle, displayName) => {
+exports.createUser = async (email, password, handle, displayName) => {
     console.log('createUser called for handle: ', handle);
 
     try {
@@ -23,7 +15,11 @@ const createUser = async (email, password, handle, displayName) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert the new user into the Users table
-        const userQuery = 'INSERT INTO Users (handle, display_name, created_at) VALUES (?, ?, NOW())';
+        const userQuery = `
+            INSERT INTO Users (handle, display_name, created_at) 
+            VALUES (?, ?, NOW())
+        `;
+
         const userParams = [handle, displayName];
         const userResult = await executeQuery(userQuery, userParams);
 
@@ -31,7 +27,11 @@ const createUser = async (email, password, handle, displayName) => {
         console.log('User created with ID:', userID);
 
         // Insert the authentication data into the Authentication table
-        const authQuery = 'INSERT INTO Authentication (user_id, email, hashed_password, auth_provider, created_at) VALUES (?, ?, ?, "local", NOW())';
+        const authQuery = `
+            INSERT INTO Authentication (user_id, email, hashed_password, auth_provider, created_at) 
+            VALUES (?, ?, ?, "local", NOW())
+        `;
+
         const authParams = [userID, email, hashedPassword];
         await executeQuery(authQuery, authParams);
         console.log('Authentication record created for user:', userID);
@@ -82,27 +82,22 @@ const createProfile = async (userID, handle) => {
     }
 };
 
-// Fetch user by email (Authentication table)
-const getUserByEmail = async (email) => {
-    console.log("getUserByEmail called for email:", email);
-    try {
-        const query = `
-            SELECT u.*, a.email, a.auth_provider
-            FROM Users u
-            INNER JOIN Authentication a ON u.user_id = a.user_id
-            WHERE a.email = ?
-        `;
-        const result = await executeQuery(query, [email]);
-
-        return result.length > 0 ? result[0] : null; // Return user or null
-    } catch (error) {
-        console.error("Error in getUserByEmail:", error.message);
-        throw new Error('Failed to fetch user by email');
-    }
+// Fetch user details by user_id
+exports.getUserById = (userId) => {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM Users WHERE user_id = ?';
+        meNexus.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error('Database error in getUserById:', err);
+                return reject(err);
+            }
+            resolve(results[0]); // Return the first result (or undefined if none found)
+        });
+    });
 };
 
 // Fetch user by handle
-const getUserByHandle = async (handle) => {
+exports.getUserByHandle = async (handle) => {
     console.log("getUserByHandle called for handle:", handle);
     try {
         const query = 'SELECT * FROM Users WHERE handle = ?';
@@ -111,36 +106,6 @@ const getUserByHandle = async (handle) => {
     } catch (error) {
         console.error("Error in getUserByHandle:", error.message);
         throw new Error('Failed to fetch user by handle');
-    }
-};
-
-// Fetch user by ID
-const getUserById = async (userID) => {
-    console.log("getUserByID called for ID:", userID);
-    try {
-        const query = 'SELECT * FROM Users WHERE user_id = ?';
-        const result = await executeQuery(query, [userID]);
-        return result.length > 0 ? result[0] : null; // Return user or null
-    } catch (error) {
-        console.error("Error in getUserById:", error.message);
-        throw new Error('Failed to fetch user by ID');
-    }
-};
-
-// Fetch Authentication by email
-const getAuthByEmail = async (email) => {
-    console.log("getAuthByEmail called for email:", email);
-    try {
-        const query = `
-            SELECT * 
-            FROM Authentication 
-            WHERE email = ?
-        `;
-        const result = await executeQuery(query, [email]);
-        return result.length > 0 ? result[0] : null;
-    } catch (error) {
-        console.error("Error in getAuthByEmail:", error.message);
-        throw new Error('Failed to fetch authentication data by email');
     }
 };
 
@@ -158,11 +123,69 @@ const executeQuery = (query, params) => {
     });
 };
 
-module.exports = {
-    createUser,
-    createProfile,
-    getUserByEmail,
-    getUserByHandle,
-    getUserById,
-    getAuthByEmail
+exports.getProfile = (handle) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT
+                Profiles.user_id,
+                Profiles.profile_name,
+                Profiles.profile_bio,
+                Profiles.profile_location,
+                Profiles.profile_picture,
+                Profiles.profile_banner,
+                Profiles.custom_css,
+                Users.display_name,
+                Users.handle
+            FROM Profiles
+            INNER JOIN Users ON Profiles.user_id = Users.user_id
+            WHERE Users.handle = ?;
+        `;
+
+        meNexus.query(sql, [handle], (err, results) => {
+            if (err) {
+                console.error('Error fetching user profile:', err);
+                return reject(new Error (err));
+            } else if (results.length === 0) {
+                return reject(null)
+            } else {
+                resolve(results[0]);
+            }
+        });
+    });
+};
+
+exports.updateUser = (userFields, userValues) => {
+    return new Promise((resolve, reject) => {
+        const userSql = `
+            UPDATE Users 
+            SET ${userFields.join(', ')} 
+            WHERE handle = ?
+        `;
+
+        meNexus.query(userSql, userValues, (err, result) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(result);
+        });
+    });
+};
+
+exports.updateProfile = (profileFields, profileValues) => {
+    return new Promise((resolve, reject) => {
+        const profileSql = `
+            UPDATE Profiles 
+            SET ${profileFields.join(', ')} 
+            WHERE user_id = (SELECT user_id FROM Users WHERE handle = ?)
+        `;
+
+        meNexus.query(profileSql, profileValues, (err, result) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(result);
+        });
+    });
 };

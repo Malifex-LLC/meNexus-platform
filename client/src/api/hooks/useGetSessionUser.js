@@ -7,10 +7,9 @@ const useGetSessionUser = () => {
 
     const getSessionUser = async () => {
         try {
-            const url = ENDPOINTS.GET_CURRENT_USER;
             const response = await sendRequest( {
                 method: 'GET',
-                url: url,
+                url: ENDPOINTS.GET_SESSION_USER,
                 withCredentials: true,
             });
 

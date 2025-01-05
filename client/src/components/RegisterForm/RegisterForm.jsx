@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './RegisterForm.css'
+import useCreateUser from '../../api/hooks/useCreateUser.js'
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
@@ -10,8 +10,9 @@ const RegisterForm = () => {
     const [display_name, setDisplay_name] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { createUser } = useCreateUser();
 
-    function handleSubmit(event) {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         // Checking to make sure all fields have been filled out
         if (!email || !password || !handle || !display_name) {
@@ -19,21 +20,19 @@ const RegisterForm = () => {
             return;
         }
 
-        // TODO this needs to be updated to use custom hooks like useAxios or useCreateUser
-        const userData = { email, password, handle, display_name };
-        axios
-            .post('http://localhost:3001/createUser', userData)
-            .then((res) => {
-                if (res.data.message === 'User created successfully') {
-                    // Redirect to login page after successful registration
-                    navigate('/login');
-                } else {
-                    setError('Failed to create user');
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        try {
+            const userData = { email, password, handle, display_name };
+            const response = await createUser(userData);
+            if (response.status === 200) {
+                // Redirect to login page after successful registration
+                navigate('/login');
+            } else {
+                setError('Failed to create user');
+            }
+        } catch (error) {
+            console.error(error);
+            setError(error);
+        }
     }
 
     return (
