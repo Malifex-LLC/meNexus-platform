@@ -2,6 +2,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/Home/HomePage.jsx';
 import RegisterPage from "./pages/Register/RegisterPage.jsx";
+import RegisterPagePKI from "./pages/Register/RegisterPagePKI.jsx";
 import LoginPage from "./pages/Login/LoginPage.jsx";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 import SettingsPage from "./pages/Settings/SettingsPage.jsx";
@@ -14,6 +15,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/registerPKI" element={<RegisterPagePKI />} />
                     <Route path="/login" element={<LoginPage />} />
 
                     {/* /home redirects to /home/:handle based on session user */}
