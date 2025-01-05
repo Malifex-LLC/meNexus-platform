@@ -42,7 +42,7 @@ const AccountSettings = () => {
             setNewPassword("");
             setConfirmPassword("");
             setNewEmail("");
-        } else if (response.status === 401) {
+        } else if (response.status === 400 || response.status === 500) {
             setIsUpdateSuccess(false);
             setIsUpdateError(true);
         }

@@ -8,7 +8,7 @@ const useSetNotificationAsRead = () => {
     const setNotificationAsRead = async (notification_id) => {
         const response = await sendRequest({
             method: 'PUT',
-            url: ENDPOINTS.UPDATE_NOTIFICATION,
+            url: ENDPOINTS.SET_NOTIFICATION_AS_READ,
             data: {notification_id},
             withCredentials: true
         });
