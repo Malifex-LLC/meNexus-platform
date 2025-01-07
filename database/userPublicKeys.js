@@ -1,12 +1,14 @@
 import { getDatabase} from '../database/orbitdb-service.js';
 
+const databaseAddress = '/orbitdb/zdpuAs1iPVDsxxjeEKwnUb9szJmqhSN4f8qgdckwiX9JdweZZ'
 let publicKeysDB = null;
 
 export async function getPublicKeysDB() {
     if (!publicKeysDB) {
         console.log('Fetching database from getDatabase...');
-        publicKeysDB = await getDatabase('user-public-keys', 'documents');
+        publicKeysDB = await getDatabase(databaseAddress, 'documents');
     }
+    console.log('Database Address:', publicKeysDB.address);
     return publicKeysDB;
 }
 
