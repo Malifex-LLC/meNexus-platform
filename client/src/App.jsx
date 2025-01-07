@@ -8,6 +8,7 @@ import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 import SettingsPage from "./pages/Settings/SettingsPage.jsx";
 import SearchPage from "./pages/Search/SearchPage.jsx";
 import MessagesPage from "./pages/Messages/MessagesPage.jsx";
+import LoginPagePKI from "./pages/Login/LoginPagePKI.jsx";
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/registerPKI" element={<RegisterPagePKI />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/loginPKI" element={<LoginPagePKI />} />
 
                     {/* /home redirects to /home/:handle based on session user */}
                     <Route path="/home" element={<HomePage />} />

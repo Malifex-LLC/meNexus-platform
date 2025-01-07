@@ -1,6 +1,9 @@
 // Import the Passport.js config
 const passport = require('../config/passport');
 
+// Import crypto
+const crypto = require('crypto');
+
 // Import bcrypt
 bcrypt = require('bcrypt');
 
@@ -11,7 +14,11 @@ const Auth = require('../models/auth')
 const User = require("../models/user");
 
 // Import orbitDB userPublicKeys database wrapper function
-const { storePublicKey, getUserIdByPublicKey, getAllPublicKeys } = require('../../../database/userPublicKeys')
+const { getUserIdByPublicKey, getAllPublicKeys } = require('../../../database/userPublicKeys')
+
+const {verifySignature} = require('../utils/cryptoUtils')
+
+
 
 // Account registration logic
 exports.createUser = async (req, res) => {
@@ -46,18 +53,6 @@ exports.createUser = async (req, res) => {
     }
 }
 
-exports.storePublicKey = async (req, res) => {
-    console.log("storePublicKey called for user_id:", req.query.user_id, " and public key: ", req.query.publicKey);
-    const user_id = req.body.user_id;
-    const publicKey = req.query.publicKey;
-    try {
-        await storePublicKey(user_id);
-    } catch (error) {
-        console.error("Error in /storePublicKey:", error);
-    }
-
-}
-
 exports.getUserIdByPublicKey = async (req, res) => {
     console.log("getUserIdByPublicKey called for: ", req.query.publicKey);
     const publicKey = req.query.publicKey;
@@ -88,6 +83,52 @@ exports.getAllPublicKeys = async (req, res) => {
     }
 
 }
+
+// Provide a crypto challenge for user to sign
+exports.getCryptoChallenge = (req, res) => {
+    const challenge = crypto.randomBytes(32).toString('hex'); // Generate challenge
+
+    // Store the challenge in the session for later verification
+    req.session.challenge = challenge;
+
+    res.status(200).json({ challenge });
+};
+
+exports.verifyCryptoSignature = async (req, res) => {
+    const {signature}  = req.body;
+    const {challenge} = req.body;
+    const {publicKey} = req.body;
+
+    if (!challenge) {
+        return res.status(400).json({ error: 'No challenge found. Start login process again.' });
+    }
+
+    const isValid = await verifySignature(signature, challenge, publicKey);
+    console.log("verifySignature isValid:", isValid);
+    try {
+        if (isValid) {
+            console.log("Signature is valid");
+            const user_id = getUserIdByPublicKey(publicKey);
+            const user_id_int =  parseInt(await user_id);
+
+            const user = await User.getUserById(user_id_int);
+            console.log("user: ",  user);
+
+            // Attach session data
+            req.session.user = {
+                user_id: user.user_id,
+                handle: user.handle,
+                display_name: user.display_name,
+            };
+
+            console.log('Session Data:', req.session.user);
+
+            res.status(200).json({message: 'publicKey validated and session user data set'});
+        }
+    } catch (error) {
+        console.error("Error in /verifyCryptoSignature:", error);
+    }
+};
 
 // Login logic
 exports.login = async (req, res, next) => {
