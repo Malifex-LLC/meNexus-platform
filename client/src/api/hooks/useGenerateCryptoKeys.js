@@ -1,9 +1,6 @@
-import useAxios from './useAxios';
-import { ENDPOINTS } from '../config';
 import * as secp from '@noble/secp256k1';
 
 const useGenerateCryptoKeys = () => {
-    const { sendRequest, loading, error } = useAxios();
 
     const generateCryptoKeys = async () => {
         try {
@@ -13,19 +10,14 @@ const useGenerateCryptoKeys = () => {
             // Generate public key (compressed format by default)
             const publicKey = secp.getPublicKey(privateKey, true);
 
-            // Send public key to the backend
-            // await sendRequest({
-            //     method: 'POST',
-            //     url: ENDPOINTS.REGISTER_PUBLIC_KEY,
-            //     data: {
-            //         publicKey: publicKey, // Send as hex
-            //     },
-            // });
+            // Convert Uint8Array keys to hex strings
+            const publicKeyHex = secp.etc.bytesToHex(publicKey);
+            const privateKeyHex = secp.etc.bytesToHex(privateKey);
 
             // Return private key (user must securely store it)
             return {
-                publicKey: publicKey,
-                privateKey: privateKey,
+                publicKey: publicKeyHex,
+                privateKey: privateKeyHex,
             };
         } catch (error) {
             console.error('Error generating crypto keys:', error);
@@ -35,8 +27,7 @@ const useGenerateCryptoKeys = () => {
 
     return {
         generateCryptoKeys,
-        loading,
-        error
+
     };
 }
 

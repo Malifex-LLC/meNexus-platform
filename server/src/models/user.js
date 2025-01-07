@@ -1,19 +1,21 @@
 // Import database connection
 const meNexus = require('../config/db');
 
+// Import orbitDB userPublicKeys database wrapper function
+const { storePublicKey } = require('../../../database/userPublicKeys');
+
+
 // Import bcrypt
 const bcrypt = require('bcrypt');
 
 // TODO not all functions are written in the return new Promise() format
 
 // Function to create a new user
-exports.createUser = async (email, password, handle, displayName) => {
+exports.createUser = async (publicKey, handle, displayName) => {
     console.log('createUser called for handle: ', handle);
+    console.log('createUser called with publicKey: ', publicKey);
 
     try {
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
         // Insert the new user into the Users table
         const userQuery = `
             INSERT INTO Users (handle, display_name, created_at) 
@@ -26,15 +28,7 @@ exports.createUser = async (email, password, handle, displayName) => {
         const userID = userResult.insertId;
         console.log('User created with ID:', userID);
 
-        // Insert the authentication data into the Authentication table
-        const authQuery = `
-            INSERT INTO Authentication (user_id, email, hashed_password, auth_provider, created_at) 
-            VALUES (?, ?, ?, "local", NOW())
-        `;
-
-        const authParams = [userID, email, hashedPassword];
-        await executeQuery(authQuery, authParams);
-        console.log('Authentication record created for user:', userID);
+        await storePublicKey(userID, publicKey);
 
         // Create a default profile for the new user
         await createProfile(userID, handle);
