@@ -1,4 +1,4 @@
-import RegisterForm from "../../components/RegisterForm/RegisterForm.jsx";
+import RegisterFormPKI from "../../components/RegisterForm/RegisterForm.jsx";
 import RegisterLayout from '../../layouts/RegisterLayout/RegisterLayout.jsx'
 
 const RegisterPage = () => {
@@ -7,7 +7,7 @@ const RegisterPage = () => {
             <div className="register__main-content">
                 <h1>Welcome to meNexus</h1>
                 <p>Create your account to get started!</p>
-                <RegisterForm />
+                <RegisterFormPKI />
             </div>
         </RegisterLayout>
     );

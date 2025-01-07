@@ -33,11 +33,6 @@ app.use(sessionMiddleware);
 // Use sessionLogger middleware
 //app.use(sessionLogger);
 
-// Initialize passport middleware
-passport = require('../src/config/passport')
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Serve static files from /uploads directory
 app.use('/uploads', express.static('uploads'));
 
