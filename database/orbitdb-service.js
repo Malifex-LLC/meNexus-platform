@@ -48,6 +48,10 @@ export async function initializeOrbitDB() {
     });
 
     console.log('OrbitDB initialized');
+    const dbs = orbitdbInstance.databases; // Get all opened databases
+    for (const dbName in dbs) {
+        console.log(`Server Database: ${dbName}, Address: ${dbs[dbName].address.toString()}`);
+    }
     return orbitdbInstance;
 }
 

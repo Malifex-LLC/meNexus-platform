@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@chainsafe/libp2p-gossipsub": "^14.1.0",
+    "@helia/block-brokers": "^4.0.2",
+    "@libp2p/identify": "^3.0.14",
+    "@orbitdb/core": "^2.4.3",
+    "blockstore-level": "^2.0.1",
+    "helia": "^5.1.1",
+    "libp2p": "^2.4.2"
+  }
+}
