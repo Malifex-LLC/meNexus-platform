@@ -33,13 +33,23 @@ app.use(sessionMiddleware);
 // Use sessionLogger middleware
 //app.use(sessionLogger);
 
-// Initialize passport middleware
-passport = require('../src/config/passport')
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Serve static files from /uploads directory
 app.use('/uploads', express.static('uploads'));
+
+// Import orbitdb-service functions
+const { initializeOrbitDB, getDatabase, closeDatabase, closeOrbitDB } = require('../../database/orbitdb-service');
+
+// Initialize OrbitDB when the server starts
+(async () => {
+    await initializeOrbitDB();
+    console.log('OrbitDB service running');
+})();
+
+// Ensure OrbitDB stops gracefully when the server shuts down
+process.on('SIGINT', async () => {
+    await closeOrbitDB();
+    process.exit();
+});
 
 ///////////////////////////////////////////API Routes///////////////////////////////////////////
 

@@ -1,8 +1,8 @@
-import './LoginLayout.css'
+import './LoginLayoutPKI.css'
 import {Link} from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
 
-const LoginLayout = ({children}) => {
+const LoginLayoutPKI = ({children}) => {
     return (
         <div className='login-layout'>
             <Header/>
@@ -16,4 +16,4 @@ const LoginLayout = ({children}) => {
     );
 }
 
-export default LoginLayout;
+export default LoginLayoutPKI;

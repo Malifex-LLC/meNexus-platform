@@ -2,47 +2,69 @@ import './LoginForm.css'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
-import useLogin from "../../api/hooks/useLogin.js";
+import useGetCryptoChallenge from '../../api/hooks/useGetCryptoChallenge.js'
+import useVerifyCryptoSignature from '../../api/hooks/useVerifyCryptoSignature.js'
+import * as secp from '@noble/secp256k1';
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+
+    const [privateKey, setPrivateKey] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { login, loading: loginLoading, error: loginError } = useLogin();
+    const { getCryptoChallenge  } = useGetCryptoChallenge();
+    const { verifyCryptoSignature } = useVerifyCryptoSignature();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Validate fields
-        if (!email || !password) {
-            setError('All fields are required');
+        if (!privateKey) {
+            setError('Private key is required');
             return;
         }
 
+        // Attempt to log in
         try {
-            // Attempt to login
-            const loginResponse = await login(email, password);
-            console.log('Login Response:', loginResponse);
-            if (loginResponse.status === 200) {
-                console.log("Login successful. Fetching session data...");
-
-                // Fetch current user session from the server
-                console.log('Making request to getCurrentUser');
-                const sessionResponse = await getSessionUser();
-                console.log('Session Response:', sessionResponse);
-
-                if (sessionResponse.status === 200 && sessionResponse.data.handle) {
-                    // Navigate to the user's home page based on session data
-                    navigate(`/home/${sessionResponse.data.handle}`);
-                } else {
-                    setError('Failed to retrieve session data.');
-                }
-            } else {
-                setError('Incorrect email or password');
+            // Step 1: Fetch challenge from server
+            const challengeResponse = await getCryptoChallenge();
+            if (challengeResponse.status !== 200) {
+                throw new Error('Failed to fetch challenge');
             }
+
+            const { challenge } = challengeResponse.data;
+
+            // Step 2: Sign the challenge using the private key
+            const signChallenge = async (privateKey, challenge) => {
+                return await secp.signAsync(challenge, privateKey)
+            };
+
+            const publicKey = secp.getPublicKey(privateKey);
+            const signature = await signChallenge(privateKey, challenge);
+            const publicKeyString = secp.etc.bytesToHex(publicKey);
+            const signatureString = signature.toCompactHex();
+
+            // Debug logs
+            console.log("publicKey: ", publicKey)
+            console.log("signature: ", signature)
+            console.log("publicKeyString: ", publicKeyString)
+            console.log("signatureString: ", signatureString)
+            console.log("challenge: ", challenge)
+
+            // Step 3: Send signature to the server
+            const verifyResponse = await verifyCryptoSignature(signatureString, challenge, publicKeyString);
+            if (verifyResponse.status !== 200) {
+                throw new Error('Signature verification failed');
+            }
+
+            // Step 4: Fetch user session
+            const sessionResponse = await getSessionUser();
+            if (sessionResponse.status === 200 && sessionResponse.data.handle) {
+                navigate(`/home/${sessionResponse.data.handle}`);
+            } else {
+                throw new Error('Failed to retrieve session data');
+            }
+
         } catch (error) {
             console.error("Error during login or session retrieval:", error);
             setError('Login failed. Please try again.');
@@ -53,19 +75,12 @@ const LoginForm = () => {
         <div className="login__main-content">
             <form className='login__form' onSubmit={handleSubmit}>
                 <label>
-                    Email:
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)} />
-                </label>
-                <br />
-                <label>
-                    Password:
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)} />
+                    Private Key:
+                    <textarea
+                        value={privateKey}
+                        onChange={(e) => setPrivateKey(e.target.value)}
+                        placeholder="Paste your private key here"
+                    />
                 </label>
                 <br />
                 {error && <p>{error}</p>}

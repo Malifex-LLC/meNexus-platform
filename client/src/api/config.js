@@ -4,6 +4,11 @@ export const ENDPOINTS = {
 
     WEBSOCKET: "ws://localhost:3001?user_id=",
 
+    REGISTER_PUBLIC_KEY: `${API_BASE_URL}/api/auth/registerPublicKey`,
+    STORE_PUBLIC_KEY: `${API_BASE_URL}/api/auth/storePublicKey`,
+    GET_PUBLIC_KEY: `${API_BASE_URL}/api/auth/getPublicKey`,
+    GET_CRYPTO_CHALLENGE: `${API_BASE_URL}/api/auth/getCryptoChallenge`,
+    VERIFY_CRYPTO_SIGNATURE: `${API_BASE_URL}/api/auth/verifyCryptoSignature`,
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
 
