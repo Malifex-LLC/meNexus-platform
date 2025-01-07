@@ -1,21 +1,19 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/Home/HomePage.jsx';
-import RegisterPage from "./pages/Register/RegisterPage.jsx";
-import RegisterPagePKI from "./pages/Register/RegisterPagePKI.jsx";
-import LoginPage from "./pages/Login/LoginPage.jsx";
+import RegisterPagePKI from "./pages/Register/RegisterPage.jsx";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 import SettingsPage from "./pages/Settings/SettingsPage.jsx";
 import SearchPage from "./pages/Search/SearchPage.jsx";
 import MessagesPage from "./pages/Messages/MessagesPage.jsx";
+import LoginPage from "./pages/Login/LoginPage.jsx";
 
 function App() {
     return (
         <div className="App">
             <BrowserRouter>
                 <Routes>
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/registerPKI" element={<RegisterPagePKI />} />
+                    <Route path="/register" element={<RegisterPagePKI />} />
                     <Route path="/login" element={<LoginPage />} />
 
                     {/* /home redirects to /home/:handle based on session user */}

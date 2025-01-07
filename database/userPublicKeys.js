@@ -1,12 +1,15 @@
-import { getDatabase} from '../database/orbitdb-service.js';
+import { getDatabase} from './orbitdb-service.js';
 
+const databaseAddress = '/orbitdb/zdpuAxcSKQy1yqfX6WF9tpwUSTLSTJKcb5GuT4zkjQtDpFGCE'
 let publicKeysDB = null;
 
 export async function getPublicKeysDB() {
     if (!publicKeysDB) {
         console.log('Fetching database from getDatabase...');
-        publicKeysDB = await getDatabase('user-public-keys', 'documents');
+        publicKeysDB = await getDatabase(databaseAddress, 'documents');
     }
+    console.log('Database Address:', publicKeysDB.address);
+
     return publicKeysDB;
 }
 
@@ -53,4 +56,3 @@ export async function deletePublicKey(userId) {
     const db = await getPublicKeysDB();
     await db.delete(userId);
 }
-
