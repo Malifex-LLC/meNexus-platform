@@ -10,25 +10,19 @@ const Auth = require('../models/auth')
 // Import the User model
 const User = require("../models/user");
 
+// Import orbitDB userPublicKeys database wrapper function
+const { storePublicKey, getUserIdByPublicKey, getAllPublicKeys } = require('../../../database/userPublicKeys')
+
 // Account registration logic
 exports.createUser = async (req, res) => {
     try {
-        const { email, password, handle, display_name } = req.body;
-        console.log("Received data:", { email, password, handle, display_name });
+        const { publicKey, handle, display_name } = req.body;
+        console.log("Received data:", { publicKey, handle, display_name });
 
         // Validate required fields
-        if (!email || !password || !handle || !display_name) {
+        if (!publicKey || !handle || !display_name) {
             console.log("Missing required fields.");
             return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        // Check if the email is already used by another user
-        const existingUserByEmail = await Auth.getUserByEmail(email);
-        console.log("Existing user by email:", existingUserByEmail);
-
-        if (existingUserByEmail) {
-            console.log("Email is already taken.");
-            return res.status(400).json({ error: 'Email is already taken' });
         }
 
         // Check if the handle is already used by another user
@@ -41,7 +35,7 @@ exports.createUser = async (req, res) => {
         }
 
         // Call the createUser function from the User model
-        const newUserId = await User.createUser(email, password, handle, display_name);
+        const newUserId = await User.createUser(publicKey, handle, display_name);
         console.log("New user created with ID:", newUserId);
 
         // Return a success response
@@ -52,8 +46,51 @@ exports.createUser = async (req, res) => {
     }
 }
 
+exports.storePublicKey = async (req, res) => {
+    console.log("storePublicKey called for user_id:", req.query.user_id, " and public key: ", req.query.publicKey);
+    const user_id = req.body.user_id;
+    const publicKey = req.query.publicKey;
+    try {
+        await storePublicKey(user_id);
+    } catch (error) {
+        console.error("Error in /storePublicKey:", error);
+    }
+
+}
+
+exports.getUserIdByPublicKey = async (req, res) => {
+    console.log("getUserIdByPublicKey called for: ", req.query.publicKey);
+    const publicKey = req.query.publicKey;
+
+    try {
+        const userId = await getUserIdByPublicKey(publicKey);
+        if (userId) {
+            console.log(`userId: ${userId}`);
+            res.status(200).json(userId)
+        } else {
+            console.log(`No userId found for publicKey ${publicKey}`);
+            res.status(404).json({ error: 'No userId found for publicKey: ', publicKey });
+        }
+    } catch (error) {
+        console.error(`Error fetching userId for publicKey ${publicKey}:`, error);
+        res.status(500).json({ error: 'Failed to fetch userId' });
+    }
+}
+
+exports.getAllPublicKeys = async (req, res) => {
+    console.log("getAllPublicKeys called");
+    try {
+        const publicKeys = await getAllPublicKeys();
+        console.log("Public keys: ", publicKeys);
+        return res.status(200).json(publicKeys);
+    } catch (error) {
+        console.error("Error in /getAllPublicKeys called", error);
+    }
+
+}
+
 // Login logic
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
     console.log('/login called');
     passport.authenticate('local', (err, user, info) => {
         if (err) {

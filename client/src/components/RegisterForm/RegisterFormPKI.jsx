@@ -24,9 +24,18 @@ const RegisterForm = () => {
             console.log('Generated Keys:', newCryptoKeys); // Debugging
             setCryptoKeys(newCryptoKeys);
             setKeysGenerated(true);
+            const publicKey = newCryptoKeys.publicKey;
+            console.log('newCryptoKeys.publicKey: ', publicKey);
+
+            const userData = {publicKey, handle, display_name };
+            const response = await createUser(userData);
+            if (response.status === 200) {
+                // Redirect to login page after successful registration
+                console.log("Public key: ", publicKey)
+            }
         } catch (error) {
             console.error(error);
-            setError("Failed to generate CryptoKeys");
+            setError("Failed to create user");
         }
 
 
