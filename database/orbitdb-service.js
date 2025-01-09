@@ -26,7 +26,7 @@ export async function initializeOrbitDB() {
     const libp2p = await createLibp2p({
         addresses: {
             listen: [
-                '/ip4/0.0.0.0/tcp/4001', // Listen on a random TCP port
+                '/ip4/0.0.0.0/tcp/4002', // Listen on a TCP port
                 '/ip4/0.0.0.0/udp/0/quic-v1', // Listen on a random UDP port for QUIC
             ]
         },
@@ -69,6 +69,47 @@ export async function initializeOrbitDB() {
         directory: directory,
     });
     console.log('OrbitDB initialized');
+
+    // Log when a peer connects
+    libp2p.addEventListener('peer:connect', ({ detail }) => {
+        console.log('Connected to peer:', detail)
+    })
+
+    // Log when a peer disconnects
+    libp2p.addEventListener('peer:disconnect', ({ detail }) => {
+        console.log('Disconnected from peer:', detail)
+    })
+
+    console.log('Connected peers:', libp2p.getPeers());
+
+    const db = await orbitdbInstance.open('meNexus-publicKeys', {
+        type: 'documents',
+        accessController: {
+            type: 'orbitdb',
+            write: [
+                '*',
+            ]
+        }
+    })
+
+    db.events.on('replicate', (address) => {
+        console.log(`[Replicate] Starting replication for database: ${address}`);
+    });
+
+    db.events.on('replicate.progress', (address, hash, entry, progress, have) => {
+        console.log(`[Replicate Progress] Database: ${address}`);
+        console.log(`  - Hash: ${hash}`);
+        console.log(`  - Entry:`, entry);
+        console.log(`  - Progress: ${progress}`);
+        console.log(`  - Have: ${have}`);
+    });
+
+    db.events.on('replicated', (address) => {
+        console.log(`[Replicated] Replication complete for database: ${address}`);
+    });
+
+    console.log('Database Address:', db.address);
+    console.log('Identity:', orbitdbInstance.identity);
 
     return orbitdbInstance;
 }
