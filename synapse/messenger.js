@@ -1,6 +1,6 @@
-import { SNP_VERSION} from "../protocols/snp";
-import { MESSAGE_TYPES } from '../protocols/snp'
-import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../protocols/snp';
+import { SNP_VERSION} from "../protocols/snp/index.js";
+import { MESSAGE_TYPES } from '../protocols/snp/index.js'
+import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../protocols/snp/index.js';
 import { createLibp2pInstance } from './config/libp2p.js'; // Import the configured libp2p constructor
 
 /* Using a defined PROTOCOL_ID using the SNP_VERSION allows the libp2p to support multiple versions of SNP.
@@ -45,7 +45,7 @@ export const initializeMessenger = async () => {
 // Send a message
 export const sendMessage = async (peerId, message) => {
     const encodedMessage = encodeMessage(message);
-    const { stream } = await libp2p.dialProtocol(peerId, '/snp/1.0.0');
+    const { stream } = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
     const writer = stream.getWriter();
     await writer.write(encodedMessage);
     await writer.close();

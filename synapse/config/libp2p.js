@@ -6,14 +6,21 @@ import { mplex } from '@libp2p/mplex';
 import { gossipsub } from '@chainsafe/libp2p-gossipsub';
 import { bootstrap } from '@libp2p/bootstrap';
 import { mdns } from '@libp2p/mdns';
+import { identify } from '@libp2p/identify';
+
 
 // Configure libp2p2Instance for use by Synapse
 export const createLibp2pInstance = async () => {
     return await createLibp2p({
         addresses: {
-            listen: ['/ip4/0.0.0.0/tcp/4002', '/ip4/0.0.0.0/ws'],
+            listen: ['/ip4/0.0.0.0/tcp/0',
+                //'/ip4/0.0.0.0/ws'
+            ],
         },
-        transports: [tcp(), webSockets()],
+        transports: [
+            tcp(),
+            //webSockets()
+        ],
         connectionEncrypters: [noise()],
         streamMuxers: [mplex()],
         services: {
@@ -22,6 +29,7 @@ export const createLibp2pInstance = async () => {
                 gossipInterval: 2000,
                 heartbeatInterval: 1000,
             }),
+            identify: identify(),
         },
         peerDiscovery: [
             bootstrap({

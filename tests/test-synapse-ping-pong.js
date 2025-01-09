@@ -1,5 +1,6 @@
-import { initializeMessenger, sendMessage } from '../synapse/messenger';
-import { createMessage, MESSAGE_TYPES } from '../protocols/snp/';
+import { initializeMessenger, sendMessage } from '../synapse/messenger.js';
+import { createMessage,  } from '../protocols/snp/index.js';
+import { MESSAGE_TYPES } from '../protocols/snp/index.js';
 
 (async () => {
     console.log('Initializing Messenger...');
