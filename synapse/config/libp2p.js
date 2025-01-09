@@ -13,7 +13,8 @@ import { identify } from '@libp2p/identify';
 export const createLibp2pInstance = async () => {
     return await createLibp2p({
         addresses: {
-            listen: ['/ip4/0.0.0.0/tcp/0',
+            listen: [
+                '/ip4/0.0.0.0/tcp/4002',
                 //'/ip4/0.0.0.0/ws'
             ],
         },
@@ -34,8 +35,8 @@ export const createLibp2pInstance = async () => {
         peerDiscovery: [
             bootstrap({
                 list: [
-                    '/ip4/192.168.1.10/tcp/4001/p2p/QmBootstrapNode1',
-                    '/ip4/192.168.1.11/tcp/4001/p2p/QmBootstrapNode2',
+                    '/ip4/192.168.1.253/tcp/4002/p2p/12D3KooWR4tucEgYH5KtiSopP1fWvJo3CAiXJxrSRgpZBKVhkNU2',
+                    '/ip4/192.168.1.188/tcp/4002/p2p/12D3KooWGaom9R5jvycTviE4156rvocxpHBKZiVtSza5PwszkqEh',
                 ],
             }),
             mdns({
