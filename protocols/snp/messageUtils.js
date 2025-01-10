@@ -80,7 +80,9 @@ export const validateMessage = (message) => {
         throw new Error(`Unsupported protocol version: ${message.version}`);
     }
 
-    if (!Object.values(MESSAGE_TYPES).includes(message.type)) {
+    if (!Object.values(MESSAGE_TYPES)
+        .flatMap((namespace) => Object.values(namespace))
+        .includes(message.type)) {
         throw new Error(`Invalid message type: ${message.type}`);
     }
 

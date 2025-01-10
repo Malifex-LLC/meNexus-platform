@@ -61,7 +61,9 @@ export const initializeMessenger = async () => {
         try {
             for await (const chunk of stream.source) {
                 console.log('Raw chunk received:', chunk);
-                const rawMessage = decoder.decode(chunk);
+
+                // Convert Uint8ArrayList to a single Uint8Array
+                const rawMessage = decoder.decode(chunk.subarray());
                 console.log('Decoded raw message:', rawMessage);
 
                 try {
