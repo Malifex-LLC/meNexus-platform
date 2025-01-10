@@ -40,8 +40,24 @@ export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
     // Handle incoming messages
     const handleMessage = (event) => {
         try {
+            console.log('Event details:', event.detail); // Log the entire event detail
+
             const topic = event.detail.topic;
-            const message = JSON.parse(new TextDecoder().decode(event.detail.message));
+            const rawMessageBuffer = event.detail.data; // Use `data` field for the message payload
+
+            // Log raw buffer
+            console.log('Raw buffer received:', rawMessageBuffer);
+
+            if (!rawMessageBuffer || rawMessageBuffer.length === 0) {
+                throw new Error('Received empty message buffer');
+            }
+
+            const rawMessage = new TextDecoder().decode(rawMessageBuffer);
+
+            // Log decoded string
+            console.log('Decoded message string:', rawMessage);
+
+            const message = JSON.parse(rawMessage); // Attempt to parse JSON
 
             validateMessage(message);
             events.emit(topic, message);
@@ -51,6 +67,8 @@ export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
         }
     };
 
+
+
     // Attach the handler to the libp2p pubsub events
     libp2pInstance.services.pubsub.addEventListener('message', handleMessage);
 
@@ -58,13 +76,20 @@ export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
     const publish = async (topic, message) => {
         try {
             validateMessage(message);
-            const encodedMessage = new TextEncoder().encode(JSON.stringify(message));
+            const messageString = JSON.stringify(message);
+            const encodedMessage = new TextEncoder().encode(messageString);
+
+            console.log('Publishing message:', messageString);
+            console.log('Encoded message buffer:', encodedMessage);
+
             await libp2pInstance.services.pubsub.publish(topic, encodedMessage);
             console.log(`Published to topic: ${topic}`);
         } catch (error) {
             console.error(`Failed to publish message to ${topic}:`, error);
         }
     };
+
+
 
     // Subscribe to a topic
     const subscribe = (topic, callback) => {
