@@ -19,6 +19,7 @@
     "@libp2p/mplex": "^11.0.16",
     "@libp2p/tcp": "^10.0.15",
     "@libp2p/websockets": "^9.1.2",
-    "libp2p": "^2.5.0"
+    "libp2p": "^2.5.0",
+    "multiaddr": "^10.0.1"
   }
 }

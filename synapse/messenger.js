@@ -2,6 +2,7 @@ import { SNP_VERSION} from "../protocols/snp/index.js";
 import { MESSAGE_TYPES } from '../protocols/snp/index.js'
 import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../protocols/snp/index.js';
 import { createLibp2pInstance } from './config/libp2p.js'; // Import the configured libp2p constructor
+import { multiaddr } from 'multiaddr';
 
 
 /* Using a defined PROTOCOL_ID using the SNP_VERSION allows the libp2p to support multiple versions of SNP.
@@ -10,17 +11,42 @@ import { createLibp2pInstance } from './config/libp2p.js'; // Import the configu
 * */
 const PROTOCOL_ID = `/snp/${SNP_VERSION}`;
 let libp2p = null;
+const discoveredPeers = new Map();
+const connectedPeers = new Set();
+
+
 
 // Initialize Messenger
 export const initializeMessenger = async () => {
     libp2p = await createLibp2pInstance();
 
     libp2p.addEventListener('peer:discovery', (event) => {
-        console.log(`Discovered peer: ${event.detail.id.toString()}`);
+        const peerId = event.detail.id.toString();
+        const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
+        if (!discoveredPeers.has(peerId)) {
+            console.log(`Discovered peer: ${peerId} at ${peerMultiaddrs}`);
+            discoveredPeers.set(peerId, peerMultiaddrs); // Store peerId and its multiaddrs
+        }
     });
 
     libp2p.addEventListener('peer:connect', (event) => {
-        console.log(`Connected to peer: ${event.detail.toString()}`);
+        const peerId = event.detail.toString();
+        console.log(`Connected to peer: ${peerId}`);
+        connectedPeers.add(peerId);
+    });
+
+    libp2p.addEventListener('peer:connect', async (event) => {
+        const peerId = event.detail.toString();
+        console.log(`Auto-pinging connected peer: ${peerId}`);
+
+        const pingMessage = createMessage(MESSAGE_TYPES.HEALTH.PING, {}, { sender: libp2p.peerId.toString() });
+        await sendMessage(peerId, pingMessage);
+    });
+
+    libp2p.addEventListener('peer:disconnect', (event) => {
+        const peerId = event.detail.toString();
+        console.log(`Disconnected from peer: ${peerId}`);
+        connectedPeers.delete(peerId);
     });
 
 
@@ -57,12 +83,35 @@ export const initializeMessenger = async () => {
 
 // Send a message
 export const sendMessage = async (peerId, message) => {
-    const encodedMessage = encodeMessage(message);
-    console.log(`Dialing peerId: ${peerId}`);
-    const { stream } = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
-    const writer = stream.getWriter();
-    await writer.write(encodedMessage);
-    await writer.close();
+    const multiaddrs = discoveredPeers.get(peerId);
+
+    if (!multiaddrs || multiaddrs.length === 0) {
+        console.error(`No known multiaddrs for peer: ${peerId}`);
+        return;
+    }
+
+    for (const addr of multiaddrs) {
+        try {
+            const peerAddress = multiaddr(addr);
+            console.log(`Dialing peerId: ${peerId} at: ${peerAddress.toString()}`);
+            const result = await libp2p.dialProtocol(peerAddress, PROTOCOL_ID);
+            console.log(`Dial result:`, result); // Debugging result
+            const { stream } = result;
+            if (!stream) {
+                console.error(`No stream returned for peer ${peerId} at ${peerAddress}`);
+                continue; // Try the next address
+            }
+            console.log('Stream object:', stream);
+            const writer = stream.getWriter();
+            const encodedMessage = encodeMessage(message);
+            await writer.write(encodedMessage);
+            await writer.close();
+            return; // Exit after successful message
+        } catch (error) {
+            console.error(`Failed to dial ${addr}: ${error.message}`);
+        }
+
+    }
 };
 
 // Process an incoming message
