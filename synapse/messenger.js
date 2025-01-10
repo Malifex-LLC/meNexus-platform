@@ -113,8 +113,11 @@ export const sendMessage = async (peerId, message) => {
             console.log('Encoded message being sent:', encodedMessage);
 
             // Writing to the stream
-            const writer = stream.sink;
-            await writer([encodedMessage]); // Write the encoded message
+            const writer = stream.sink; // Correctly use stream sink
+            await writer(async function* () {
+                yield new TextEncoder().encode(encodedMessage); // Encode the message as Uint8Array
+            }());
+
             console.log('Message successfully sent to:', peerId);
             return; // Exit after successful message
         } catch (error) {
