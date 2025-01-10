@@ -8,7 +8,6 @@ import { bootstrap } from '@libp2p/bootstrap';
 import { mdns } from '@libp2p/mdns';
 import { identify } from '@libp2p/identify';
 
-
 // Configure libp2p2Instance for use by Synapse
 export const createLibp2pInstance = async () => {
     return await createLibp2p({

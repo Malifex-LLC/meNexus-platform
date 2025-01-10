@@ -4,7 +4,6 @@ import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../
 import { createLibp2pInstance } from './config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
 
-
 /* Using a defined PROTOCOL_ID using the SNP_VERSION allows the libp2p to support multiple versions of SNP.
 *  For example if PROTOCOL_ID = `/snp/2.0.0` libp2p could call the appropriate handler ->
 *  libp2p.handle(PROTOCOL_ID, handleV1);
@@ -13,8 +12,6 @@ const PROTOCOL_ID = `/snp/${SNP_VERSION}`;
 let libp2p = null;
 const discoveredPeers = new Map();
 const connectedPeers = new Set();
-
-
 
 // Initialize Messenger
 export const initializeMessenger = async () => {
@@ -50,7 +47,6 @@ export const initializeMessenger = async () => {
         connectedPeers.delete(peerId);
     });
 
-
     // Add a handler for incoming messages
     await libp2p.handle(PROTOCOL_ID, async ({ stream, connection }) => {
         console.log(`Message received from peer: ${connection.remotePeer.toString()}`);
@@ -81,9 +77,7 @@ export const initializeMessenger = async () => {
     });
 
     console.log(`Handler registered for protocol: ${PROTOCOL_ID}`);
-
     console.log('libp2p Listening addresses:', libp2p.getMultiaddrs().map((addr) => addr.toString()));
-
 
     return libp2p;
 };
@@ -134,7 +128,7 @@ const processMessage = async (message) => {
     switch (message.type) {
         case MESSAGE_TYPES.HEALTH.PING:
             console.log('Received PING. Sending PONG...');
-            const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG);
+            const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG, {}, { sender: libp2p.peerId.toString() });
             await sendMessage(message.meta.sender, pongMessage);
             break;
 
