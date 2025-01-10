@@ -34,6 +34,11 @@ export const ACTION_TYPES = {
         NOTIFY_EVENT: 'MSG_NOTIFY_EVENT',
     },
 
+    // Health Action
+    HEALTH: {
+        ECHO: 'HEALTH_ECHO',
+    },
+
     // System or Debugging Actions
     SYSTEM: {
         RESTART: 'SYSTEM_RESTART',
