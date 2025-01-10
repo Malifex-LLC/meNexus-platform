@@ -40,6 +40,7 @@ export const initializeMessenger = async () => {
         console.log(`Auto-pinging connected peer: ${peerId}`);
 
         const pingMessage = createMessage(MESSAGE_TYPES.HEALTH.PING, {}, { sender: libp2p.peerId.toString() });
+
         await sendMessage(peerId, pingMessage);
     });
 
@@ -53,7 +54,7 @@ export const initializeMessenger = async () => {
     // Add a handler for incoming messages
     await libp2p.handle(PROTOCOL_ID, async ({ stream, connection }) => {
         console.log(`Message received from peer: ${connection.remotePeer.toString()}`);
-        console.log('Stream', stream);
+        //console.log('Stream', stream);
 
         const decoder = new TextDecoder();
 
@@ -99,23 +100,26 @@ export const sendMessage = async (peerId, message) => {
         try {
             const peerAddress = multiaddr(addr);
             console.log(`Dialing peerId: ${peerId} at: ${peerAddress.toString()}`);
-            const result = await libp2p.dialProtocol(peerAddress, PROTOCOL_ID);
-            //console.log(`Dial result:`, result); // Debugging result
-            const { stream } = result;
-            if (!stream) {
-                console.error(`No stream returned for peer ${peerId} at ${peerAddress}`);
+            const stream = await libp2p.dialProtocol(peerAddress, PROTOCOL_ID);
+
+            if (!stream || stream.status !== 'open') {
+                console.error(`Failed to establish a stream for peer ${peerId} at ${peerAddress}`);
                 continue; // Try the next address
             }
-            console.log('Stream object:', stream);
-            const writer = stream.getWriter();
+
+            //console.log('Stream established:', stream);
+
             const encodedMessage = encodeMessage(message);
-            await writer.write(encodedMessage);
-            await writer.close();
+            console.log('Encoded message being sent:', encodedMessage);
+
+            // Writing to the stream
+            const writer = stream.sink;
+            await writer([encodedMessage]); // Write the encoded message
+            console.log('Message successfully sent to:', peerId);
             return; // Exit after successful message
         } catch (error) {
             console.error(`Failed to dial ${addr}: ${error.message}`);
         }
-
     }
 };
 

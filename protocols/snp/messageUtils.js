@@ -13,7 +13,7 @@ export const createMessage = (type, payload = {}, meta = {}) => {
     if (!isValidMessageType(type)) {
         throw new Error(`Invalid message type: ${type}`);
     }
-    console.log('Validate message type: ', type);
+    console.log('Valid message type: ', type);
 
     return {
         protocol: 'SNP',
@@ -34,7 +34,7 @@ export const createMessage = (type, payload = {}, meta = {}) => {
  */
 export const encodeMessage = (message) => {
     console.log('encodeMessage called for:', message);
-    JSON.stringify(message);
+    return JSON.stringify(message);
 }
 
 /**
