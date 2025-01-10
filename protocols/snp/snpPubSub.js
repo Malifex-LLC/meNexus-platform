@@ -67,8 +67,6 @@ export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
         }
     };
 
-
-
     // Attach the handler to the libp2p pubsub events
     libp2pInstance.services.pubsub.addEventListener('message', handleMessage);
 
@@ -88,8 +86,6 @@ export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
             console.error(`Failed to publish message to ${topic}:`, error);
         }
     };
-
-
 
     // Subscribe to a topic
     const subscribe = (topic, callback) => {
