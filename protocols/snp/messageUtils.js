@@ -9,9 +9,11 @@ import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
  * @returns {object} - The constructed message
  */
 export const createMessage = (type, payload = {}, meta = {}) => {
+    console.log('createMessage: ', type, payload, meta);
     if (!isValidMessageType(type)) {
         throw new Error(`Invalid message type: ${type}`);
     }
+    console.log('Validate message type: ', type);
 
     return {
         protocol: 'SNP',
@@ -19,8 +21,8 @@ export const createMessage = (type, payload = {}, meta = {}) => {
         type,
         payload,
         meta: {
-            timestamp: meta.timestamp || new Date().toISOString(),
-            ...meta,
+            sender: meta.sender,
+            timestamp: meta.timestamp || new Date().toISOString()
         },
     };
 };
@@ -30,7 +32,10 @@ export const createMessage = (type, payload = {}, meta = {}) => {
  * @param {object} message - The message to encode
  * @returns {string} - JSON string
  */
-export const encodeMessage = (message) => JSON.stringify(message);
+export const encodeMessage = (message) => {
+    console.log('encodeMessage called for:', message);
+    JSON.stringify(message);
+}
 
 /**
  * Utility to decode a JSON string into a message object
@@ -39,6 +44,7 @@ export const encodeMessage = (message) => JSON.stringify(message);
  * @throws {Error} - If the message format is invalid
  */
 export const decodeMessage = (rawMessage) => {
+    console.log('decodeMessage called for:', rawMessage);
     try {
         const message = JSON.parse(rawMessage);
 
@@ -65,6 +71,7 @@ export const decodeMessage = (rawMessage) => {
  * @returns {boolean} - True if valid, throws an error otherwise
  */
 export const validateMessage = (message) => {
+    console.log('validateMessage called for:', message);
     if (message.protocol !== 'SNP') {
         throw new Error(`Invalid protocol: ${message.protocol}`);
     }

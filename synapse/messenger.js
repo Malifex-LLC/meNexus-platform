@@ -53,15 +53,19 @@ export const initializeMessenger = async () => {
     // Add a handler for incoming messages
     await libp2p.handle(PROTOCOL_ID, async ({ stream, connection }) => {
         console.log(`Message received from peer: ${connection.remotePeer.toString()}`);
+        console.log('Stream', stream);
 
         const decoder = new TextDecoder();
 
         try {
             for await (const chunk of stream.source) {
+                console.log('Raw chunk received:', chunk);
                 const rawMessage = decoder.decode(chunk);
+                console.log('Decoded raw message:', rawMessage);
 
                 try {
                     const message = decodeMessage(rawMessage);
+                    console.log('Decoded message:', message);
                     validateMessage(message);
                     await processMessage(message);
                 } catch (error) {
@@ -83,6 +87,7 @@ export const initializeMessenger = async () => {
 
 // Send a message
 export const sendMessage = async (peerId, message) => {
+    console.log(`Sending message to peer: ${peerId}`);
     const multiaddrs = discoveredPeers.get(peerId);
 
     if (!multiaddrs || multiaddrs.length === 0) {
@@ -95,7 +100,7 @@ export const sendMessage = async (peerId, message) => {
             const peerAddress = multiaddr(addr);
             console.log(`Dialing peerId: ${peerId} at: ${peerAddress.toString()}`);
             const result = await libp2p.dialProtocol(peerAddress, PROTOCOL_ID);
-            console.log(`Dial result:`, result); // Debugging result
+            //console.log(`Dial result:`, result); // Debugging result
             const { stream } = result;
             if (!stream) {
                 console.error(`No stream returned for peer ${peerId} at ${peerAddress}`);
@@ -116,6 +121,7 @@ export const sendMessage = async (peerId, message) => {
 
 // Process an incoming message
 const processMessage = async (message) => {
+    console.log(`Processing message: ${message}`);
     switch (message.type) {
         case MESSAGE_TYPES.HEALTH.PING:
             console.log('Received PING. Sending PONG...');
