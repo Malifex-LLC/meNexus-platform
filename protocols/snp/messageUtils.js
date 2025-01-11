@@ -91,8 +91,14 @@ export const validateMessage = (message) => {
 
     if (!Object.values(MESSAGE_TYPES)
         .flatMap((namespace) => Object.values(namespace))
-        .includes(message.type)) {
-        throw new Error(`Invalid message type: ${message.type}`);
+        .includes(message.messageType)) {
+        throw new Error(`Invalid message type: ${message.messageType}`);
+    }
+
+    if (!Object.values(ACTION_TYPES)
+        .flatMap((namespace) => Object.values(namespace))
+        .includes(message.actionType)) {
+        throw new Error(`Invalid action type: ${message.actionType}`);
     }
 
     return true;
