@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const User = require("../models/user");
 const { storePublicKey, getUserIdByPublicKey, getAllPublicKeys } = require('../../../../synapse/src/orbitdb/userPublicKeys')
-const { verifySignature, generateCryptoKeys } = require('../utils/cryptoUtils')
+const { verifySignature, generateCryptoKeys } = require('../../../utils/cryptoUtils')
 
 // Account registration logic
 exports.createUser = async (req, res) => {
