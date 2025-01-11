@@ -1,6 +1,6 @@
 import './AccountSettings.css';
 import {useState} from "react";
-import useUpdateAccountSettings from '../../../api/hooks/useUpdateAccountSettings.js'
+import useUpdateAccountSettings from '../../../hooks/api/useUpdateAccountSettings.js'
 
 const AccountSettings = () => {
     const [ newEmail, setNewEmail ] = useState(null);

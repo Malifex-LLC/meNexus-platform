@@ -2,12 +2,12 @@ import './Home.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts, refreshComments } from '../../utils/apiUtils.js';
-import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
+import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
 import Post from '../../components/Posts/Post/Post.jsx';
 import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
-import useGetPosts from "../../api/hooks/useGetPosts.js";
-import useEditPost from "../../api/hooks/useEditPost.js";
-import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useGetPosts from "../../hooks/api/useGetPosts.js";
+import useEditPost from "../../hooks/api/useEditPost.js";
+import useDeletePost from "../../hooks/api/useDeletePost.js";
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)

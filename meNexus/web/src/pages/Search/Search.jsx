@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./Search.css";
-import "../../api/hooks/useSearch.js"
-import useSearch from "../../api/hooks/useSearch.js";
+import "../../hooks/api/useSearch.js"
+import useSearch from "../../hooks/api/useSearch.js";
 import ProfileCard from "../../components/ProfileCard/ProfileCard.jsx";
 import Post from "../../components/Posts/Post/Post.jsx"
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetPosts from "../../api/hooks/useGetPosts.js";
-import useEditPost from "../../api/hooks/useEditPost.js";
-import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useGetSessionUser from "../../hooks/api/useGetSessionUser.js";
+import useGetPosts from "../../hooks/api/useGetPosts.js";
+import useEditPost from "../../hooks/api/useEditPost.js";
+import useDeletePost from "../../hooks/api/useDeletePost.js";
 
 const Search = () => {
     const location = useLocation();

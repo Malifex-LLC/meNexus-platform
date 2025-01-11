@@ -1,7 +1,7 @@
 import './ConversationMenu.css';
 import {useEffect} from "react";
-import useCreateConversation from "../../../../api/hooks/useCreateConversation.js";
-import useSetMessagesAsRead from "../../../../api/hooks/useSetMessagesAsRead.js";
+import useCreateConversation from "../../../../hooks/api/useCreateConversation.js";
+import useSetMessagesAsRead from "../../../../hooks/api/useSetMessagesAsRead.js";
 
 const ConversationMenu = ({
                               getConversations,

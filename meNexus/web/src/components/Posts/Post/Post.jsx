@@ -1,14 +1,14 @@
 import "./Post.css";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
-import useFollowActions from "../../../api/hooks/useFollowActions.js";
+import useFollowActions from "../../../hooks/api/useFollowActions.js";
 import {NavLink} from "react-router-dom";
-import useGetComments from "../../../api/hooks/useGetComments.js"
+import useGetComments from "../../../hooks/api/useGetComments.js"
 import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
-import useEditComment from "../../../api/hooks/useEditComment.js"
-import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
-import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
+import useEditComment from "../../../hooks/api/useEditComment.js"
+import useDeleteComment from "../../../hooks/api/useDeleteComment.js";
+import useCreateNotification from "../../../hooks/api/useCreateNotification.js"
 
 const Post = ({
                   post_id,

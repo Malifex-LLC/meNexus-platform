@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegisterForm.css'
-import useCreateUser from '../../api/hooks/useCreateUser.js'
-import useGenerateCryptoKeys from "../../api/hooks/useGenerateCryptoKeys.js";
+import useCreateUser from '../../hooks/api/useCreateUser.js'
+import useGenerateCryptoKeys from "../../hooks/api/useGenerateCryptoKeys.js";
 
 const RegisterForm = () => {
 

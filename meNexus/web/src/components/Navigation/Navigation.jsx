@@ -1,7 +1,7 @@
 import './Navigation.css'
 import { NavLink } from "react-router-dom";
 import {useNavigate} from "react-router-dom";
-import useLogout from '../../api/hooks/useLogout.js'
+import useLogout from '../../hooks/api/useLogout.js'
 
 const Navigation = () => {
     const { logout } = useLogout();

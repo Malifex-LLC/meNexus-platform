@@ -1,7 +1,7 @@
 import './CommentForm.css';
 import { useState } from "react";
-import useCreateComment from "../../../api/hooks/useCreateComment.js";
-import useCreateNotification from "../../../api/hooks/useCreateNotification.js";
+import useCreateComment from "../../../hooks/api/useCreateComment.js";
+import useCreateNotification from "../../../hooks/api/useCreateNotification.js";
 
 const CommentForm = ({
                          user_id,

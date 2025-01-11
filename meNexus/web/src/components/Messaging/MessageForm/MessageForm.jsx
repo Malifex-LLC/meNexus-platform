@@ -1,6 +1,6 @@
 import './MessageForm.css';
 import { useState } from "react";
-import useCreateMessage from '../../../api/hooks/useCreateMessage.js';
+import useCreateMessage from '../../../hooks/api/useCreateMessage.js';
 
 const MessageForm = ({
                          conversation_id,

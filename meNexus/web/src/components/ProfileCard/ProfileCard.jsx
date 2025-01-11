@@ -1,11 +1,11 @@
 import './ProfileCard.css';
-import '../../api/hooks/useGetProfile.js';
-import useGetProfile from "../../api/hooks/useGetProfile.js";
+import '../../hooks/api/useGetProfile.js';
+import useGetProfile from "../../hooks/api/useGetProfile.js";
 import {useEffect, useState} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
-import useFollowActions from "../../api/hooks/useFollowActions.js"
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js"
-import useCreateNotification from "../../api/hooks/useCreateNotification.js"
+import useFollowActions from "../../hooks/api/useFollowActions.js"
+import useGetSessionUser from "../../hooks/api/useGetSessionUser.js"
+import useCreateNotification from "../../hooks/api/useCreateNotification.js"
 
 const ProfileCard = ({handle}) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();

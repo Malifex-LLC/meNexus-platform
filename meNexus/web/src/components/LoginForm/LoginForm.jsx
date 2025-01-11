@@ -1,9 +1,9 @@
 import './LoginForm.css'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
-import useGetCryptoChallenge from '../../api/hooks/useGetCryptoChallenge.js'
-import useVerifyCryptoSignature from '../../api/hooks/useVerifyCryptoSignature.js'
+import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
+import useGetCryptoChallenge from '../../hooks/api/useGetCryptoChallenge.js'
+import useVerifyCryptoSignature from '../../hooks/api/useVerifyCryptoSignature.js'
 import * as secp from '@noble/secp256k1';
 
 const LoginForm = () => {

@@ -1,13 +1,13 @@
 import './Conversation.css';
 import {useEffect, useState} from "react";
-import useGetSessionUser from '../../../../api/hooks/useGetSessionUser.js'
+import useGetSessionUser from '../../../../hooks/api/useGetSessionUser.js'
 import Message from '../../Message/Message.jsx'
 import MessageForm from '../../MessageForm/MessageForm.jsx'
-import useGetMessages from '../../../../api/hooks/useGetMessages.js'
-import useMessagesWebSocket from '../../../../api/hooks/useMessagesWebSocket.js'
+import useGetMessages from '../../../../hooks/api/useGetMessages.js'
+import useMessagesWebSocket from '../../../../hooks/api/useMessagesWebSocket.js'
 import { refreshMessages } from '../../../../utils/apiUtils.js'
-import useUpdateConversationParticipants from "../../../../api/hooks/useUpdateConversationParticipants.js";
-import useSetMessagesAsRead from "../../../../api/hooks/useSetMessagesAsRead.js";
+import useUpdateConversationParticipants from "../../../../hooks/api/useUpdateConversationParticipants.js";
+import useSetMessagesAsRead from "../../../../hooks/api/useSetMessagesAsRead.js";
 
 const Conversation = ({
                           conversation_id,

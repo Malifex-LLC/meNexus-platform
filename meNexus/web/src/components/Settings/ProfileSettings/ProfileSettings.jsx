@@ -1,10 +1,10 @@
 import "./ProfileSettings.css";
 import {useEffect, useState} from "react";
-import useUploadProfilePicture from "../../../api/hooks/useUploadProfilePicture.js";
-import useGetProfile from "../../../api/hooks/useGetProfile.js";
+import useUploadProfilePicture from "../../../hooks/api/useUploadProfilePicture.js";
+import useGetProfile from "../../../hooks/api/useGetProfile.js";
 import {useNavigate} from "react-router-dom";
-import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
-import useUpdateProfileSettings from "../../../api/hooks/useUpdateProfileSettings.js";
+import useGetSessionUser from "../../../hooks/api/useGetSessionUser.js";
+import useUpdateProfileSettings from "../../../hooks/api/useUpdateProfileSettings.js";
 
 const ProfileSettings = () => {
     const [sessionUserId, setsessionUserId] = useState(null);

@@ -1,12 +1,12 @@
 import './Header.css';
 import '../Search/Search.jsx'
 import {useEffect, useState} from "react";
-import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
+import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
 import NotificationsTray from '../Notifications/NotificationsTray/NotificationsTray.jsx'
 import Search from "../Search/Search.jsx";
-import useGetNotifications from "../../api/hooks/useGetNotifications.js";
-import useNotificationsWebSocket from '../../api/hooks/useNotificationsWebSocket.js'
-import useSetNotificationAsRead from "../../api/hooks/useSetNotificationAsRead.js";
+import useGetNotifications from "../../hooks/api/useGetNotifications.js";
+import useNotificationsWebSocket from '../../hooks/api/useNotificationsWebSocket.js'
+import useSetNotificationAsRead from "../../hooks/api/useSetNotificationAsRead.js";
 
 const Header = () => {
 

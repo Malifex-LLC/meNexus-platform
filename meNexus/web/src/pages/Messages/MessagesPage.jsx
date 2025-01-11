@@ -2,7 +2,7 @@ import MessagesLayout from '../../layouts/MessagesLayout/MessagesLayout.jsx';
 import ConversationMenu from "../../components/Messaging/Conversations/ConversationMenu/ConversationMenu.jsx";
 import Conversation from '../../components/Messaging/Conversations/Conversation/Conversation.jsx'
 import {useState} from "react";
-import useGetConversations from "../../api/hooks/useGetConversations.js";
+import useGetConversations from "../../hooks/api/useGetConversations.js";
 
 const MessagesPage = () => {
     const [selectedConversation, setSelectedConversation] = useState(null);

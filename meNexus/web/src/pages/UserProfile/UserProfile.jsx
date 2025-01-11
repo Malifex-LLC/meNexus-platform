@@ -2,13 +2,13 @@ import "./UserProfile.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {refreshComments, refreshPosts} from '../../utils/apiUtils.js';
-import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
-import useGetProfile from '../../api/hooks/useGetProfile.js';
-import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
-import useEditPost from "../../api/hooks/useEditPost.js";
-import useDeletePost from "../../api/hooks/useDeletePost.js";
-import useFollowActions from "../../api/hooks/useFollowActions.js";
-import useCreateNotification from "../../api/hooks/useCreateNotification.js";
+import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
+import useGetProfile from '../../hooks/api/useGetProfile.js';
+import useGetUserPosts from '../../hooks/api/useGetUserPosts.js';
+import useEditPost from "../../hooks/api/useEditPost.js";
+import useDeletePost from "../../hooks/api/useDeletePost.js";
+import useFollowActions from "../../hooks/api/useFollowActions.js";
+import useCreateNotification from "../../hooks/api/useCreateNotification.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 

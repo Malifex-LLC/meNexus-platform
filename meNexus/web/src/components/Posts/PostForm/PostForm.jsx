@@ -1,6 +1,6 @@
 import './PostForm.css';
 import { useState } from "react";
-import useCreatePost from '../../../api/hooks/useCreatePost.js';
+import useCreatePost from '../../../hooks/api/useCreatePost.js';
 
 const PostForm = ({ handle, refreshPosts }) => {
     const [text, setText] = useState(`What's on your mind?`);
