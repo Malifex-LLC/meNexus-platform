@@ -1,8 +1,8 @@
-import { initializeSnpPubSub } from '../protocols/snp/snpPubSub.js';
+import { initializeSnpPubSub } from '../synapse/src/snpPubSub.js';
 import { createLibp2pInstance } from '../synapse/config/libp2p.js';
 import { MESSAGE_TYPES } from '../protocols/snp/messageTypes.js';
 import { ACTION_TYPES} from "../protocols/snp/actionTypes.js";
-import { initializeMessenger} from "../synapse/messenger.js";
+import { initializeMessenger} from "../synapse/src/messenger.js";
 
 (async () => {
     // Step 1: Initialize libp2p and snpPubSub
