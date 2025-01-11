@@ -23,6 +23,13 @@ export const initializeMessenger = async () => {
         if (!discoveredPeers.has(peerId)) {
             console.log(`Discovered peer: ${peerId} at ${peerMultiaddrs}`);
             discoveredPeers.set(peerId, peerMultiaddrs); // Store peerId and its multiaddrs
+
+            const publicKeyRequest = createMessage(
+                MESSAGE_TYPES.PEER.REQUEST_PUBLIC_KEY,
+                {},
+                {sender: libp2p.peerId.toString()}
+            );
+            sendMessage(peerId, publicKeyRequest);
         }
     });
 
@@ -32,14 +39,14 @@ export const initializeMessenger = async () => {
         connectedPeers.add(peerId);
     });
 
-    libp2p.addEventListener('peer:connect', async (event) => {
-        const peerId = event.detail.toString();
-        console.log(`Auto-pinging connected peer: ${peerId}`);
-
-        const pingMessage = createMessage(MESSAGE_TYPES.HEALTH.PING, {}, { sender: libp2p.peerId.toString() });
-
-        await sendMessage(peerId, pingMessage);
-    });
+    // libp2p.addEventListener('peer:connect', async (event) => {
+    //     const peerId = event.detail.toString();
+    //     console.log(`Auto-pinging connected peer: ${peerId}`);
+    //
+    //     const pingMessage = createMessage(MESSAGE_TYPES.HEALTH.PING, {}, { sender: libp2p.peerId.toString() });
+    //
+    //     await sendMessage(peerId, pingMessage);
+    // });
 
     libp2p.addEventListener('peer:disconnect', (event) => {
         const peerId = event.detail.toString();
@@ -126,6 +133,26 @@ export const sendMessage = async (peerId, message) => {
 const processMessage = async (message) => {
     console.log(`Processing message: ${message}`);
     switch (message.type) {
+
+        case MESSAGE_TYPES.PEER.REQUEST_PUBLIC_KEY:
+            console.log('Received publicKey request')
+            const publicKeyResponse = createMessage(
+                MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY,
+                {publicKey: process.env.PUBLIC_KEY},
+                {sender: libp2p.peerId.toString()}
+            );
+            await sendMessage(message.meta.sender, publicKeyResponse);
+            break;
+
+        case MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY:
+            console.log('Received publicKey response: ', message.payload.publicKey);
+            const peerId = message.meta.sender;
+            if (discoveredPeers.has(peerId)) {
+                discoveredPeers.get(peerId).publicKey = message.payload.publicKey;
+                console.log('Stored public key for peerId: ', peerId);
+            }
+            break;
+
         case MESSAGE_TYPES.HEALTH.PING:
             console.log('Received PING. Sending PONG...');
             const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG, {}, { sender: libp2p.peerId.toString() });
