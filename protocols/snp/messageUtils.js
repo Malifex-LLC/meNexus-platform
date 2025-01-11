@@ -58,11 +58,12 @@ export const decodeMessage = (rawMessage) => {
 
         // Validate message structure
         if (
-            !message.protocol ||
-            message.protocol !== 'SNP' ||
+            !message.protocol || message.protocol !== 'SNP' ||
             !message.version ||
-            !message.type ||
-            !message.payload
+            !message.messageType ||
+            !message.actionType ||
+            !message.payload ||
+            !message.meta
         ) {
             throw new Error('Invalid SNP message format');
         }
