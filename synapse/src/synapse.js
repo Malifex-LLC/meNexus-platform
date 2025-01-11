@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '../api/config/.env' }); // Load base environment variables
 import { generateCryptoKeys } from '../utils/cryptoUtils.js'; // Utility for keypair generation
 import { loadConfig, saveConfig } from '../utils/configUtils.js'; // Config file handlers
+import { initializeMessenger} from "./messenger.js";
+import { initializeSnpPubSub} from "./snpPubSub.js";
 
 const CONFIG_FILE = path.join(process.cwd(), '../config/synapse-config.json');
 
@@ -34,7 +36,8 @@ const initializeSynapse = async () => {
     process.env.PRIVATE_KEY = config.identity.privateKey;
     process.env.EXPRESS_PORT = config.api.port;
 
-    startServer();
+    await startServer();
+    await startSnpPubSub();
 };
 
 const startServer = () => {
@@ -53,6 +56,11 @@ const startServer = () => {
         }
     });
 };
+
+const startSnpPubSub = async () => {
+    const libp2pInstance = await initializeMessenger();
+    await initializeSnpPubSub(libp2pInstance);
+}
 
 // Run the initialization
 initializeSynapse().catch((err) => {
