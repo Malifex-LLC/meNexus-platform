@@ -38,6 +38,8 @@ export const ACTION_TYPES = {
 
     // Health Action
     HEALTH: {
+        PING: 'HEALTH_PING',
+        PONG: 'HEALTH_PONG',
         ECHO: 'HEALTH_ECHO',
     },
 

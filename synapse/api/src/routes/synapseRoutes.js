@@ -1,10 +1,10 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import synapseController from '../controllers/synapseController.js';
+const synapseController = require('../controllers/synapseController.js');
 
 // Define synapseRoutes and link them to corresponding controller functions
 
-router.get('/getSynapseUserPosts', synapseController.getAll);
+router.get('/getSynapseUserPosts', synapseController.getSynapseUserPosts);
 
 // Export the router so it can be used in server.js
-export default router;
+module.exports = router;

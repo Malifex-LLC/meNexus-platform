@@ -84,3 +84,6 @@ server.use('/api/search', searchRoutes);
 
 import settingsRoutes from './routes/settingsRoutes.js'
 server.use('/api/settings', settingsRoutes);
+
+import synapseRoutes from './routes/synapseRoutes.js'
+server.use('/synapse', synapseRoutes);

@@ -31,9 +31,6 @@ export const MESSAGE_TYPES = {
 
     // Health checks: Monitor and debug Synapse health
     HEALTH: {
-        PING: 'HEALTH_PING',
-        PONG: 'HEALTH_PONG',
-        ECHO: 'HEALTH_ECHO',
         CHECK: 'HEALTH_CHECK',
         STATUS: 'HEALTH_STATUS',
     },

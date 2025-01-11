@@ -1,6 +1,9 @@
 import {ACTION_TYPES, SNP_VERSION} from "../../protocols/snp/index.js";
 import { MESSAGE_TYPES } from '../../protocols/snp/index.js'
+import { RESOURCE_TYPES } from '../../protocols/snp/resourceTypes.js'
+import { ENDPOINTS } from '../api/config/endpoints.js'
 import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../../protocols/snp/index.js';
+import { sendRequest } from '../utils/apiUtils.js'
 import { createLibp2pInstance } from '../config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
 
@@ -12,6 +15,8 @@ const PROTOCOL_ID = `/snp/${SNP_VERSION}`;
 let libp2p = null;
 const discoveredPeers = new Map();
 const connectedPeers = new Set();
+const pendingRequests = new Map();
+
 
 // Initialize Messenger
 export const initializeMessenger = async () => {
@@ -148,6 +153,45 @@ export const sendMessage = async (peerId, message) => {
     }
 };
 
+export const sendMessageWithResponse = async (peerId, message, timeout = 10000) => {
+    const requestId = message.meta.requestId;
+
+    // Return a promise that tracks the response
+    const responsePromise = new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            if (pendingRequests.has(requestId)) {
+                pendingRequests.delete(requestId);
+                reject(new Error(`Request with ID ${requestId} timed out.`));
+            }
+        }, timeout);
+
+        pendingRequests.set(requestId, { resolve, reject, timer });
+    });
+
+    try {
+        await sendMessage(peerId, message);
+    } catch (error) {
+        pendingRequests.delete(requestId); // Clean up if the send fails
+        throw error;
+    }
+
+    return responsePromise;
+};
+
+export const resolvePendingRequest = (requestId, response) => {
+    if (pendingRequests.has(requestId)) {
+        const { resolve, timer } = pendingRequests.get(requestId);
+        clearTimeout(timer); // Clear the timeout
+        resolve(response); // Resolve the promise
+        pendingRequests.delete(requestId); // Clean up
+    } else {
+        console.warn(`No pending request found for requestId: ${requestId}`);
+    }
+};
+
+
+
+
 // Process an incoming message
 const processMessage = async (message) => {
     console.log(`Processing message: ${message}`);
@@ -179,15 +223,42 @@ const processMessage = async (message) => {
             }
             break;
 
-        case MESSAGE_TYPES.HEALTH.PING:
-            console.log('Received PING. Sending PONG...');
-            const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG, {}, { sender: libp2p.peerId.toString() });
-            await sendMessage(message.meta.sender, pongMessage);
+        case MESSAGE_TYPES.HEALTH.CHECK:
+            console.log('Received HEALTH_CHECK');
+            if (message.actionType === ACTION_TYPES.HEALTH.PING) {
+                console.log(`Received PING from ${message.meta.sender}. Sending PONG...`);
+                const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG, {}, { sender: libp2p.peerId.toString() });
+                await sendMessage(message.meta.sender, pongMessage);
+            }
+
+            if (message.actionType === ACTION_TYPES.HEALTH.PONG) {
+                console.log(`Received PONG from ${message.meta.sender}.`);
+
+            }
             break;
 
-        case MESSAGE_TYPES.HEALTH.PONG:
-            console.log('Received PONG.');
+        case MESSAGE_TYPES.DATA.REQUEST:
+            console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
+            if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
+                console.log('Received RESOURCE_FETCH from ${message.meta.sender}.');
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
+                    console.log('Received ALL_POSTS request from ${message.meta.sender}.');
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_USER_POSTS,
+                        params: message.payload.handle,
+                        withCredentials: true
+                    })
+                }
+
+            }
             break;
+
+        case MESSAGE_TYPES.DATA.RESPONSE:
+            console.log(`Received DATA_RESPONSE from ${message.meta.sender}.`);
+            resolvePendingRequest(message.meta.requestId, message);
+            break;
+
 
         default:
             console.warn('Unknown message type:', message.type);

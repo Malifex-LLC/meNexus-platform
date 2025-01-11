@@ -1,6 +1,8 @@
 import { SNP_VERSION } from './version.js';
 import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
 import { ACTION_TYPES, isValidActionType } from './actionTypes.js';
+import { v4 as uuidv4 } from 'uuid'; // Use UUID for unique request IDs
+
 
 /**
  * Utility to create a standardized SNP message
@@ -29,6 +31,7 @@ export const createMessage = (messageType, actionType = {}, payload = {}, meta =
         actionType,
         payload,
         meta: {
+            requestId: uuidv4(),
             sender: meta.sender,
             timestamp: meta.timestamp || new Date().toISOString()
         },
