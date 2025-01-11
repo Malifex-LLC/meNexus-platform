@@ -158,7 +158,8 @@ const processMessage = async (message) => {
             if (message.actionType === ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY) {
                 console.log('Received publicKey request')
                 const publicKeyResponse = createMessage(
-                    MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY,
+                    MESSAGE_TYPES.PEER.RESPONSE,
+                    ACTION_TYPES.PEER.RESPONSE_PUBLIC_KEY,
                     {publicKey: process.env.PUBLIC_KEY},
                     {sender: libp2p.peerId.toString()}
                 );
