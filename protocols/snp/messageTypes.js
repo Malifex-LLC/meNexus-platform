@@ -19,8 +19,8 @@ export const MESSAGE_TYPES = {
     PEER: {
         ANNOUNCE: 'PEER_ANNOUNCE',
         DISCONNECT: 'PEER_DISCONNECT',
-        REQUEST_PUBLIC_KEY: 'PEER_REQUEST_PUBLIC_KEY',
-        RESPONSE_PUBLIC_KEY: 'PEER_RESPONSE_PUBLIC_KEY',
+        REQUEST: 'PEER_REQUEST',
+        RESPONSE: 'PEER_RESPONSE',
     },
 
     // Messaging: Direct or broadcast messages between peers

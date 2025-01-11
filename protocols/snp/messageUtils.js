@@ -1,24 +1,32 @@
 import { SNP_VERSION } from './version.js';
 import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
+import { ACTION_TYPES, isValidActionType } from './actionTypes.js';
 
 /**
  * Utility to create a standardized SNP message
- * @param {string} type - The type of the message (e.g., SYNCHRONIZE_STATE, REQUEST)
+ * @param {string} messageType - The type of the message (e.g., SYNCHRONIZE_STATE, REQUEST)
+ * @param {string} actionType - The type of action (e.g., DATA_QUERY, RESOURCE_FETCH)
  * @param {object} payload - The data being sent
  * @param {object} meta - Additional metadata (e.g., timestamp)
  * @returns {object} - The constructed message
  */
-export const createMessage = (type, payload = {}, meta = {}) => {
-    console.log('createMessage: ', type, payload, meta);
-    if (!isValidMessageType(type)) {
-        throw new Error(`Invalid message type: ${type}`);
+export const createMessage = (messageType, actionType = {}, payload = {}, meta = {}) => {
+    console.log('createMessage: ', messageType, actionType, payload, meta);
+    if (!isValidMessageType(messageType)) {
+        throw new Error(`Invalid message type: ${messageType}`);
     }
-    console.log('Valid message type: ', type);
+    console.log('Valid message type: ', messageType);
+
+    if (!isValidActionType(actionType)) {
+        throw new Error(`Invalid action type: ${actionType}`);
+    }
+    console.log('Valid action type: ', actionType);
 
     return {
         protocol: 'SNP',
         version: SNP_VERSION,
-        type,
+        messageType,
+        actionType,
         payload,
         meta: {
             sender: meta.sender,

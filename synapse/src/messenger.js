@@ -1,4 +1,4 @@
-import { SNP_VERSION} from "../../protocols/snp/index.js";
+import {ACTION_TYPES, SNP_VERSION} from "../../protocols/snp/index.js";
 import { MESSAGE_TYPES } from '../../protocols/snp/index.js'
 import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../../protocols/snp/index.js';
 import { createLibp2pInstance } from '../config/libp2p.js'; // Import the configured libp2p constructor
@@ -19,13 +19,22 @@ export const initializeMessenger = async () => {
 
     libp2p.addEventListener('peer:discovery', (event) => {
         const peerId = event.detail.id.toString();
+        console.log(`Discovered peerId: ${peerId}`);
+        console.log(`Local peerId: ${libp2p.peerId.toString()}`);
+
+        // TODO Self connecting filtering does not appear to be working
+        if (peerId === libp2p.peerId.toString()) {
+            console.log('Skipping self-connection.');
+            return;
+        }
         const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
         if (!discoveredPeers.has(peerId)) {
             console.log(`Discovered peer: ${peerId} at ${peerMultiaddrs}`);
             discoveredPeers.set(peerId, peerMultiaddrs); // Store peerId and its multiaddrs
 
             const publicKeyRequest = createMessage(
-                MESSAGE_TYPES.PEER.REQUEST_PUBLIC_KEY,
+                MESSAGE_TYPES.PEER.REQUEST,
+                ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY,
                 {},
                 {sender: libp2p.peerId.toString()}
             );
@@ -89,6 +98,16 @@ export const initializeMessenger = async () => {
     return libp2p;
 };
 
+export const fetchPeerId = async (publicKey) => {
+    if (discoveredPeers.has(publicKey)) {
+       const peer = discoveredPeers.get(publicKey)
+        return peer.peerId.toString();
+    } else {
+        console.error('No peerId found for publicKey: ', publicKey);
+        return null;
+    }
+}
+
 // Send a message
 export const sendMessage = async (peerId, message) => {
     console.log(`Sending message to peer: ${peerId}`);
@@ -132,24 +151,30 @@ export const sendMessage = async (peerId, message) => {
 // Process an incoming message
 const processMessage = async (message) => {
     console.log(`Processing message: ${message}`);
-    switch (message.type) {
+    switch (message.messageType) {
 
-        case MESSAGE_TYPES.PEER.REQUEST_PUBLIC_KEY:
-            console.log('Received publicKey request')
-            const publicKeyResponse = createMessage(
-                MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY,
-                {publicKey: process.env.PUBLIC_KEY},
-                {sender: libp2p.peerId.toString()}
-            );
-            await sendMessage(message.meta.sender, publicKeyResponse);
+        case MESSAGE_TYPES.PEER.REQUEST:
+            console.log('Received PEER_REQUEST');
+            if (message.actionType === ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY) {
+                console.log('Received publicKey request')
+                const publicKeyResponse = createMessage(
+                    MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY,
+                    {publicKey: process.env.PUBLIC_KEY},
+                    {sender: libp2p.peerId.toString()}
+                );
+                await sendMessage(message.meta.sender, publicKeyResponse);
+            }
             break;
 
-        case MESSAGE_TYPES.PEER.RESPONSE_PUBLIC_KEY:
-            console.log('Received publicKey response: ', message.payload.publicKey);
-            const peerId = message.meta.sender;
-            if (discoveredPeers.has(peerId)) {
-                discoveredPeers.get(peerId).publicKey = message.payload.publicKey;
-                console.log('Stored public key for peerId: ', peerId);
+        case MESSAGE_TYPES.PEER.RESPONSE:
+            console.log('Received PEER_RESPONSE');
+            if (message.actionType === ACTION_TYPES.PEER.RESPONSE_PUBLIC_KEY) {
+                console.log('Received PEER_RESPONSE_PUBLIC_KEY: ', message.payload.publicKey);
+                const peerId = message.meta.sender;
+                if (discoveredPeers.has(peerId)) {
+                    discoveredPeers.get(peerId).publicKey = message.payload.publicKey;
+                    console.log('Stored public key for peerId: ', peerId);
+                }
             }
             break;
 
