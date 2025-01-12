@@ -6,6 +6,7 @@ import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../
 import { sendRequest } from '../utils/apiUtils.js'
 import { createLibp2pInstance } from '../config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
+import * as peerStateManager from './peerStateManager.js'
 
 /* Using a defined PROTOCOL_ID using the SNP_VERSION allows the libp2p to support multiple versions of SNP.
 *  For example if PROTOCOL_ID = `/snp/2.0.0` libp2p could call the appropriate handler ->
@@ -13,16 +14,17 @@ import { multiaddr } from 'multiaddr';
 * */
 const PROTOCOL_ID = `/snp/${SNP_VERSION}`;
 let libp2p = null;
-const discoveredPeers = new Map();
-const connectedPeers = new Set();
 const pendingRequests = new Map();
 
 
 // Initialize Messenger
 export const initializeMessenger = async () => {
+    console.log('Initializing messenger...');
     libp2p = await createLibp2pInstance();
 
-    libp2p.addEventListener('peer:discovery', (event) => {
+
+
+    libp2p.addEventListener('peer:discovery', async (event) => {
         const peerId = event.detail.id.toString();
         console.log(`Discovered peerId: ${peerId}`);
         console.log(`Local peerId: ${libp2p.peerId.toString()}`);
@@ -33,24 +35,24 @@ export const initializeMessenger = async () => {
             return;
         }
         const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
-        if (!discoveredPeers.has(peerId)) {
-            console.log(`Discovered peer: ${peerId} at ${peerMultiaddrs}`);
-            discoveredPeers.set(peerId, peerMultiaddrs); // Store peerId and its multiaddrs
+        await peerStateManager.addDiscoveredPeer(peerId, peerMultiaddrs);
+        console.log('Discovered Peers: ', await peerStateManager.getAllDiscoveredPeers())
 
-            const publicKeyRequest = createMessage(
-                MESSAGE_TYPES.PEER.REQUEST,
-                ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY,
-                {},
-                {sender: libp2p.peerId.toString()}
-            );
-            sendMessage(peerId, publicKeyRequest);
-        }
+        const publicKeyRequest = createMessage(
+            MESSAGE_TYPES.PEER.REQUEST,
+            ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY,
+            {},
+            {sender: libp2p.peerId.toString()}
+        );
+        await sendMessage(peerId, publicKeyRequest);
+
     });
 
     libp2p.addEventListener('peer:connect', (event) => {
         const peerId = event.detail.toString();
-        console.log(`Connected to peer: ${peerId}`);
-        connectedPeers.add(peerId);
+        // const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
+        // console.log(`Connected to peer: ${peerId}`);
+        // peerStateManager.addConnectedPeer(peerId, peerMultiaddrs);
     });
 
     // libp2p.addEventListener('peer:connect', async (event) => {
@@ -62,10 +64,11 @@ export const initializeMessenger = async () => {
     //     await sendMessage(peerId, pingMessage);
     // });
 
-    libp2p.addEventListener('peer:disconnect', (event) => {
+    libp2p.addEventListener('peer:disconnect', async (event) => {
         const peerId = event.detail.toString();
         console.log(`Disconnected from peer: ${peerId}`);
-        connectedPeers.delete(peerId);
+        await peerStateManager.removeConnectedPeer(peerId);
+        await peerStateManager.removeDiscoveredPeer(peerId);
     });
 
     // Add a handler for incoming messages
@@ -85,7 +88,7 @@ export const initializeMessenger = async () => {
 
                 try {
                     const message = decodeMessage(rawMessage);
-                    console.log('Decoded message:', message);
+                    //console.log('Decoded message:', message);
                     validateMessage(message);
                     await processMessage(message);
                 } catch (error) {
@@ -103,21 +106,36 @@ export const initializeMessenger = async () => {
     return libp2p;
 };
 
-export const fetchPeerId = async (publicKey) => {
-    if (discoveredPeers.has(publicKey)) {
-       const peer = discoveredPeers.get(publicKey)
-        return peer.peerId.toString();
-    } else {
-        console.error('No peerId found for publicKey: ', publicKey);
-        return null;
-    }
-}
+// export const fetchPeerId = async (publicKey) => {
+//     console.log(`Fetching peerId for publicKey: ${publicKey}`);
+//     console.log('Discovered peers:', discoveredPeers);
+//
+//     if (discoveredPeers.has(publicKey)) {
+//         console.log('Found publicKey in discoveredPeers.');
+//        const peer = discoveredPeers.get(publicKey)
+//         return peer.peerId.toString();
+//     } else {
+//         console.error('No peerId found for publicKey: ', publicKey);
+//         return null;
+//     }
+// }
 
 // Send a message
 export const sendMessage = async (peerId, message) => {
     console.log(`Sending message to peer: ${peerId}`);
-    const multiaddrs = discoveredPeers.get(peerId);
+    // if (!peerStateManager.getConnectedPeers().has(peerId)) {
+    //     console.error(`Peer ${peerId} is not currently connected.`);
+    //     return;
+    // }
+    const peer = await peerStateManager.getPeer(peerId);
+    if (!peer || !peer.multiaddrs) {
+        console.error(`No known peer: ${peerId}`);
+        return;
+    }
 
+    const multiaddrs = peer.multiaddrs
+
+    console.log('peer: ', peer);
     if (!multiaddrs || multiaddrs.length === 0) {
         console.error(`No known multiaddrs for peer: ${peerId}`);
         return;
@@ -137,7 +155,7 @@ export const sendMessage = async (peerId, message) => {
             //console.log('Stream established:', stream);
 
             const encodedMessage = encodeMessage(message);
-            console.log('Encoded message being sent:', encodedMessage);
+            //console.log('Encoded message being sent:', encodedMessage);
 
             // Writing to the stream
             const writer = stream.sink; // Correctly use stream sink
@@ -146,6 +164,7 @@ export const sendMessage = async (peerId, message) => {
             }());
 
             console.log('Message successfully sent to:', peerId);
+            console.log('Discovered Peers after message sent: ', peerStateManager.getAllDiscoveredPeers());
             return; // Exit after successful message
         } catch (error) {
             console.error(`Failed to dial ${addr}: ${error.message}`);
@@ -155,6 +174,7 @@ export const sendMessage = async (peerId, message) => {
 
 export const sendMessageWithResponse = async (peerId, message, timeout = 10000) => {
     const requestId = message.meta.requestId;
+
 
     // Return a promise that tracks the response
     const responsePromise = new Promise((resolve, reject) => {
@@ -216,10 +236,8 @@ const processMessage = async (message) => {
             if (message.actionType === ACTION_TYPES.PEER.RESPONSE_PUBLIC_KEY) {
                 console.log('Received PEER_RESPONSE_PUBLIC_KEY: ', message.payload.publicKey);
                 const peerId = message.meta.sender;
-                if (discoveredPeers.has(peerId)) {
-                    discoveredPeers.get(peerId).publicKey = message.payload.publicKey;
-                    console.log('Stored public key for peerId: ', peerId);
-                }
+                const publicKey = message.payload.publicKey;
+                await peerStateManager.updatePeerPublicKey(peerId, publicKey);
             }
             break;
 

@@ -29,6 +29,7 @@ const validateMessage = (message) => {
 };
 
 export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
+    console.log('Initializing snpPubSub...');
     const libp2pInstance = externalLibp2pInstance || await createLibp2pInstance();
 
     if (!libp2pInstance) {

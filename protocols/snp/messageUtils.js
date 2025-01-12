@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'; // Use UUID for unique request IDs
  * @returns {object} - The constructed message
  */
 export const createMessage = (messageType, actionType = {}, payload = {}, meta = {}) => {
-    console.log('createMessage: ', messageType, actionType, payload, meta);
+    //console.log('createMessage: ', messageType, actionType, payload, meta);
     if (!isValidMessageType(messageType)) {
         throw new Error(`Invalid message type: ${messageType}`);
     }
@@ -44,7 +44,7 @@ export const createMessage = (messageType, actionType = {}, payload = {}, meta =
  * @returns {string} - JSON string
  */
 export const encodeMessage = (message) => {
-    console.log('encodeMessage called for:', message);
+    //console.log('encodeMessage called for:', message);
     return JSON.stringify(message);
 }
 
@@ -55,7 +55,7 @@ export const encodeMessage = (message) => {
  * @throws {Error} - If the message format is invalid
  */
 export const decodeMessage = (rawMessage) => {
-    console.log('decodeMessage called for:', rawMessage);
+    //console.log('decodeMessage called for:', rawMessage);
     try {
         const message = JSON.parse(rawMessage);
 
@@ -83,7 +83,7 @@ export const decodeMessage = (rawMessage) => {
  * @returns {boolean} - True if valid, throws an error otherwise
  */
 export const validateMessage = (message) => {
-    console.log('validateMessage called for:', message);
+    //console.log('validateMessage called for:', message);
     if (message.protocol !== 'SNP') {
         throw new Error(`Invalid protocol: ${message.protocol}`);
     }

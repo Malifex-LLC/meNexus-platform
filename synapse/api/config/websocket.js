@@ -25,7 +25,7 @@ const createWebSocketServer = (server) => {
             return;
         }
 
-        console.log(`WebSocket connection established for user_id: ${user_id}`);
+        //console.log(`WebSocket connection established for user_id: ${user_id}`);
         clients.set(user_id, ws);
 
         ws.on('pong', () => {

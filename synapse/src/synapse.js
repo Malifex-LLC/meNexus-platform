@@ -13,6 +13,7 @@ const CONFIG_FILE = path.join(process.cwd(), '../config/synapse-config.json');
 
 // Initialize the Synapse instance
 const initializeSynapse = async () => {
+    console.log('Initializing Synapse...');
     let config;
 
     // Load or generate configuration
@@ -41,7 +42,7 @@ const initializeSynapse = async () => {
 };
 
 const startServer = () => {
-    console.log('Starting Synapse...');
+    console.log('Starting API server...');
     const serverProcess = spawn('node', ['server.js'], { cwd: '../api/src', stdio: 'inherit' });
 
     serverProcess.on('error', (error) => {
@@ -58,6 +59,7 @@ const startServer = () => {
 };
 
 const startSnpPubSub = async () => {
+    console.log('Starting snpPubSub...');
     const libp2pInstance = await initializeMessenger();
     await initializeSnpPubSub(libp2pInstance);
 }
