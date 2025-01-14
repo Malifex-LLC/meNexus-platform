@@ -1,3 +1,5 @@
+console.log('Initializing Peer State Manager...');
+
 import {discoveredPeers, connectedPeers} from "./peerState.js";
 
 export const addDiscoveredPeer = async (peerId, multiaddrs) => {
