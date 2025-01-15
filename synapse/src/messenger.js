@@ -1,12 +1,17 @@
-import {ACTION_TYPES, SNP_VERSION} from "../../protocols/snp/index.js";
-import { MESSAGE_TYPES } from '../../protocols/snp/index.js'
-import { RESOURCE_TYPES } from '../../protocols/snp/resourceTypes.js'
-import { ENDPOINTS } from '../api/config/endpoints.js'
-import { createMessage, encodeMessage, decodeMessage, validateMessage} from '../../protocols/snp/index.js';
-import { sendRequest } from '../utils/apiUtils.js'
-import { createLibp2pInstance } from '../config/libp2p.js'; // Import the configured libp2p constructor
+import { SNP_VERSION } from '#protocols/snp/version.js'
+import { ACTION_TYPES } from "#protocols/snp/actionTypes.js";
+import { MESSAGE_TYPES } from '#protocols/snp/messageTypes.js'
+import { RESOURCE_TYPES } from '#protocols/snp/resourceTypes.js'
+import { ENDPOINTS } from '#api/config/endpoints.js'
+import { createMessage, encodeMessage, decodeMessage, validateMessage} from '#protocols/snp/messageUtils.js';
+import { sendRequest } from '#utils/apiUtils.js'
+import { createLibp2pInstance } from '#config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
-import * as peerStateManager from './peerStateManager.js'
+import * as peerStateManager from '#src/peerStateManager.js'
+console.log('peerStateManager instance:', import.meta.url);
+console.log('peerStateManager instance in messenger:', peerStateManager);
+
+
 
 /* Using a defined PROTOCOL_ID using the SNP_VERSION allows the libp2p to support multiple versions of SNP.
 *  For example if PROTOCOL_ID = `/snp/2.0.0` libp2p could call the appropriate handler ->
@@ -35,8 +40,8 @@ export const initializeMessenger = async () => {
             return;
         }
         const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
-        await peerStateManager.addDiscoveredPeer(peerId, peerMultiaddrs);
-        console.log('Discovered Peers: ', await peerStateManager.getAllDiscoveredPeers())
+        peerStateManager.addDiscoveredPeer(peerId, peerMultiaddrs);
+        console.log('Discovered Peers: ', peerStateManager.getAllDiscoveredPeers())
 
         const publicKeyRequest = createMessage(
             MESSAGE_TYPES.PEER.REQUEST,
@@ -67,8 +72,8 @@ export const initializeMessenger = async () => {
     libp2p.addEventListener('peer:disconnect', async (event) => {
         const peerId = event.detail.toString();
         console.log(`Disconnected from peer: ${peerId}`);
-        await peerStateManager.removeConnectedPeer(peerId);
-        await peerStateManager.removeDiscoveredPeer(peerId);
+        peerStateManager.removeConnectedPeer(peerId);
+        peerStateManager.removeDiscoveredPeer(peerId);
     });
 
     // Add a handler for incoming messages
@@ -127,7 +132,7 @@ export const sendMessage = async (peerId, message) => {
     //     console.error(`Peer ${peerId} is not currently connected.`);
     //     return;
     // }
-    const peer = await peerStateManager.getPeer(peerId);
+    const peer = peerStateManager.getPeer(peerId);
     if (!peer || !peer.multiaddrs) {
         console.error(`No known peer: ${peerId}`);
         return;
@@ -175,7 +180,6 @@ export const sendMessage = async (peerId, message) => {
 export const sendMessageWithResponse = async (peerId, message, timeout = 10000) => {
     const requestId = message.meta.requestId;
 
-
     // Return a promise that tracks the response
     const responsePromise = new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
@@ -209,9 +213,6 @@ export const resolvePendingRequest = (requestId, response) => {
     }
 };
 
-
-
-
 // Process an incoming message
 const processMessage = async (message) => {
     console.log(`Processing message: ${message}`);
@@ -237,7 +238,7 @@ const processMessage = async (message) => {
                 console.log('Received PEER_RESPONSE_PUBLIC_KEY: ', message.payload.publicKey);
                 const peerId = message.meta.sender;
                 const publicKey = message.payload.publicKey;
-                await peerStateManager.updatePeerPublicKey(peerId, publicKey);
+                peerStateManager.updatePeerPublicKey(peerId, publicKey);
             }
             break;
 

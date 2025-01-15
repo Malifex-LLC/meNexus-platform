@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const messageController = require('../controllers/messageController');
+import messageController from '../controllers/messageController.js';
 
 // Define messageRoutes and link them to corresponding controller functions
 
@@ -9,4 +9,4 @@ router.post('/createMessage', messageController.createMessage);
 router.put('/setMessagesAsRead', messageController.setMessagesAsRead);
 
 // Export the router so it can be used in server.js
-module.exports = router;
+export default router;

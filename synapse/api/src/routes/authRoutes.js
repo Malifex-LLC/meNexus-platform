@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const authController = require('../controllers/authController')
+import authController from '../controllers/authController.js'
 
 // Define authRoutes and link them to corresponding controller functions
 
@@ -15,4 +15,4 @@ router.post('/logout', authController.logout);
 router.put('/updateAccountSettings', authController.updateAccountSettings);
 
 // Export the router so it can be used in server.js
-module.exports = router;
+export default router;

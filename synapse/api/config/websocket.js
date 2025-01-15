@@ -1,11 +1,11 @@
 // Import WebSocket library
-const ws = require('ws')
-
+//import ws from 'ws'
+import {WebSocketServer} from "ws";
 // Store connected clients
-const clients = new Map();
+export const clients = new Map();
 
-const createWebSocketServer = (server) => {
-    const wss = new ws.Server({ noServer: true });
+export const createWebSocketServer = (server) => {
+    const wss = new WebSocketServer({ noServer: true });
 
     // TODO Not sure if WebSocket needs CORS
     // Configure WebSocket Server for CORS
@@ -75,7 +75,7 @@ const createWebSocketServer = (server) => {
     return wss;
 };
 
-module.exports = {
+export default {
     createWebSocketServer,
-    clients
+    setInterval
 }

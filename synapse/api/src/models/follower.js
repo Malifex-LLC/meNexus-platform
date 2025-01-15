@@ -1,7 +1,7 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js"
 
 // Logic to follow a user
-exports.followUser = (user_id, followed_id) => {
+export const followUser = (user_id, followed_id) => {
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO Followers (follower_id, followed_id) VALUES (?, ?)';
 
@@ -17,7 +17,7 @@ exports.followUser = (user_id, followed_id) => {
 }
 
 // Logic to unfollow a user
-exports.unfollowUser = (user_id, followed_id) => {
+export const unfollowUser = (user_id, followed_id) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM Followers WHERE follower_id = ? AND followed_id = ?';
         meNexus.query(sql, [user_id, followed_id], (err, result) => {
@@ -32,7 +32,7 @@ exports.unfollowUser = (user_id, followed_id) => {
 }
 
 // Logic to check if a user is following another user
-exports.followCheck = (user_id, followed_id) => {
+export const followCheck = (user_id, followed_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT * 
@@ -51,4 +51,10 @@ exports.followCheck = (user_id, followed_id) => {
             resolve({isFollowing});
         });
     });
+}
+
+export default {
+    followUser,
+    unfollowUser,
+    followCheck,
 }

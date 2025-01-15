@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const commentController = require('../controllers/commentController');
+import commentController from '../controllers/commentController.js';
 
 // Define commentRoutes and link them to corresponding controller functions
 
@@ -10,4 +10,4 @@ router.delete('/deleteComment/:comment_id', commentController.deleteComment);
 router.get('/getComments', commentController.getComments);
 
 // Export the router so it can be used in server.js
-module.exports = router;
+export default router;

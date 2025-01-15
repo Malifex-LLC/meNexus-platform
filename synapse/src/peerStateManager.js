@@ -2,7 +2,9 @@ console.log('Initializing Peer State Manager...');
 
 import {discoveredPeers, connectedPeers} from "./peerState.js";
 
-export const addDiscoveredPeer = async (peerId, multiaddrs) => {
+
+
+export const addDiscoveredPeer = (peerId, multiaddrs) => {
     if (!discoveredPeers.has(peerId)) {
         discoveredPeers.set(peerId, { publicKey: null, multiaddrs });
         console.log('Discovered Peers after addDiscoveredPeer:', discoveredPeers);
@@ -10,7 +12,7 @@ export const addDiscoveredPeer = async (peerId, multiaddrs) => {
 
 };
 
-export  const updatePeerPublicKey = async (peerId, publicKey) => {
+export  const updatePeerPublicKey = (peerId, publicKey) => {
     if (discoveredPeers.has(peerId)) {
         discoveredPeers.get(peerId).publicKey = publicKey;
         console.log('Updated peer publicKey');
@@ -18,23 +20,26 @@ export  const updatePeerPublicKey = async (peerId, publicKey) => {
     }
 };
 
-export const removeDiscoveredPeer = async (peerId) => {
+export const removeDiscoveredPeer = (peerId) => {
+    console.log('DiscoveredPeers @ removeDisocoveredPeer: ', discoveredPeers)
+    console.log('Remove discovered peer:', peerId);
     discoveredPeers.delete(peerId);
     connectedPeers.delete(peerId);
 };
 
-export const addConnectedPeer = async (peerId) => {
+export const addConnectedPeer = (peerId) => {
     connectedPeers.add(peerId);
 };
 
-export const removeConnectedPeer = async (peerId) => {
+export const removeConnectedPeer = (peerId) => {
+    console.log('Remove connected peer:', peerId);
     connectedPeers.delete(peerId);
 };
 
 
-export const getPeer = async (peerId) => discoveredPeers.get(peerId);
+export const getPeer = (peerId) => discoveredPeers.get(peerId);
 
-export  const getPeerByPublicKey = async (publicKey) => {
+export  const getPeerByPublicKey = (publicKey) => {
     console.log('Discovered Peers @ getPeerByPublicKey:', discoveredPeers);
     for (const [peerId, peerData] of discoveredPeers) {
         if (peerData.publicKey === publicKey) {
@@ -44,10 +49,10 @@ export  const getPeerByPublicKey = async (publicKey) => {
     return null; // Return null if no peer with that publicKey is found
 };
 
-export const isPeerConnected = async (peerId) => connectedPeers.has(peerId);
+export const isPeerConnected = (peerId) => connectedPeers.has(peerId);
 
-export const getConnectedPeers = async () => connectedPeers;
+export const getConnectedPeers = () => connectedPeers;
 
-export const getAllDiscoveredPeers = async () => discoveredPeers;
+export const getAllDiscoveredPeers = () => discoveredPeers;
 
-export const getAllConnectedPeers = async () => new Set(connectedPeers);
+export const getAllConnectedPeers = () => new Set(connectedPeers);

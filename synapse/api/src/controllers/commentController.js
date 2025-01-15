@@ -1,7 +1,7 @@
 // Import the Comment model
-const Comment = require('../models/comment');
+import Comment from '../models/comment.js';
 
-exports.createComment = async (req, res) => {
+export const createComment = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -18,7 +18,7 @@ exports.createComment = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.updateComment = async (req, res) => {
+export const updateComment = async (req, res) => {
     const comment_id = req.params.comment_id;
     const updatedContent = req.body.content;
 
@@ -31,7 +31,7 @@ exports.updateComment = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.deleteComment = async (req, res) => {
+export const deleteComment = async (req, res) => {
     const comment_id = req.params.comment_id;
 
     const result = await Comment.deleteComment(comment_id);
@@ -43,7 +43,7 @@ exports.deleteComment = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.getComments = async (req, res) => {
+export const getComments = async (req, res) => {
     const {resource_type, resource_id } = req.query;
 
     if (!resource_id || resource_id.trim() === "") {
@@ -52,4 +52,11 @@ exports.getComments = async (req, res) => {
 
     const results = await Comment.getComments(resource_type, resource_id);
     return res.status(200).json(results);
+}
+
+export default {
+    createComment,
+    updateComment,
+    deleteComment,
+    getComments
 }

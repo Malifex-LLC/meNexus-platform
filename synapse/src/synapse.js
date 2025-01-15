@@ -4,7 +4,7 @@ import path from 'path';
 import { exec, spawn } from 'child_process';
 import dotenv from 'dotenv';
 dotenv.config({ path: '../api/config/.env' }); // Load base environment variables
-import { generateCryptoKeys } from '../utils/cryptoUtils.js'; // Utility for keypair generation
+import { generateCryptoKeysUtil } from '../utils/cryptoUtils.js'; // Utility for keypair generation
 import { loadConfig, saveConfig } from '../utils/configUtils.js'; // Config file handlers
 import { initializeMessenger} from "./messenger.js";
 import { initializeSnpPubSub} from "./snpPubSub.js";

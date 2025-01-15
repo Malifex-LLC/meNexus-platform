@@ -1,7 +1,7 @@
 // Import Settings model
-const Settings = require('../models/settings');
+import Settings from '../models/settings.js';
 
-exports.uploadProfilePicture = async (req, res) => {
+export const uploadProfilePicture = async (req, res) => {
     console.log('uploadType: ', req.body.uploadType)
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
@@ -22,3 +22,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const result = await Settings.uploadProfilePicture(profilePicturePath, user_id);
     return res.status(200).json(result);
 }
+
+export default {
+    uploadProfilePicture
+};

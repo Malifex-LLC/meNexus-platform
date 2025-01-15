@@ -1,5 +1,5 @@
-const meNexus = require("../../config/mysql.js");
-const { clients } = require('../../config/websocket');
+import meNexus from "../../config/mysql.js";
+import { clients } from '../../config/websocket.js';
 
 // Helper to send messages via WebSocket
 const sendMessage = (userId, message) => {
@@ -21,7 +21,7 @@ const sendMessage = (userId, message) => {
     client.send(JSON.stringify(message));
 };
 
-exports.getMessages = (conversation_id) => {
+export const getMessages = (conversation_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT * 
@@ -41,7 +41,7 @@ exports.getMessages = (conversation_id) => {
     })
 }
 
-exports.createMessage = (user_id, conversation_id, message, participant_id, content) => {
+export const createMessage = (user_id, conversation_id, message, participant_id, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
             INSERT INTO Messages (conversation_id, sender_id, receiver_id, content, created_at)
@@ -83,7 +83,7 @@ exports.createMessage = (user_id, conversation_id, message, participant_id, cont
     })
 }
 
-exports.setMessageAsRead = (conversation_id) => {
+export const setMessageAsRead = (conversation_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
             UPDATE Messages 
@@ -101,4 +101,10 @@ exports.setMessageAsRead = (conversation_id) => {
             resolve({ message: 'Messages marked as read', affectedRows: results.affectedRows })
         });
     })
+}
+
+export default {
+    getMessages,
+    createMessage,
+    setMessageAsRead
 }

@@ -1,7 +1,7 @@
 // Import the Notification model
-const Notification = require('../models/notification');
+import Notification from '../models/notification.js'
 
-exports.createNotification = async (req, res) => {
+export const createNotification = async (req, res) => {
     const { user_id, actor_id, resource_type, resource_id, action } = req.body;
     console.log("createNotification req: ", req);
 
@@ -13,7 +13,7 @@ exports.createNotification = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.getNotifications = async (req, res) => {
+export const getNotifications = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -30,7 +30,7 @@ exports.getNotifications = async (req, res) => {
 
 }
 
-exports.setNotificationAsRead = async (req, res) => {
+export const setNotificationAsRead = async (req, res) => {
     const { notification_id } = req.body;
 
     if (!notification_id) {
@@ -40,4 +40,10 @@ exports.setNotificationAsRead = async (req, res) => {
     const result = await Notification.setNotificationAsRead(notification_id);
 
     return res.status(200).json(result);
+}
+
+export default {
+    createNotification,
+    getNotifications,
+    setNotificationAsRead,
 }

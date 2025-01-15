@@ -1,7 +1,7 @@
 // Import User model
-const User = require('../models/user')
+import User from '../models/user.js'
 
-exports.getSessionUser = async (req, res) => {
+export const getSessionUser = async (req, res) => {
 
     console.log('getSessionUser called');
     console.log('Session ID:', req.sessionID);
@@ -29,7 +29,7 @@ exports.getSessionUser = async (req, res) => {
     }
 }
 
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     console.log('/getUser called');
     const { user_id } = req.query;
 
@@ -41,7 +41,7 @@ exports.getUserById = async (req, res) => {
     return res.status(200).json(user);
 }
 
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
     console.log('getProfile called');
     const handle = req.params.handle;
 
@@ -49,7 +49,7 @@ exports.getProfile = async (req, res) => {
     res.status(200).json(profile)
 }
 
-exports.updateProfileSettings = async (req, res) => {
+export const updateProfileSettings = async (req, res) => {
     const { handle } = req.params; // Get the current user handle from the request
     const updatedFields = req.body; // Get the fields to update from the request body
 
@@ -121,4 +121,11 @@ exports.updateProfileSettings = async (req, res) => {
         return res.status(500).json({error: 'Error updating Profile settings'});
     }
 
+}
+
+export default {
+    getSessionUser,
+    getUserById,
+    getProfile,
+    updateProfileSettings,
 }

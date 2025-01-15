@@ -1,6 +1,6 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js";
 
-exports.createPost = (content, handle) => {
+export const createPost = (content, handle) => {
     return new Promise((resolve, reject) => {
         // Fetch user_id from handle
         const userSql = `
@@ -32,7 +32,7 @@ exports.createPost = (content, handle) => {
     })
 }
 
-exports.updatePost = (postId, updatedContent) => {
+export const updatePost = (postId, updatedContent) => {
     return new Promise((resolve, reject) => {
         // Update the post in orbitdb
         const updateSql = `
@@ -52,7 +52,7 @@ exports.updatePost = (postId, updatedContent) => {
     })
 }
 
-exports.deletePost = (postId) => {
+export const deletePost = (postId) => {
     return new Promise((resolve, reject) => {
         // Delete the post from the orbitdb
         const deleteSql = `
@@ -71,7 +71,7 @@ exports.deletePost = (postId) => {
     })
 }
 
-exports.getPosts = (user_id) => {
+export const getPosts = (user_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
         SELECT Posts.*, Users.display_name, Users.handle
@@ -98,7 +98,7 @@ exports.getPosts = (user_id) => {
     })
 }
 
-exports.getUserPosts = (handle) => {
+export const getUserPosts = (handle) => {
     return new Promise((resolve, reject) => {
         // SQL is performing an inner join on Posts and Users tables where post.user_id == users.user_id
         const sql = `
@@ -118,4 +118,12 @@ exports.getUserPosts = (handle) => {
             resolve(results);
         });
     })
+}
+
+export default {
+    createPost,
+    updatePost,
+    deletePost,
+    getPosts,
+    getUserPosts,
 }

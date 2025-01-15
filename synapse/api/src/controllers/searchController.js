@@ -1,7 +1,7 @@
 // Import Search model
-const Search = require('../models/search')
+import Search from '../models/search.js'
 
-exports.search = async (req, res) => {
+export const search = async (req, res) => {
     const { query, type } = req.query;
 
     if (!query || query.trim() === "") {
@@ -11,3 +11,5 @@ exports.search = async (req, res) => {
     const results = await Search.search(query, type);
     return res.status(200).json(results);
 }
+
+export default { search };

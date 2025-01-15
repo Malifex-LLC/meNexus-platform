@@ -15,7 +15,7 @@ export async function verifySignature(signature, challenge, publicKey) {
 // Generates cryptographic public/private key pairs
 // Not the preferred method as its generated on api instead of web
 // security risk for privateKey...used mainly to convert meNexus-legacy accounts to PKI
-export async function generateCryptoKeys() {
+export async function generateCryptoKeysUtil() {
     console.log('generateCryptoKeys cryptoUtils called');
     try {
         // Generate private key

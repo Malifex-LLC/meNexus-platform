@@ -1,6 +1,6 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js";
 
-exports.search = (query, type) => {
+export const search = (query, type) => {
     return new Promise((resolve, reject) => {
         let sql = "";
         const params = [`%${query}%`];
@@ -68,4 +68,8 @@ exports.search = (query, type) => {
             resolve({type, results});
         });
     });
+};
+
+export default {
+    search
 };

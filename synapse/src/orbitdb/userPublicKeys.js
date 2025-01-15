@@ -1,4 +1,4 @@
-import { getDatabase} from '../../config/orbitdb-service.js';
+import { getDatabase} from '#config/orbitdb-service.js';
 
 const databaseAddress = '/orbitdb/zdpuAwHqN76o8y2qjGVRXb82kKYJbnSLpYaawj95aWLprNJY7'
 let publicKeysDB = null;
@@ -13,7 +13,7 @@ export async function getPublicKeysDB() {
     return publicKeysDB;
 }
 
-export async function storePublicKey(userId, publicKey) {
+export async function storePublicKeyInDB(userId, publicKey) {
     const db = await getPublicKeysDB();
 
     console.log('storePublicKey called for user_id: ', userId, 'and publicKey: ', publicKey);
@@ -22,7 +22,7 @@ export async function storePublicKey(userId, publicKey) {
     console.log(`Stored public key for ${userId}`);
 }
 
-export async function getUserIdByPublicKey(publicKey) {
+export async function getUserIdByPublicKeyInDB(publicKey) {
     const db = await getPublicKeysDB();
 
     console.log(`Looking up user_id for publicKey: ${publicKey}`);
@@ -39,7 +39,7 @@ export async function getUserIdByPublicKey(publicKey) {
     }
 }
 
-export async function getAllPublicKeys() {
+export async function getAllPublicKeysInDB() {
     const db = await getPublicKeysDB();
 
     const allDocs = await db.all();
