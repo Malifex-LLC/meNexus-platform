@@ -1,5 +1,5 @@
 // Import the Notification model
-const Notification = require('../models/Notification');
+const Notification = require('../models/notification');
 
 exports.createNotification = async (req, res) => {
     const { user_id, actor_id, resource_type, resource_id, action } = req.body;

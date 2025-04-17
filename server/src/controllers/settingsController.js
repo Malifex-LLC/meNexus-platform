@@ -1,5 +1,5 @@
 // Import Settings model
-const Settings = require('../models/Settings');
+const Settings = require('../models/settings');
 const { uploadToS3 } = require('../utils/uploadToS3');
 const fs = require("fs");
 
