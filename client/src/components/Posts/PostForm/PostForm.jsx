@@ -1,4 +1,3 @@
-import './PostForm.css';
 import { useState } from "react";
 import useCreatePost from '../../../api/hooks/useCreatePost.js';
 
@@ -34,16 +33,17 @@ const PostForm = ({ handle, refreshPosts }) => {
     };
 
     return (
-        <div className="post-form">
-            <div onClick={handleFormClick}>
+        <div className="post-form  text-center p-4 mt-4">
+            <div className={``}
+                onClick={handleFormClick}>
                 <textarea
-                    className="post-form__entry-field"
+                    className="post-form__entry-field p-4  bg-white rounded-md"
                     style={styles.textarea}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button className="post-form__button" onClick={handleSubmit} disabled={loading}>
+            <button className="post-form__button mt-4 px-4 bg-brand rounded-lg" onClick={handleSubmit} disabled={loading}>
                 {loading ? "Posting..." : "Post"}
             </button>
             {error && <div className="error">Error: {error}</div>}

@@ -4,9 +4,9 @@ import LoginForm from "../../components/LoginForm/LoginForm.jsx";
 const LoginPage = () => {
     return(
         <LoginLayout>
-            <div className="register__main-content">
-                <h1>Welcome to meNexus</h1>
-                <p>Login to your account to get started!</p>
+            <div className="flex flex-col text-xl items-center w-md mb-4 bg-surface text-foreground rounded-2xl">
+                <h1 className={`text-5xl text-center font-bold p-4`}>Welcome to meNexus</h1>
+                <p className={`text-xl text-center font-light p-4`}>Login to your account to get started!</p>
                 <LoginForm/>
             </div>
         </LoginLayout>

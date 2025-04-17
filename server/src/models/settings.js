@@ -1,6 +1,6 @@
 const meNexus = require("../config/db");
 
-exports.uploadProfilePicture = (profilePicturePath, user_id) => {
+exports.uploadProfilePicture = (s3Url, user_id) => {
     return new Promise((resolve, reject) => {
 
         // Update the database with the new profile picture path
@@ -10,14 +10,14 @@ exports.uploadProfilePicture = (profilePicturePath, user_id) => {
             WHERE user_id = ?
         `;
 
-        meNexus.query(sql, [profilePicturePath, user_id], (err, result) => {
+        meNexus.query(sql, [s3Url, user_id], (err, result) => {
             if (err) {
                 console.error('Error updating profile picture:', err.message);
                 return reject(err);
             }
 
             console.log('Database Update Result:', result);
-            return resolve({ message: 'Profile picture uploaded successfully', profile_picture: profilePicturePath });
+            return resolve({ message: 'Profile picture uploaded successfully', profile_picture: s3Url });
         });
     });
 }

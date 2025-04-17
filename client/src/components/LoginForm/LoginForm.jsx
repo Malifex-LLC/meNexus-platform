@@ -1,4 +1,3 @@
-import './LoginForm.css'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
@@ -50,11 +49,12 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="login__main-content">
-            <form className='login__form' onSubmit={handleSubmit}>
+        <div className="login__main-content flex flex-col items-center justify-center p-8  rounded-2xl">
+            <form className='login__form w-full flex flex-col' onSubmit={handleSubmit}>
                 <label>
                     Email:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)} />
@@ -63,13 +63,20 @@ const LoginForm = () => {
                 <label>
                     Password:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)} />
                 </label>
                 <br />
                 {error && <p>{error}</p>}
-                <button type="submit">Login</button>
+                <button
+                    className={`w-full p-2 rounded-md bg-brand`}
+
+                    type="submit"
+                >
+                    Login
+                </button>
             </form>
         </div>
     );

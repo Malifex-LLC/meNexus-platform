@@ -80,17 +80,23 @@ const Search = () => {
         <div className="search-results">
             <h1>Search Results for "{query}"</h1>
             <div className="search-results__filters">
-                <button onClick={() => setFilter("all")} className={filter === "all" ? "active" : ""}>
+                <button
+                    onClick={() => setFilter("all")}
+                    className={filter === "all" ? "active" : ""}>
                     All
                 </button>
-                <button onClick={() => setFilter("users")} className={filter === "users" ? "active" : ""}>
+                <button
+                    onClick={() => setFilter("users")}
+                    className={filter === "users" ? "active" : ""}>
                     Users
                 </button>
-                <button onClick={() => setFilter("posts")} className={filter === "posts" ? "active" : ""}>
+                <button
+                    onClick={() => setFilter("posts")}
+                    className={filter === "posts" ? "active" : ""}>
                     Posts
                 </button>
             </div>
-            <div className="search-results__content">
+            <div className="search-results__content ">
                 {loading && <p>Loading...</p>}
                 {error && <p className="error">{error}</p>}
                 {!loading && !error && results.length === 0 && <p>No results found.</p>}
@@ -98,7 +104,7 @@ const Search = () => {
                     <>
                         {/* Render User Results */}
                         {userResults.length > 0 && (
-                            <div className="search-results__users-container">
+                            <div className="search-results__users-container ">
                                 <h1>Users Found:</h1>
                                 {userResults.map((user, index) => (
                                     <ProfileCard key={index} handle={user.handle} />

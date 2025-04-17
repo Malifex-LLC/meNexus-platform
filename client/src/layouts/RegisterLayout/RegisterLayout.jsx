@@ -1,11 +1,9 @@
-import './RegisterLayout.css'
 import {Link} from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
 
 const RegisterLayout = ({children}) => {
     return (
-        <div className='register-layout'>
-            <Header />
+        <div className='register-layout flex pt-17 bg-background'>
             <main className='register-layout__main-content'>
                 {children}
             </main>

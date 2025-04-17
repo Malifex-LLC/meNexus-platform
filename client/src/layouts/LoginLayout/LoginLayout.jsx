@@ -1,16 +1,14 @@
-import './LoginLayout.css'
 import {Link} from "react-router-dom";
 import Header from "../../components/Header/Header.jsx";
 
 const LoginLayout = ({children}) => {
     return (
-        <div className='login-layout'>
-            <Header/>
-            <main className='login-layout__main-content'>
+        <div className='login-layout flex flex-col w-screen h-screen items-center justify-center  bg-background'>
+            <main className='login-layout__main-content  '>
                 {children}
             </main>
-            <div className='login-layout__register-redirect'>
-                Don't have an account? <Link to="/register">Register!</Link>
+            <div className='login-layout__register-redirect text-xl text-foreground'>
+                Don't have an account? <Link to="/register" className={`text-brand`}>Register!</Link>
             </div>
         </div>
     );

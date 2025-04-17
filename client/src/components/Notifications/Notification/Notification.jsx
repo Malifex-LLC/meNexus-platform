@@ -1,4 +1,3 @@
-import './Notification.css'
 
 const Notification = ({
                           notification_id,
@@ -12,7 +11,8 @@ const Notification = ({
                       }) => {
 
     return (
-        <div className="notification">
+        <div className="notification flex text-sm p-4 w-full
+        border border-border bg-background rounded-2xl hover:bg-surface">
             <p>{summary}</p>
         </div>
     )

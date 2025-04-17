@@ -1,5 +1,7 @@
 // Import Settings model
 const Settings = require('../models/Settings');
+const { uploadToS3 } = require('../utils/uploadToS3');
+const fs = require("fs");
 
 exports.uploadProfilePicture = async (req, res) => {
     console.log('uploadType: ', req.body.uploadType)
@@ -16,9 +18,19 @@ exports.uploadProfilePicture = async (req, res) => {
         return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const profilePicturePath = `/uploads/profile_pictures/${req.file.filename}`;
-    console.log('Profile Picture Path:', profilePicturePath);
+    const localFilePath = req.file.path;
+    const s3Key = `profile_pictures/${Date.now()}_${req.file.originalname}`;
+    console.log('Profile Picture localFilePath: ', localFilePath);
+    console.log('Profile Picture s3Key: ', s3Key);
 
-    const result = await Settings.uploadProfilePicture(profilePicturePath, user_id);
-    return res.status(200).json(result);
+    try {
+        const s3Url = await uploadToS3(localFilePath, s3Key);
+        fs.unlinkSync(localFilePath); // delete local file
+
+        const result = await Settings.uploadProfilePicture(s3Url, user_id);
+        return res.status(200).json({ profile_picture: s3Url, message: result.message });
+    } catch (err) {
+        console.error('Upload error:', err);
+        return res.status(500).json({ error: 'Failed to upload image' });
+    }
 }
