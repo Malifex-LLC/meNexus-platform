@@ -8,6 +8,7 @@ import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
 import useEditComment from "../../../api/hooks/useEditComment.js"
 import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
+import useGetProfile from "../../../api/hooks/useGetProfile.js";
 
 const Post = ({
                   post_id,
@@ -33,6 +34,8 @@ const Post = ({
     const { getComments, commentsData } = useGetComments();
     const { createNotification } = useCreateNotification();
     const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, post_id, getComments, setComments));
+    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+
 
     const {
         handleCommentEdit,
@@ -41,6 +44,9 @@ const Post = ({
         editedCommentContent,
         setEditedCommentContent,
     } = useEditComment(() => refreshComments(resource_type, post_id, getComments, setComments));
+
+    const [currentHandle, setCurrentHandle] = useState(handle || null);
+    const [profile, setProfile] = useState({});
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [comments, setComments] = useState([]);
@@ -105,28 +111,62 @@ const Post = ({
         setShowComments((prev) => !prev); // Toggle visibility
     };
 
+    // Fetch profile and posts once the current handle is determined
+    useEffect(() => {
+        setCurrentHandle(handle)
+        if (currentHandle) {
+            const fetchData = async () => {
+                try {
+                    console.log("Fetching profile and posts for handle:", currentHandle);
+                    const [profileData] = await Promise.all([
+                        getProfile(currentHandle),
+                    ]);
+                    console.log("Profile Data after getProfile() fetching is:", profileData);
+                    setProfile(profileData);
+
+                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
+                    console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
+                    setIsFollowing(isCurrentlyFollowing);
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [currentHandle]);
+
+
     return (
         <div className={`user-post ${isEditing ? "user-post--editing   border border-is-editing " : ""} 
         p-8 mb-16 rounded-xl bg-surface text-foreground`}>
-            <div className="user-post__identity flex flex-col w-auto">
-                <Link
-                    className="user-post__display-name text-2xl hover:cursor-pointer hover:underline"
-                    to={`/profile/${handle}`}
-                >
-                    {display_name}
-                </Link>
-                <Link
-                    className="user-post__handle text-lg text-brand hover:cursor-pointer"
-                    to={`/profile/${handle}`}
-                >
-                    @{handle}
-                </Link>
-                <div className="user-post__date text-neutral">
-                    <p>{formatDate(date)}</p>
+            <div className={`flex gap-4`}>
+                <img
+                    className={`relative w-24 h-auto`}
+                    src={profile.profile_picture}
+                    alt={`${profile.display_name}'s profile picture`}
+                />
+                <div className="user-post__identity flex flex-col w-auto">
+
+                    <Link
+                        className="user-post__display-name text-2xl hover:cursor-pointer hover:underline"
+                        to={`/profile/${handle}`}
+                    >
+                        {display_name}
+                    </Link>
+                    <Link
+                        className="user-post__handle text-lg text-brand hover:cursor-pointer"
+                        to={`/profile/${handle}`}
+                    >
+                        @{handle}
+                    </Link>
+                    <div className="user-post__date text-neutral">
+                        <p>{formatDate(date)}</p>
+                    </div>
                 </div>
             </div>
             {!isOwner && (
-                <div className="user-post__follow-actions pt-4">
+                <div className="user-post__follow-actions pt-4 pl-4">
                     <button
                         className="user-post__follow-button p-1 text-sm rounded-lg bg-brand"
                         onClick={isFollowing ? handleUnfollow : handleFollow}

@@ -58,8 +58,8 @@ const createProfile = async (userID, handle) => {
         const defaultProfileName = handle;
         const defaultProfileBio = 'Update your bio!';
         const defaultProfileLocation = 'Update your location';
-        const defaultProfilePicture = '/uploads/profile_pictures/default_avatar.jpeg';
-        const defaultProfileBanner = '/assets/default_profile_banner.jpg';
+        const defaultProfilePicture = '/default_avatar.jpeg';
+        const defaultProfileBanner = '/default_profile_banner.jpg';
         const defaultCSS = '';
 
         const profileParams = [

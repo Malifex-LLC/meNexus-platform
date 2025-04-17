@@ -1,9 +1,9 @@
-export const API_BASE_URL ="http://localhost:3001";
-//TODO update to https://api.menexus.social for production
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
 
 export const ENDPOINTS = {
 
-    WEBSOCKET: "ws://localhost:3001?user_id=",
+    WEBSOCKET: WS_BASE_URL,
 
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,

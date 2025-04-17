@@ -2,7 +2,6 @@ import useGetProfile from "../../api/hooks/useGetProfile.js";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetUserPosts from "../../api/hooks/useGetUserPosts.js";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
 
 const SocialPanel = () => {
@@ -90,8 +89,9 @@ const SocialPanel = () => {
                     </div>
                     <img
                         className={`relative -top-16  w-32 mb-0 pb-0`}
-                        src={`/default_avatar.jpeg`}
-                        alt="Profile Picture" />
+                        src={profile.profile_picture}
+                        alt={`${profile.display_name}'s profile picture`}
+                    />
                     <div className={`flex flex-col items-center`}>
                         <p className={`px-4`}>69</p>
                         <p className={`px-4`}>Following</p>

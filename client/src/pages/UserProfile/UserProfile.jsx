@@ -154,7 +154,8 @@ const UserProfile = () => {
             <div className="user-profile__data flex flex-col p-4 items-center
             bg-surface text-foreground rounded-2xl">
                 <div className="user-profile__picture w-32 items-center">
-                    <img src={'/default_avatar.jpeg'} alt="Profile Picture" />
+                    <img src={profile.profile_picture}
+                         alt="Profile Picture" />
                 </div>
                 {!isOwner && (
                     <button
