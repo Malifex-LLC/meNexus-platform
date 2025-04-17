@@ -1,4 +1,3 @@
-import './ProfileCard.css';
 import '../../api/hooks/useGetProfile.js';
 import useGetProfile from "../../api/hooks/useGetProfile.js";
 import {useEffect, useState} from "react";
@@ -93,27 +92,29 @@ const ProfileCard = ({handle}) => {
     }, [profile.user_id]);
 
     return (
-        <div className="profile-card">
-            <div className="profile-card__identity">
-                <div className="profile-card__profile-picture">
+        <div className="profile-card flex justify-start px-64 bg-surface gap-4">
+            <div className="profile-card__identity flex gap-4 ">
+                <div className="profile-card__profile-picture w-32">
                     <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
                 </div>
-                <NavLink
-                    className="profile-card__display-name"
-                    to={`/profile/${profile.handle}`}
-                >
-                    {profile.display_name}
-                </NavLink>
-                <NavLink
-                    className="profile-card__handle"
-                    to={`/profile${profile.handle}`}
-                >
-                    @{profile.handle}
-                </NavLink>
+                <div className={`flex flex-col`}>
+                    <NavLink
+                        className="profile-card__display-name"
+                        to={`/profile/${profile.handle}`}
+                    >
+                        {profile.display_name}
+                    </NavLink>
+                    <NavLink
+                        className="profile-card__handle text-brand"
+                        to={`/profile${profile.handle}`}
+                    >
+                        @{profile.handle}
+                    </NavLink>
+                </div>
             </div>
             <div className="profile-card__follow-actions">
                 <button
-                    className="profile-card__follow-button"
+                    className="profile-card__follow-button p-1 px-2 rounded-md bg-brand"
                     onClick={isFollowing ? handleUnfollow : handleFollow}
                 >
                     {isFollowing ? "Unfollow" : "Follow"}

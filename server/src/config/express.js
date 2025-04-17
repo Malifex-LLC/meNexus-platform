@@ -10,7 +10,7 @@ const createExpressApp = () => {
 
     // Configure CORS
     app.use(cors({
-        origin: 'http://localhost:5173', // client's origin
+        origin: 'http://localhost:5173', // client's origin  // TODO update for production
         credentials: true, // Allow credentials (cookies) to be sent
     }));
 

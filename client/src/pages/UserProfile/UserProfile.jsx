@@ -1,4 +1,3 @@
-import "./UserProfile.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {refreshComments, refreshPosts} from '../../utils/apiUtils.js';
@@ -11,6 +10,8 @@ import useFollowActions from "../../api/hooks/useFollowActions.js";
 import useCreateNotification from "../../api/hooks/useCreateNotification.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
+import { IoLocationSharp } from "react-icons/io5";
+
 
 const UserProfile = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
@@ -147,32 +148,39 @@ const UserProfile = () => {
 
     const isOwner = currentHandle === session_user_handle;
 
+    // TODO update img src url for production
     return currentHandle ? (
-        <div className="user-profile__container">
-            <div className="user-profile__data">
-                <div className="user-profile__picture">
-                    <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
+        <div className="user-profile__container flex flex-col md:flex-row p-16  ">
+            <div className="user-profile__data flex flex-col p-4 items-center
+            bg-surface text-foreground rounded-2xl">
+                <div className="user-profile__picture w-32 items-center">
+                    <img src={'/default_avatar.jpeg'} alt="Profile Picture" />
                 </div>
                 {!isOwner && (
                     <button
-                        className="user-profile__follow-button"
+                        className="user-profile__follow-button rounded-xl bg-brand"
                         onClick={isFollowing ? handleUnfollow : handleFollow}>
                         {isFollowing ? "Unfollow" : "Follow"}
                     </button>
                 )}
-                <div className="user-profile__info">
-                    <h2 className="user-profile__name">{profile.profile_name}</h2>
-                    <p className="user-profile__bio">{profile.profile_bio}</p>
-                    <p className="user-profile__location">{profile.profile_location}</p>
+                <div className="user-profile__info p-4 ">
+                    <h2 className="user-profile__name text-4xl">{profile.profile_name}</h2>
+                    <p className="user-profile__bio text-2xl">{profile.profile_bio}</p>
+                    <div className={`text-2xl flex items-center gap-2`} >
+                        <IoLocationSharp />
+                        <p className="user-profile__location ">{profile.profile_location}</p>
+
+                    </div>
+
                 </div>
             </div>
-            <div className="user-profile__post-container">
-            <div className="user-profile__post-form">
-                    <PostForm
-                        handle={currentHandle}
-                        refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
-                </div>
-                <div className="user-profile__posts">
+            <div className="user-profile__post-container flex flex-col h-full">
+                <div className="user-profile__posts flex-1 overflow-y-auto px-4 py-2 space-y-16  ">
+                    <div className="user-profile__post-form bg-surface p-4 rounded-xl mt-8 ">
+                        <PostForm
+                            handle={currentHandle}
+                            refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                    </div>
                     {posts.length > 0 ? (
                         posts
                             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

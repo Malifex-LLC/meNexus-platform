@@ -1,4 +1,3 @@
-import './Message.css';
 import { formatDate } from '../../../utils/dateUtils.js';
 
 const Message = ({
@@ -14,15 +13,20 @@ const Message = ({
     const isOwner = session_user_id === sender_id;
 
     return (
-        <div className={`message ${isOwner ? 'message--owner' : 'message--other'}`}>
-            <div className="message__date">
-                <p>{formatDate(created_at)}</p>
-            </div>
-            <div className="message__main-content">
-                <p>{content}</p>
+        <div className={`flex w-full px-4 mb-8 ${isOwner ? 'justify-end' : 'justify-start'}`}>
+            <div
+                className={`rounded-2xl px-6 py-4 max-w-xl text-black
+          ${isOwner ? 'bg-foreground ' : 'bg-brand '}`}
+            >
+                <div className="text-sm text-neutral mb-2 text-left">
+                    {formatDate(created_at)}
+                </div>
+                <div className="text-xl">
+                    <p>{content}</p>
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Message;

@@ -6,7 +6,7 @@ import ProfileSettings from "../../components/Settings/ProfileSettings/ProfileSe
 import DisplaySettings from "../../components/Settings/DisplaySettings/DisplaySettings.jsx";
 
 const SettingsPage = () => {
-    const [selectedMenu, setSelectedMenu] = useState('Account');
+    const [selectedMenu, setSelectedMenu] = useState('Profile');
 
     // Render content based on selection
     const renderContent = () => {
@@ -30,7 +30,10 @@ const SettingsPage = () => {
 
     return (
         <SettingsLayout>
-            <SettingsMenu onSelectMenu={setSelectedMenu} />
+            <SettingsMenu
+                onSelectMenu={setSelectedMenu}
+                selectedMenu={selectedMenu}
+            />
             {renderContent()}
         </SettingsLayout>
     );

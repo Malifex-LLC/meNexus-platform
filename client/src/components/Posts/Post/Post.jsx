@@ -1,8 +1,7 @@
-import "./Post.css";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
-import {NavLink} from "react-router-dom";
+import {Link} from "react-router-dom";
 import useGetComments from "../../../api/hooks/useGetComments.js"
 import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
@@ -107,80 +106,85 @@ const Post = ({
     };
 
     return (
-        <div className={`user-post ${isEditing ? "user-post--editing" : ""}`}>
-            <div className="user-post__identity">
-                <NavLink
-                    className="user-post__display-name"
+        <div className={`user-post ${isEditing ? "user-post--editing   border border-is-editing " : ""} 
+        p-8 mb-16 rounded-xl bg-surface text-foreground`}>
+            <div className="user-post__identity flex flex-col w-auto">
+                <Link
+                    className="user-post__display-name text-2xl hover:cursor-pointer hover:underline"
                     to={`/profile/${handle}`}
                 >
                     {display_name}
-                </NavLink>
-                <NavLink
-                    className="user-post__handle"
+                </Link>
+                <Link
+                    className="user-post__handle text-lg text-brand hover:cursor-pointer"
                     to={`/profile/${handle}`}
                 >
                     @{handle}
-                </NavLink>
-                <div className="user-post__date">
+                </Link>
+                <div className="user-post__date text-neutral">
                     <p>{formatDate(date)}</p>
                 </div>
             </div>
             {!isOwner && (
-                <div className="user-post__follow-actions">
+                <div className="user-post__follow-actions pt-4">
                     <button
-                        className="user-post__follow-button"
+                        className="user-post__follow-button p-1 text-sm rounded-lg bg-brand"
                         onClick={isFollowing ? handleUnfollow : handleFollow}
                     >
                         {isFollowing ? "Unfollow" : "Follow"}
                     </button>
                 </div>
             )}
-            <div className="user-post__content">
+            <div className="user-post__content pt-4">
                 {isEditing ? (
                     <textarea
-                        className="user-post__textarea"
+                        className="user-post__textarea w-full text-3xl"
                         value={editedContent}
                         onChange={onContentChange}
                     />
                 ) : (
-                    <p>{content}</p>
+                    <div className={`text-3xl `}>
+                        <p>{content}</p>
+                    </div>
                 )}
             </div>
             {isOwner && (
-                <div className="user-post__content-actions">
+                <div className="user-post__content-actions flex justify-end gap-4 pt-4">
                     {isEditing ? (
                         <button
-                            className="user-post__button user-post__button--save"
+                            className="user-post__button user-post__button--save text-sm rounded-lg p-1 bg-save"
                             onClick={onSave}
                         >
                             Save
                         </button>
                     ) : (
                         <button
-                            className="user-post__button user-post__button--edit"
+                            className="user-post__button user-post__button--edit text-sm rounded-lg p-1
+                            bg-edit hover:bg-edit-hover"
                             onClick={onEdit}
                         >
                             Edit
                         </button>
                     )}
                     <button
-                        className="user-post__button user-post__button--delete"
+                        className="user-post__button user-post__button--delete text-sm rounded-lg p-1
+                        bg-delete hover:bg-delete-hover"
                         onClick={onDelete}
                     >
                         Delete
                     </button>
                 </div>
             )}
-            <div className="user-post__stats">
+            <div className="user-post__stats flex gap-4 text-neutral">
                 <p className="user-post__stats-likes">{likes} likes</p>
-                <p className={`user-post__stats-comments ${
+                <p className={`user-post__stats-comments hover:underline ${
                     comments.length > 0 ? "user-post__stats-comments--active" : ""
                     }`} onClick={toggleComments}>
                     {showComments ? "Hide Comments" : `${comments.length} Comments`}
                 </p>
             </div>
             { showComments && (
-                <div className="user-post__comments">
+                <div className="user-post__comments mt-8">
                     {comments.length > 0 ? (
                         comments
                             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

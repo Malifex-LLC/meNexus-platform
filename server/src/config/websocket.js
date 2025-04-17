@@ -10,7 +10,7 @@ const createWebSocketServer = (server) => {
     // TODO Not sure if WebSocket needs CORS
     // Configure WebSocket Server for CORS
     wss.on('headers', (headers, req) => {
-        headers.push('Access-Control-Allow-Origin: http://localhost:5173');
+        headers.push('Access-Control-Allow-Origin: http://localhost:5173'); // TODO update for prod?
         headers.push('Access-Control-Allow-Credentials: true');
     });
 

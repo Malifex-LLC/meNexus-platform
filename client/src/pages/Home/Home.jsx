@@ -1,4 +1,3 @@
-import './Home.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts, refreshComments } from '../../utils/apiUtils.js';
@@ -101,14 +100,14 @@ const Home = () => {
     }
 
     return currentHandle ? (
-        <div className="home__post-container">
-            <div className="home__post-form">
-                <PostForm
-                    handle={currentHandle}
-                    refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
-                />
-            </div>
-            <div className="home__posts">
+        <div className="home__post-container flex flex-col h-full">
+            <div className="home__posts flex-1 overflow-y-auto px-32 py-2 space-y-16 ">
+                <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
+                    <PostForm
+                        handle={currentHandle}
+                        refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
+                    />
+                </div>
                 {posts.length > 0 ? (
                     posts
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

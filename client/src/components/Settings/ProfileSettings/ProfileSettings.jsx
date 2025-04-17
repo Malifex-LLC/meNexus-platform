@@ -1,4 +1,3 @@
-import "./ProfileSettings.css";
 import {useEffect, useState} from "react";
 import useUploadProfilePicture from "../../../api/hooks/useUploadProfilePicture.js";
 import useGetProfile from "../../../api/hooks/useGetProfile.js";
@@ -155,19 +154,22 @@ const ProfileSettings = () => {
     }, [sessionUserHandle, isHandleSet]);
 
     return (
-        <div className="profile-settings__container">
-            <h2 className="profile-settings__header">Profile Settings</h2>
-            <form className="profile-settings__form">
+        <div className="profile-settings__container flex flex-col p-8  mx-16 text-foreground">
+            <h2 className="profile-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 items-center rounded-2xl
+            bg-surface">Profile Settings</h2>
+            <form className="profile-settings__form flex flex-col p-4">
                 {/* Profile Picture */}
-                <label>
+                <label className={`flex flex-col  w-md mb-4`}>
                     Profile Picture:
                     <input
+                        className={`border border-border `}
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
                     />
                 </label>
                 <button
+                    className={`w-md bg-brand`}
                     type="button"
                     onClick={handleProfilePictureUpload}
                 >
@@ -175,9 +177,10 @@ const ProfileSettings = () => {
                 </button>
 
                 {/* Username */}
-                <label>
+                <label className={`flex flex-col mt-16 w-md mb-4`}>
                     Display Name:
                     <input
+                        className={`border border-border `}
                         type="text"
                         value={newDisplayName}
                         onChange={(e) => setNewDisplayName(e.target.value)}
@@ -186,9 +189,10 @@ const ProfileSettings = () => {
                 </label>
 
                 {/* Handle */}
-                <label>
+                <label className={`flex flex-col w-md mb-4`}>
                     Handle:
                     <input
+                        className={`border border-border `}
                         type="text"
                         value={newHandle}
                         onChange={(e) => setNewHandle(e.target.value)}
@@ -197,9 +201,10 @@ const ProfileSettings = () => {
                 </label>
 
                 {/* Full Name */}
-                <label>
+                <label className={`flex flex-col w-md mb-4`}>
                     Profile Name:
                     <input
+                        className={`border border-border `}
                         type="text"
                         value={newProfileName}
                         onChange={(e) => setNewProfileName(e.target.value)}
@@ -208,9 +213,10 @@ const ProfileSettings = () => {
                 </label>
 
                 {/* Bio */}
-                <label>
+                <label className={`flex flex-col w-md mb-4`}>
                     Bio:
                     <input
+                        className={`border border-border `}
                         type="text"
                         value={newProfileBio}
                         onChange={(e) => setNewProfileBio(e.target.value)}
@@ -219,9 +225,10 @@ const ProfileSettings = () => {
                 </label>
 
                 {/* Location */}
-                <label>
+                <label className={`flex flex-col w-md mb-4`}>
                     Location:
                     <input
+                        className={`border border-border `}
                         type="text"
                         value={newProfileLocation}
                         onChange={(e) => setNewProfileLocation(e.target.value)}
@@ -230,6 +237,7 @@ const ProfileSettings = () => {
                 </label>
 
                 <button
+                    className={`mt-16 w-md bg-brand`}
                     type="button"
                     onClick={handleProfileUpdate}
                 >

@@ -1,7 +1,8 @@
-import './ConversationMenu.css';
 import {useEffect} from "react";
 import useCreateConversation from "../../../../api/hooks/useCreateConversation.js";
 import useSetMessagesAsRead from "../../../../api/hooks/useSetMessagesAsRead.js";
+import { PiNotePencil } from "react-icons/pi";
+
 
 const ConversationMenu = ({
                               getConversations,
@@ -56,19 +57,22 @@ const ConversationMenu = ({
     };
 
     return (
-        <div className="conversation-menu">
-            <div className="conversation-menu__new-conversation" onClick={handleComposeClick}>
-                Compose
+        <div className="conversation-menu  text-foreground text-2xl bg-surface rounded-2xl p-4 mx-4 flex flex-col h-full ">
+            <div className="conversation-menu__new-conversation flex justify-center gap-4 m-4 text-3xl "
+                 onClick={handleComposeClick}>
+                New Message
+                <PiNotePencil />
             </div>
-            <div className="conversation-menu__conversation-list">
+            <div className={`w-full h-1 bg-border mb-4 `}/>
+            <div className="conversation-menu__conversation-list h-screen  overflow-y-auto ">
                 {conversations.length > 0 ? (
                     conversations
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                         .map((conversation) => (
                             <div
                                 key={conversation.conversation_id}
-                                className={`conversation-menu__conversation ${
-                                    activeConversationId === conversation.conversation_id ? 'active' : ''
+                                className={`conversation-menu__conversation  p-8 mx-4 rounded-xl ${
+                                    activeConversationId === conversation.conversation_id ? 'active bg-brand text-black' : ''
                                 }${conversation.has_unread_messages ? 'conversation-menu__conversation--unread' : ''}`}
                                 onClick={() => handleConversationClick(conversation)}
                             >
