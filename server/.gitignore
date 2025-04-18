@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+# Excluding package-lock.json because I'm running yarn install on EC2 server as npm install hangs/crashes
+package-lock.json
 
 # Editor directories and files
 .vscode/*
@@ -22,6 +24,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
-.env.production
-.env.*.local
+src/.env
+src/.env.production
+src/.env.*.local
