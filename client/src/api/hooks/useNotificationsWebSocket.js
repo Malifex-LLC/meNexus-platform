@@ -9,7 +9,7 @@ const useNotificationsWebSocket = () => {
         let reconnectTimeout;
 
         const connectWebSocket = () => {
-            ws = new WebSocket(`${ENDPOINTS.WEBSOCKET}${user_id}`);
+            ws = new WebSocket(`${ENDPOINTS.WEBSOCKET}?user_id=${user_id}`);
             ws.onopen = () => {
                 console.log("WebSocket connected");
             };

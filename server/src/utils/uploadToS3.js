@@ -17,6 +17,6 @@ exports.uploadToS3 = async (localPath, key) => {
 
     await s3.send(command);
 
-    return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    return `https://${process.env.CDN_DOMAIN}/${key}`;
 }
 
