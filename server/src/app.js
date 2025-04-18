@@ -7,7 +7,7 @@ const sessionLogger = require('./middlewares/sessionLogger');
 
 // Create Express app
 const app = createExpressApp();
-app.use(express.json());
+//app.use(express.json());
 
 // Assigning port number for the express server
 const port = process.env.EXPRESS_PORT;
@@ -44,31 +44,31 @@ app.use('/uploads', express.static('uploads'));
 ///////////////////////////////////////////API Routes///////////////////////////////////////////
 
 const authRoutes = require('../src/routes/authRoutes');
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', express.json(), authRoutes);
 
 const userRoutes = require('../src/routes/userRoutes');
-app.use('/api/user', userRoutes);
+app.use('/api/user', express.json(), userRoutes);
 
 const followerRoutes = require('./routes/followerRoutes');
-app.use('/api/follow', followerRoutes);
+app.use('/api/follow', express.json(), followerRoutes);
 
 const postRoutes = require('../src/routes/postRoutes');
-app.use('/api/post', postRoutes );
+app.use('/api/post', express.json(), postRoutes );
 
 const commentRoutes = require('../src/routes/commentRoutes');
-app.use('/api/comment', commentRoutes);
+app.use('/api/comment', express.json(), commentRoutes);
 
 const conversationRoutes = require('../src/routes/conversationRoutes');
-app.use('/api/conversation', conversationRoutes);
+app.use('/api/conversation', express.json(), conversationRoutes);
 
 const messageRoutes = require('../src/routes/messageRoutes');
-app.use('/api/message', messageRoutes);
+app.use('/api/message', express.json(), messageRoutes);
 
 const notificationRoutes = require('../src/routes/notificationRoutes');
-app.use('/api/notification', notificationRoutes);
+app.use('/api/notification', express.json(), notificationRoutes);
 
 const searchRoutes = require('../src/routes/searchRoutes');
-app.use('/api/search', searchRoutes);
+app.use('/api/search', express.json(), searchRoutes);
 
 const settingsRoutes = require('../src/routes/settingsRoutes');
-app.use('/api/settings', settingsRoutes);
+app.use('/api/settings',  settingsRoutes);
