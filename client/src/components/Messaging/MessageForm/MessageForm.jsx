@@ -39,7 +39,7 @@ const MessageForm = ({
         <div className="message-form flex gap-4 bg-surface px-8">
             <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
-                    className="message-form__entry-field w-full h-full bg-zinc-700 text-foreground rounded-2xl"
+                    className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />

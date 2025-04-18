@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './RegisterForm.css'
 import useCreateUser from '../../api/hooks/useCreateUser.js'
 
 const RegisterForm = () => {
@@ -36,11 +35,12 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="register__main-content">
-            <form className='register__form' onSubmit={handleSubmit}>
+        <div className="register__main-content flex flex-col items-center justify-center p-8  rounded-2xl">
+            <form className='register__form w-full flex flex-col' onSubmit={handleSubmit}>
                 <label>
                     Email:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)} />
@@ -49,6 +49,7 @@ const RegisterForm = () => {
                 <label>
                     Password:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)} />
@@ -57,6 +58,7 @@ const RegisterForm = () => {
                 <label>
                     Handle:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="text"
                         value={handle}
                         onChange={(e) => setHandle(e.target.value)} />
@@ -65,13 +67,19 @@ const RegisterForm = () => {
                 <label>
                     Display Name:
                     <input
+                        className={`w-full p-2 rounded-md border border-border`}
                         type="text"
                         value={display_name}
                         onChange={(e) => setDisplay_name(e.target.value)} />
                 </label>
                 <br />
                 {error && <p>{error}</p>}
-                <button type="submit">Register</button>
+                <button
+                    className={`w-full p-2 rounded-md bg-brand`}
+                    type="submit"
+                >
+                    Register
+                </button>
             </form>
         </div>
     );

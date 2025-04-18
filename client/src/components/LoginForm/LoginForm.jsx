@@ -72,7 +72,6 @@ const LoginForm = () => {
                 {error && <p>{error}</p>}
                 <button
                     className={`w-full p-2 rounded-md bg-brand`}
-
                     type="submit"
                 >
                     Login

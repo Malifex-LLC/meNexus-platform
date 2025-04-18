@@ -91,9 +91,10 @@ const Header = () => {
     }
 
     // TODO This cause WebSocket to connect on any page regardless of being logged in
+    // TODO This causes WebSocket to constantly connect and disconnect and reconnect etc and wasn't working in prod
     // Just saw WebSocket connected while on the login page after user logout
-    console.log("useNotificationsWebSocket attempting to connect for user_id: ", sessionUserId);
-    connectNotificationsWebSocket(sessionUserId, handleNewNotification);
+    //console.log("useNotificationsWebSocket attempting to connect for user_id: ", sessionUserId);
+    //connectNotificationsWebSocket(sessionUserId, handleNewNotification);
 
 
     return (

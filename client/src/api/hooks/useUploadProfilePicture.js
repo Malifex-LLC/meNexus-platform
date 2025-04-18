@@ -19,7 +19,7 @@ const useUploadProfilePicture = () => {
                 },
                 withCredentials: true
             });
-            return response.data;
+            return response;
         } catch (err) {
             console.error('Error uploading profile picture:', err);
             throw err;

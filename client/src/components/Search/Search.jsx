@@ -17,7 +17,7 @@ const Search = () => {
         <div className="search border  border-border rounded-xl">
             <label>
                 <input
-                    className="search__input  bg-surface rounded-xl"
+                    className="search__input px-4 bg-surface rounded-xl"
                     type="text"
                     placeholder="Search..."
                     value={query}
