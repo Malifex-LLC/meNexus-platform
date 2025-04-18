@@ -10,11 +10,12 @@ const session = require('../middlewares/session')
 // Import sessionLogger middleware
 const sessionLogger = require('../middlewares/sessionLogger');
 
-
-
 // Configure and instantiate Express app
 const createExpressApp = () => {
     const app = express();
+
+    // Trust the first proxy (Cloudflare, NGINX, etc.)
+    app.set('trust proxy', true);
 
     // Configure CORS
     app.use(cors({

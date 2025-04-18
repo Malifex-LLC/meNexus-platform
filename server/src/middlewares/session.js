@@ -2,15 +2,14 @@ const session = require('express-session');
 require('dotenv').config();
 
 const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET, // Replace with a secure key
     resave: false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in prod
-        sameSite: 'Lax', // Safe for most use cases
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week session duration
+        secure: false, // Set to true only if using HTTPS
+        sameSite: 'Lax', // Allow cross-origin requests
     }
-});
+})
 
 module.exports = sessionMiddleware;

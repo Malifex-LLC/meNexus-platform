@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logsDir = path.join(__dirname, '../logs');
+const logsDir = path.join(__dirname, '../../logs');
 
 // Create the logs directory if it doesn't exist
 if (!fs.existsSync(logsDir)) {
@@ -14,7 +14,7 @@ const logStream = fs.createWriteStream(logPath, { flags: 'a' }); // append mode
 
 const sessionLogger = (req, res, next) => {
     const now = new Date().toISOString();
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const ip = req.ip;
     const userAgent = req.headers['user-agent'];
     const sessionID = req.sessionID || 'N/A';
     const user = req.session?.user || {};
