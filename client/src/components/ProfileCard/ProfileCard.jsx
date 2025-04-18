@@ -1,7 +1,7 @@
 import '../../api/hooks/useGetProfile.js';
 import useGetProfile from "../../api/hooks/useGetProfile.js";
 import {useEffect, useState} from "react";
-import {NavLink, useNavigate} from "react-router-dom";
+import {Link, NavLink, useNavigate} from "react-router-dom";
 import useFollowActions from "../../api/hooks/useFollowActions.js"
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js"
 import useCreateNotification from "../../api/hooks/useCreateNotification.js"
@@ -92,34 +92,41 @@ const ProfileCard = ({handle}) => {
     }, [profile.user_id]);
 
     return (
-        <div className="profile-card flex justify-start px-64 bg-surface gap-4">
-            <div className="profile-card__identity flex gap-4 ">
+        <div className="profile-card flex justify-start p-4  my-4 rounded-2xl bg-surface gap-4">
+            <div className="profile-card__identity flex gap-8 ">
                 <div className="profile-card__profile-picture w-32">
-                    <img src={`http://localhost:3001${profile.profile_picture}`} alt="Profile Picture"/>
+                    <Link
+                        className="profile-card__display-name cursor-pointer"
+                        to={`/profile/${profile.handle}`}
+                    >
+                        <img src={profile.profile_picture} alt="Profile Picture"/>
+                    </Link>
                 </div>
                 <div className={`flex flex-col`}>
-                    <NavLink
-                        className="profile-card__display-name"
+                    <Link
+                        className="profile-card__display-name text-2xl cursor-pointer hover:underline"
                         to={`/profile/${profile.handle}`}
                     >
                         {profile.display_name}
-                    </NavLink>
-                    <NavLink
-                        className="profile-card__handle text-brand"
-                        to={`/profile${profile.handle}`}
+                    </Link>
+                    <Link
+                        className="profile-card__handle text-xl text-brand cursor-pointer"
+                        to={`/profile/${profile.handle}`}
                     >
                         @{profile.handle}
-                    </NavLink>
+                    </Link>
+                    <div className="profile-card__follow-actions py-4">
+                        <button
+                            className="profile-card__follow-button p-1 px-2 rounded-md bg-brand"
+                            onClick={isFollowing ? handleUnfollow : handleFollow}
+                        >
+                            {isFollowing ? "Unfollow" : "Follow"}
+                        </button>
+                    </div>
                 </div>
+
             </div>
-            <div className="profile-card__follow-actions">
-                <button
-                    className="profile-card__follow-button p-1 px-2 rounded-md bg-brand"
-                    onClick={isFollowing ? handleUnfollow : handleFollow}
-                >
-                    {isFollowing ? "Unfollow" : "Follow"}
-                </button>
-            </div>
+
         </div>
     )
 };

@@ -109,8 +109,9 @@ const Conversation = ({
         setConversations(refreshedConversations);
     }
 
-    console.log("useMessagesWebSocket attempting to connect");
-    connectMessagesWebSocket(sessionUserId, handleNewMessage);
+    // TODO Need to fix WebSockets in prod, constantly connecting and disconnecting and reconnecting etc
+    //console.log("useMessagesWebSocket attempting to connect");
+    //connectMessagesWebSocket(sessionUserId, handleNewMessage);
 
     return (
         <div className="conversation  h-full w-full flex flex-col p-8">

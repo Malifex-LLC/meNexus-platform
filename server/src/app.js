@@ -2,12 +2,9 @@
 const createExpressApp = require('./config/express');
 const { createWebSocketServer, clients } = require('./config/websocket');
 const express = require('express')
-const sessionMiddleware = require('./middlewares/session')
-const sessionLogger = require('./middlewares/sessionLogger');
 
 // Create Express app
 const app = createExpressApp();
-//app.use(express.json());
 
 // Assigning port number for the express server
 const port = process.env.EXPRESS_PORT;
@@ -26,12 +23,6 @@ module.exports = {
     wss,
     clients,
 };
-
-// Initialize session middleware
-app.use(sessionMiddleware);
-
-// Use sessionLogger middleware
-//app.use(sessionLogger);
 
 // Initialize passport middleware
 passport = require('../src/config/passport')

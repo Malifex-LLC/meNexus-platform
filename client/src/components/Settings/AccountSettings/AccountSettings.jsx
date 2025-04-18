@@ -59,7 +59,7 @@ const AccountSettings = () => {
                 <label className={`flex flex-col w-md mb-4`}>
                     Email:
                     <input
-                        className={`border border-border`}
+                        className={`border border-border p-2`}
                         type="email"
                         value={newEmail}
                         onChange={(e) => setNewEmail(e.target.value)}
@@ -69,7 +69,7 @@ const AccountSettings = () => {
                 <label className={`flex flex-col w-md mb-4`}>
                     Password:
                     <input
-                        className={`border border-border`}
+                        className={`border border-border p-2`}
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
@@ -79,7 +79,7 @@ const AccountSettings = () => {
                 <label className={`flex flex-col w-md mb-4`}>
                     Confirm Password:
                     <input
-                        className={`border border-border`}
+                        className={`border border-border p-2`}
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
