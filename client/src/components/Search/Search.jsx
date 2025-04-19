@@ -14,10 +14,10 @@ const Search = () => {
     };
 
     return (
-        <div className="search border  border-border rounded-xl">
+        <div className="search border w-32 md:w-full  border-border lg:rounded-xl">
             <label>
                 <input
-                    className="search__input px-4 bg-surface rounded-xl"
+                    className="search__input w-32 md:w-full lg:px-4 bg-surface lg:rounded-xl"
                     type="text"
                     placeholder="Search..."
                     value={query}

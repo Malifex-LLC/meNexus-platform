@@ -9,8 +9,8 @@ const activityData = [
 
 const ActivityFeed = () => {
     return (
-        <div className={`flex flex-col p-4  h-screen w-sm bg-background text-foreground `}>
-            <div className={`self-center text-3xl pb-8`}>
+        <div className={`flex flex-col p-4  h-screen w-sm md:w-xs lg:w-sm bg-background text-foreground `}>
+            <div className={`self-center text-3xl text-md lg:text-3xl pb-8`}>
                 <h1>Activity</h1>
             </div>
             <div className={`self-center w-full h-1 mb-8 bg-border`}/>

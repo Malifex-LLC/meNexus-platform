@@ -138,29 +138,28 @@ const Post = ({
 
 
     return (
-        <div className={`user-post ${isEditing ? "user-post--editing   border border-is-editing " : ""} 
-        p-8 mb-16 rounded-xl bg-surface text-foreground`}>
-            <div className={`flex gap-4`}>
+        <div className={`user-post w-full ${isEditing ? "user-post--editing   border border-is-editing " : ""} 
+        p-4 lg:p-8 mb-16 w-full rounded-xl bg-surface text-foreground`}>
+            <div className={`flex  gap-4`}>
                 <img
-                    className={`relative w-24 h-auto`}
+                    className={`relative w-16 h-16 md:w-24 md:h-auto`}
                     src={profile.profile_picture}
                     alt={`${profile.display_name}'s profile picture`}
                 />
                 <div className="user-post__identity flex flex-col w-auto">
-
                     <Link
-                        className="user-post__display-name text-2xl hover:cursor-pointer hover:underline"
+                        className="user-post__display-name text-md md:text-2xl hover:cursor-pointer hover:underline"
                         to={`/profile/${handle}`}
                     >
                         {display_name}
                     </Link>
                     <Link
-                        className="user-post__handle text-lg text-brand hover:cursor-pointer"
+                        className="user-post__handle text-sm md:text-xl text-brand hover:cursor-pointer"
                         to={`/profile/${handle}`}
                     >
                         @{handle}
                     </Link>
-                    <div className="user-post__date text-neutral">
+                    <div className="user-post__date text-xs md:text-lg text-neutral">
                         <p>{formatDate(date)}</p>
                     </div>
                 </div>
@@ -175,15 +174,15 @@ const Post = ({
                     </button>
                 </div>
             )}
-            <div className="user-post__content pt-4">
+            <div className="user-post__content pt-4 w-full">
                 {isEditing ? (
                     <textarea
-                        className="user-post__textarea w-full text-3xl"
+                        className="user-post__textarea w-full text-md lg:text-3xl"
                         value={editedContent}
                         onChange={onContentChange}
                     />
                 ) : (
-                    <div className={`text-3xl `}>
+                    <div className={`text-md lg:text-3xl `}>
                         <p>{content}</p>
                     </div>
                 )}
@@ -192,14 +191,14 @@ const Post = ({
                 <div className="user-post__content-actions flex justify-end gap-4 pt-4">
                     {isEditing ? (
                         <button
-                            className="user-post__button user-post__button--save text-sm rounded-lg p-1 bg-save"
+                            className="user-post__button user-post__button--save text-xs md:text-sm rounded-lg p-1 bg-save"
                             onClick={onSave}
                         >
                             Save
                         </button>
                     ) : (
                         <button
-                            className="user-post__button user-post__button--edit text-sm rounded-lg p-1
+                            className="user-post__button user-post__button--edit text-xs md:text-sm rounded-lg p-1
                             bg-edit hover:bg-edit-hover"
                             onClick={onEdit}
                         >
@@ -207,7 +206,7 @@ const Post = ({
                         </button>
                     )}
                     <button
-                        className="user-post__button user-post__button--delete text-sm rounded-lg p-1
+                        className="user-post__button user-post__button--delete text-xs md:text-sm rounded-lg p-1
                         bg-delete hover:bg-delete-hover"
                         onClick={onDelete}
                     >
@@ -224,7 +223,7 @@ const Post = ({
                 </p>
             </div>
             { showComments && (
-                <div className="user-post__comments mt-8">
+                <div className="user-post__comments mt-8 ">
                     {comments.length > 0 ? (
                         comments
                             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -250,19 +249,20 @@ const Post = ({
                     ) : (
                         <div>No comments</div>
                     )}
+                    <div className="user-post__comment-form w-full">
+                        <CommentForm
+                            user_id={user_id}
+                            session_user_id={session_user_id}
+                            resource_type={resource_type}
+                            resource_id={post_id}
+                            getComments={getComments}
+                            setComments={setComments}
+                            refreshComments={refreshComments}
+                        />
+                    </div>
                 </div>
             )}
-            <div className="user-post__comment-form">
-                <CommentForm
-                    user_id={user_id}
-                    session_user_id={session_user_id}
-                    resource_type={resource_type}
-                    resource_id={post_id}
-                    getComments={getComments}
-                    setComments={setComments}
-                    refreshComments={refreshComments}
-                />
-            </div>
+
         </div>
     );
 };

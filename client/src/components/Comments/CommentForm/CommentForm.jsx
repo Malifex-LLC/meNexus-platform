@@ -50,7 +50,7 @@ const CommentForm = ({
     };
 
     return (
-        <div className="comment-form items-center text-center px-32 ">
+        <div className="comment-form items-center text-center w-full lg:px-32 ">
             <div className={` `}
                 onClick={handleFormClick}>
                 <textarea
@@ -59,7 +59,8 @@ const CommentForm = ({
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button className="comment-form__button p-1 px-2 my-4 rounded-md bg-primary" onClick={handleSubmit} disabled={loading}>
+            <button className="comment-form__button p-1 px-2 my-4 text-xs md:text-sm rounded-md bg-primary"
+                    onClick={handleSubmit} disabled={loading}>
                 {loading ? "Commenting..." : "Comment"}
             </button>
             {error && <div className="error">Error: {error}</div>}

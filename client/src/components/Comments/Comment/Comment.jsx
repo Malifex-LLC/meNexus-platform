@@ -19,7 +19,7 @@ const Comment = ({
     console.log("isOwner for comment: ", isOwner);
 
     return (
-        <div className={`user-comment relative flex flex-col p-4  mx-16
+        <div className={`user-comment relative flex flex-col p-4  mx-4 md:mx-16
         border border-border mb-4 bg-background text-sm ${isEditing ? "user-comment--editing" : ""}`}>
             <div className="user-comment__identity flex flex-col">
                 <NavLink

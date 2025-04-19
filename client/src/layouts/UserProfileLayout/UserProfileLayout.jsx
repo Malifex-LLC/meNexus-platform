@@ -10,7 +10,7 @@ const UserProfileLayout = ({ children }) => {
                 <Header />
             </div>
 
-            <div className=' pt-17 flex-1 overflow-hidden'>
+            <div className=' pt-17 flex-1 overflow-y-auto '>
                 {children}
             </div>
 

@@ -8,13 +8,6 @@ const PostForm = ({ handle, refreshPosts }) => {
 
     const { createPost, loading, error } = useCreatePost(refreshPosts);
 
-    const styles = {
-        textarea: {
-            width: expanded ? '43%' : '43%',
-            height: expanded ? '200%' : '100%',
-        },
-    };
-
     const handleSubmit = async () => {
         const post = {
             handle: handle,
@@ -37,8 +30,7 @@ const PostForm = ({ handle, refreshPosts }) => {
             <div className={``}
                 onClick={handleFormClick}>
                 <textarea
-                    className="post-form__entry-field p-4  bg-white rounded-md"
-                    style={styles.textarea}
+                    className="post-form__entry-field p-4 w-full bg-background text-foreground rounded-md"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />

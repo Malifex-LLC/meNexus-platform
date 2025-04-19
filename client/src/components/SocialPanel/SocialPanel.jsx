@@ -78,23 +78,23 @@ const SocialPanel = () => {
 
 
     return (
-        <div className={`relative flex flex-col h-screen w-sm p-4 items-center`}>
-            <div className={`p-24 w-full relative top-2 bg-gradient-to-b from-background via-primary to-surface backdrop-blur-md rounded-2xl`}/>
+        <div className={`relative flex flex-col h-screen  p-4 items-center`}>
+            <div className={`p-24 md:p-12 lg:p-24 w-full relative top-2 bg-gradient-to-b from-background via-primary to-surface backdrop-blur-md rounded-2xl`}/>
             <div className=" relative z-1  flex flex-col px-4 pb-0 w-full -top-8  justify-center rounded-2xl
             bg-surface text-foreground">
                 <div className={`flex  justify-center`}>
-                    <div className={`flex flex-col relative  items-center`}>
-                        <p className={`px-4`}>420</p>
-                        <p className={`px-4`}>Followers</p>
+                    <div className={`flex flex-col relative  items-center text-xl md:text-xs lg:text-xl`}>
+                        <p className={`px-4 md:px-2 lg:px-4`}>420</p>
+                        <p className={`px-4 md:px-2 lg:px-4`}>Followers</p>
                     </div>
                     <img
-                        className={`relative -top-16  w-32 mb-0 pb-0`}
+                        className={`relative -top-16 w-48 md:w-24 lg:w-32 mb-0 pb-0`}
                         src={profile.profile_picture}
                         alt={`${profile.display_name}'s profile picture`}
                     />
-                    <div className={`flex flex-col items-center`}>
-                        <p className={`px-4`}>69</p>
-                        <p className={`px-4`}>Following</p>
+                    <div className={`flex flex-col items-center text-xl md:text-xs lg:text-xl`}>
+                        <p className={`px-4 md:px-2 lg:px-4 `}>69</p>
+                        <p className={`px-4 md:px-2 lg:px-4 `}>Following</p>
                     </div>
                 </div>
                 <div className={`relative flex flex-col py-2 -top-16 items-center text-foreground`}>

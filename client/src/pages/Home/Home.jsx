@@ -101,7 +101,7 @@ const Home = () => {
 
     return currentHandle ? (
         <div className="home__post-container flex flex-col h-full">
-            <div className="home__posts flex-1 overflow-y-auto px-32 py-2 space-y-16 ">
+            <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
                         handle={currentHandle}
