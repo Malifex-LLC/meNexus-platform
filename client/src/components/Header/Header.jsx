@@ -126,13 +126,14 @@ const Header = () => {
 
                     </div>
                     {showNotificationsTray && (
-                        <div className={`header__notifications-tray absolute bg-black rounded-2xl  top-13  z-10 w-md`}>
+                        <div className="absolute right-0 mt-2 w-80 z-50 bg-black rounded-2xl shadow-lg">
                             <NotificationsTray
                                 user_id={sessionUserId}
                                 existingNotifications={notifications}
                             />
                         </div>
                     )}
+
                 </div>
             </div>
 

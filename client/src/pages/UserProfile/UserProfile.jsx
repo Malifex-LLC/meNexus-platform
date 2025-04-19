@@ -149,8 +149,8 @@ const UserProfile = () => {
     const isOwner = currentHandle === session_user_handle;
 
     return currentHandle ? (
-        <div className="user-profile__container flex flex-col md:grid grid-cols-12 p-16  ">
-            <div className="user-profile__data flex flex-col md:col-span-3 p-4 items-center
+        <div className="user-profile__container flex flex-col lg:grid grid-cols-12 p-16  ">
+            <div className="user-profile__data flex flex-col lg:col-span-3 p-4 items-center
             bg-surface text-foreground rounded-2xl">
                 <div className="user-profile__picture w-32 items-center">
                     <img src={profile.profile_picture}
@@ -174,7 +174,7 @@ const UserProfile = () => {
 
                 </div>
             </div>
-            <div className="user-profile__post-container flex flex-col md:col-span-9 h-full">
+            <div className="user-profile__post-container flex flex-col lg:col-span-9 h-full">
                 <div className="user-profile__posts flex-1 overflow-y-auto px-4 py-2 space-y-16  ">
                     <div className="user-profile__post-form bg-surface p-4 rounded-xl mt-8 ">
                         <PostForm

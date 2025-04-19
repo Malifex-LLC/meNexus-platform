@@ -84,6 +84,7 @@ const ProfileSettings = () => {
         if (file) {
             const preview = URL.createObjectURL(file);
             setPreviewUrl(preview);
+            console.log('Preview URL: ', preview);
         } else {
             setPreviewUrl(null);
         }
@@ -171,11 +172,11 @@ const ProfileSettings = () => {
     }, [sessionUserHandle, isHandleSet]);
 
     return (
-        <div className="profile-settings__container   p-8  mx-16 text-foreground">
-            <h2 className="profile-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 items-center rounded-2xl
+        <div className="profile-settings__container flex-1  p-8 h-full  md:mx-16 text-foreground">
+            <h2 className="profile-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 rounded-2xl
             bg-surface">Profile Settings</h2>
-            <div className={`flex flex-row gap-8 p-4`}>
-                <div>
+            <div className={`flex flex-col xl:flex-row gap-8 p-4 `}>
+                <div className={``}>
                     {/* Username */}
                     <label className={`flex flex-col  w-md mb-4`}>
                         Display Name:
@@ -254,7 +255,7 @@ const ProfileSettings = () => {
                         </p>
                     )}
                 </div>
-                <form className="profile-settings__form flex flex-col ">
+                <form className="profile-settings__form flex-1 flex flex-col overflow-y-auto">
                     {/* Profile Picture */}
                     <div className="flex flex-col mb-6">
                         <span className="mb-2 text-lg font-semibold">Profile Picture</span>
@@ -283,11 +284,9 @@ const ProfileSettings = () => {
                         <img
                             src={previewUrl}
                             alt="Profile Preview"
-                            className="mt-4 w-64 self-center   mb-8  border border-border"
+                            className="mt-4 w-64 self-center mb-8  border border-border"
                         />
                     )}
-
-
                     <button
                         className={`w-md bg-brand hover:bg-primary active:bg-surface`}
                         type="button"
