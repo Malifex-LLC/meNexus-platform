@@ -4,9 +4,8 @@ import Notification from '../Notification/Notification.jsx'
 
 const NotificationsTray = ({
                                 user_id,
-                                existingNotifications,
+                                notifications,
                            }) => {
-    const [notifications, setNotifications] = useState(existingNotifications);
 
     return (
         <div className="notifications-tray flex flex-col  m-4  bg-black text-brand rounded-lg">
@@ -16,6 +15,7 @@ const NotificationsTray = ({
                     .map((notification, index) => (
                         <div key={index} className={`my-2`}>
                             <Notification
+                                notification_id={notification.notification_id}
                                 user_id={notification.user_id}
                                 actor_id={notification.actor_id}
                                 resource_type={notification.resource_type}
@@ -23,7 +23,6 @@ const NotificationsTray = ({
                                 summary={notification.summary}
                                 is_read={notification.is_read}
                                 created_at={notification.created_at}
-
                             />
                         </div>
                     ))

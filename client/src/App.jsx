@@ -7,6 +7,7 @@ import UserProfilePage from "./pages/UserProfile/UserProfilePage.jsx";
 import SettingsPage from "./pages/Settings/SettingsPage.jsx";
 import SearchPage from "./pages/Search/SearchPage.jsx";
 import MessagesPage from "./pages/Messages/MessagesPage.jsx";
+import PostPage from "./pages/Post/PostPage.jsx";
 
 function App() {
     return (
@@ -23,6 +24,8 @@ function App() {
                     {/* /profile redirects to /profile/:handle based on session user */}
                     <Route path="/profile" element={<UserProfilePage />} />
                     <Route path="/profile/:handle" element={<UserProfilePage />} />
+
+                    <Route path="/post/:postId" element={<PostPage />} />
 
                     <Route path="/messages" element={<MessagesPage />} />
 

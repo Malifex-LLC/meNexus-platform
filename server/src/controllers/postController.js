@@ -50,6 +50,21 @@ exports.deletePost = async (req, res) => {
     }
 }
 
+exports.getPost = async (req, res) => {
+    const postId = req.params.postId;
+    if (!postId) {
+        return res.status(400).json({error: 'postID not found.'});
+    }
+
+    try {
+        const response = await Post.getPost(postId);
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error in getPost:', error);
+        res.status(500).json({error: 'Failed to fetch post.'});
+    }
+}
+
 // Post fetching logic
 exports.getPosts = async (req, res) => {
     if (!req.session || !req.session.user) {

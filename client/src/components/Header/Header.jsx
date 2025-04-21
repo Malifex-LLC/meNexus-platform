@@ -23,7 +23,8 @@ const Header = () => {
     const [sessionUserId, setSessionUserId] = useState(null);
     const [isSessionUserIdSet, setIsSessionUserIdSet] = useState(null);
     const [showNotificationsTray, setShowNotificationsTray] = useState(false);
-    const [notifications, setNotifications] = useState([])
+    const [notifications, setNotifications] = useState([]);
+    const [unreadNotifications, setUnreadNotifications] = useState(false);
 
     const location = useLocation();
     const isActive = (path) => location.pathname === path ? "text-brand" : "text-foreground";
@@ -60,6 +61,11 @@ const Header = () => {
                 const newNotifications = await getNotifications();
                 setNotifications(newNotifications);
                 console.log("fetchNotifications retrieved:", newNotifications);
+                newNotifications.map((notification) => {
+                    if (notification.is_read === 0) {
+                        setUnreadNotifications(true);
+                    }
+                })
             } catch (error) {
                 console.error("Error fetching notifications:", error)
             }
@@ -71,23 +77,8 @@ const Header = () => {
         setNotifications((prev) => [notification, ...prev]);
     };
 
-    // TODO This seems atrocious but its working idk
     const toggleNotificationsTray = () => {
         setShowNotificationsTray((prevState) => !prevState);
-        if (showNotificationsTray === true) {
-            notifications.map((notification) => {
-                setNotificationAsRead(notification.notification_id);
-            })
-            notifications.length = 0;
-        }
-        if (!showNotificationsTray) {
-            getNotifications().then((fetchedNotifications) => {
-                setNotifications(fetchedNotifications);
-                notifications.map((notification) => {
-                    setNotificationAsRead(notification.notification_id);
-                })
-            });
-        }
     }
 
     // TODO This cause WebSocket to connect on any page regardless of being logged in
@@ -117,26 +108,23 @@ const Header = () => {
                     <div
                         className={`header__notifications-tray-toggle ${
                             showNotificationsTray ? 'header__notifications-tray-toggle--expanded ' : ''
-                        } ${notifications.length > 0 ? 'header__notifications-tray-toggle--has-notifications text-red-500' : ''}`}
+                        } ${unreadNotifications ? 'header__notifications-tray-toggle--has-notifications text-red-500' : ''}`}
                         onClick={toggleNotificationsTray}
                     >
                         <div className={`text-3xl md:text-4xl`}>
                             <IoNotifications />
                         </div>
-
                     </div>
                     {showNotificationsTray && (
                         <div className="absolute right-0 mt-2 w-80 z-50 bg-black rounded-2xl shadow-lg">
                             <NotificationsTray
                                 user_id={sessionUserId}
-                                existingNotifications={notifications}
+                                notifications={notifications}
                             />
                         </div>
                     )}
-
                 </div>
             </div>
-
             <div className="header__search  mr-8 md:mr-0">
                 <Search/>
             </div>

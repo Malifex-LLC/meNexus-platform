@@ -71,6 +71,28 @@ exports.deletePost = (postId) => {
     })
 }
 
+exports.getPost = (postId) => {
+    console.log('getPost() called with postId:', postId);
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT Posts.*, Users.display_name, Users.handle
+            FROM Posts
+            INNER JOIN Users ON Posts.user_id = Users.user_id
+            WHERE Posts.post_id = ?
+        `;
+
+
+        mysql.query(sql, [postId], (err, result) => {
+            if (err) {
+                console.error('Error fetching post:', err);
+                return reject(new Error(err));
+            }
+            console.log('getPost() result:', result);
+            resolve(result[0]);
+        })
+    })
+}
+
 exports.getPosts = (user_id) => {
     return new Promise((resolve, reject) => {
         const sql = `

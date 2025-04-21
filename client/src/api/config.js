@@ -23,6 +23,7 @@ export const ENDPOINTS = {
     CREATE_POST: `${API_BASE_URL}/api/post/createPost`,
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
+    GET_POST: `${API_BASE_URL}/api/post/getPost/:postId`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts/:handle`,
 
