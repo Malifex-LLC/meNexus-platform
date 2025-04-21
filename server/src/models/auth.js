@@ -1,4 +1,4 @@
-const meNexus = require('../config/db');
+const mysql = require('../config/db');
 
 // Fetch authentication details by email
 exports.getAuthByEmail = (email) => {
@@ -9,7 +9,7 @@ exports.getAuthByEmail = (email) => {
             WHERE email = ?
         `;
 
-        meNexus.query(query, [email], (err, results) => {
+        mysql.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Database error in getAuthByEmail:', err);
                 return reject(err);
@@ -30,7 +30,7 @@ exports.getUserByEmail = async (email) => {
             WHERE a.email = ?
         `;
 
-        meNexus.query(query, [email], (err, results) => {
+        mysql.query(query, [email], (err, results) => {
             if (err) {
                 console.error('Database error in getUserByEmail:', err);
                 return reject(err);
@@ -49,7 +49,7 @@ exports.updateAccountSettings = (authFields, authValues) => {
             WHERE user_id = ?;
         `;
 
-        meNexus.query(authSql, authValues, (err, results) => {
+        mysql.query(authSql, authValues, (err, results) => {
             if (err) {
                 return reject(err);
             }

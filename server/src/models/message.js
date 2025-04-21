@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 const { clients } = require('../config/websocket');
 
 // Helper to send messages via WebSocket
@@ -29,7 +29,7 @@ exports.getMessages = (conversation_id) => {
             WHERE conversation_id = ?;
         `;
 
-        meNexus.query(sql, [conversation_id], (err, results) => {
+        mysql.query(sql, [conversation_id], (err, results) => {
             if (err) {
                 console.error('Error fetching messages', err);
                 return reject(err);
@@ -48,7 +48,7 @@ exports.createMessage = (user_id, conversation_id, message, participant_id, cont
             VALUES (?, ?, ?, ?, NOW())
         `;
 
-        meNexus.query(sql, [conversation_id, user_id, participant_id, content], (err, results) => {
+        mysql.query(sql, [conversation_id, user_id, participant_id, content], (err, results) => {
             if (err) {
                 console.error('Error creating message', err);
                 return reject(err);
@@ -64,7 +64,7 @@ exports.createMessage = (user_id, conversation_id, message, participant_id, cont
 
             const messageId = results.insertId;
 
-            meNexus.query(fetchSql, [messageId], (fetchErr, fetchedResults) => {
+            mysql.query(fetchSql, [messageId], (fetchErr, fetchedResults) => {
                 if (fetchErr) {
                     console.error('Error fetching the created message:', fetchErr);
                     return reject(fetchErr);
@@ -91,7 +91,7 @@ exports.setMessageAsRead = (conversation_id) => {
             WHERE conversation_id = ?;
         `;
 
-        meNexus.query(sql, [conversation_id], (err, results) => {
+        mysql.query(sql, [conversation_id], (err, results) => {
             if (err) {
                 console.error('Error updating messages as read', err);
                 return reject(err);

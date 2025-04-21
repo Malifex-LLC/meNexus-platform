@@ -1,5 +1,5 @@
 // Import database connection
-const meNexus = require('../config/db');
+const mysql = require('../config/db');
 
 // Import bcrypt
 const bcrypt = require('bcrypt');
@@ -86,7 +86,7 @@ const createProfile = async (userID, handle) => {
 exports.getUserById = (userId) => {
     return new Promise((resolve, reject) => {
         const query = 'SELECT * FROM Users WHERE user_id = ?';
-        meNexus.query(query, [userId], (err, results) => {
+        mysql.query(query, [userId], (err, results) => {
             if (err) {
                 console.error('Database error in getUserById:', err);
                 return reject(err);
@@ -112,7 +112,7 @@ exports.getUserByHandle = async (handle) => {
 // Generic query execution
 const executeQuery = (query, params) => {
     return new Promise((resolve, reject) => {
-        meNexus.query(query, params, (error, results) => {
+        mysql.query(query, params, (error, results) => {
             if (error) {
                 console.error(`Database query failed: ${query}`, error.message);
                 reject(error);
@@ -141,7 +141,7 @@ exports.getProfile = (handle) => {
             WHERE Users.handle = ?;
         `;
 
-        meNexus.query(sql, [handle], (err, results) => {
+        mysql.query(sql, [handle], (err, results) => {
             if (err) {
                 console.error('Error fetching user profile:', err);
                 return reject(new Error (err));
@@ -162,7 +162,7 @@ exports.updateUser = (userFields, userValues) => {
             WHERE handle = ?
         `;
 
-        meNexus.query(userSql, userValues, (err, result) => {
+        mysql.query(userSql, userValues, (err, result) => {
             if (err) {
                 return reject(err);
             }
@@ -180,7 +180,7 @@ exports.updateProfile = (profileFields, profileValues) => {
             WHERE user_id = (SELECT user_id FROM Users WHERE handle = ?)
         `;
 
-        meNexus.query(profileSql, profileValues, (err, result) => {
+        mysql.query(profileSql, profileValues, (err, result) => {
             if (err) {
                 return reject(err);
             }

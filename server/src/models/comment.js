@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 
 exports.createComment = (user_id, resource_type, resource_id, content) => {
     return new Promise((resolve, reject) => {
@@ -6,7 +6,7 @@ exports.createComment = (user_id, resource_type, resource_id, content) => {
             INSERT INTO PostComments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
         `;
 
-        meNexus.query(sql, [user_id, resource_type, resource_id, content], (error, result) => {
+        mysql.query(sql, [user_id, resource_type, resource_id, content], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
@@ -25,7 +25,7 @@ exports.updateComment = (comment_id, updated_content) => {
             WHERE comment_id = ?
         `;
 
-        meNexus.query(sql, [updated_content, comment_id], (error, result) => {
+        mysql.query(sql, [updated_content, comment_id], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
@@ -43,7 +43,7 @@ exports.deleteComment = (comment_id) => {
             WHERE comment_id = ?
         `;
 
-        meNexus.query(deleteSql, [comment_id], (error, result) => {
+        mysql.query(deleteSql, [comment_id], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
@@ -83,7 +83,7 @@ exports.getComments = (resource_type, resource_id) => {
                     WHERE Posts.post_id = ?
                 `;
 
-                meNexus.query(sql, [resource_id], (error, results) => {
+                mysql.query(sql, [resource_id], (error, results) => {
                     if (error) {
                         console.error(error);
                         return reject(error);

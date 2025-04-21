@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 
 exports.search = (query, type) => {
     return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ exports.search = (query, type) => {
                 break;
         }
 
-        meNexus.query(sql, params, (err, results) => {
+        mysql.query(sql, params, (err, results) => {
             if (err) {
                 return reject(err);
             }

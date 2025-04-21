@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 const { clients } = require('../config/websocket');
 
 // Helper to send notifications via WebSocket
@@ -30,7 +30,7 @@ exports.createNotification = (user_id, actor_id, resource_type, resource_id, act
             WHERE user_id = ?
         `;
 
-        meNexus.query(actorQuery, [actor_id], (actorErr, actorResult) => {
+        mysql.query(actorQuery, [actor_id], (actorErr, actorResult) => {
             if (actorErr) {
                 console.error("Error fetching actor handle:", actorErr);
                 return reject(actorErr);
@@ -64,7 +64,7 @@ exports.createNotification = (user_id, actor_id, resource_type, resource_id, act
                 VALUES (?, ?, ?, ?, ?, ?)
             `;
 
-            meNexus.query(sql, [user_id, actor_id, resource_type, resource_id, action, summary], (err, result) => {
+            mysql.query(sql, [user_id, actor_id, resource_type, resource_id, action, summary], (err, result) => {
                 if (err) {
                     console.error("Error creating notification:", err);
                     return reject(err);
@@ -90,7 +90,7 @@ exports.getNotifications = (user_id) => {
             AND is_read = false;
         `;
 
-        meNexus.query(sql, [user_id], (err, results) => {
+        mysql.query(sql, [user_id], (err, results) => {
             if (err) {
                 console.error("Error fetching notifications for user_id: ", user_id);
                 return reject(err);
@@ -110,7 +110,7 @@ exports.setNotificationAsRead = (notification_id) => {
             WHERE notification_id = ?
         `;
 
-        meNexus.query(sql, [notification_id], (err, result) => {
+        mysql.query(sql, [notification_id], (err, result) => {
             if (err) {
                 console.error("Error updating notification:", err);
                 return reject(err);

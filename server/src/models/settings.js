@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 
 exports.uploadProfilePicture = (s3Url, user_id) => {
     return new Promise((resolve, reject) => {
@@ -10,7 +10,7 @@ exports.uploadProfilePicture = (s3Url, user_id) => {
             WHERE user_id = ?
         `;
 
-        meNexus.query(sql, [s3Url, user_id], (err, result) => {
+        mysql.query(sql, [s3Url, user_id], (err, result) => {
             if (err) {
                 console.error('Error updating profile picture:', err.message);
                 return reject(err);

@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 
 exports.createPost = (content, handle) => {
     return new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ exports.createPost = (content, handle) => {
             WHERE handle = ?
         `;
 
-        meNexus.query(userSql, [handle], (err, results) => {
+        mysql.query(userSql, [handle], (err, results) => {
             if (err) return reject(err);
             if (results.length === 0) return reject(new Error('User not found'));
 
@@ -21,7 +21,7 @@ exports.createPost = (content, handle) => {
                 VALUES (?, ?)
             `;
 
-            meNexus.query(postSql, [content, userId], (err, result) => {
+            mysql.query(postSql, [content, userId], (err, result) => {
                 if (err) {
                     return reject(err);
                 }
@@ -41,7 +41,7 @@ exports.updatePost = (postId, updatedContent) => {
             WHERE post_id = ?
         `;
 
-        meNexus.query(updateSql, [updatedContent, postId], (updateErr, updateResult) => {
+        mysql.query(updateSql, [updatedContent, postId], (updateErr, updateResult) => {
             if (updateErr) {
                 console.error(updateErr);
                 return reject(new Error('Database error')); // Reject with an error
@@ -60,7 +60,7 @@ exports.deletePost = (postId) => {
             WHERE post_id = ?
         `;
 
-        meNexus.query(deleteSql, [postId], (deleteErr, deleteResult) => {
+        mysql.query(deleteSql, [postId], (deleteErr, deleteResult) => {
             if (deleteErr) {
                 console.error(deleteErr);
                 return reject(new Error('Database error')); // Reject with an error
@@ -86,7 +86,7 @@ exports.getPosts = (user_id) => {
         ORDER BY Posts.created_at DESC
     `;
 
-        meNexus.query(sql, [user_id, user_id], (err, results) => {
+        mysql.query(sql, [user_id, user_id], (err, results) => {
             if (err) {
                 console.error('Error fetching posts:', err);
                 return reject(new Error(err)); // Reject with an error
@@ -109,7 +109,7 @@ exports.getUserPosts = (handle) => {
             WHERE Users.handle = ?
     `;
 
-        meNexus.query(sql, [handle], (err, results) => {
+        mysql.query(sql, [handle], (err, results) => {
             if (err) {
                 console.log('Error getting user posts:', err);
                 return reject(new Error(err)); // Reject with an error

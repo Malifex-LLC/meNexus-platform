@@ -1,4 +1,4 @@
-const meNexus = require("../config/db");
+const mysql = require("../config/db");
 
 exports.getConversations = (user_id) => {
     return new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ exports.getConversations = (user_id) => {
                 c.conversation_id, participant_id
         `;
 
-        meNexus.query(sql, [user_id, user_id], (err, results) => {
+        mysql.query(sql, [user_id, user_id], (err, results) => {
             if (err) {
                 console.error('Error fetching conversations', err);
                 return reject(err);
@@ -53,7 +53,7 @@ exports.createConversation = (user_id) => {
             VALUES ();
     `;
 
-        meNexus.query(newConversationSql, (err, results) => {
+        mysql.query(newConversationSql, (err, results) => {
             if (err) {
                 console.error('Error creating conversation', err);
                 return reject(err);
@@ -68,7 +68,7 @@ exports.createConversation = (user_id) => {
                 VALUES (?, ?);
             `;
 
-            meNexus.query(addSenderParticipantSql, [newConversationId, user_id], (err, results) => {
+            mysql.query(addSenderParticipantSql, [newConversationId, user_id], (err, results) => {
                 if (err) {
                     console.error('Error adding sender to  ConversationParticipants', err);
                     return reject(err);
@@ -88,7 +88,7 @@ exports.updateConversationParticipants = (conversation_id, newParticipantsHandle
             WHERE handle = ?;
         `;
 
-        meNexus.query(getParticipantUserIdSql, [newParticipantsHandle], (err, result) => {
+        mysql.query(getParticipantUserIdSql, [newParticipantsHandle], (err, result) => {
             if (err) {
                 console.error(`Error getting new participant's user_id`, err);
                 return reject(err);
@@ -102,7 +102,7 @@ exports.updateConversationParticipants = (conversation_id, newParticipantsHandle
                 VALUES (?, ?);
             `;
 
-                meNexus.query(addParticipantsSql, [conversation_id, newParticipantsUserId], (err, result) => {
+                mysql.query(addParticipantsSql, [conversation_id, newParticipantsUserId], (err, result) => {
                     if (err) {
                         console.error('Error updating conversation participants', err);
                         return reject(err);
