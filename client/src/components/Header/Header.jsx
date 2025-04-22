@@ -27,7 +27,7 @@ const Header = () => {
     const [unreadNotifications, setUnreadNotifications] = useState(false);
 
     const location = useLocation();
-    const isActive = (path) => location.pathname === path ? "text-brand" : "text-foreground";
+    const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
 
 
     useEffect(() => {
@@ -41,14 +41,11 @@ const Header = () => {
                     if (response.status === 200 && response.data.user_id) {
                         console.log("Session user handle:", response.data.handle);
                         setSessionUserId(response.data.user_id);
-                    } else {
-                        console.error("Invalid session");
+                        setIsSessionUserIdSet(true);
                     }
                 } catch (error) {
                     console.error("Error fetching current user session:", error);
                 }
-            } else if (sessionUserId) {
-                setSessionUserId(sessionUserId);
             }
         };
 

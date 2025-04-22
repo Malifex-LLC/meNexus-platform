@@ -60,8 +60,8 @@ const Home = () => {
             }
         };
 
-        fetchSessionUser();
-    }, [handle, navigate, isHandleSet]); // Only run if `handle` or `isHandleSet` changes
+        if (!isHandleSet) fetchSessionUser();
+    }, [getSessionUser, handle, isHandleSet, navigate]);
 
     // Fetch posts once the `currentHandle` is determined
     useEffect(() => {
@@ -71,16 +71,15 @@ const Home = () => {
                     console.log("Fetching posts for handle:", currentHandle);
                     const userPostsData = await getPosts();
                     setPosts(userPostsData); // Set the posts
-
-
                 } catch (error) {
                     console.error("Error fetching posts:", error);
                 }
             };
-
-            fetchPosts();
+            if (currentHandle && isHandleSet && posts.length === 0) {
+                fetchPosts();
+            }
         }
-    }, [currentHandle, isHandleSet]); // Trigger fetching posts only when `currentHandle` and `isHandleSet` are ready
+    }, [currentHandle, getPosts, isHandleSet, posts.length]);
 
     // Handle loading and error states for posts
     if (postsLoading) {
