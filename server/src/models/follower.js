@@ -52,3 +52,41 @@ exports.followCheck = (user_id, followed_id) => {
         });
     });
 }
+
+exports.getFollowerCount = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT COUNT(*) AS follower_count 
+            FROM Followers 
+            WHERE followed_id = ?
+        `;
+
+        mysql.query(sql, [user_id], (err, result) => {
+            if (err) {
+                console.error('Error fetching follower count:', err);
+                return reject(err);
+            }
+
+            resolve(result[0])
+        })
+    })
+}
+
+exports.getFollowingCount = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT COUNT(*) AS following_count 
+            FROM Followers 
+            WHERE follower_id = ?
+        `;
+
+        mysql.query(sql, [user_id], (err, result) => {
+            if (err) {
+                console.error('Error fetching following count:', err);
+                return reject(err);
+            }
+
+            resolve(result[0])
+        })
+    })
+}

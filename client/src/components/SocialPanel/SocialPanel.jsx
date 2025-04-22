@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
+import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
+import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
 
 const SocialPanel = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
+    const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
 
     const [profile, setProfile] = useState({});
@@ -16,6 +20,8 @@ const SocialPanel = () => {
     const [session_user_handle, setSession_user_handle] = useState(null);
     const [isHandleSet, setIsHandleSet] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [followerCount, setFollowerCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
 
     const navigate = useNavigate();
 
@@ -76,6 +82,30 @@ const SocialPanel = () => {
         }
     }, [currentHandle, isHandleSet]);
 
+    useEffect(() => {
+        const fetchFollowerCount = async () => {
+            try {
+                const fetchedFollowerCount = await getFollowerCount(session_user_id);
+                setFollowerCount(fetchedFollowerCount.result.follower_count);
+            } catch (error) {
+                console.error("Error fetching follower count:", error);
+            }
+        }
+        fetchFollowerCount();
+    }, [session_user_id]);
+
+    useEffect(() => {
+        const fetchFollowingCount = async () => {
+            try {
+                const fetchedFollowingCount = await getFollowingCount(session_user_id);
+                setFollowingCount(fetchedFollowingCount.result.following_count);
+            } catch (error) {
+                console.error("Error fetching follower count:", error);
+            }
+        }
+        fetchFollowingCount();
+    }, [session_user_id]);
+
 
     return (
         <div className={`relative flex flex-col h-screen  p-4 items-center`}>
@@ -84,7 +114,7 @@ const SocialPanel = () => {
             bg-surface text-foreground">
                 <div className={`flex  justify-center`}>
                     <div className={`flex flex-col relative  items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
-                        <p className={`px-4 lg:px-2  xl:px-4`}>420</p>
+                        <p className={`px-4 lg:px-2  xl:px-4`}>{followerCount}</p>
                         <p className={`px-4 lg:px-2  xl:px-4`}>Followers</p>
                     </div>
                     <img
@@ -93,7 +123,7 @@ const SocialPanel = () => {
                         alt={`${profile.display_name}'s profile picture`}
                     />
                     <div className={`flex flex-col items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
-                        <p className={`px-4 lg:px-2 xl:px-4 `}>69</p>
+                        <p className={`px-4 lg:px-2 xl:px-4 `}>{followingCount}</p>
                         <p className={`px-4 lg:px-2 xl:px-4 `}>Following</p>
                     </div>
                 </div>

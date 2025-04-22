@@ -1,9 +1,8 @@
 import Activity from "../Activity/Activity.jsx";
 
 const activityData = [
-    {description: `jacobwileyross started following Skrillex!`},
-    {description: `heavenlyy.art started following sophie.tea!`},
-    {description: `meNexus just posted!`},
+    {description: `Activity feed is coming soon!`},
+
 
 ]
 

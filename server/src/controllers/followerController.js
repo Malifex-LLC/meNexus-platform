@@ -69,3 +69,27 @@ exports.followCheck = async (req, res) => {
 
     return res.status(200).json(result);
 }
+
+exports.getFollowerCount = async (req, res) => {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+        return res.status(400).json({ error: 'Invalid data' });
+    }
+
+    const result = await Follower.getFollowerCount(user_id);
+
+    return res.status(200).json({result});
+}
+
+exports.getFollowingCount = async (req, res) => {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+        return res.status(400).json({ error: 'Invalid data' });
+    }
+
+    const result = await Follower.getFollowingCount(user_id);
+
+    return res.status(200).json({result});
+}

@@ -19,6 +19,8 @@ export const ENDPOINTS = {
     FOLLOW_USER: `${API_BASE_URL}/api/follow/followUser`,
     UNFOLLOW_USER: `${API_BASE_URL}/api/follow/unfollowUser`,
     FOLLOW_CHECK: `${API_BASE_URL}/api/follow/followCheck`,
+    GET_FOLLOWER_COUNT: `${API_BASE_URL}/api/follow/getFollowerCount`,
+    GET_FOLLOWING_COUNT: `${API_BASE_URL}/api/follow/getFollowingCount`,
 
     CREATE_POST: `${API_BASE_URL}/api/post/createPost`,
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,

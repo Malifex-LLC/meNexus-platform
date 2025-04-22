@@ -6,7 +6,10 @@ const followerController = require('../controllers/followerController');
 
 router.post('/followUser', followerController.followUser);
 router.delete('/unfollowUser', followerController.unfollowUser);
-router.get('/followCheck', followerController.followCheck)
+router.get('/followCheck', followerController.followCheck);
+router.get('/getFollowerCount', followerController.getFollowerCount);
+router.get('/getFollowingCount', followerController.getFollowingCount);
+
 
 // Export the router so it can be used in app.js
 module.exports = router;
