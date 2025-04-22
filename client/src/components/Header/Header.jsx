@@ -111,7 +111,7 @@ const Header = () => {
                         } ${unreadNotifications ? 'header__notifications-tray-toggle--has-notifications text-red-500' : ''}`}
                         onClick={toggleNotificationsTray}
                     >
-                        <div className={`text-3xl md:text-4xl`}>
+                        <div className={`text-3xl md:text-4xl cursor-pointer`}>
                             <IoNotifications />
                         </div>
                     </div>

@@ -38,7 +38,9 @@ const CommentForm = ({
 
         console.log("Submitting comment:", comment);
         await createComment(comment);
-        await createNotification(notification);
+        if (user_id !== session_user_id) {
+            await createNotification(notification);
+        }
         setText(""); // Reset the text field after submission
     };
 

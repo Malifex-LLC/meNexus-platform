@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGetUser from "../../../api/hooks/useGetUser.js";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useSetNotificationAsRead from "../../../api/hooks/useSetNotificationAsRead.js";
 
 const Notification = ({
@@ -16,8 +16,6 @@ const Notification = ({
     const { getUser } = useGetUser();
     const { setNotificationAsRead } = useSetNotificationAsRead();
     const [actorUser, setActorUser] = useState(null);
-    const navigate = useNavigate();
-
 
     useEffect(() => {
         if (resource_type === "FOLLOW" && actor_id) {
@@ -28,15 +26,6 @@ const Notification = ({
             fetchActor();
         }
     }, [actor_id, resource_type]);
-
-    const handleClick = async (e, path) => {
-        console.log("handleClick: ", path);
-        console.log("notification_id: ", notification_id);
-        e.preventDefault(); // Prevent default <Link> navigation
-        await setNotificationAsRead(notification_id);
-        navigate(path); // Navigate manually after marking as read
-    };
-
 
     const renderNotification = () => {
         switch (resource_type) {

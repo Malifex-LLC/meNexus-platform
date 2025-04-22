@@ -32,6 +32,7 @@ const PostObject = () => {
 
     useEffect(() => {
         const fetchPost = async () => {
+            setPost(null);
             try {
                 console.log("Fetching post with id: ", postId);
                 const fetchedPost = await getPost(postId);
@@ -41,7 +42,10 @@ const PostObject = () => {
                 console.error("Error getting post:", error);
             }
         }
+        fetchPost();
+    }, [postId]);
 
+    useEffect(() => {
         const fetchSessionUser = async () => {
             try {
                 const response = await getSessionUser();
@@ -49,11 +53,11 @@ const PostObject = () => {
             } catch (error) {
                 console.error("Error fetching session user:", error);
             }
-        }
+        };
 
-        if (!post) fetchPost();
-        if (!session_user_id) fetchSessionUser();
-    }, [post, postId, session_user_id]);
+        fetchSessionUser();
+    }, []);
+
 
     return (
         <div>
