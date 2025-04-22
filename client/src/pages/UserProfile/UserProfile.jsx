@@ -176,11 +176,13 @@ const UserProfile = () => {
             </div>
             <div className="user-profile__post-container flex flex-col lg:col-span-9 h-full">
                 <div className="user-profile__posts flex-1 overflow-y-auto px-4 py-2 space-y-16  ">
-                    <div className="user-profile__post-form bg-surface p-4 rounded-xl mt-8 ">
-                        <PostForm
-                            handle={currentHandle}
-                            refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
-                    </div>
+                    {isOwner && (
+                        <div className="user-profile__post-form bg-surface p-4 rounded-xl mt-8 ">
+                            <PostForm
+                                handle={currentHandle}
+                                refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                        </div>
+                    )}
                     {posts.length > 0 ? (
                         posts
                             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
