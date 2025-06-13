@@ -4,8 +4,9 @@ import { MESSAGE_TYPES} from "#protocols/snp/messageTypes.js";
 import { ACTION_TYPES } from '#protocols/snp/actionTypes.js'
 import { RESOURCE_TYPES} from "#protocols/snp/resourceTypes.js";
 import * as peerStateManager from '#src/peerStateManager.js'
-console.log('peerStateManager instance:', import.meta.url);
-console.log('peerStateManager instance in messenger:', peerStateManager);
+
+// console.log('peerStateManager instance:', import.meta.url);
+// console.log('peerStateManager instance in messenger:', peerStateManager);
 
 export const getSynapseUserPosts = async (req, res) => {
     console.log('Discovered Peers in getSynapseUserPosts: ', peerStateManager.getAllDiscoveredPeers());

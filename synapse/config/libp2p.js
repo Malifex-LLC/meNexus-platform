@@ -34,8 +34,8 @@ export const createLibp2pInstance = async () => {
         peerDiscovery: [
             bootstrap({
                 list: [
-                    '/ip4/192.168.1.253/tcp/4001/p2p/12D3KooWJtLJ3Z5YM855gxsWDnEFHhATAPTGMBQDQGYjh3icFsbs',
-                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWEESBm7xFdo35dGnbjY5LZVnWvbn1JS51Kc71ooGkcWNr',
+                    '/ip4/192.168.1.60/tcp/4001/p2p/12D3KooWMgmyd1zh7pB4srggFNiKVb1BbzWzKfBtUnEzbZds8iSe',
+                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWPPHrMDJBJHwxcKgkWSLwphZS9V3X3wDAthpYe1CiDo6Z',
                 ],
             }),
             mdns({

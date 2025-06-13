@@ -8,8 +8,9 @@ import { sendRequest } from '#utils/apiUtils.js'
 import { createLibp2pInstance } from '#config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
 import * as peerStateManager from '#src/peerStateManager.js'
-console.log('peerStateManager instance:', import.meta.url);
-console.log('peerStateManager instance in messenger:', peerStateManager);
+
+// console.log('peerStateManager instance:', import.meta.url);
+// console.log('peerStateManager instance in messenger:', peerStateManager);
 
 
 
@@ -39,7 +40,13 @@ export const initializeMessenger = async () => {
             console.log('Skipping self-connection.');
             return;
         }
-        const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
+        const peerMultiaddrs = event.detail.multiaddrs
+            .map((addr) => addr.toString())
+            .filter(address => address.includes('/tcp/4001'));
+        if (peerMultiaddrs.length === 0) {
+            console.log(`Peer ${peerId} has no Messenger addresses; ignoring.`);
+            return;
+        }
         peerStateManager.addDiscoveredPeer(peerId, peerMultiaddrs);
         console.log('Discovered Peers: ', peerStateManager.getAllDiscoveredPeers())
 
@@ -259,15 +266,37 @@ const processMessage = async (message) => {
         case MESSAGE_TYPES.DATA.REQUEST:
             console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
             if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
-                console.log('Received RESOURCE_FETCH from ${message.meta.sender}.');
+                console.log(`Received RESOURCE_FETCH from ${message.meta.sender}.`);
                 if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
-                    console.log('Received ALL_POSTS request from ${message.meta.sender}.');
+                    console.log(`Received ALL_POSTS request from ${message.meta.sender}.`);
+                    const { handle } = message.payload;
+                    const url = ENDPOINTS.GET_USER_POSTS.replace(':handle', encodeURIComponent(handle));
                     const response = await sendRequest({
                         method: 'GET',
-                        url: ENDPOINTS.GET_USER_POSTS,
-                        params: message.payload.handle,
+                        url: url,
+                        params: { handle },
                         withCredentials: true
-                    })
+                    });
+
+                    console.log("ALL_POSTS response: ", response);
+                    const posts = response.data;
+
+                    const dataResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        { posts },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, dataResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peer-id - response not sent.');
+                    }
                 }
 
             }

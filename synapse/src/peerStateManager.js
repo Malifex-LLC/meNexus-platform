@@ -13,6 +13,7 @@ export const addDiscoveredPeer = (peerId, multiaddrs) => {
 };
 
 export  const updatePeerPublicKey = (peerId, publicKey) => {
+    console.log(`Storing key ${publicKey.slice(0,8)}… for ${peerId}`);
     if (discoveredPeers.has(peerId)) {
         discoveredPeers.get(peerId).publicKey = publicKey;
         console.log('Updated peer publicKey');
