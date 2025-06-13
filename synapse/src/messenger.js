@@ -87,6 +87,10 @@ export const initializeMessenger = async () => {
     await libp2p.handle(PROTOCOL_ID, async ({ stream, connection }) => {
         console.log(`Message received from peer: ${connection.remotePeer.toString()}`);
         //console.log('Stream', stream);
+        const peerId = connection.remotePeer.toString();
+
+        // A. single address from the connection object
+        peerStateManager.mergeMultiaddrs(peerId, [connection.remoteAddr])
 
         const decoder = new TextDecoder();
 

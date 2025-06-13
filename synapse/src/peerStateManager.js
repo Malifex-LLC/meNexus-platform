@@ -21,6 +21,16 @@ export  const updatePeerPublicKey = (peerId, publicKey) => {
     }
 };
 
+export const mergeMultiaddrs = (peerId, addrs = []) => {
+    if (!discoveredPeers.has(peerId)) {
+        discoveredPeers.set(peerId, { publicKey: null, multiaddrs: [] })
+    }
+    const peer  = discoveredPeers.get(peerId)
+    const union = new Set([...peer.multiaddrs, ...addrs.map(a => a.toString())])
+    peer.multiaddrs = [...union]
+}
+
+
 export const removeDiscoveredPeer = (peerId) => {
     console.log('DiscoveredPeers @ removeDisocoveredPeer: ', discoveredPeers)
     console.log('Remove discovered peer:', peerId);
