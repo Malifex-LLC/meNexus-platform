@@ -9,6 +9,8 @@ import { loadConfig, saveConfig } from '../utils/configUtils.js'; // Config file
 import { initializeMessenger} from "./messenger.js";
 import { initializeSnpPubSub} from "./snpPubSub.js";
 
+// Await ensures .env is loaded before server.js runs...was causing mySQL to fail to connect before
+const { startApi } = await import('../api/src/server.js');
 const CONFIG_FILE = path.join(process.cwd(), '../config/synapse-config.json');
 
 // Initialize the Synapse instance
@@ -41,21 +43,9 @@ const initializeSynapse = async () => {
     await startSnpPubSub();
 };
 
-const startServer = () => {
+const startServer = async () => {
     console.log('Starting API server...');
-    const serverProcess = spawn('node', ['server.js'], { cwd: '../api/src', stdio: 'inherit' });
-
-    serverProcess.on('error', (error) => {
-        console.error(`Error starting server: ${error.message}`);
-    });
-
-    serverProcess.on('exit', (code, signal) => {
-        if (code !== 0) {
-            console.error(`Server process exited with code: ${code}, signal: ${signal}`);
-        } else {
-            console.log('Server process exited successfully.');
-        }
-    });
+    await startApi();
 };
 
 const startSnpPubSub = async () => {

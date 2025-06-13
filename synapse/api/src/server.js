@@ -1,89 +1,88 @@
-// Imports
+/* -------------------------------------------------
+   ../api/src/server.js
+   ------------------------------------------------- */
+
 import dotenv from 'dotenv';
 dotenv.config({ path: '../config/.env' });
-import { createExpressApp } from '../config/express.js';
-import { createWebSocketServer, clients } from '../config/websocket.js'
-import express from 'express'
-import sessionMiddleware from './middlewares/session.js'
-import sessionLogger from './middlewares/sessionLogger.js'
 
-// Create Express server
-const server = createExpressApp();
+import express from 'express';
+import { createExpressApp }     from '../config/express.js';
+import { createWebSocketServer } from '../config/websocket.js';
+import sessionMiddleware         from './middlewares/session.js';
+// import sessionLogger           from './middlewares/sessionLogger.js'
 
+import { initializeOrbitDB,
+    closeOrbitDB }          from '../../config/orbitdb-service.js';
 
-// Assigning port number for the express api
-const port = process.env.EXPRESS_PORT;
+// Route modules
+import authRoutes         from './routes/authRoutes.js';
+import userRoutes         from './routes/userRoutes.js';
+import followerRoutes     from './routes/followerRoutes.js';
+import postRoutes         from './routes/postRoutes.js';
+import commentRoutes      from './routes/commentRoutes.js';
+import conversationRoutes from './routes/conversationRoutes.js';
+import messageRoutes      from './routes/messageRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import searchRoutes       from './routes/searchRoutes.js';
+import settingsRoutes     from './routes/settingsRoutes.js';
+import synapseRoutes      from './routes/synapseRoutes.js';
 
-// Express api listening on port number specified
-const httpServer = server.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-});
+/* ────────────────────────────────────────────────
+   1.  The starter function
+   ──────────────────────────────────────────────── */
+export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
 
-// Instantiate WebSocket Server
-const wss = createWebSocketServer(httpServer);
+    /* ---- Express & HTTP -------------------------------------------------- */
+    const app = createExpressApp();
+    app.use(sessionMiddleware);
+    // app.use(sessionLogger);
 
-// Export Express server, WebSocket api, and WebSocket clients for use externally
-export {
-    server,
-    wss,
-    clients,
-};
+    // Static uploads
+    app.use('/uploads', express.static('../uploads'));
 
-// Initialize session middleware
-server.use(sessionMiddleware);
+    /* ---- REST routes ----------------------------------------------------- */
+    app.use('/api/auth',         authRoutes);
+    app.use('/api/user',         userRoutes);
+    app.use('/api/follow',       followerRoutes);
+    app.use('/api/post',         postRoutes);
+    app.use('/api/comment',      commentRoutes);
+    app.use('/api/conversation', conversationRoutes);
+    app.use('/api/message',      messageRoutes);
+    app.use('/api/notification', notificationRoutes);
+    app.use('/api/search',       searchRoutes);
+    app.use('/api/settings',     settingsRoutes);
+    app.use('/synapse',          synapseRoutes);
 
-// Use sessionLogger middleware
-//server.use(sessionLogger);
+    /* ---- Start listening ------------------------------------------------- */
+    const httpServer = await new Promise(resolve => {
+        const server = app.listen(port, () => {
+            console.log(`API listening on port ${port}`);
+            resolve(server);               // resolve after it’s ready
+        });
+    });
 
-// Serve static files from /uploads directory
-server.use('/uploads', express.static('../uploads'));
+    /* ---- WebSockets ------------------------------------------------------ */
+    const wss = createWebSocketServer(httpServer);
 
-// Import orbitdb-service functions
-import { initializeOrbitDB, getDatabase, closeDatabase, closeOrbitDB } from '../../config/orbitdb-service.js'
-
-// Initialize OrbitDB when the api starts
-(async () => {
+    /* ---- OrbitDB --------------------------------------------------------- */
     await initializeOrbitDB();
     console.log('OrbitDB service running');
-})();
 
-// Ensure OrbitDB stops gracefully when the api shuts down
-process.on('SIGINT', async () => {
-    await closeOrbitDB();
-    process.exit();
-});
+    process.once('SIGINT', async () => {
+        await closeOrbitDB();
+        httpServer.close(() => process.exit());
+    });
 
-///////////////////////////////////////////API Routes///////////////////////////////////////////
+    /* ---- Return whatever callers need ----------------------------------- */
+    return { app, httpServer, wss };
+}
 
-import authRoutes from './routes/authRoutes.js'
-server.use('/api/auth', authRoutes);
-
-import userRoutes from './routes/userRoutes.js'
-server.use('/api/user', userRoutes);
-
-import followerRoutes from './routes/followerRoutes.js'
-server.use('/api/follow', followerRoutes);
-
-import postRoutes from './routes/postRoutes.js'
-server.use('/api/post', postRoutes );
-
-import commentRoutes from './routes/commentRoutes.js'
-server.use('/api/comment', commentRoutes);
-
-import conversationRoutes from './routes/conversationRoutes.js'
-server.use('/api/conversation', conversationRoutes);
-
-import messageRoutes from './routes/messageRoutes.js'
-server.use('/api/message', messageRoutes);
-
-import notificationRoutes from './routes/notificationRoutes.js'
-server.use('/api/notification', notificationRoutes);
-
-import searchRoutes from './routes/searchRoutes.js'
-server.use('/api/search', searchRoutes);
-
-import settingsRoutes from './routes/settingsRoutes.js'
-server.use('/api/settings', settingsRoutes);
-
-import synapseRoutes from './routes/synapseRoutes.js'
-server.use('/synapse', synapseRoutes);
+/* ────────────────────────────────────────────────
+   2.  Allow “node server.js” for local dev
+   ──────────────────────────────────────────────── */
+if (import.meta.url === `file://${process.argv[1]}`) {
+    startApi().catch(err => {
+        console.error('Failed to start API:', err);
+        process.exit(1);
+    });
+}
