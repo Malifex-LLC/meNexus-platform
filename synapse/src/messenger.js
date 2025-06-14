@@ -299,10 +299,6 @@ const processMessage = async (message) => {
                     }
                 }
             }
-            break;
-
-        case MESSAGE_TYPES.DATA.REQUEST:
-            console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
             if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
                 console.log(`Received RESOURCE_FETCH from ${message.meta.sender}.`);
                 if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
