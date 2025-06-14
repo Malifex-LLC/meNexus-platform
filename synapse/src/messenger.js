@@ -298,6 +298,33 @@ const processMessage = async (message) => {
                         console.warn('Cannot map publicKey to peerId - response not sent.');
                     }
                 }
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
+                    console.log(`Received ALL_POSTS request from ${message.meta.sender}.`);
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_ALL_POSTS,
+                        withCredentials: true,
+                    });
+
+                    console.log("GET_ALL_POSTS response ", response);
+                    const posts = response.data;
+
+                    const postsResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        { posts },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, postsResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peerId - response not sent.');
+                    }
+                }
             }
             if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
                 console.log(`Received RESOURCE_FETCH from ${message.meta.sender}.`);

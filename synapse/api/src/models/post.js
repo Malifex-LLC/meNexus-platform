@@ -71,6 +71,19 @@ export const deletePost = (postId) => {
     })
 }
 
+export const getAllPosts = async (req, res) => {
+    return new Promise((resolve, reject) => {
+        const query = `SELECT * FROM Posts`;
+        meNexus.query(query, (err, results) => {
+            if (err) {
+                console.error('Database error in getAllPosts:', err);
+                return reject(err)
+            }
+            resolve(results);
+        });
+    });
+};
+
 export const getPosts = (user_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
@@ -124,6 +137,7 @@ export default {
     createPost,
     updatePost,
     deletePost,
+    getAllPosts,
     getPosts,
     getUserPosts,
 }
