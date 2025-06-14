@@ -3,6 +3,7 @@
  */
 export const RESOURCE_TYPES = {
     USER: 'USER',
+    ALL_USERS: 'ALL_USERS',
     POST: 'POST',
     ALL_POSTS: 'ALL_POSTS',
     COMMENT: 'COMMENT',

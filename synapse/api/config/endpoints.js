@@ -13,6 +13,7 @@ export const ENDPOINTS = {
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
 
     CREATE_USER: `${API_BASE_URL}/api/auth/createUser`,
+    GET_ALL_USERS: `${API_BASE_URL}/api/user/getAllUsers`,
     GET_SESSION_USER: `${API_BASE_URL}/api/user/getSessionUser`,
     GET_USER: `${API_BASE_URL}/api/user/getUserById/:user_id`,
     GET_PROFILE: `${API_BASE_URL}/api/user/getProfile/:handle`,
