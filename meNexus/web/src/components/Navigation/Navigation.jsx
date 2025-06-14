@@ -1,7 +1,6 @@
-import './Navigation.css'
 import { NavLink } from "react-router-dom";
 import {useNavigate} from "react-router-dom";
-import useLogout from '../../hooks/api/useLogout.js'
+import useLogout from '../../api/hooks/useLogout.js'
 
 const Navigation = () => {
     const { logout } = useLogout();
@@ -14,21 +13,22 @@ const Navigation = () => {
     }
 
     return (
-        <nav className='navigation' aria-label="Primary Navigation">
-            <ul>
-                <li>
+        <nav className='navigation flex h-screen w-sm text-2xl p-8 px-12
+        bg-background '>
+            <ul className={`text-white`}>
+                <li className={`pt-4 hover:text-brand`}>
                     <NavLink to="/home" activeClassName="active">Home</NavLink>
                 </li>
-                <li>
+                <li className={`pt-4 hover:text-brand`}>
                     <NavLink to="/profile" activeClassName="active">Profile</NavLink>
                 </li>
-                <li>
+                <li className={`pt-4 hover:text-brand`}>
                     <NavLink to="/messages" activeClassName="active">Messages</NavLink>
                 </li>
-                <li>
+                <li className={`pt-4 hover:text-brand`}>
                     <NavLink to="/settings" activeClassName="active">Settings</NavLink>
                 </li>
-                <li>
+                <li className={`pt-4 hover:text-brand`}>
                     <NavLink to="/login" onClick={handleLogout} activeClassName="active">Logout</NavLink>
                 </li>
             </ul>

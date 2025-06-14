@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./Search.css";
-import "../../hooks/api/useSearch.js"
-import useSearch from "../../hooks/api/useSearch.js";
+import "../../api/hooks/useSearch.js"
+import useSearch from "../../api/hooks/useSearch.js";
 import ProfileCard from "../../components/ProfileCard/ProfileCard.jsx";
 import Post from "../../components/Posts/Post/Post.jsx"
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
-import useGetSessionUser from "../../hooks/api/useGetSessionUser.js";
-import useGetPosts from "../../hooks/api/useGetPosts.js";
-import useEditPost from "../../hooks/api/useEditPost.js";
-import useDeletePost from "../../hooks/api/useDeletePost.js";
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import useGetPosts from "../../api/hooks/useGetPosts.js";
+import useEditPost from "../../api/hooks/useEditPost.js";
+import useDeletePost from "../../api/hooks/useDeletePost.js";
 
 const Search = () => {
     const location = useLocation();
@@ -77,29 +77,19 @@ const Search = () => {
     const postResults = results.filter((result) => result.type === "post");
 
     return (
-        <div className="search-results">
+        <div className="search-results h-screen overflow-hidden flex flex-col ">
             <h1>Search Results for "{query}"</h1>
-            <div className="search-results__filters">
-                <button onClick={() => setFilter("all")} className={filter === "all" ? "active" : ""}>
-                    All
-                </button>
-                <button onClick={() => setFilter("users")} className={filter === "users" ? "active" : ""}>
-                    Users
-                </button>
-                <button onClick={() => setFilter("posts")} className={filter === "posts" ? "active" : ""}>
-                    Posts
-                </button>
-            </div>
-            <div className="search-results__content">
+
+            <div className="search-results__content flex-1 overflow-hidden flex gap-16 px-8 ">
                 {loading && <p>Loading...</p>}
                 {error && <p className="error">{error}</p>}
                 {!loading && !error && results.length === 0 && <p>No results found.</p>}
                 {!loading && !error && (
-                    <>
+                    <div className={'flex gap-16'}>
                         {/* Render User Results */}
                         {userResults.length > 0 && (
-                            <div className="search-results__users-container">
-                                <h1>Users Found:</h1>
+                            <div className="search-results__users-container flex-1 overflow-y-auto p-4 space-y-8 ">
+                                <h1 className={`font-semibold`}>Users Found:</h1>
                                 {userResults.map((user, index) => (
                                     <ProfileCard key={index} handle={user.handle} />
                                 ))}
@@ -107,8 +97,8 @@ const Search = () => {
                         )}
                         {/* Render Post Results */}
                         {postResults.length > 0 && (
-                            <div className="search-results__posts-container">
-                                <h1>Posts Found:</h1>
+                            <div className="search-results__posts-container flex-1 overflow-y-auto p-4 space-y-4">
+                                <h1 className={`font-semibold`}>Posts Found:</h1>
                                 {postResults
                                     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                                     .map((post, index) => (
@@ -136,7 +126,7 @@ const Search = () => {
                                 ))}
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
             </div>
         </div>

@@ -1,4 +1,3 @@
-import "./DisplaySettings.css";
 import { useState } from "react";
 
 const DisplaySettings = () => {
@@ -11,11 +10,12 @@ const DisplaySettings = () => {
     };
 
     return (
-        <div className="display-settings__container">
-            <h2 className="display-settings__header">Display Settings</h2>
-            <form className="display-settings__form" onSubmit={handleSubmit}>
+        <div className="display-settings__container flex flex-col p-8 md:mx-16 text-foreground">
+            <h2 className="display-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 items-center rounded-2xl
+            bg-surface">Display Settings</h2>
+            <form className="display-settings__form flex flex-col p-4" onSubmit={handleSubmit}>
                 {/* Theme Selection */}
-                <label>
+                <label className={`mb-4`}>
                     Theme:
                     <select
                         value={theme}
@@ -27,7 +27,7 @@ const DisplaySettings = () => {
                 </label>
 
                 {/* Font Size Selection */}
-                <label>
+                <label className={`mb-4`}>
                     Font Size:
                     <input
                         type="number"
@@ -39,7 +39,7 @@ const DisplaySettings = () => {
                 </label>
 
                 {/* Submit Button */}
-                <button type="submit">Save Changes</button>
+                <button className={`w-xs bg-brand`} type="submit">Save Changes</button>
             </form>
         </div>
     );

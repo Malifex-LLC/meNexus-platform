@@ -1,6 +1,7 @@
-import './MessageForm.css';
 import { useState } from "react";
-import useCreateMessage from '../../../hooks/api/useCreateMessage.js';
+import useCreateMessage from '../../../api/hooks/useCreateMessage.js';
+import { IoSend } from "react-icons/io5";
+
 
 const MessageForm = ({
                          conversation_id,
@@ -35,16 +36,16 @@ const MessageForm = ({
     };
 
     return (
-        <div className="message-form">
-            <div onClick={handleFormClick}>
+        <div className="message-form flex gap-4 bg-surface px-8">
+            <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
-                    className="message-form__entry-field"
+                    className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button className="message-form__button" onClick={handleSubmit} disabled={loading}>
-                {loading ? "Sending..." : "Send"}
+            <button className="message-form__button text-2xl text-foreground " onClick={handleSubmit} disabled={loading}>
+                {loading ? "Sending..." : <IoSend />}
             </button>
             {error && <div className="error">Error: {error}</div>}
         </div>

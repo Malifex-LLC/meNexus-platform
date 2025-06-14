@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@noble/hashes": "^1.7.0",
-    "@noble/secp256k1": "^2.2.2",
+    "@noble/secp256k1": "^2.3.0",
+    "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.0.2"
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.0.2",
+    "react-swipeable": "^7.0.2",
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

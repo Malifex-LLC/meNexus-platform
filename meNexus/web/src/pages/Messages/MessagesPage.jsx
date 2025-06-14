@@ -2,7 +2,7 @@ import MessagesLayout from '../../layouts/MessagesLayout/MessagesLayout.jsx';
 import ConversationMenu from "../../components/Messaging/Conversations/ConversationMenu/ConversationMenu.jsx";
 import Conversation from '../../components/Messaging/Conversations/Conversation/Conversation.jsx'
 import {useState} from "react";
-import useGetConversations from "../../hooks/api/useGetConversations.js";
+import useGetConversations from "../../api/hooks/useGetConversations.js";
 
 const MessagesPage = () => {
     const [selectedConversation, setSelectedConversation] = useState(null);
@@ -22,17 +22,20 @@ const MessagesPage = () => {
                 setActiveConversationId={setActiveConversationId}
             />
             {selectedConversation ? (
-                <Conversation
-                    conversation_id={selectedConversation.conversation_id}
-                    getConversations={getConversations}
-                    setConversations={setConversations}
-                    setActiveConversationId={setActiveConversationId}
-                    setSelectedConversation={setSelectedConversation}
-                    participant_id={selectedConversation.participant_id}
+                    <Conversation
+                        conversation_id={selectedConversation.conversation_id}
+                        getConversations={getConversations}
+                        setConversations={setConversations}
+                        setActiveConversationId={setActiveConversationId}
+                        setSelectedConversation={setSelectedConversation}
+                        participant_id={selectedConversation.participant_id}
 
-                />
+                    />
+
             ) : (
-                <p>Select a conversation to view messages</p>
+                <div className="flex flex-1 items-center justify-center text-foreground">
+                    <p>Select a conversation to view messages</p>
+                </div>
             )}
         </MessagesLayout>
     );
