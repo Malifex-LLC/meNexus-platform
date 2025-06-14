@@ -31,8 +31,8 @@ export const createMessage = (messageType, actionType = {}, payload = {}, meta =
         actionType,
         payload,
         meta: {
-            requestId: uuidv4(),
-            sender: meta.sender,
+            requestId: meta.requestId ?? uuidv4(),
+            sender: meta.sender ?? '',
             timestamp: meta.timestamp || new Date().toISOString()
         },
     };
