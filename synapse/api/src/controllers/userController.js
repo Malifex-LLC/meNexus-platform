@@ -49,9 +49,14 @@ export const getUserById = async (req, res) => {
 export const getProfile = async (req, res) => {
     console.log('getProfile called');
     const handle = req.params.handle;
+    try {
+        const profile = await User.getProfile(handle);
+        res.status(200).json(profile)
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error getting profile info' });
+    }
 
-    const profile = await User.getProfile(handle);
-    res.status(200).json(profile)
 }
 
 export const updateProfileSettings = async (req, res) => {
