@@ -73,7 +73,12 @@ export const deletePost = (postId) => {
 
 export const getAllPosts = async (req, res) => {
     return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Posts`;
+        const query = `
+            SELECT Posts.*, Users.display_name, Users.handle
+            FROM Posts
+            INNER JOIN Users ON Posts.user_id = Users.user_id
+            ORDER BY Posts.created_at DESC
+        `;
         meNexus.query(query, (err, results) => {
             if (err) {
                 console.error('Database error in getAllPosts:', err);
@@ -97,7 +102,7 @@ export const getPosts = (user_id) => {
             WHERE follower_id = ?
         )
         ORDER BY Posts.created_at DESC
-    `;
+        `;
 
         meNexus.query(sql, [user_id, user_id], (err, results) => {
             if (err) {
