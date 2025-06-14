@@ -1,13 +1,12 @@
-import './Home.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { refreshPosts, refreshComments } from '../../utils/apiUtils.js';
-import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
+import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import Post from '../../components/Posts/Post/Post.jsx';
 import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
-import useGetPosts from "../../hooks/api/useGetPosts.js";
-import useEditPost from "../../hooks/api/useEditPost.js";
-import useDeletePost from "../../hooks/api/useDeletePost.js";
+import useGetPosts from "../../api/hooks/useGetPosts.js";
+import useEditPost from "../../api/hooks/useEditPost.js";
+import useDeletePost from "../../api/hooks/useDeletePost.js";
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
@@ -61,8 +60,8 @@ const Home = () => {
             }
         };
 
-        fetchSessionUser();
-    }, [handle, navigate, isHandleSet]); // Only run if `handle` or `isHandleSet` changes
+        if (!isHandleSet) fetchSessionUser();
+    }, [getSessionUser, handle, isHandleSet, navigate]);
 
     // Fetch posts once the `currentHandle` is determined
     useEffect(() => {
@@ -72,16 +71,15 @@ const Home = () => {
                     console.log("Fetching posts for handle:", currentHandle);
                     const userPostsData = await getPosts();
                     setPosts(userPostsData); // Set the posts
-
-
                 } catch (error) {
                     console.error("Error fetching posts:", error);
                 }
             };
-
-            fetchPosts();
+            if (currentHandle && isHandleSet && posts.length === 0) {
+                fetchPosts();
+            }
         }
-    }, [currentHandle, isHandleSet]); // Trigger fetching posts only when `currentHandle` and `isHandleSet` are ready
+    }, [currentHandle, getPosts, isHandleSet, posts.length]);
 
     // Handle loading and error states for posts
     if (postsLoading) {
@@ -101,14 +99,14 @@ const Home = () => {
     }
 
     return currentHandle ? (
-        <div className="home__post-container">
-            <div className="home__post-form">
-                <PostForm
-                    handle={currentHandle}
-                    refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
-                />
-            </div>
-            <div className="home__posts">
+        <div className="home__post-container flex flex-col h-full">
+            <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
+                <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
+                    <PostForm
+                        handle={currentHandle}
+                        refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
+                    />
+                </div>
                 {posts.length > 0 ? (
                     posts
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

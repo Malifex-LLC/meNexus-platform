@@ -1,4 +1,3 @@
-import './Search.css';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,10 +14,10 @@ const Search = () => {
     };
 
     return (
-        <div className="search">
+        <div className="search border w-32 md:w-full  border-border lg:rounded-xl">
             <label>
                 <input
-                    className="search__input"
+                    className="search__input w-32 md:w-full lg:px-4 bg-surface lg:rounded-xl"
                     type="text"
                     placeholder="Search..."
                     value={query}

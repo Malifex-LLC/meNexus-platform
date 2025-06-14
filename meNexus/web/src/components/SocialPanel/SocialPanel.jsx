@@ -1,0 +1,148 @@
+import useGetProfile from "../../api/hooks/useGetProfile.js";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import useFollowActions from "../../api/hooks/useFollowActions.js";
+import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
+import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
+
+const SocialPanel = () => {
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
+    const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
+    const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
+
+    const [profile, setProfile] = useState({});
+    const { handle } = useParams();
+    const [currentHandle, setCurrentHandle] = useState(handle || null);
+    const [session_user_id, setSession_user_id] = useState(null);
+    const [session_user_handle, setSession_user_handle] = useState(null);
+    const [isHandleSet, setIsHandleSet] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [followerCount, setFollowerCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
+
+    const navigate = useNavigate();
+
+    // Redirect from /profile to /profile/:handle if no handle is provided
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            if (!handle && !isHandleSet) {
+                try {
+                    console.log("Fetching current user session...");
+                    const response = await getSessionUser();
+
+                    if (response.status === 200 && response.data.handle) {
+                        console.log("Session user handle:", response.data.handle);
+                        setCurrentHandle(response.data.handle);
+                        setIsHandleSet(true);
+                        setSession_user_id(response.data.user_id);
+                        setSession_user_handle(response.data.handle);
+                    } else {
+                        console.error("Invalid session, redirecting to login.");
+                        navigate('/login');
+                    }
+                } catch (error) {
+                    console.error("Error fetching current user session:", error);
+                    navigate('/login');
+                }
+            } else if (handle) {
+                const response = await getSessionUser();
+                setSession_user_id(response.data.user_id);
+                setCurrentHandle(handle);
+                setSession_user_handle(response.data.handle);
+                setIsHandleSet(true);
+            }
+        };
+        fetchSessionUser();
+    }, [handle, isHandleSet]);
+
+    // Fetch profile and posts once the current handle is determined
+    useEffect(() => {
+        if (currentHandle && isHandleSet) {
+            const fetchData = async () => {
+                try {
+                    console.log("Fetching profile and posts for handle:", currentHandle);
+                    const [profileData] = await Promise.all([
+                        getProfile(currentHandle),
+                    ]);
+                    console.log("Profile Data after getProfile() fetching is:", profileData);
+                    setProfile(profileData);
+
+                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
+                    console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
+                    setIsFollowing(isCurrentlyFollowing);
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [currentHandle, isHandleSet]);
+
+    useEffect(() => {
+        const fetchFollowerCount = async () => {
+            try {
+                const fetchedFollowerCount = await getFollowerCount(session_user_id);
+                setFollowerCount(fetchedFollowerCount.result.follower_count);
+            } catch (error) {
+                console.error("Error fetching follower count:", error);
+            }
+        }
+        fetchFollowerCount();
+    }, [session_user_id]);
+
+    useEffect(() => {
+        const fetchFollowingCount = async () => {
+            try {
+                const fetchedFollowingCount = await getFollowingCount(session_user_id);
+                setFollowingCount(fetchedFollowingCount.result.following_count);
+            } catch (error) {
+                console.error("Error fetching follower count:", error);
+            }
+        }
+        fetchFollowingCount();
+    }, [session_user_id]);
+
+
+    return (
+        <div className={`relative flex flex-col h-screen  p-4 items-center`}>
+            <div className={`p-24 md:p-12 xl:p-24 w-full relative top-2 bg-gradient-to-b from-background via-primary to-surface backdrop-blur-md rounded-2xl`}/>
+            <div className=" relative z-1  flex flex-col px-4 pb-0 w-full -top-8  justify-center rounded-2xl
+            bg-surface text-foreground">
+                <div className={`flex  justify-center`}>
+                    <div className={`flex flex-col relative  items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
+                        <p className={`px-4 lg:px-2  xl:px-4`}>{followerCount}</p>
+                        <p className={`px-4 lg:px-2  xl:px-4`}>Followers</p>
+                    </div>
+                    <img
+                        className={`relative -top-16 w-48 lg:w-16 lg:-top-8 xl:w-32 mb-0 pb-0`}
+                        src={profile.profile_picture}
+                        alt={`${profile.display_name}'s profile picture`}
+                    />
+                    <div className={`flex flex-col items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
+                        <p className={`px-4 lg:px-2 xl:px-4 `}>{followingCount}</p>
+                        <p className={`px-4 lg:px-2 xl:px-4 `}>Following</p>
+                    </div>
+                </div>
+                <div className={`relative flex flex-col py-2 md:-top-8 -top-16 items-center text-foreground`}>
+                    <p className={`md:text-2xl xl:text-3xl`}>{profile.display_name}</p>
+                    <p className={`md:text-lg xl:text-xl text-brand`}>@{currentHandle}</p>
+                </div>
+                <div className={`relative text-lg md:text-sm -top-8 flex flex-col  items-center`}>
+                    <p>{profile.profile_bio}</p>
+                </div>
+
+            </div>
+            <div className={`flex text-foreground gap-4`}>
+
+            </div>
+
+
+        </div>
+    );
+};
+
+export default SocialPanel;

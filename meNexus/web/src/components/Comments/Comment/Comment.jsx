@@ -1,4 +1,3 @@
-import './Comment.css';
 import { formatDate } from "../../../utils/dateUtils.js";
 import {NavLink} from "react-router-dom";
 
@@ -20,8 +19,9 @@ const Comment = ({
     console.log("isOwner for comment: ", isOwner);
 
     return (
-        <div className={`user-comment ${isEditing ? "user-comment--editing" : ""}`}>
-            <div className="user-comment__identity">
+        <div className={`user-comment relative flex flex-col p-4  mx-4 md:mx-16
+        border border-border mb-4 bg-background text-sm ${isEditing ? "user-comment--editing" : ""}`}>
+            <div className="user-comment__identity flex flex-col">
                 <NavLink
                     className="user-comment__display-name"
                     to={`/profile/${handle}`}
@@ -29,20 +29,20 @@ const Comment = ({
                     {display_name}
                 </NavLink>
                 <NavLink
-                    className="user-comment__handle"
+                    className="user-comment__handle text-brand"
                     to={`/profile/${handle}`}
                 >
                     @{handle}
                 </NavLink>
-                <div className="user-comment__date">
+                <div className="user-comment__date text-neutral">
                     <p>{formatDate(date)}</p>
                 </div>
 
             </div>
-            <div className="user-comment__content">
+            <div className="user-comment__content flex w-full mt-4 text-lg">
                 {isEditing ? (
                     <textarea
-                        className="user-comment__textarea"
+                        className="user-comment__textarea w-full border border-border p-4"
                         value={editedContent}
                         onChange={onContentChange}
                     />
@@ -51,24 +51,24 @@ const Comment = ({
                 )}
             </div>
             {isOwner && (
-                <div className="user-comment__content-actions">
-                    {isEditing ? (
+                <div className="flex justify-end gap-4 ">
+                    {isEditing ?  (
                         <button
-                            className="user-comment__button user-comment__button--save"
+                            className="hover:underline"
                             onClick={onSave}
                         >
                             Save
                         </button>
                     ) : (
                         <button
-                            className="user-comment__button user-comment__button--edit"
+                            className="hover:underline"
                             onClick={onEdit}
                         >
                             Edit
                         </button>
                     )}
                     <button
-                        className="user-comment__button user-comment__button--delete"
+                        className="hover:underline"
                         onClick={onDelete}
                     >
                         Delete

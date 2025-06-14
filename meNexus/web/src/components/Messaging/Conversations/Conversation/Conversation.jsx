@@ -1,13 +1,12 @@
-import './Conversation.css';
 import {useEffect, useState} from "react";
-import useGetSessionUser from '../../../../hooks/api/useGetSessionUser.js'
+import useGetSessionUser from '../../../../api/hooks/useGetSessionUser.js'
 import Message from '../../Message/Message.jsx'
 import MessageForm from '../../MessageForm/MessageForm.jsx'
-import useGetMessages from '../../../../hooks/api/useGetMessages.js'
-import useMessagesWebSocket from '../../../../hooks/api/useMessagesWebSocket.js'
+import useGetMessages from '../../../../api/hooks/useGetMessages.js'
+import useMessagesWebSocket from '../../../../api/hooks/useMessagesWebSocket.js'
 import { refreshMessages } from '../../../../utils/apiUtils.js'
-import useUpdateConversationParticipants from "../../../../hooks/api/useUpdateConversationParticipants.js";
-import useSetMessagesAsRead from "../../../../hooks/api/useSetMessagesAsRead.js";
+import useUpdateConversationParticipants from "../../../../api/hooks/useUpdateConversationParticipants.js";
+import useSetMessagesAsRead from "../../../../api/hooks/useSetMessagesAsRead.js";
 
 const Conversation = ({
                           conversation_id,
@@ -110,11 +109,12 @@ const Conversation = ({
         setConversations(refreshedConversations);
     }
 
-    console.log("useMessagesWebSocket attempting to connect");
-    connectMessagesWebSocket(sessionUserId, handleNewMessage);
+    // TODO Need to fix WebSockets in prod, constantly connecting and disconnecting and reconnecting etc
+    //console.log("useMessagesWebSocket attempting to connect");
+    //connectMessagesWebSocket(sessionUserId, handleNewMessage);
 
     return (
-        <div className="conversation">
+        <div className="conversation  h-full w-full flex flex-col p-8">
             {!participant_id &&(
                 <div className="conversation__new-participants">
                     <p>
@@ -136,27 +136,29 @@ const Conversation = ({
 
             )}
 
-            <div className="conversation__messages">
-                {messages.length > 0 ? (
-                    messages
-                        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-                        .map((message, index) => (
-                            <Message
-                            key={index}
-                            session_user_id={sessionUserId}
-                            conversation_id={message.conversation_id}
-                            message_id={message.message_id}
-                            sender_id={message.sender_id}
-                            content={message.content}
-                            is_read={message.is_read}
-                            created_at={message.created_at}
-                            />
-                        ))
-                ) : (
-                    <div>  </div>
-                )}
+            <div className="conversation__messages overflow-y-auto w-full h-full">
+                <div className={``}>
+                    {messages.length > 0 ? (
+                        messages
+                            .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                            .map((message, index) => (
+                                <Message
+                                    key={index}
+                                    session_user_id={sessionUserId}
+                                    conversation_id={message.conversation_id}
+                                    message_id={message.message_id}
+                                    sender_id={message.sender_id}
+                                    content={message.content}
+                                    is_read={message.is_read}
+                                    created_at={message.created_at}
+                                />
+                            ))
+                    ) : (
+                        <div>  </div>
+                    )}
+                </div>
             </div>
-            <div className="conversation__message-form">
+            <div className="conversation__message-form   bg-surface p-4 mt-4 rounded-2xl">
                 <MessageForm
                     conversation_id={conversation_id}
                     participant_id={participant_id}
@@ -165,6 +167,7 @@ const Conversation = ({
                     refreshMessages={refreshMessages}
                 />
             </div>
+
 
         </div>
     )

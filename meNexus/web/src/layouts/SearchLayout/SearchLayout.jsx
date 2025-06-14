@@ -1,13 +1,10 @@
-import './SearchLayout.css'
 import Header from "../../components/Header/Header.jsx";
-import Navigation from "../../components/Navigation/Navigation.jsx";
 
 const SearchLayout = ({children}) => {
     return (
-        <div className="search-layout">
+        <div className="search-layout h-full pt-17   bg-background text-foreground">
             <Header />
-            <Navigation />
-            <main className="search-layout__main-content">
+            <main className="search-layout__main-content ">
                 {children}
             </main>
         </div>
