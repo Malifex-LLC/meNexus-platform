@@ -1,6 +1,11 @@
 // Import User model
 import User from '../models/user.js'
 
+export const getAllUsers = async (req, res) => {
+    const users = await User.getAllUsers();
+    res.status(200).json(users);
+}
+
 export const getSessionUser = async (req, res) => {
 
     console.log('getSessionUser called');
@@ -124,6 +129,7 @@ export const updateProfileSettings = async (req, res) => {
 }
 
 export default {
+    getAllUsers,
     getSessionUser,
     getUserById,
     getProfile,

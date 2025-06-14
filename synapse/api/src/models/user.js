@@ -72,6 +72,19 @@ const createProfile = async (userID, handle) => {
     }
 };
 
+export const getAllUsers = () => {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM Users';
+        meNexus.query(query, (err, results) => {
+            if (err) {
+                console.error('Database error in getAllUsers: ', err);
+                return reject(err);
+            }
+            resolve(results);
+        });
+    });
+};
+
 // Fetch user details by user_id
 export const getUserById = (userId) => {
     return new Promise((resolve, reject) => {
@@ -182,6 +195,7 @@ export const updateProfile = (profileFields, profileValues) => {
 
 export default {
     createUser,
+    getAllUsers,
     getUserById,
     getUserByHandle,
     getProfile,

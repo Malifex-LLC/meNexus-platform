@@ -263,12 +263,69 @@ const processMessage = async (message) => {
 
             if (message.actionType === ACTION_TYPES.HEALTH.PONG) {
                 console.log(`Received PONG from ${message.meta.sender}.`);
-
             }
             break;
 
         case MESSAGE_TYPES.DATA.REQUEST:
             console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
+            if (message.actionType === ACTION_TYPES.DATA.QUERY) {
+                console.log(`Received DATA_QUERY from ${message.meta.sender}.`);
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_USERS) {
+                    console.log(`Received ALL_USERS request from ${message.meta.sender}.`);
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_ALL_USERS,
+                        withCredentials: true,
+                    });
+
+                    console.log("GET_ALL_USERS response ", response);
+                    const users = response.data;
+
+                    const usersResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        {users},
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, usersResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peerId - response not sent.');
+                    }
+                }
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
+                    console.log(`Received ALL_POSTS request from ${message.meta.sender}.`);
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_ALL_POSTS,
+                        withCredentials: true,
+                    });
+
+                    console.log("GET_ALL_POSTS response ", response);
+                    const posts = response.data;
+
+                    const postsResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        { posts },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, postsResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peerId - response not sent.');
+                    }
+                }
+            }
             if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
                 console.log(`Received RESOURCE_FETCH from ${message.meta.sender}.`);
                 if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
@@ -302,7 +359,6 @@ const processMessage = async (message) => {
                         console.warn('Cannot map publicKey to peer-id - response not sent.');
                     }
                 }
-
             }
             break;
 
@@ -310,7 +366,6 @@ const processMessage = async (message) => {
             console.log(`Received DATA_RESPONSE from ${message.meta.sender}.`);
             resolvePendingRequest(message.meta.requestId, message);
             break;
-
 
         default:
             console.warn('Unknown message type:', message.type);

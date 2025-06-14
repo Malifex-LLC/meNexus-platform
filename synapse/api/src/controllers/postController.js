@@ -50,6 +50,17 @@ export const deletePost = async (req, res) => {
     }
 }
 
+// Get ALL posts (Used for getting all posts from a Synapse)
+export const getAllPosts = async (req, res) => {
+    try {
+        const posts = await Post.getAllPosts();
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error in getAllPosts:', error);
+        res.status(500).json({error: 'Failed to get all posts.'})
+    }
+}
+
 // Post fetching logic
 export const getPosts = async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -90,6 +101,7 @@ export default {
     createPost,
     updatePost,
     deletePost,
+    getAllPosts,
     getPosts,
     getUserPosts,
 }
