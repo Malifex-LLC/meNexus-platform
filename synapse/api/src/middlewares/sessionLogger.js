@@ -9,4 +9,4 @@ const sessionLogger = (req, res, next) => {
     next();
 };
 
-module.exports = sessionLogger;
+export default sessionLogger;

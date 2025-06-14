@@ -1,17 +1,13 @@
 // Import orbitdb connection
-const meNexus = require('../../config/mysql.js');
+import meNexus from '../../config/mysql.js';
 
 // Import orbitDB userPublicKeys orbitdb wrapper function
-const { storePublicKey } = require('../../../src/orbitdb/userPublicKeys');
-
-
-// Import bcrypt
-const bcrypt = require('bcrypt');
+import { storePublicKeyInDB } from '#src/orbitdb/userPublicKeys.js';
 
 // TODO not all functions are written in the return new Promise() format
 
 // Function to create a new user
-exports.createUser = async (publicKey, handle, displayName) => {
+export const createUser = async (publicKey, handle, displayName) => {
     console.log('createUser called for handle: ', handle);
     console.log('createUser called with publicKey: ', publicKey);
 
@@ -28,7 +24,7 @@ exports.createUser = async (publicKey, handle, displayName) => {
         const userID = userResult.insertId;
         console.log('User created with ID:', userID);
 
-        await storePublicKey(userID, publicKey);
+        await storePublicKeyInDB(userID, publicKey);
 
         // Create a default profile for the new user
         await createProfile(userID, handle);
@@ -77,7 +73,7 @@ const createProfile = async (userID, handle) => {
 };
 
 // Fetch user details by user_id
-exports.getUserById = (userId) => {
+export const getUserById = (userId) => {
     return new Promise((resolve, reject) => {
         const query = 'SELECT * FROM Users WHERE user_id = ?';
         meNexus.query(query, [userId], (err, results) => {
@@ -91,7 +87,7 @@ exports.getUserById = (userId) => {
 };
 
 // Fetch user by handle
-exports.getUserByHandle = async (handle) => {
+export const getUserByHandle = async (handle) => {
     console.log("getUserByHandle called for handle:", handle);
     try {
         const query = 'SELECT * FROM Users WHERE handle = ?';
@@ -117,7 +113,7 @@ const executeQuery = (query, params) => {
     });
 };
 
-exports.getProfile = (handle) => {
+export const getProfile = (handle) => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT
@@ -148,7 +144,7 @@ exports.getProfile = (handle) => {
     });
 };
 
-exports.updateUser = (userFields, userValues) => {
+export const updateUser = (userFields, userValues) => {
     return new Promise((resolve, reject) => {
         const userSql = `
             UPDATE Users 
@@ -166,7 +162,7 @@ exports.updateUser = (userFields, userValues) => {
     });
 };
 
-exports.updateProfile = (profileFields, profileValues) => {
+export const updateProfile = (profileFields, profileValues) => {
     return new Promise((resolve, reject) => {
         const profileSql = `
             UPDATE Profiles 
@@ -183,3 +179,12 @@ exports.updateProfile = (profileFields, profileValues) => {
         });
     });
 };
+
+export default {
+    createUser,
+    getUserById,
+    getUserByHandle,
+    getProfile,
+    updateUser,
+    updateProfile
+}

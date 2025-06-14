@@ -1,5 +1,5 @@
-const meNexus = require("../../config/mysql.js");
-const { clients } = require('../../config/websocket');
+import meNexus from "../../config/mysql.js";
+import  { clients } from '../../config/websocket.js';
 
 // Helper to send notifications via WebSocket
 const sendNotification = (userId, notification) => {
@@ -21,7 +21,7 @@ const sendNotification = (userId, notification) => {
     client.send(JSON.stringify(notification));
 };
 
-exports.createNotification = (user_id, actor_id, resource_type, resource_id, action) => {
+export const createNotification = (user_id, actor_id, resource_type, resource_id, action) => {
     return new Promise((resolve, reject) => {
         // Fetch actor's handle from Users table
         const actorQuery = `
@@ -81,7 +81,7 @@ exports.createNotification = (user_id, actor_id, resource_type, resource_id, act
     });
 }
 
-exports.getNotifications = (user_id) => {
+export const getNotifications = (user_id) => {
     return new Promise((resolve, reject) => {
         let sql = `
             SELECT * 
@@ -102,7 +102,7 @@ exports.getNotifications = (user_id) => {
     })
 }
 
-exports.setNotificationAsRead = (notification_id) => {
+export const setNotificationAsRead = (notification_id) => {
     return new Promise((resolve, reject) => {
         let sql = `
             UPDATE Notifications 
@@ -119,4 +119,10 @@ exports.setNotificationAsRead = (notification_id) => {
             resolve(result);
         });
     })
+}
+
+export default {
+    createNotification,
+    getNotifications,
+    setNotificationAsRead
 }

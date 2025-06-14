@@ -1,5 +1,5 @@
-const mysql = require('mysql2');
-const dotenv =require('dotenv');
+import mysql from 'mysql2';
+import dotenv from 'dotenv';
 dotenv.config({path: '../config/.env'});
 
 //Create mySQL Connection using data stored in .env file
@@ -22,4 +22,4 @@ meNexus.connect((err) => {
 });
 
 // Export the connection to use it in other modules
-module.exports = meNexus;
+export default meNexus;

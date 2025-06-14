@@ -1,6 +1,6 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js";
 
-exports.createComment = (user_id, resource_type, resource_id, content) => {
+export const createComment = (user_id, resource_type, resource_id, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
             INSERT INTO PostComments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
@@ -17,7 +17,7 @@ exports.createComment = (user_id, resource_type, resource_id, content) => {
     });
 };
 
-exports.updateComment = (comment_id, updated_content) => {
+export const updateComment = (comment_id, updated_content) => {
     return new Promise((resolve, reject) => {
         const sql = `
             UPDATE PostComments 
@@ -36,7 +36,7 @@ exports.updateComment = (comment_id, updated_content) => {
     });
 };
 
-exports.deleteComment = (comment_id) => {
+export const deleteComment = (comment_id) => {
     return new Promise((resolve, reject) => {
         const deleteSql = `
             DELETE FROM PostComments 
@@ -54,7 +54,7 @@ exports.deleteComment = (comment_id) => {
     })
 }
 
-exports.getComments = (resource_type, resource_id) => {
+export const getComments = (resource_type, resource_id) => {
     return new Promise((resolve, reject) => {
         let sql = "";
         const params = [`%${resource_id}%`];
@@ -103,4 +103,11 @@ exports.getComments = (resource_type, resource_id) => {
                 break;
         }
     })
+}
+
+export default {
+    createComment,
+    updateComment,
+    deleteComment,
+    getComments,
 }

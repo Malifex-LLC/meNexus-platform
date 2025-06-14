@@ -1,6 +1,6 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js";
 
-exports.uploadProfilePicture = (profilePicturePath, user_id) => {
+export const uploadProfilePicture = (profilePicturePath, user_id) => {
     return new Promise((resolve, reject) => {
 
         // Update the orbitdb with the new profile picture path
@@ -21,3 +21,7 @@ exports.uploadProfilePicture = (profilePicturePath, user_id) => {
         });
     });
 }
+
+export default {
+    uploadProfilePicture,
+};

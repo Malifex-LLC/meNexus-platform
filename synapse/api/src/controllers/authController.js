@@ -1,10 +1,10 @@
-const crypto = require('crypto');
-const User = require("../models/user");
-const { storePublicKey, getUserIdByPublicKey, getAllPublicKeys } = require('../../../../synapse/src/orbitdb/userPublicKeys')
-const { verifySignature, generateCryptoKeys } = require('../utils/cryptoUtils')
+import crypto from 'crypto';
+import User from "../models/user.js" ;
+import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
+import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 
 // Account registration logic
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
     try {
         const { publicKey, handle, display_name } = req.body;
         console.log("Received data:", { publicKey, handle, display_name });
@@ -39,21 +39,21 @@ exports.createUser = async (req, res) => {
 // Generates cryptographic public/private key pairs
 // Not the preferred method as its generated on api instead of web
 // security risk for privateKey...used mainly to convert meNexus-legacy accounts to PKI
-exports.generateCryptoKeys = async (req, res) => {
-    const newCryptoKeys = await generateCryptoKeys()
+export const generateCryptoKeys = async (req, res) => {
+    const newCryptoKeys = await generateCryptoKeysUtil()
     return res.status(200).json(newCryptoKeys);
 }
 
 // Stores provided publicKey and associates provided userId
 // used mainly to convert meNexus-legacy accounts to PKI
-exports.storePublicKey = async (req, res) => {
+export const storePublicKey = async (req, res) => {
     const {userId, publicKey} = req.query;
     if (!userId || !publicKey) {
         return res.status(400).json({ error: 'No userId or publicKey provided' });
     }
 
     try {
-        await storePublicKey(userId, publicKey);
+        await storePublicKeyInDB(userId, publicKey);
         return res.status(200).json({ message: `userId: ${userId} and publicKey: ${publicKey} stored successfully` });
     } catch (error) {
         console.error("Error in /storePublicKey:", error);
@@ -61,12 +61,12 @@ exports.storePublicKey = async (req, res) => {
 }
 
 // Retrieves a user_id associated with provided public key
-exports.getUserIdByPublicKey = async (req, res) => {
+export const getUserIdByPublicKey = async (req, res) => {
     console.log("getUserIdByPublicKey called for: ", req.query.publicKey);
     const publicKey = req.query.publicKey;
 
     try {
-        const userId = await getUserIdByPublicKey(publicKey);
+        const userId = await getUserIdByPublicKeyInDB(publicKey);
         if (userId) {
             console.log(`userId: ${userId}`);
             res.status(200).json(userId)
@@ -80,10 +80,10 @@ exports.getUserIdByPublicKey = async (req, res) => {
     }
 }
 
-exports.getAllPublicKeys = async (req, res) => {
+export const getAllPublicKeys = async (req, res) => {
     console.log("getAllPublicKeys called");
     try {
-        const publicKeys = await getAllPublicKeys();
+        const publicKeys = await getAllPublicKeysInDB();
         console.log("Public keys: ", publicKeys);
         return res.status(200).json(publicKeys);
     } catch (error) {
@@ -92,7 +92,7 @@ exports.getAllPublicKeys = async (req, res) => {
 }
 
 // Provide a crypto challenge for user to sign
-exports.getCryptoChallenge = (req, res) => {
+export const getCryptoChallenge = (req, res) => {
     const challenge = crypto.randomBytes(32).toString('hex'); // Generate challenge
 
     // Store the challenge in the session for later verification
@@ -101,7 +101,7 @@ exports.getCryptoChallenge = (req, res) => {
 };
 
 // Verify the challenge to signature to authenticate via private key
-exports.verifyCryptoSignature = async (req, res) => {
+export const verifyCryptoSignature = async (req, res) => {
     const {signature}  = req.body;
     const {challenge} = req.body;
     const {publicKey} = req.body;
@@ -115,7 +115,7 @@ exports.verifyCryptoSignature = async (req, res) => {
     try {
         if (isValid) {
             console.log("Signature is valid");
-            const user_id = getUserIdByPublicKey(publicKey);
+            const user_id = getUserIdByPublicKeyInDB(publicKey);
             const user_id_int =  parseInt(await user_id);
 
             if (user_id_int) {
@@ -141,7 +141,7 @@ exports.verifyCryptoSignature = async (req, res) => {
 };
 
 // Logout logic
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
     req.logout((err) => {
         if (err) {
             console.error('Error during logout:', err);
@@ -162,10 +162,22 @@ exports.logout = (req, res) => {
     });
 }
 
-exports.updateAccountSettings = async (req, res) => {
+export const updateAccountSettings = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
     // TODO updateAccountSettings needs to be updated to support updating public/private keys instead of email/password
+}
+
+export default {
+    createUser,
+    generateCryptoKeys,
+    storePublicKey,
+    getUserIdByPublicKey,
+    getAllPublicKeys,
+    getCryptoChallenge,
+    verifyCryptoSignature,
+    logout,
+    updateAccountSettings
 }

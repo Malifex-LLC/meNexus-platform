@@ -1,5 +1,6 @@
-const session = require('express-session');
-require('dotenv').config();
+import session from 'express-session';
+import dotenv from 'dotenv'
+dotenv.config();
 
 const sessionMiddleware = session({
     // TODO replace with a secure, random session secret
@@ -13,4 +14,4 @@ const sessionMiddleware = session({
     }
 })
 
-module.exports = sessionMiddleware;
+export default sessionMiddleware;

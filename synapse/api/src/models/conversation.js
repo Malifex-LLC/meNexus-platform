@@ -1,6 +1,6 @@
-const meNexus = require("../../config/mysql.js");
+import meNexus from "../../config/mysql.js";
 
-exports.getConversations = (user_id) => {
+export const getConversations = (user_id) => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT
@@ -44,7 +44,7 @@ exports.getConversations = (user_id) => {
     });
 };
 
-exports.createConversation = (user_id) => {
+export const createConversation = (user_id) => {
     return new Promise((resolve, reject) => {
         let newConversationId;
 
@@ -80,7 +80,7 @@ exports.createConversation = (user_id) => {
     });
 }
 
-exports.updateConversationParticipants = (conversation_id, newParticipantsHandle) => {
+export const updateConversationParticipants = (conversation_id, newParticipantsHandle) => {
     return new Promise((resolve, reject) => {
         const getParticipantUserIdSql = `
             SELECT user_id 
@@ -116,4 +116,10 @@ exports.updateConversationParticipants = (conversation_id, newParticipantsHandle
             }
         });
     });
+}
+
+export default {
+    getConversations,
+    createConversation,
+    updateConversationParticipants,
 }

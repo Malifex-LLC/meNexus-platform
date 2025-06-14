@@ -26,6 +26,8 @@ export const ACTION_TYPES = {
     PEER: {
         ADD_PEER: 'PEER_ADD_PEER',
         REMOVE_PEER: 'PEER_REMOVE_PEER',
+        REQUEST_PUBLIC_KEY: 'PEER_REQUEST_PUBLIC_KEY',
+        RESPONSE_PUBLIC_KEY: 'PEER_RESPONSE_PUBLIC_KEY',
     },
 
     // Messaging and Notifications
@@ -36,6 +38,8 @@ export const ACTION_TYPES = {
 
     // Health Action
     HEALTH: {
+        PING: 'HEALTH_PING',
+        PONG: 'HEALTH_PONG',
         ECHO: 'HEALTH_ECHO',
     },
 

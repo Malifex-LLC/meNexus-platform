@@ -1,7 +1,7 @@
 // Import the Follower model
-const Follower = require('../models/follower')
+import Follower from '../models/follower.js'
 
-exports.followUser = async (req, res) => {
+export const followUser = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -24,7 +24,7 @@ exports.followUser = async (req, res) => {
     return res.status(200).json({result});
 }
 
-exports.unfollowUser = async (req, res) => {
+export const unfollowUser = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -47,7 +47,7 @@ exports.unfollowUser = async (req, res) => {
     return res.status(200).json({result});
 }
 
-exports.followCheck = async (req, res) => {
+export const followCheck = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -68,4 +68,10 @@ exports.followCheck = async (req, res) => {
     }
 
     return res.status(200).json(result);
+}
+
+export default {
+    followUser,
+    unfollowUser,
+    followCheck,
 }

@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import { createLibp2pInstance } from '../config/libp2p.js'
-import { isValidMessageType } from '../../protocols/snp/messageTypes.js'
-import { isValidActionType } from '../../protocols/snp/actionTypes.js'
-import { isValidResourceType } from '../../protocols/snp/resourceTypes.js'
+import { isValidMessageType } from '../protocols/snp/messageTypes.js'
+import { isValidActionType } from '../protocols/snp/actionTypes.js'
+import { isValidResourceType } from '../protocols/snp/resourceTypes.js'
 
 // SNP message validation function
 const validateMessage = (message) => {
@@ -29,6 +29,7 @@ const validateMessage = (message) => {
 };
 
 export const initializeSnpPubSub = async (externalLibp2pInstance = null) => {
+    console.log('Initializing snpPubSub...');
     const libp2pInstance = externalLibp2pInstance || await createLibp2pInstance();
 
     if (!libp2pInstance) {

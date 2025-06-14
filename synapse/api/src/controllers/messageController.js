@@ -1,7 +1,7 @@
 // Import Message model
-const Message = require("../models/message");
+import Message from "../models/message.js"
 
-exports.getMessages = async (req, res) => {
+export const getMessages = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -19,7 +19,7 @@ exports.getMessages = async (req, res) => {
     return res.status(200).json(results);
 }
 
-exports.createMessage = async (req, res) => {
+export const createMessage = async (req, res) => {
     console.log('/createMessage called');
     console.log('/createMessage req.body:', req.body);
     console.log('/createMessage req.query:', req.query);
@@ -47,10 +47,16 @@ exports.createMessage = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.setMessagesAsRead = async (req, res) => {
+export const setMessagesAsRead = async (req, res) => {
     console.log('/setMessagesAsRead called for: ', req.body);
     const { conversation_id } = req.body;
 
     const results = await Message.setMessageAsRead(conversation_id);
     return res.status(200).json(results);
+}
+
+export default {
+    getMessages,
+    createMessage,
+    setMessagesAsRead
 }

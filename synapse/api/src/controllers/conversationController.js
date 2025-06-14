@@ -1,7 +1,7 @@
 // Import Conversation model
-const Conversation = require('../models/conversation');
+import Conversation from '../models/conversation.js';
 
-exports.getConversations = async (req, res) => {
+export const getConversations = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -17,7 +17,7 @@ exports.getConversations = async (req, res) => {
     res.status(200).json(results);
 }
 
-exports.createConversation = async (req, res) => {
+export const createConversation = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -34,7 +34,7 @@ exports.createConversation = async (req, res) => {
     return res.status(200).json(result);
 }
 
-exports.updateConversationParticipants = async (req, res) => {
+export const updateConversationParticipants = async (req, res) => {
     const newParticipantsHandle = req.body.participants;
     const conversation_id = req.body.conversation_id;
     console.log("/updateConversationParticipants called for participant: ", newParticipantsHandle, ' and conversation_id: ', conversation_id);
@@ -47,4 +47,10 @@ exports.updateConversationParticipants = async (req, res) => {
         console.error("Error updating conversation participants", error);
         return res.status(400).json({ error: error.message });
     }
+}
+
+export default {
+    getConversations,
+    createConversation,
+    updateConversationParticipants
 }

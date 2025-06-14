@@ -1,7 +1,7 @@
-const meNexus = require('../../config/mysql.js');
+import meNexus from '../../config/mysql.js';
 
 // Fetch authentication details by email
-exports.getAuthByEmail = (email) => {
+export const getAuthByEmail = (email) => {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT * 
@@ -21,7 +21,7 @@ exports.getAuthByEmail = (email) => {
 };
 
 // Fetch user by email (Authentication table)
-exports.getUserByEmail = async (email) => {
+export const getUserByEmail = async (email) => {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT u.*, a.email, a.auth_provider
@@ -41,7 +41,7 @@ exports.getUserByEmail = async (email) => {
     });
 };
 
-exports.updateAccountSettings = (authFields, authValues) => {
+export const updateAccountSettings = (authFields, authValues) => {
     return new Promise((resolve, reject) => {
         const authSql = `
             UPDATE Authentication 
@@ -57,4 +57,10 @@ exports.updateAccountSettings = (authFields, authValues) => {
             resolve(results);
         })
     })
+}
+
+export default {
+    getAuthByEmail,
+    getUserByEmail,
+    updateAccountSettings,
 }

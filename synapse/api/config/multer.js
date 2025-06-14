@@ -1,8 +1,8 @@
-const multer =  require("multer");
-const path = require('path')
+import multer from "multer";
+import path from 'path'
 
 // Configure Multer storage
-const storage = multer.diskStorage({
+export const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // Determine the upload folder based on the uploadType
         const uploadType = req.body.uploadType || req.query.uploadType;
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 });
 
 // Initialize Multer with the storage configuration
-const upload = multer({
+export const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
     fileFilter: (req, file, cb) => {
@@ -42,4 +42,7 @@ const upload = multer({
     },
 });
 
-module.exports = upload;
+export default {
+    storage,
+    upload,
+};

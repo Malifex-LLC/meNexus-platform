@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const postController = require('../controllers/postController');
+import postController from '../controllers/postController.js';
 
 // Define postRoutes and link them to corresponding controller functions
 
@@ -11,4 +11,4 @@ router.get('/getPosts', postController.getPosts);
 router.get('/getUserPosts/:handle', postController.getUserPosts);
 
 // Export the router so it can be used in server.js
-module.exports = router;
+export default router;

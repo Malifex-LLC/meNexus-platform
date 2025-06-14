@@ -19,6 +19,8 @@ export const MESSAGE_TYPES = {
     PEER: {
         ANNOUNCE: 'PEER_ANNOUNCE',
         DISCONNECT: 'PEER_DISCONNECT',
+        REQUEST: 'PEER_REQUEST',
+        RESPONSE: 'PEER_RESPONSE',
     },
 
     // Messaging: Direct or broadcast messages between peers
@@ -29,9 +31,6 @@ export const MESSAGE_TYPES = {
 
     // Health checks: Monitor and debug Synapse health
     HEALTH: {
-        PING: 'HEALTH_PING',
-        PONG: 'HEALTH_PONG',
-        ECHO: 'HEALTH_ECHO',
         CHECK: 'HEALTH_CHECK',
         STATUS: 'HEALTH_STATUS',
     },

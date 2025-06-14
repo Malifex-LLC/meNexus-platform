@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const followerController = require('../controllers/followerController');
+import followerController from '../controllers/followerController.js';
 
 // Define follwerRoutes and link them to corresponding controller functions
 
@@ -9,4 +9,4 @@ router.delete('/unfollowUser', followerController.unfollowUser);
 router.get('/followCheck', followerController.followCheck)
 
 // Export the router so it can be used in server.js
-module.exports = router;
+export default router;

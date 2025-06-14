@@ -1,8 +1,8 @@
 // Import the Post model
-const Post = require('../models/post');
+import Post from '../models/post.js';
 
 // Post creation logic
-exports.createPost = async (req, res) => {
+export const createPost = async (req, res) => {
     const { content, handle } = req.body;
     if (!content || !handle) {
         return res.status(400).json({error: 'Content or handle not found.'});
@@ -18,7 +18,7 @@ exports.createPost = async (req, res) => {
 };
 
 // Post update logic
-exports.updatePost = async (req, res) => {
+export const updatePost = async (req, res) => {
     const postId = req.params.postId;
     const updatedContent = req.body.content;
     if (!postId || !updatedContent) {
@@ -35,7 +35,7 @@ exports.updatePost = async (req, res) => {
 }
 
 // Post delete logic
-exports.deletePost = async (req, res) => {
+export const deletePost = async (req, res) => {
     const postId = req.params.postId;
     if (!postId) {
         return res.status(400).json({error: 'postID not found.'});
@@ -51,7 +51,7 @@ exports.deletePost = async (req, res) => {
 }
 
 // Post fetching logic
-exports.getPosts = async (req, res) => {
+export const getPosts = async (req, res) => {
     if (!req.session || !req.session.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
@@ -71,7 +71,7 @@ exports.getPosts = async (req, res) => {
     }
 }
 
-exports.getUserPosts = async (req, res) => {
+export const getUserPosts = async (req, res) => {
     const handle = req.params.handle
     if (!handle) {
         return res.status(401).json({error: 'User not authenticated'});
@@ -84,4 +84,12 @@ exports.getUserPosts = async (req, res) => {
         console.error('Error in getUserPosts:', error);
         res.status(500).json({error: 'Failed to get user posts.'});
     }
+}
+
+export default {
+    createPost,
+    updatePost,
+    deletePost,
+    getPosts,
+    getUserPosts,
 }
