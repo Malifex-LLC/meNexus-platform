@@ -5,6 +5,7 @@ import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
 
@@ -15,10 +16,12 @@ const Synapse = () => {
     const [currentHandle, setCurrentHandle] = useState(handle || null); // State for the current handle
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
     const [session_user_id, setSession_user_id] = useState(null);
-    const [posts, setPosts] = useState([]); // State for user posts
+    const [posts, setPosts] = useState([]); // State for synapse posts
+    const [synapseMetadata, setSynapseMetadata] = useState([]);
     const navigate = useNavigate(); // React Router navigate
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getSynapseMetadata, loading, error } = useGetSynapseMetadata();
     const { getSynapsePosts, loading: synapsePostsLoading, error: synapsePostsError } = useGetSynapsePosts();
 
     // Hooks for editing and deleting posts
@@ -31,7 +34,6 @@ const Synapse = () => {
     } = useEditPost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
     const { handleDelete } = useDeletePost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
 
-    // Redirect from /home to /home/:handle if no handle is provided
     useEffect(() => {
         const fetchSessionUser = async () => {
             if (!handle && !isHandleSet) {
@@ -63,15 +65,17 @@ const Synapse = () => {
     }, [getSessionUser, handle, isHandleSet, navigate]);
 
     useEffect(() => {
-        const fetchSynapsePosts = async () => {
+        const fetchSynapseData = async () => {
             try {
                 const synapsePostsData = await getSynapsePosts(publicKey);
                 setPosts(synapsePostsData);
+                const synapseMetadataResponse = await getSynapseMetadata(publicKey);
+                setSynapseMetadata(synapseMetadataResponse);
             } catch (error) {
                 console.error("Error fetching Synapse posts", error);
             }
         };
-        fetchSynapsePosts();
+        fetchSynapseData();
     },[]);
 
     if (synapsePostsLoading) {
@@ -84,7 +88,10 @@ const Synapse = () => {
 
     return(
         <div className="bg-background ">
-            Synapse publicKey: {publicKey}
+            <div>
+                {synapseMetadata.metadata.name}
+                Synapse publicKey: {publicKey}
+            </div>
             <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm

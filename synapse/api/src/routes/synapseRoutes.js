@@ -4,6 +4,8 @@ import synapseController from '../controllers/synapseController.js';
 
 // Define synapseRoutes and link them to corresponding controller functions
 
+router.get('/getSynapseMetadata', synapseController.getSynapseMetadata);
+router.get('/getLocalSynapseMetadata', synapseController.getLocalSynapseMetadata);
 router.get('/getSynapseUsers', synapseController.getSynapseUsers);
 router.get('/getSynapsePosts', synapseController.getSynapsePosts);
 router.get('/getSynapseUserPosts', synapseController.getSynapseUserPosts);

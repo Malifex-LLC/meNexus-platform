@@ -270,6 +270,32 @@ const processMessage = async (message) => {
             console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
             if (message.actionType === ACTION_TYPES.DATA.QUERY) {
                 console.log(`Received DATA_QUERY from ${message.meta.sender}.`);
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.SYNAPSE_METADATA) {
+                    console.log(`Received SYNAPSE_METADATA request from ${message.meta.sender}.`);
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_SYNAPSE_METADATA,
+                        withCredentials: true,
+                    });
+                    console.log("GET_SYNAPSE_METADATA response ", response);
+                    const metadata = response.data;
+
+                    const metadataResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        { metadata },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, metadataResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peerId - response not sent.');
+                    }
+                }
                 if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_USERS) {
                     console.log(`Received ALL_USERS request from ${message.meta.sender}.`);
                     const response = await sendRequest({

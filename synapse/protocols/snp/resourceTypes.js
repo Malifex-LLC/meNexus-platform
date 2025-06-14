@@ -2,6 +2,7 @@
  * Resource types supported by the protocol
  */
 export const RESOURCE_TYPES = {
+    SYNAPSE_METADATA: 'SYNAPSE_METADATA',
     USER: 'USER',
     ALL_USERS: 'ALL_USERS',
     POST: 'POST',
