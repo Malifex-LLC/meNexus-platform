@@ -7,6 +7,8 @@ import useGetNotifications from "../../api/hooks/useGetNotifications.js";
 import useNotificationsWebSocket from '../../api/hooks/useNotificationsWebSocket.js'
 import useSetNotificationAsRead from "../../api/hooks/useSetNotificationAsRead.js";
 import { FaHome } from "react-icons/fa";
+import { IoGitNetworkSharp } from "react-icons/io5";
+import { FaNetworkWired } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
 import { FaEnvelope } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
@@ -91,6 +93,9 @@ const Header = () => {
             <div className={`flex-1 flex justify-center gap-8 text-3xl md:text-4xl ml-[175px]`}>
                 <Link to={'/home'} className={isActive('/home')}>
                     <FaHome />
+                </Link>
+                <Link to={'/synapseExplore'} className={isActive('/synapseExplore')}>
+                    <FaNetworkWired />
                 </Link>
                 <Link to={'/profile'} className={isActive('/profile')}>
                     <IoPerson />
