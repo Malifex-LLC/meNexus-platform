@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+
 import { getDatabase} from '#config/orbitdb-service.js';
 
-const databaseAddress = '/orbitdb/zdpuAvABwAMwq9HBnBtzk8yiXwqyLvPY35mSbj53DY7Uas1wL'
+const databaseAddress = process.env.PUBLIC_KEYS_DB_ADDR
 let publicKeysDB = null;
 
 export async function getPublicKeysDB() {

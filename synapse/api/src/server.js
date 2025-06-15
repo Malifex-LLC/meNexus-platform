@@ -11,8 +11,8 @@ import { createWebSocketServer } from '../config/websocket.js';
 import sessionMiddleware         from './middlewares/session.js';
 // import sessionLogger           from './middlewares/sessionLogger.js'
 
-import { initializeOrbitDB,
-    closeOrbitDB }          from '../../config/orbitdb-service.js';
+import { initializeOrbitDB, closeOrbitDB }          from '../../config/orbitdb-service.js';
+import { getPublicKeysDB } from '../../src/orbitdb/userPublicKeys.js'
 
 // Route modules
 import authRoutes         from './routes/authRoutes.js';
@@ -67,6 +67,8 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     /* ---- OrbitDB --------------------------------------------------------- */
     await initializeOrbitDB();
     console.log('OrbitDB service running');
+    console.log('Getting publicKeysDB');
+    await getPublicKeysDB();
 
     process.once('SIGINT', async () => {
         await closeOrbitDB();
