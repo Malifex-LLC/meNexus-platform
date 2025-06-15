@@ -1,15 +1,28 @@
+// scripts/createPublicKeyDB.js
 import { initializeOrbitDB } from '../config/orbitdb-service.js';
 
-const db = await initializeOrbitDB().then(async (ob) => {
-    const db = await ob.open('meNexus-publicKeys', {
+try {
+    const orbitdb = await initializeOrbitDB();
+
+    // 1. Create (or open-if-already-there) with wide-open ACL
+    console.log("Opening meNexus-publicKeys")
+    const db = await orbitdb.open('meNexus-publicKeys', {
         type: 'documents',
         indexBy: '_id',
         accessController: {
             type: 'orbitdb',
-            write: ['*']          // 👈 open ACL so any Synapse identity may append
+            write: ['*']          // allow any valid OrbitDB identity
         }
     });
-    //await db.load();// force manifest/head write
-    console.log('✔️  New DB address:', db.address.toString());
+    console.log("meNexus-publicKeys opened")
+
+    console.log('\n✔️  New DB address:', db.address.toString(), '\n');
+
+    await db.close();        // flush head to disk
+    await orbitdb.stop();    // clean shutdown
     process.exit(0);
-});
+
+} catch (err) {
+    console.error('Failed to create public-keys DB:', err);
+    process.exit(1);
+}
