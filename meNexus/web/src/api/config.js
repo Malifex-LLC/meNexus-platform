@@ -49,4 +49,11 @@ export const ENDPOINTS = {
     UPLOAD_PROFILE_PICTURE: `${API_BASE_URL}/api/settings/uploadProfilePicture`,
 
     SEARCH: `${API_BASE_URL}/api/search/search`,
+
+    /* ---- SYNAPSE ROUTES ----------------------------------------------------- */
+    GET_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getSynapseMetadata`,
+    GET_LOCAL_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getLocalSynapseMetadata`,
+    GET_SYNAPSE_USERS: `${API_BASE_URL}/synapse/getSynapseUsers`,
+    GET_SYNAPSE_POSTS: `${API_BASE_URL}/synapse/getSynapsePosts`,
+    GET_SYNAPSE_USER_POSTS: `${API_BASE_URL}/synapse/getSynapseUserPosts`,
 };

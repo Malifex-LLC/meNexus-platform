@@ -3,10 +3,45 @@ import { sendMessageWithResponse } from "#src/messenger.js";
 import { MESSAGE_TYPES} from "#protocols/snp/messageTypes.js";
 import { ACTION_TYPES } from '#protocols/snp/actionTypes.js'
 import { RESOURCE_TYPES} from "#protocols/snp/resourceTypes.js";
+import { loadConfig, saveConfig } from '../../../utils/configUtils.js'; // Config file handlers
+const CONFIG_FILE = '../config/synapse-config.json';
 import * as peerStateManager from '#src/peerStateManager.js'
+import path from "path";
 
 // console.log('peerStateManager instance:', import.meta.url);
 // console.log('peerStateManager instance in messenger:', peerStateManager);
+
+export const getSynapseMetadata = async (req, res) => {
+    const synapsePublicKey = req.query.publicKey;
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!synapsePublicKey) {
+        return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
+    const resource = RESOURCE_TYPES.SYNAPSE_METADATA;
+    const metadataRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.DATA.QUERY,
+        { resource },
+        {sender: process.env.PUBLIC_KEY}
+    );
+    try {
+        const response = await sendMessageWithResponse(peerId, metadataRequest);
+        res.status(200).json(response.payload.metadata);
+    } catch (err) {
+        console.error('Error fetching Synapse metadata:', err);
+        res.status(500).json({error: 'Failed to fetch metadata from the synapse.'});
+    }
+}
+
+export const getLocalSynapseMetadata = async (req, res) => {
+    try {
+        const metadata = await loadConfig(CONFIG_FILE);
+        res.status(200).json(metadata);
+    } catch (err) {
+        console.error('Error fetching Local Synapse Metadata:', err);
+        res.status(500).json({error: 'Failed to fetch Metadata from the Synapse '});
+    }
+}
 
 export const getSynapseUsers = async (req, res) => {
     const synapsePublicKey = req.query.publicKey;
@@ -97,6 +132,8 @@ export const getSynapseUserPosts = async (req, res) => {
 }
 
 export default {
+    getSynapseMetadata,
+    getLocalSynapseMetadata,
     getSynapseUsers,
     getSynapsePosts,
     getSynapseUserPosts,
