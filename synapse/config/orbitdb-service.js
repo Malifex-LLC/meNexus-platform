@@ -94,17 +94,6 @@ export async function initializeOrbitDB() {
 
     console.log('Connected peers:', libp2p.getPeers());
 
-    // const db = await orbitdbInstance.open('meNexus-publicKeys', {
-    //     type: 'documents',
-    //     accessController: {
-    //         type: 'orbitdb',
-    //         write: [
-    //             '*',
-    //         ]
-    //     }
-    // })
-
-
     //
     // console.log('Database Address:', db.address);
     console.log('Identity:', orbitdbInstance.identity);
