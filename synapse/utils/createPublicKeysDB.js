@@ -10,7 +10,6 @@ try {
         type: 'documents',
         indexBy: '_id',
         accessController: {
-            type: 'orbitdb',
             write: ['*']          // allow any valid OrbitDB identity
         },
         create: true,
