@@ -12,7 +12,9 @@ try {
         accessController: {
             type: 'orbitdb',
             write: ['*']          // allow any valid OrbitDB identity
-        }
+        },
+        create: true,
+        overwrite: true,
     });
     console.log("meNexus-publicKeys opened")
 
