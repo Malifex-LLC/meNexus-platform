@@ -68,11 +68,11 @@ export async function initializeOrbitDB() {
     const keystorePath = '../src/orbitdb/keystore';
     const keystore = await KeyStore({ path: keystorePath });
 
-    const id = 'meNexus-orbitdb'
-    const identities = await Identities({ keystore });
-    const identity = identities.createIdentity({ id })
-
     ipfsInstance = await createHelia({ libp2p, blockstore, blockBrokers: [bitswap()] })
+
+    const id = 'meNexus-orbitdb'
+    const identities = await Identities({ keystore, ipfs: ipfsInstance });
+    const identity = identities.createIdentity({ id })
 
     orbitdbInstance = await createOrbitDB({
         ipfs: ipfsInstance,
