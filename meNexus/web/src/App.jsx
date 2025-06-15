@@ -23,7 +23,7 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/home/:handle" element={<HomePage />} />
 
-                    <Route path="/synapseExplore" element={<SynapseExplorePage />} />
+                    <Route path="/synapse/explore" element={<SynapseExplorePage />} />
                     <Route path="/synapse/:publicKey" element={<SynapsePage />} />
 
                     {/* /profile redirects to /profile/:handle based on session user */}

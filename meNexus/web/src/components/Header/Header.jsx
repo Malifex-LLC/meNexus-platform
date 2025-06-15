@@ -94,7 +94,7 @@ const Header = () => {
                 <Link to={'/home'} className={isActive('/home')}>
                     <FaHome />
                 </Link>
-                <Link to={'/synapseExplore'} className={isActive('/synapseExplore')}>
+                <Link to={'/synapse/explore'} className={isActive('/synapse/')}>
                     <FaNetworkWired />
                 </Link>
                 <Link to={'/profile'} className={isActive('/profile')}>

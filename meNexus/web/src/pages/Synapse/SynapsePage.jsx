@@ -4,7 +4,6 @@ import Synapse from './Synapse.jsx';
 const SynapsePage = () => {
     return (
         <SynapseLayout>
-            Synapse Page
             <Synapse />
         </SynapseLayout>
     );

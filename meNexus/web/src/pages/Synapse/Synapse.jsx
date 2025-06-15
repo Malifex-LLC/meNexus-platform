@@ -17,7 +17,7 @@ const Synapse = () => {
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
     const [session_user_id, setSession_user_id] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
-    const [synapseMetadata, setSynapseMetadata] = useState([]);
+    const [synapseMetadata, setSynapseMetadata] = useState(null);
     const navigate = useNavigate(); // React Router navigate
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
@@ -76,7 +76,7 @@ const Synapse = () => {
             }
         };
         fetchSynapseData();
-    },[]);
+    },[publicKey]);
 
     if (synapsePostsLoading) {
         return <div>Loading Synapse Posts...</div>
@@ -88,10 +88,19 @@ const Synapse = () => {
 
     return(
         <div className="bg-background ">
-            <div>
-                {synapseMetadata.metadata.name}
-                Synapse publicKey: {publicKey}
-            </div>
+            {synapseMetadata ? (
+                <header className="p-4 text-foreground">
+                    <h1 className="text-7xl text-brand font-bold">{synapseMetadata.metadata.name}</h1>
+                    <p className="text-3xl text-foreground">
+                        {synapseMetadata.metadata.description}
+                    </p>
+                    <code className="text-xs block mt-2">
+                        publicKey: {synapseMetadata.identity.publicKey}
+                    </code>
+                </header>
+            ) : (
+                <div className="p-4">Loading synapse info…</div>
+            )}
             <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
