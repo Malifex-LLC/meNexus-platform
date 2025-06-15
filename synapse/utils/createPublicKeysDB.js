@@ -5,8 +5,8 @@ try {
     const orbitdb = await initializeOrbitDB();
 
     // 1. Create (or open-if-already-there) with wide-open ACL
-    console.log("Opening meNexus-publicKeys")
-    const db = await orbitdb.open('meNexus-publicKeys', {
+    console.log("Opening meNexus-publicKeys-v2")
+    const db = await orbitdb.open('meNexus-publicKeys-v2', {
         type: 'documents',
         indexBy: '_id',
         accessController: {
@@ -16,7 +16,7 @@ try {
         create: true,
         overwrite: true,
     });
-    console.log("meNexus-publicKeys opened")
+    console.log("meNexus-publicKeys-v2 opened")
 
     console.log('\n✔️  New DB address:', db.address.toString(), '\n');
 
