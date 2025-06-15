@@ -11,6 +11,7 @@ import { webSockets } from '@libp2p/websockets';
 import { noise } from '@chainsafe/libp2p-noise'; // For encryption
 import { mplex } from '@libp2p/mplex';
 import { mdns } from '@libp2p/mdns';
+import { bootstrap } from '@libp2p/bootstrap';
 
 let orbitdbInstance = null; // To hold the OrbitDB instance
 let ipfsInstance = null;
@@ -48,6 +49,12 @@ export async function initializeOrbitDB() {
             identify: identify(),
         },
         peerDiscovery: [
+            bootstrap({
+                list: [
+                    '/ip4/192.168.1.60/tcp/4001/p2p/12D3KooWMgmyd1zh7pB4srggFNiKVb1BbzWzKfBtUnEzbZds8iSe',
+                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWPPHrMDJBJHwxcKgkWSLwphZS9V3X3wDAthpYe1CiDo6Z',
+                ],
+            }),
             mdns({
                 interval: 2000,
             }),
