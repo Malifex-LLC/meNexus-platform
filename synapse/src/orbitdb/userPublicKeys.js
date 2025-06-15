@@ -1,6 +1,6 @@
 import { getDatabase} from '#config/orbitdb-service.js';
 
-const databaseAddress = '/orbitdb/zdpuAwqLXhQp2mLwA3TjCpb3X7pbxnZicUiy5w99bCahERc2W'
+const databaseAddress = '/orbitdb/zdpuAuxZ1JvgFx1RnC5zsxTz6F31gSfJPQPwiGH6SVchqb7RN'
 let publicKeysDB = null;
 
 export async function getPublicKeysDB() {

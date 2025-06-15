@@ -65,7 +65,7 @@ export async function initializeOrbitDB() {
     const directory = '../src/orbitdb'
     const blockstore = new LevelBlockstore(`${directory}/ipfs/blocks`)
 
-    const keystorePath = '../../src/orbitdb/keystore';
+    const keystorePath = '../src/orbitdb/keystore';
     const keystore = await KeyStore({ path: keystorePath });
 
     const id = 'meNexus-orbitdb'
