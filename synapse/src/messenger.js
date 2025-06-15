@@ -274,7 +274,7 @@ const processMessage = async (message) => {
                     console.log(`Received SYNAPSE_METADATA request from ${message.meta.sender}.`);
                     const response = await sendRequest({
                         method: 'GET',
-                        url: ENDPOINTS.GET_SYNAPSE_METADATA,
+                        url: ENDPOINTS.GET_LOCAL_SYNAPSE_METADATA,
                         withCredentials: true,
                     });
                     console.log("GET_SYNAPSE_METADATA response ", response);
