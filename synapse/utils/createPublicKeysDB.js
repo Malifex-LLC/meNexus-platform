@@ -1,5 +1,6 @@
 // scripts/createPublicKeyDB.js
 import { initializeOrbitDB } from '../config/orbitdb-service.js';
+import { IPFSAccessController } from '@orbitdb/core';
 
 try {
     const orbitdb = await initializeOrbitDB();
@@ -9,9 +10,7 @@ try {
     const db = await orbitdb.open('meNexus-publicKeys-v2', {
         type: 'documents',
         indexBy: '_id',
-        accessController: {
-            write: ['*']          // allow any valid OrbitDB identity
-        },
+        AccessController: IPFSAccessController({ write: ['*'] }),
         create: true,
         overwrite: true,
     });
