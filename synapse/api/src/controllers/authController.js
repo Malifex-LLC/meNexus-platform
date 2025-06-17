@@ -123,7 +123,7 @@ export const verifyCryptoSignature = async (req, res) => {
             req.session.user = {
                 publicKey: user.publicKey,
                 handle: user.handle,
-                display_name: user.displayName,
+                displayName: user.displayName,
             };
 
             console.log('Session Data:', req.session.user);

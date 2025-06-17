@@ -6,7 +6,7 @@ import userController from '../controllers/userController.js';
 
 router.get('/getAllUsers', userController.getAllUsers);
 router.get('/getSessionUser', userController.getSessionUser);
-router.get('/getUserById/:user_id', userController.getUserByPublicKey)
+router.get('/getUserByPublicKey', userController.getUserByPublicKey)
 router.get('/getProfile/:handle', userController.getProfile);
 router.put('/updateProfileSettings/:handle', userController.updateProfileSettings);
 

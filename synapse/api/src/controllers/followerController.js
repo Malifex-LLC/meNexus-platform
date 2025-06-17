@@ -53,15 +53,15 @@ export const followCheck = async (req, res) => {
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { user_id } = req.session.user; // Get the current user's ID
+    const { publicKey } = req.session.user; // Get the current user's ID
     const { followed_id } = req.query; // ID of the user being checked
-    console.log("api handling followCheck for followed_id: ", followed_id, "for user_id: ", user_id);
+    console.log("api handling followCheck for followed_id: ", followed_id, "for user_id: ", publicKey);
 
-    if (!user_id || !followed_id) {
+    if (!publicKey || !followed_id) {
         return res.status(400).json({ error: 'Invalid data' });
     }
 
-    const result = await Follower.followCheck(user_id, followed_id);
+    const result = await Follower.followCheck(publicKey, followed_id);
 
     if (result.affectedRows === 0) {
         return res.status(404).json({error: 'User not found'});

@@ -13,10 +13,10 @@ export const getSessionUser = async (req, res) => {
     console.log('Session Data:', req.session);
 
     if (req.session && req.session.user) {
-        const { publicKey, handle, display_name } = req.session.user;
+        const { publicKey, handle, displayName } = req.session.user;
 
         // Ensure the session data contains all necessary fields
-        if (!publicKey || !handle || !display_name) {
+        if (!publicKey || !handle || !displayName) {
             console.error('Incomplete session data');
             return res.status(400).json({ error: 'Incomplete session data' });
         }
@@ -26,7 +26,7 @@ export const getSessionUser = async (req, res) => {
         return res.json({
             publicKey,
             handle,
-            display_name
+            displayName
         });
     } else {
         console.log('User not authenticated');
@@ -35,7 +35,7 @@ export const getSessionUser = async (req, res) => {
 }
 
 export const getUserByPublicKey = async (req, res) => {
-    const { publicKey } = req.params.publicKey;
+    const publicKey = req.query.publicKey;
     try {
         const user = await User.getUserByPublicKey(publicKey);
         res.status(200).json(user);

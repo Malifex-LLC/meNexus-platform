@@ -79,7 +79,7 @@ const Home = () => {
                 fetchPosts();
             }
         }
-    }, [currentHandle, getPosts, isHandleSet, posts.length]);
+    }, []);
 
     // Handle loading and error states for posts
     if (postsLoading) {
