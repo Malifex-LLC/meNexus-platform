@@ -68,13 +68,13 @@ export const getPosts = async (req, res) => {
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { user_id } = req.session.user; // Get the current user's ID
-    if (!user_id) {
+    const { publicKey } = req.session.user; // Get the current user's ID
+    if (!publicKey) {
         return res.status(401).json({ error: 'User not authenticated' });
     }
 
     try {
-        const posts = await Post.getPosts(user_id);
+        const posts = await Post.getPosts(publicKey);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error in getPosts:', error);

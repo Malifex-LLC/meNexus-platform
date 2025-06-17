@@ -13,10 +13,10 @@ export const getSessionUser = async (req, res) => {
     console.log('Session Data:', req.session);
 
     if (req.session && req.session.user) {
-        const { user_id, handle, display_name } = req.session.user;
+        const { publicKey, handle, display_name } = req.session.user;
 
         // Ensure the session data contains all necessary fields
-        if (!user_id || !handle || !display_name) {
+        if (!publicKey || !handle || !display_name) {
             console.error('Incomplete session data');
             return res.status(400).json({ error: 'Incomplete session data' });
         }
@@ -24,7 +24,7 @@ export const getSessionUser = async (req, res) => {
         // Send the user data stored in the session
         console.log('User found in session:', req.session.user);
         return res.json({
-            user_id,
+            publicKey,
             handle,
             display_name
         });
@@ -34,16 +34,15 @@ export const getSessionUser = async (req, res) => {
     }
 }
 
-export const getUserById = async (req, res) => {
-    console.log('/getUser called');
-    const { user_id } = req.query;
-
-    if(!user_id) {
-        return res.status(401).json({ error: 'User not authenticated' });
+export const getUserByPublicKey = async (req, res) => {
+    const { publicKey } = req.params.publicKey;
+    try {
+        const user = await User.getUserByPublicKey(publicKey);
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error getting user by publicKey: ', error);
+        return res.status(500).json({ error: 'Error getting user by publicKey: ', publicKey });
     }
-
-    const user = await User.getUserById(user_id);
-    return res.status(200).json(user);
 }
 
 export const getProfile = async (req, res) => {
@@ -136,7 +135,7 @@ export const updateProfileSettings = async (req, res) => {
 export default {
     getAllUsers,
     getSessionUser,
-    getUserById,
+    getUserByPublicKey,
     getProfile,
     updateProfileSettings,
 }

@@ -6,14 +6,14 @@ const useGetUser = () => {
     console.log("useGetUser called");
     const{ sendRequest, data, loading, error } = useAxios();
 
-    const getUser = async (user_id) => {
-        const url = replaceParams(ENDPOINTS.GET_USER, { user_id });
+    const getUser = async (publicKey) => {
+        const url = replaceParams(ENDPOINTS.GET_USER, { user_id: publicKey });
 
         try {
             const response = await sendRequest({
                 method: "GET",
                 url: url,
-                params: { user_id },
+                params: { publicKey },
                 withCredentials: true
             });
 

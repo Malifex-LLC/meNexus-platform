@@ -115,25 +115,20 @@ export const verifyCryptoSignature = async (req, res) => {
     try {
         if (isValid) {
             console.log("Signature is valid");
-            const user_id = getUserIdByPublicKeyInDB(publicKey);
-            const user_id_int =  parseInt(await user_id);
 
-            if (user_id_int) {
-                const user = await User.getUserById(user_id_int);
-                console.log("user: ",  user);
+            const user = await User.getUserByPublicKey(publicKey);
+            console.log("user: ",  user);
 
-                // Attach session data
-                req.session.user = {
-                    user_id: user.user_id,
-                    handle: user.handle,
-                    display_name: user.display_name,
-                };
+            // Attach session data
+            req.session.user = {
+                publicKey: user.publicKey,
+                handle: user.handle,
+                display_name: user.displayName,
+            };
 
-                console.log('Session Data:', req.session.user);
-                res.status(200).json({message: 'publicKey validated and session user data set'});
-            } else {
-                res.status(404).json({ error: 'No user_id found with that private key.' });
-            }
+            console.log('Session Data:', req.session.user);
+            res.status(200).json({message: 'publicKey validated and session user data set'});
+
         }
     } catch (error) {
         console.error("Error in /verifyCryptoSignature:", error);
