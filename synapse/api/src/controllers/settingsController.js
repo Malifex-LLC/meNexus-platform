@@ -9,7 +9,7 @@ export const uploadProfilePicture = async (req, res) => {
     }
 
     // Validate session user
-    const { user_id } = req.session.user // Extract user ID from the session
+    const { publicKey } = req.session.user // Extract user ID from the session
 
     // Validate uploaded file
     if (!req.file) {
@@ -19,7 +19,7 @@ export const uploadProfilePicture = async (req, res) => {
     const profilePicturePath = `/uploads/profile_pictures/${req.file.filename}`;
     console.log('Profile Picture Path:', profilePicturePath);
 
-    const result = await Settings.uploadProfilePicture(profilePicturePath, user_id);
+    const result = await Settings.uploadProfilePicture(profilePicturePath, publicKey);
     return res.status(200).json(result);
 }
 

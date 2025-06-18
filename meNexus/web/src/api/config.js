@@ -15,7 +15,7 @@ export const ENDPOINTS = {
     GET_PROFILE: `${API_BASE_URL}/api/user/getProfile/:handle`,
 
     UPDATE_ACCOUNT_SETTINGS: `${API_BASE_URL}/api/auth/updateAccountSettings`,
-    UPDATE_PROFILE_SETTINGS: `${API_BASE_URL}/api/user/updateProfileSettings/:handle`,
+    UPDATE_PROFILE_SETTINGS: `${API_BASE_URL}/api/user/updateProfileSettings/:publicKey`,
 
     FOLLOW_USER: `${API_BASE_URL}/api/follow/followUser`,
     UNFOLLOW_USER: `${API_BASE_URL}/api/follow/unfollowUser`,
