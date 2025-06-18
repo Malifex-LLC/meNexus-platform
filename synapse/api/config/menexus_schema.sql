@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `menexus_schema` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `menexus_schema`;
 -- MySQL dump 10.13  Distrib 8.0.40, for macos14 (x86_64)
 --
 -- Host: localhost    Database: menexus_schema
@@ -31,16 +33,6 @@ CREATE TABLE `ConversationParticipants` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ConversationParticipants`
---
-
-LOCK TABLES `ConversationParticipants` WRITE;
-/*!40000 ALTER TABLE `ConversationParticipants` DISABLE KEYS */;
-INSERT INTO `ConversationParticipants` VALUES ();
-/*!40000 ALTER TABLE `ConversationParticipants` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Conversations`
 --
 
@@ -56,16 +48,6 @@ CREATE TABLE `Conversations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Conversations`
---
-
-LOCK TABLES `Conversations` WRITE;
-/*!40000 ALTER TABLE `Conversations` DISABLE KEYS */;
-INSERT INTO `Conversations` VALUES ();
-/*!40000 ALTER TABLE `Conversations` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Followers`
 --
 
@@ -78,16 +60,6 @@ CREATE TABLE `Followers` (
                              `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Followers`
---
-
-LOCK TABLES `Followers` WRITE;
-/*!40000 ALTER TABLE `Followers` DISABLE KEYS */;
-INSERT INTO `Followers` VALUES ();
-/*!40000 ALTER TABLE `Followers` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Messages`
@@ -113,16 +85,6 @@ CREATE TABLE `Messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Messages`
---
-
-LOCK TABLES `Messages` WRITE;
-/*!40000 ALTER TABLE `Messages` DISABLE KEYS */;
-INSERT INTO `Messages` VALUES ();
-/*!40000 ALTER TABLE `Messages` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Notifications`
 --
 
@@ -142,16 +104,6 @@ CREATE TABLE `Notifications` (
                                  PRIMARY KEY (`notification_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=358 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Notifications`
---
-
-LOCK TABLES `Notifications` WRITE;
-/*!40000 ALTER TABLE `Notifications` DISABLE KEYS */;
-INSERT INTO `Notifications` VALUES ();
-/*!40000 ALTER TABLE `Notifications` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `PostComments`
@@ -175,16 +127,6 @@ CREATE TABLE `PostComments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `PostComments`
---
-
-LOCK TABLES `PostComments` WRITE;
-/*!40000 ALTER TABLE `PostComments` DISABLE KEYS */;
-INSERT INTO `PostComments` VALUES ();
-/*!40000 ALTER TABLE `PostComments` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Posts`
 --
 
@@ -203,16 +145,6 @@ CREATE TABLE `Posts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Posts`
---
-
-LOCK TABLES `Posts` WRITE;
-/*!40000 ALTER TABLE `Posts` DISABLE KEYS */;
-INSERT INTO `Posts` VALUES ();
-/*!40000 ALTER TABLE `Posts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Reactions`
 --
 
@@ -228,15 +160,6 @@ CREATE TABLE `Reactions` (
                              PRIMARY KEY (`reaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Reactions`
---
-
-LOCK TABLES `Reactions` WRITE;
-/*!40000 ALTER TABLE `Reactions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Reactions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Themes`
@@ -260,15 +183,6 @@ CREATE TABLE `Themes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Themes`
---
-
-LOCK TABLES `Themes` WRITE;
-/*!40000 ALTER TABLE `Themes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Themes` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `UserSettings`
 --
 
@@ -287,15 +201,6 @@ CREATE TABLE `UserSettings` (
                                 PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `UserSettings`
---
-
-LOCK TABLES `UserSettings` WRITE;
-/*!40000 ALTER TABLE `UserSettings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `UserSettings` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -306,4 +211,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-18  2:30:17
+-- Dump completed on 2025-06-18  2:44:16
