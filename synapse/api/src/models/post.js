@@ -60,17 +60,29 @@ export const deletePost = (postId) => {
 export const getAllPosts = async (req, res) => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT Posts.*, Users.display_name, Users.handle
+            SELECT *
             FROM Posts
-            INNER JOIN Users ON Posts.user_id = Users.user_id
             ORDER BY Posts.created_at DESC
         `;
-        meNexus.query(query, (err, results) => {
+        meNexus.query(query, async (err, results) => {
             if (err) {
                 console.error('Database error in getAllPosts:', err);
                 return reject(err)
             }
-            resolve(results);
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
         });
     });
 };
