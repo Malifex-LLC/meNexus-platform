@@ -30,6 +30,8 @@ export async function createGlobalUser(publicKey, handle, displayName) {
         location: 'Update your location',
         profilePicture: '/uploads/profile_pictures/default_avatar.jpeg',
         profileBanner: '/assets/default_profile_banner.jpg',
+        followers: [],
+        following: [],
         synapses: [], // Will append Synapse publicKeys here when user logs in to other Synapses
         createdAt: new Date().toISOString(),
         is_online: false,

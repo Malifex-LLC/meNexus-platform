@@ -84,6 +84,8 @@ const ProfileCard = ({publicKey, handle}) => {
         const fetchFollowStatus = async () => {
             try {
                 const isCurrentlyFollowing = await followCheck(user.publicKey);
+                console.log('profileCard calling followCheck for followedPublicKey: ', user.publicKey);
+                console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
                 setIsFollowing(isCurrentlyFollowing);
             } catch (error) {
                 console.error("Error fetching follow status:", error);

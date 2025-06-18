@@ -1,94 +1,81 @@
 import meNexus from "../../config/mysql.js"
+import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
 
-// Logic to follow a user
-export const followUser = (publicKey, followed_id) => {
-    return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO Followers (follower_public_key, followed_public_key) VALUES (?, ?)';
+export const followUser = async (publicKey, followedPublicKey) => {
+    try {
+        const db = await getGlobalUsersDB();
+        const [followedUser] = await db.query(doc => doc._id === followedPublicKey);
+        const [followingUser] = await db.query(doc => doc._id === publicKey);
+        console.log('followedUser query response: clear', followedUser);
 
-        meNexus.query(sql, [publicKey, followed_id], (err, result) => {
-            if (err) {
-                console.error('Error adding follow:', err.message);
-                return reject(err);
-            }
-
-            resolve(result)
-        });
-    })
+        if (!followedUser.followers.includes(publicKey)) {
+            followedUser.followers.push(publicKey);
+            followingUser.following.push(followedPublicKey);
+            await db.put(followedUser);
+            await db.put(followingUser);
+            return true;
+        }
+    } catch (err) {
+        console.error('Error following user: ', err);
+    }
 }
 
-// Logic to unfollow a user
-export const unfollowUser = (publicKey, followed_id) => {
-    return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM Followers WHERE follower_public_key = ? AND followed_public_key = ?';
-        meNexus.query(sql, [publicKey, followed_id], (err, result) => {
-            if (err) {
-                console.error('Error removing follow:', err.message);
-                return reject(err);
-            }
+export const unfollowUser = async (publicKey, followedPublicKey) => {
+    try {
+        const db = await getGlobalUsersDB();
+        const [followedUser] = await db.query(doc => doc._id === followedPublicKey);
+        const [followingUser] = await db.query(doc => doc._id === publicKey);
 
-            resolve(result)
-        });
-    })
+        // Safely push if not already following
+        if (followedUser.followers.includes(publicKey)) {
+            followedUser.followers = followedUser.followers.filter(f => f !== publicKey);
+            await db.put(followedUser); // This saves the change
+        }
+        if (followingUser.followers.includes(followedPublicKey)) {
+            followingUser.followers = followingUser.followers.filter(f => f !== followedPublicKey);
+            await db.put(followingUser); // This saves the change
+        }
+    } catch (err) {
+        console.error('Error following user: ', err);
+    }
 }
 
-// Logic to check if a user is following another user
-export const followCheck = (publicKey, followedPublicKey) => {
-    return new Promise((resolve, reject) => {
-        const sql = `
-            SELECT * 
-            FROM Followers 
-            WHERE follower_public_key = ? AND followed_public_key = ?
-         `;
+export const followCheck = async (publicKey, followedPublicKey) => {
+    try {
+        const db = await getGlobalUsersDB();
+        const [followedUser] = await db.query(doc => doc._id === followedPublicKey);
 
-        meNexus.query(sql, [publicKey, followedPublicKey], (err, results) => {
-            if (err) {
-                console.error('Error checking follow status:', err);
-                return reject(err);
-            }
+        if (!followedUser || !Array.isArray(followedUser.followers)) {
+            return false;
+        }
 
-            const isFollowing = results.length > 0; // If a record exists, the user is following
-            console.log("isFollowing: ", isFollowing);
-            resolve({isFollowing});
-        });
-    });
+        const isFollowing = followedUser.followers.includes(publicKey);
+        return { isFollowing };
+    } catch (err) {
+        console.error('Error during followCheck: ', err);
+        return { isFollowing: false };
+    }
+};
+
+
+export const getFollowerCount = async (publicKey) => {
+    try {
+        const db = await getGlobalUsersDB();
+        const [user] = await db.query(doc => doc._id === publicKey);
+        return user.followers.length;
+    } catch (err) {
+        console.error('Error fetching follower count:', err);
+    }
 }
 
-export const getFollowerCount = (publicKey) => {
-    return new Promise((resolve, reject) => {
-        const sql = `
-            SELECT COUNT(*) AS follower_count 
-            FROM Followers 
-            WHERE followed_public_key = ?
-        `;
-
-        meNexus.query(sql, [publicKey], (err, result) => {
-            if (err) {
-                console.error('Error fetching follower count:', err);
-                return reject(err);
-            }
-
-            resolve(result[0])
-        })
-    })
-}
-
-export const getFollowingCount = (publicKey) => {
-    return new Promise((resolve, reject) => {
-        const sql = `
-            SELECT COUNT(*) AS following_count 
-            FROM Followers 
-            WHERE follower_public_key = ?
-        `;
-
-        meNexus.query(sql, [publicKey], (err, result) => {
-            if (err) {
-                console.error('Error fetching following count:', err);
-                return reject(err);
-            }
-
-            resolve(result[0])
-        })
-    })
+export const getFollowingCount = async (publicKey) => {
+    try {
+        const db = await getGlobalUsersDB();
+        const [user] = await db.query(doc => doc._id === publicKey);
+        return user.following.length;
+    } catch (err) {
+        console.error('Error fetching follower count:', err);
+    }
 }
 
 export default {

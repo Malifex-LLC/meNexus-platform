@@ -13,6 +13,7 @@ const useGetFollowerCount = () => {
                 withCredentials: true,
             });
 
+            console.log('getFollowerCount response: ', response);
             return response.data;
         } catch (err) {
             console.error('Error getting follower count: ', err);

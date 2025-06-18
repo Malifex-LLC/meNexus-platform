@@ -82,7 +82,7 @@ const SocialPanel = () => {
         const fetchFollowerCount = async () => {
             try {
                 const fetchedFollowerCount = await getFollowerCount(sessionUserPublicKey);
-                setFollowerCount(fetchedFollowerCount.result.follower_count);
+                setFollowerCount(fetchedFollowerCount.result);
             } catch (error) {
                 console.error("Error fetching follower count:", error);
             }
@@ -94,9 +94,9 @@ const SocialPanel = () => {
         const fetchFollowingCount = async () => {
             try {
                 const fetchedFollowingCount = await getFollowingCount(sessionUserPublicKey);
-                setFollowingCount(fetchedFollowingCount.result.following_count);
+                setFollowingCount(fetchedFollowingCount.result);
             } catch (error) {
-                console.error("Error fetching follower count:", error);
+                console.error("Error fetching following count:", error);
             }
         }
         fetchFollowingCount();

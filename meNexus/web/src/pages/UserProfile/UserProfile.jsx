@@ -110,9 +110,8 @@ const UserProfile = () => {
                 try {
                     const userPostsData = await getUserPosts(user.publicKey);
                     setPosts(userPostsData);
-
-                    console.log('calling followCheck for followedPublicKey: ', user.publicKey);
                     const isCurrentlyFollowing = await followCheck(user.publicKey);
+                    console.log('userProfile calling followCheck for followedPublicKey: ', user.publicKey);
                     console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
                     setIsFollowing(isCurrentlyFollowing);
                 } catch (error) {

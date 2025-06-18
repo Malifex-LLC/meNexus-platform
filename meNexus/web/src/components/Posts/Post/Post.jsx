@@ -85,6 +85,8 @@ const Post = ({
         const fetchFollowStatus = async () => {
             try {
                 const isCurrentlyFollowing = await followCheck(publicKey);
+                console.log('Post calling followCheck for followedPublicKey: ', publicKey);
+                console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
                 setIsFollowing(isCurrentlyFollowing);
             } catch (error) {
                 console.error("Error fetching follow status:", error);
