@@ -6,14 +6,14 @@ export const getConversations = async (req, res) => {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-    const { user_id } = req.session.user; // Get the current user's ID
-    console.log('/getConversations called for user_id: ', user_id);
+    const { publicKey } = req.session.user;
+    console.log('/getConversations called for publicKey: ', publicKey);
 
-    if(!user_id) {
+    if(!publicKey) {
         return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    const results = await Conversation.getConversations(user_id);
+    const results = await Conversation.getConversations(publicKey);
     res.status(200).json(results);
 }
 
@@ -22,10 +22,10 @@ export const createConversation = async (req, res) => {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-    const { user_id } = req.session.user;
+    const { publicKey } = req.session.user;
     console.log("/createConversation called for participants");
 
-    const result = await Conversation.createConversation(user_id);
+    const result = await Conversation.createConversation(publicKey);
 
     if(result.affectedRows > 0) {
         res.status(500).json({error: "Failed to create conversation"});

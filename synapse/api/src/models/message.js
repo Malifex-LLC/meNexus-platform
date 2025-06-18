@@ -41,19 +41,17 @@ export const getMessages = (conversation_id) => {
     })
 }
 
-export const createMessage = (user_id, conversation_id, message, participant_id, content) => {
+export const createMessage = (publicKey, conversation_id, message, participant_id, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO Messages (conversation_id, sender_id, receiver_id, content, created_at)
+            INSERT INTO Messages (conversation_id, sender_public_key, receiver_public_key, content, created_at)
             VALUES (?, ?, ?, ?, NOW())
         `;
-
-        meNexus.query(sql, [conversation_id, user_id, participant_id, content], (err, results) => {
+        meNexus.query(sql, [conversation_id, publicKey, participant_id, content], (err, results) => {
             if (err) {
                 console.error('Error creating message', err);
                 return reject(err);
             }
-
             console.log('/createMessage results:', results);
             // Fetch the inserted message with the generated timestamp
             const fetchSql = `
@@ -61,15 +59,12 @@ export const createMessage = (user_id, conversation_id, message, participant_id,
                 FROM Messages
                 WHERE message_id = ?;
              `;
-
             const messageId = results.insertId;
-
             meNexus.query(fetchSql, [messageId], (fetchErr, fetchedResults) => {
                 if (fetchErr) {
                     console.error('Error fetching the created message:', fetchErr);
                     return reject(fetchErr);
                 }
-
                 const fullMessage = fetchedResults[0];
                 console.log('Fetched full message:', fullMessage);
 
