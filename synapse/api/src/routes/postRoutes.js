@@ -7,6 +7,7 @@ import postController from '../controllers/postController.js';
 router.post('/createPost', postController.createPost);
 router.put('/updatePost/:postId', postController.updatePost);
 router.delete('/deletePost/:postId', postController.deletePost);
+router.get('/getPost/:postId', postController.getPost)
 router.get('/getAllPosts', postController.getAllPosts);
 router.get('/getPosts', postController.getPosts);
 router.get('/getUserPosts', postController.getUserPosts);

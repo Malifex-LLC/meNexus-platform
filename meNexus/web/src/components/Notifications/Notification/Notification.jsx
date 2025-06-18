@@ -5,8 +5,8 @@ import useSetNotificationAsRead from "../../../api/hooks/useSetNotificationAsRea
 
 const Notification = ({
                           notification_id,
-                          user_id,
-                          actor_id,
+                          public_key,
+                          actor_public_key,
                           resource_type,
                           resource_id,
                           summary,
@@ -18,14 +18,14 @@ const Notification = ({
     const [actorUser, setActorUser] = useState(null);
 
     useEffect(() => {
-        if (resource_type === "FOLLOW" && actor_id) {
+        if (resource_type === "FOLLOW" && actor_public_key) {
             const fetchActor = async () => {
-                const user = await getUser(actor_id);
+                const user = await getUser(actor_public_key);
                 setActorUser(user);
             };
             fetchActor();
         }
-    }, [actor_id, resource_type]);
+    }, [actor_public_key, resource_type]);
 
     const renderNotification = () => {
         switch (resource_type) {

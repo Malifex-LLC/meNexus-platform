@@ -50,6 +50,22 @@ export const deletePost = async (req, res) => {
     }
 }
 
+export const getPost = async (req, res) => {
+    const postId = req.params.postId;
+    if (!postId) {
+        return res.status(400).json({error: 'postID not found.'});
+    }
+
+    try {
+        const response = await Post.getPost(postId);
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error in getPost:', error);
+        res.status(500).json({error: 'Failed to fetch post.'});
+    }
+}
+
+
 // Get ALL posts (Used for getting all posts from a Synapse)
 export const getAllPosts = async (req, res) => {
     try {
@@ -104,6 +120,7 @@ export default {
     createPost,
     updatePost,
     deletePost,
+    getPost,
     getAllPosts,
     getPosts,
     getUserPosts,

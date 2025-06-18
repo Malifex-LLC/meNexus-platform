@@ -52,8 +52,8 @@ const ProfileCard = ({publicKey, handle}) => {
         console.log("handleFollow for followed_id: ", user.publicKey);
 
         const notification = {
-            user_id: user.publicKey,
-            actor_id: sessionPublicKey,
+            public_key: user.publicKey,
+            actor_public_key: sessionPublicKey,
             resource_type: "FOLLOW",
             resource_id: sessionPublicKey,
             action: "FOLLOW",

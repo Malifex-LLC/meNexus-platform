@@ -12,11 +12,11 @@ import {useNavigate} from "react-router-dom";
 const PostObject = () => {
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const {getPost} = useGetPost();
+    const { getPost } = useGetPost();
     const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
     const navigate = useNavigate();
 
-    const [session_user_id, setSession_user_id] = useState(null);
+    const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const {postId} = useParams();
     const [post, setPost] = useState(null);
 
@@ -32,7 +32,6 @@ const PostObject = () => {
 
     useEffect(() => {
         const fetchPost = async () => {
-            setPost(null);
             try {
                 console.log("Fetching post with id: ", postId);
                 const fetchedPost = await getPost(postId);
@@ -43,13 +42,13 @@ const PostObject = () => {
             }
         }
         fetchPost();
-    }, [postId]);
+    }, []);
 
     useEffect(() => {
         const fetchSessionUser = async () => {
             try {
                 const response = await getSessionUser();
-                setSession_user_id(response.data.user_id);
+                setSessionPublicKey(response.data.publicKey);
             } catch (error) {
                 console.error("Error fetching session user:", error);
             }
@@ -63,11 +62,11 @@ const PostObject = () => {
         <div>
             {post ?
                 <Post
-                    post_id={post.post_id}
-                    user_id={post.user_id}
-                    session_user_id={session_user_id}
+                    postId={post.post_id}
+                    publicKey={post.public_key}
+                    sessionPublicKey={sessionPublicKey}
                     handle={post.handle}
-                    display_name={post.display_name}
+                    displayName={post.displayName}
                     date={post.created_at}
                     content={post.content}
                     comments={0}

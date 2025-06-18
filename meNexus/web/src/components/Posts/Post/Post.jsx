@@ -56,8 +56,8 @@ const Post = ({
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", publicKey);
         const notification = {
-            user_id: publicKey,
-            actor_id: sessionPublicKey,
+            public_key: publicKey,
+            actor_public_key: sessionPublicKey,
             resource_type: "FOLLOW",
             resource_id: sessionPublicKey,
             action: "FOLLOW",
@@ -223,8 +223,8 @@ const Post = ({
                     )}
                     <div className="user-post__comment-form w-full">
                         <CommentForm
-                            user_id={publicKey}
-                            session_user_id={sessionPublicKey}
+                            publicKey={publicKey}
+                            sessionPublicKey={sessionPublicKey}
                             resource_type={resource_type}
                             resource_id={postId}
                             getComments={getComments}

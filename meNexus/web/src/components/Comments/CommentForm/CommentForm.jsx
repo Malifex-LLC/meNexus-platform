@@ -29,8 +29,8 @@ const CommentForm = ({
         };
 
         const notification = {
-            user_id: publicKey,
-            actor_id: actor_id,
+            public_key: publicKey,
+            actor_public_key: actor_id,
             resource_type: resource_type,
             resource_id: resource_id,
             action: action,
@@ -38,8 +38,9 @@ const CommentForm = ({
 
         console.log("Submitting comment:", comment);
         await createComment(comment);
+        await createNotification(notification);
+
         if (publicKey !== sessionPublicKey) {
-            await createNotification(notification);
         }
         setText(""); // Reset the text field after submission
     };

@@ -45,15 +45,44 @@ export const deletePost = (postId) => {
             DELETE FROM Posts 
             WHERE post_id = ?
         `;
-
         meNexus.query(deleteSql, [postId], (deleteErr, deleteResult) => {
             if (deleteErr) {
                 console.error(deleteErr);
                 return reject(new Error('Database error')); // Reject with an error
             }
-
             resolve(deleteResult);
         });
+    })
+}
+
+export const getPost = (postId) => {
+    console.log('getPost() called with postId:', postId);
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT *
+            FROM Posts
+            WHERE Posts.post_id = ?
+        `;
+        meNexus.query(sql, [postId], async (err, result) => {
+            if (err) {
+                console.error('Error fetching post:', err);
+                return reject(new Error(err));
+            }
+            try {
+                const enrichedPost = await Promise.all(result.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPost[0]);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
+        })
     })
 }
 
@@ -158,6 +187,7 @@ export default {
     createPost,
     updatePost,
     deletePost,
+    getPost,
     getAllPosts,
     getPosts,
     getUserPosts,
