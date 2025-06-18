@@ -1,11 +1,11 @@
 import meNexus from "../../config/mysql.js"
 
 // Logic to follow a user
-export const followUser = (user_id, followed_id) => {
+export const followUser = (publicKey, followed_id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO Followers (follower_id, followed_id) VALUES (?, ?)';
+        const sql = 'INSERT INTO Followers (follower_public_key, followed_public_key) VALUES (?, ?)';
 
-        meNexus.query(sql, [user_id, followed_id], (err, result) => {
+        meNexus.query(sql, [publicKey, followed_id], (err, result) => {
             if (err) {
                 console.error('Error adding follow:', err.message);
                 return reject(err);
@@ -17,10 +17,10 @@ export const followUser = (user_id, followed_id) => {
 }
 
 // Logic to unfollow a user
-export const unfollowUser = (user_id, followed_id) => {
+export const unfollowUser = (publicKey, followed_id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM Followers WHERE follower_id = ? AND followed_id = ?';
-        meNexus.query(sql, [user_id, followed_id], (err, result) => {
+        const sql = 'DELETE FROM Followers WHERE follower_public_key = ? AND followed_public_key = ?';
+        meNexus.query(sql, [publicKey, followed_id], (err, result) => {
             if (err) {
                 console.error('Error removing follow:', err.message);
                 return reject(err);
@@ -53,8 +53,49 @@ export const followCheck = (publicKey, followedPublicKey) => {
     });
 }
 
+export const getFollowerCount = (publicKey) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT COUNT(*) AS follower_count 
+            FROM Followers 
+            WHERE followed_public_key = ?
+        `;
+
+        meNexus.query(sql, [publicKey], (err, result) => {
+            if (err) {
+                console.error('Error fetching follower count:', err);
+                return reject(err);
+            }
+
+            resolve(result[0])
+        })
+    })
+}
+
+export const getFollowingCount = (publicKey) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT COUNT(*) AS following_count 
+            FROM Followers 
+            WHERE follower_public_key = ?
+        `;
+
+        meNexus.query(sql, [publicKey], (err, result) => {
+            if (err) {
+                console.error('Error fetching following count:', err);
+                return reject(err);
+            }
+
+            resolve(result[0])
+        })
+    })
+}
+
 export default {
     followUser,
     unfollowUser,
     followCheck,
+    getFollowerCount,
+    getFollowingCount
+
 }

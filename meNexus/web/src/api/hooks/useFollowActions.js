@@ -28,7 +28,7 @@ const useFollowActions = () => {
             const response = await sendRequest({
                 method: 'DELETE',
                 url: url,
-                data: {followed_id: followed_id},
+                data: {followed_id},
                 withCredentials: true,
             });
             return response.data;
