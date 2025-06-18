@@ -16,6 +16,7 @@ export const ENDPOINTS = {
     GET_ALL_USERS: `${API_BASE_URL}/api/user/getAllUsers`,
     GET_SESSION_USER: `${API_BASE_URL}/api/user/getSessionUser`,
     GET_USER: `${API_BASE_URL}/api/user/getUserById/:user_id`,
+    GET_USER_BY_HANDLE: `${API_BASE_URL}/api/user/getUserByHandle`,
     GET_PROFILE: `${API_BASE_URL}/api/user/getProfile/:handle`,
 
     UPDATE_ACCOUNT_SETTINGS: `${API_BASE_URL}/api/auth/updateAccountSettings`,
@@ -30,7 +31,7 @@ export const ENDPOINTS = {
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
     GET_ALL_POSTS: `${API_BASE_URL}/api/post/getAllPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
-    GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts/:handle`,
+    GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
     UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,

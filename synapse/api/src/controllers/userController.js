@@ -45,6 +45,17 @@ export const getUserByPublicKey = async (req, res) => {
     }
 }
 
+export const getUserByHandle = async (req, res) => {
+    const handle = req.query.handle;
+    try {
+        const user = await User.getUserByHandle(handle);
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error getting user by handle: ', error);
+        return res.status(500).json({ error: 'Error getting user by handle: ', handle });
+    }
+}
+
 export const getProfile = async (req, res) => {
     console.log('getProfile called');
     const handle = req.params.handle;
@@ -136,6 +147,7 @@ export default {
     getAllUsers,
     getSessionUser,
     getUserByPublicKey,
+    getUserByHandle,
     getProfile,
     updateProfileSettings,
 }

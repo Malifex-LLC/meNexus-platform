@@ -1,35 +1,21 @@
 import meNexus from "../../config/mysql.js";
+import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createPost = (content, handle) => {
+export const createPost = (publicKey, content) => {
     return new Promise((resolve, reject) => {
-        // Fetch user_id from handle
-        const userSql = `
-            SELECT user_id 
-            FROM Users 
-            WHERE handle = ?
+        const sql = `
+            INSERT INTO Posts (public_key, content)
+            VALUES (?, ?)
         `;
 
-        meNexus.query(userSql, [handle], (err, results) => {
-            if (err) return reject(err);
-            if (results.length === 0) return reject(new Error('User not found'));
-
-            const userId = results[0].user_id;
-
-            // Insert the post
-            const postSql = `
-                INSERT INTO Posts (content, user_id) 
-                VALUES (?, ?)
-            `;
-
-            meNexus.query(postSql, [content, userId], (err, result) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                resolve(result.insertId); // Return the new post ID
-            });
-        })
-    })
+        meNexus.query(sql, [publicKey, content], (err, result) => {
+            if (err) {
+                console.error(err)
+                return reject(new Error('Database error'));
+            }
+            resolve(result.insertId); // Return the new post ID
+        });
+    });
 }
 
 export const updatePost = (postId, updatedContent) => {
@@ -89,51 +75,69 @@ export const getAllPosts = async (req, res) => {
     });
 };
 
-export const getPosts = (user_id) => {
-    return new Promise((resolve, reject) => {
+// TODO getUserByPublicKeyFromDB(post.public_key) in a loop is a performance bottleneck
+export const getPosts = (publicKey) => {
+    return new Promise(async (resolve, reject) => {
         const sql = `
-        SELECT Posts.*, Users.display_name, Users.handle
-        FROM Posts
-        INNER JOIN Users ON Posts.user_id = Users.user_id
-        WHERE Posts.user_id = ?
-        OR Posts.user_id IN (
-            SELECT followed_id
-            FROM Followers
-            WHERE follower_id = ?
-        )
-        ORDER BY Posts.created_at DESC
+            SELECT Posts.*
+            FROM Posts
+            WHERE Posts.public_key = ?
+               OR Posts.public_key IN (SELECT followed_public_key
+                                       FROM Followers
+                                       WHERE follower_public_key = ?)
+            ORDER BY Posts.created_at DESC
         `;
-
-        meNexus.query(sql, [user_id, user_id], (err, results) => {
+        meNexus.query(sql, [publicKey, publicKey], async (err, results) => {
             if (err) {
                 console.error('Error fetching posts:', err);
                 return reject(new Error(err)); // Reject with an error
             }
-
-            resolve(results); // Return posts in descending order of creation time
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
         });
 
     })
 }
 
-export const getUserPosts = (handle) => {
+export const getUserPosts = (publicKey) => {
     return new Promise((resolve, reject) => {
         // SQL is performing an inner join on Posts and Users tables where post.user_id == users.user_id
         const sql = `
-            SELECT Posts.*, Users.display_name, Users.handle
+            SELECT *
             FROM Posts
-            INNER JOIN Users 
-            ON Posts.user_id = Users.user_id
-            WHERE Users.handle = ?
+            WHERE Posts.public_key = ?
     `;
-
-        meNexus.query(sql, [handle], (err, results) => {
+        meNexus.query(sql, publicKey, async (err, results) => {
             if (err) {
                 console.log('Error getting user posts:', err);
                 return reject(new Error(err)); // Reject with an error
             }
-
-            resolve(results);
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
         });
     })
 }

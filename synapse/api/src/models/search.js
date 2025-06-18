@@ -1,74 +1,63 @@
 import meNexus from "../../config/mysql.js";
+import { getUserByPublicKeyFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const search = (query, type) => {
-    return new Promise((resolve, reject) => {
-        let sql = "";
-        const params = [`%${query}%`];
 
-        switch (type) {
-            case "users":
-                sql = `
-                    SELECT handle, display_name
-                    FROM Users
-                    WHERE handle LIKE ? OR display_name LIKE ?
-                `;
+export const search = async (query, type = "mixed") => {
+    const like = `%${query}%`.toLowerCase();
+    const q    = query.toLowerCase();
+    const results = [];
 
-                params.push(`%${query}%`);
-                break;
+    /* ─── USERS ─────────────────────────────── */
+    if (type === "users" || type === "mixed") {
+        const users = await getAllUsersFromDB();
 
-            case "posts":
-                sql = `
-                    SELECT Posts.content, Posts.post_id, Posts.user_id, Posts.created_at,
-                       Users.handle, Users.display_name
-                    FROM Posts
-                    INNER JOIN Users ON Posts.user_id = Users.user_id
-                    WHERE Posts.content LIKE ?
-                `;
+        const matched = users
+            .filter(u =>
+                u.handle.toLowerCase().includes(q) ||
+                u.displayName.toLowerCase().includes(q)
+            )
+            .map(u => ({
+                type: "user",
+                publicKey: u.publicKey,
+                handle: u.handle,
+                displayName: u.displayName,
+            }));
 
-                break;
+        if (type === "users") return { type: "users", results: matched };
+        results.push(...matched);
+    }
 
-            default: // Handle both users and posts
-                const userQuery = `
-                    SELECT
-                        'user' AS type,
-                        handle,
-                        display_name,
-                        user_id,
-                        NULL AS content,
-                        NULL AS post_id,
-                        NULL AS created_at
-                    FROM Users
-                    WHERE handle LIKE ? OR display_name LIKE ?
-                `;
+    /* ─── POSTS ─────────────────────────────── */
+    if (type === "posts" || type === "mixed") {
+        const [rows] = await meNexus
+            .promise()
+            .query(
+                `SELECT content, post_id, public_key, created_at
+         FROM   Posts
+         WHERE  content LIKE ?`, [like]);
 
-                const postQuery = `
-                    SELECT
-                        'post' AS type,
-                        Users.handle,
-                        Users.display_name,
-                        Posts.user_id,
-                        Posts.content,
-                        Posts.post_id,
-                        Posts.created_at
-                    FROM Posts
-                    INNER JOIN Users ON Posts.user_id = Users.user_id
-                    WHERE Posts.content LIKE ?
-                `;
+        const enriched = await Promise.all(
+            rows.map(async row => {
+                const author = await getUserByPublicKeyFromDB(row.public_key);
+                return {
+                    type: "post",
+                    post_id: row.post_id,
+                    publicKey: row.public_key,
+                    handle: author?.handle ?? "Unknown",
+                    displayName: author?.displayName ?? "Unknown",
+                    content: row.content,
+                    created_at: row.created_at,
+                };
+            })
+        );
 
-                sql = `(${userQuery}) UNION ALL (${postQuery})`;
-                params.push(`%${query}%`, `%${query}%`);
-                break;
-        }
+        if (type === "posts") return { type: "posts", results: enriched };
+        results.push(...enriched);
+    }
 
-        meNexus.query(sql, params, (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-
-            resolve({type, results});
-        });
-    });
+    return { type: "mixed", results };
 };
+
 
 export default {
     search

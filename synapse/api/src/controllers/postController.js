@@ -3,13 +3,13 @@ import Post from '../models/post.js';
 
 // Post creation logic
 export const createPost = async (req, res) => {
-    const { content, handle } = req.body;
-    if (!content || !handle) {
-        return res.status(400).json({error: 'Content or handle not found.'});
+    const { publicKey, content } = req.body;
+    if (!publicKey || !content) {
+        return res.status(400).json({error: 'publicKey or content not found.'});
     }
 
     try {
-        const postId = await Post.createPost(content, handle);
+        const postId = await Post.createPost(publicKey, content);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);
@@ -68,13 +68,15 @@ export const getPosts = async (req, res) => {
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { publicKey } = req.session.user; // Get the current user's ID
+    const publicKey  = req.session.user.publicKey; // Get the current user's publicKey
     if (!publicKey) {
-        return res.status(401).json({ error: 'User not authenticated' });
+        return res.status(401).json({ error: 'publicKey not found!' });
     }
 
     try {
+        console.log('Getting posts for publicKey: ', publicKey);
         const posts = await Post.getPosts(publicKey);
+        console.log('Posts found: ',posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error in getPosts:', error);
@@ -83,13 +85,14 @@ export const getPosts = async (req, res) => {
 }
 
 export const getUserPosts = async (req, res) => {
-    const handle = req.params.handle
-    if (!handle) {
+    const { publicKey } = req.query
+    console.log('getUserPosts publicKey: ', publicKey);
+    if (!publicKey) {
         return res.status(401).json({error: 'User not authenticated'});
     }
 
     try {
-        const posts = await Post.getUserPosts(handle);
+        const posts = await Post.getUserPosts(publicKey);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error in getUserPosts:', error);

@@ -56,6 +56,22 @@ export async function getUserByPublicKeyFromDB(publicKey) {
     }
 }
 
+// // Fetch full user by handle
+export async function getUserByHandleFromDB(handle) {
+    const db = await getGlobalUsersDB();
+
+    console.log(`Looking up user for handle: ${handle}`);
+
+    const result = await db.query((doc) => doc.handle === handle);
+
+    if (result) {
+        return result[0];
+    } else {
+        console.log(`No user found for handle: ${handle}`);
+        return null;
+    }
+}
+
 // Add Synapse publicKey to joinedSynapses array
 export async function addSynapseToUser(publicKey, synapsePublicKey) {
     const db = await getGlobalUsersDB();

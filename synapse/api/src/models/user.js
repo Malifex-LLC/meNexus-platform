@@ -1,6 +1,6 @@
 // Import orbitdb connection
 import meNexus from '../../config/mysql.js';
-import { createGlobalUser, getUserByPublicKeyFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
+import { createGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
 // Import orbitDB userPublicKeys orbitdb wrapper function
 import { storePublicKeyInDB } from '#src/orbitdb/userPublicKeys.js';
@@ -19,7 +19,7 @@ export const createUser = async (publicKey, handle, displayName) => {
 
 export const getAllUsers = async () => {
     try {
-        const users = await getAllUsers();
+        const users = await getAllUsersFromDB();
         return users;
     } catch (error) {
         console.error('Failed to get all users:', error);
@@ -37,18 +37,15 @@ export const getUserByPublicKey = async (publicKey) => {
     }
 }
 
-// Fetch user by handle
 export const getUserByHandle = async (handle) => {
-    console.log("getUserByHandle called for handle:", handle);
     try {
-        const query = 'SELECT * FROM Users WHERE handle = ?';
-        const result = await executeQuery(query, [handle]);
-        return result.length > 0 ? result[0] : null; // Return user or null
+        const user = await getUserByHandleFromDB(handle);
+        return user;
     } catch (error) {
-        console.error("Error in getUserByHandle:", error.message);
-        throw new Error('Failed to fetch user by handle');
+        console.error('Failed to get user by handle:', error);
+        throw new Error('Failed to get user by handle');
     }
-};
+}
 
 // Generic query execution
 const executeQuery = (query, params) => {

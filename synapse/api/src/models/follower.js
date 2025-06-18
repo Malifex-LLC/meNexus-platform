@@ -32,15 +32,15 @@ export const unfollowUser = (user_id, followed_id) => {
 }
 
 // Logic to check if a user is following another user
-export const followCheck = (user_id, followed_id) => {
+export const followCheck = (publicKey, followedPublicKey) => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT * 
             FROM Followers 
-            WHERE follower_id = ? AND followed_id = ?
+            WHERE follower_public_key = ? AND followed_public_key = ?
          `;
 
-        meNexus.query(sql, [user_id, followed_id], (err, results) => {
+        meNexus.query(sql, [publicKey, followedPublicKey], (err, results) => {
             if (err) {
                 console.error('Error checking follow status:', err);
                 return reject(err);

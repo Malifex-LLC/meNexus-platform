@@ -38,12 +38,11 @@ const useFollowActions = () => {
         }
     };
 
-    const followCheck = async (followed_id) => {
-        console.log("followCheck called for user:", followed_id);
+    const followCheck = async (followedPublicKey) => {
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.FOLLOW_CHECK,
-            params: {followed_id: followed_id},
+            params: {followedPublicKey},
             withCredentials: true,
         });
         return response.data.isFollowing;

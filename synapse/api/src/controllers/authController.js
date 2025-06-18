@@ -4,6 +4,8 @@ import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } fr
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 
 // Account registration logic
+// TODO Move createUser to userController? and call createUser by authController?
+// TODO Verify that handle is unique across the network
 export const createUser = async (req, res) => {
     try {
         const { publicKey, handle, display_name } = req.body;
@@ -13,15 +15,6 @@ export const createUser = async (req, res) => {
         if (!publicKey || !handle || !display_name) {
             console.log("Missing required fields.");
             return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        // Check if the handle is already used by another user
-        const existingUserByHandle = await User.getUserByHandle(handle);
-        console.log("Existing user by handle:", existingUserByHandle);
-
-        if (existingUserByHandle) {
-            console.log("Handle is already taken.");
-            return res.status(400).json({ error: 'Handle is already taken' });
         }
 
         // Call the createUser function from the User model

@@ -1,12 +1,13 @@
 import meNexus from "../../config/mysql.js";
+import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createComment = (user_id, resource_type, resource_id, content) => {
+export const createComment = (publicKey, resource_type, resource_id, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO PostComments (user_id, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
+            INSERT INTO PostComments (public_key, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
         `;
 
-        meNexus.query(sql, [user_id, resource_type, resource_id, content], (error, result) => {
+        meNexus.query(sql, [publicKey, resource_type, resource_id, content], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
@@ -64,7 +65,7 @@ export const getComments = (resource_type, resource_id) => {
                 sql = `
                     SELECT
                         PostComments.comment_id,
-                        PostComments.user_id AS comment_user_id,
+                        PostComments.public_key AS comment_public_key,
                         PostComments.resource_id,
                         PostComments.resource_type,
                         PostComments.content AS comment_content,
@@ -72,24 +73,33 @@ export const getComments = (resource_type, resource_id) => {
                         PostComments.updated_at AS comment_updated_at,
                         Posts.post_id,
                         Posts.content AS post_content,
-                        Posts.user_id AS post_user_id,
+                        Posts.public_key AS post_public_key,
                         Posts.media_url,
-                        Posts.created_at AS post_created_at,
-                        Users.display_name,
-                        Users.handle
+                        Posts.created_at AS post_created_at
                     FROM PostComments
                              INNER JOIN Posts ON PostComments.resource_id = Posts.post_id
-                             INNER JOIN Users ON PostComments.user_id = Users.user_id
                     WHERE Posts.post_id = ?
                 `;
 
-                meNexus.query(sql, [resource_id], (error, results) => {
+                meNexus.query(sql, [resource_id], async (error, results) => {
                     if (error) {
                         console.error(error);
                         return reject(error);
                     }
-
-                    resolve(results);
+                    try {
+                        const enrichedPosts = await Promise.all(results.map(async (comment) => {
+                            const user = await getUserByPublicKeyFromDB(comment.comment_public_key);
+                            return {
+                                ...comment,
+                                handle: user?.handle || 'Unknown',
+                                displayName: user?.displayName || 'Unknown'
+                            };
+                        }));
+                        resolve(enrichedPosts);
+                    } catch (error) {
+                        console.error('Error enriching posts:', error);
+                        reject(error);
+                    }
                 })
                 break;
 
