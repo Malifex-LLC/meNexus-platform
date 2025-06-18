@@ -117,40 +117,64 @@ export const getAllPosts = async (req, res) => {
 };
 
 // TODO getUserByPublicKeyFromDB(post.public_key) in a loop is a performance bottleneck
-export const getPosts = (publicKey) => {
-    return new Promise(async (resolve, reject) => {
+export const getPosts = async (publicKey) => {
+    try {
+        const user = await getUserByPublicKeyFromDB(publicKey);
+
+        if (!user) {
+            throw new Error(`User not found in globalUsers: ${publicKey}`);
+        }
+
+        // Combine own publicKey + following list
+        const publicKeysToQuery = [publicKey, ...(user.following || [])];
+
+        // If there's no one to query, return an empty array early
+        if (publicKeysToQuery.length === 0) {
+            return [];
+        }
+
+        // Create a dynamic placeholders string like (?, ?, ?)
+        const placeholders = publicKeysToQuery.map(() => '?').join(', ');
+
         const sql = `
-            SELECT Posts.*
+            SELECT *
             FROM Posts
-            WHERE Posts.public_key = ?
-               OR Posts.public_key IN (SELECT followed_public_key
-                                       FROM Followers
-                                       WHERE follower_public_key = ?)
-            ORDER BY Posts.created_at DESC
+            WHERE public_key IN (${placeholders})
+            ORDER BY created_at DESC
         `;
-        meNexus.query(sql, [publicKey, publicKey], async (err, results) => {
-            if (err) {
-                console.error('Error fetching posts:', err);
-                return reject(new Error(err)); // Reject with an error
-            }
-            try {
-                const enrichedPosts = await Promise.all(results.map(async (post) => {
-                    const user = await getUserByPublicKeyFromDB(post.public_key);
-                    return {
-                        ...post,
-                        handle: user?.handle || 'Unknown',
-                        displayName: user?.displayName || 'Unknown'
-                    };
-                }));
-                resolve(enrichedPosts);
-            } catch (error) {
-                console.error('Error enriching posts:', error);
-                reject(error);
-            }
+
+        return await new Promise((resolve, reject) => {
+            meNexus.query(sql, publicKeysToQuery, async (err, results) => {
+                if (err) {
+                    console.error('Error fetching posts:', err);
+                    return reject(new Error(err));
+                }
+
+                try {
+                    const enrichedPosts = await Promise.all(
+                        results.map(async (post) => {
+                            const postUser = await getUserByPublicKeyFromDB(post.public_key);
+                            return {
+                                ...post,
+                                handle: postUser?.handle || 'Unknown',
+                                displayName: postUser?.displayName || 'Unknown'
+                            };
+                        })
+                    );
+                    resolve(enrichedPosts);
+                } catch (error) {
+                    console.error('Error enriching posts:', error);
+                    reject(error);
+                }
+            });
         });
 
-    })
-}
+    } catch (error) {
+        console.error('Error in getPosts:', error);
+        throw error;
+    }
+};
+
 
 export const getUserPosts = (publicKey) => {
     return new Promise((resolve, reject) => {
