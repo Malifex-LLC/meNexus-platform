@@ -4,6 +4,8 @@ import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } fr
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 
 // Account registration logic
+// TODO Move createUser to userController? and call createUser by authController?
+// TODO Verify that handle is unique across the network
 export const createUser = async (req, res) => {
     try {
         const { publicKey, handle, display_name } = req.body;
@@ -13,15 +15,6 @@ export const createUser = async (req, res) => {
         if (!publicKey || !handle || !display_name) {
             console.log("Missing required fields.");
             return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        // Check if the handle is already used by another user
-        const existingUserByHandle = await User.getUserByHandle(handle);
-        console.log("Existing user by handle:", existingUserByHandle);
-
-        if (existingUserByHandle) {
-            console.log("Handle is already taken.");
-            return res.status(400).json({ error: 'Handle is already taken' });
         }
 
         // Call the createUser function from the User model
@@ -115,25 +108,20 @@ export const verifyCryptoSignature = async (req, res) => {
     try {
         if (isValid) {
             console.log("Signature is valid");
-            const user_id = getUserIdByPublicKeyInDB(publicKey);
-            const user_id_int =  parseInt(await user_id);
 
-            if (user_id_int) {
-                const user = await User.getUserById(user_id_int);
-                console.log("user: ",  user);
+            const user = await User.getUserByPublicKey(publicKey);
+            console.log("user: ",  user);
 
-                // Attach session data
-                req.session.user = {
-                    user_id: user.user_id,
-                    handle: user.handle,
-                    display_name: user.display_name,
-                };
+            // Attach session data
+            req.session.user = {
+                publicKey: user.publicKey,
+                handle: user.handle,
+                displayName: user.displayName,
+            };
 
-                console.log('Session Data:', req.session.user);
-                res.status(200).json({message: 'publicKey validated and session user data set'});
-            } else {
-                res.status(404).json({ error: 'No user_id found with that private key.' });
-            }
+            console.log('Session Data:', req.session.user);
+            res.status(200).json({message: 'publicKey validated and session user data set'});
+
         }
     } catch (error) {
         console.error("Error in /verifyCryptoSignature:", error);

@@ -5,19 +5,21 @@ import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
 import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
 import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
+import useGetUser from "../../api/hooks/useGetUser.js";
 
 const SocialPanel = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getUser, loading: userLoading, error: userError } = useGetUser();
     const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
     const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
 
-    const [profile, setProfile] = useState({});
     const { handle } = useParams();
     const [currentHandle, setCurrentHandle] = useState(handle || null);
-    const [session_user_id, setSession_user_id] = useState(null);
-    const [session_user_handle, setSession_user_handle] = useState(null);
+    const [displayName, setDisplayName] = useState('');
+    const [bio, setBio] = useState('');
+    const [profilePicture, setProfilePicture] = useState('');
+    const [sessionUserPublicKey, setsessionUserPublicKey] = useState(null);
     const [isHandleSet, setIsHandleSet] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
     const [followerCount, setFollowerCount] = useState(0);
@@ -37,8 +39,8 @@ const SocialPanel = () => {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle);
                         setIsHandleSet(true);
-                        setSession_user_id(response.data.user_id);
-                        setSession_user_handle(response.data.handle);
+                        setsessionUserPublicKey(response.data.publicKey);
+
                     } else {
                         console.error("Invalid session, redirecting to login.");
                         navigate('/login');
@@ -49,62 +51,56 @@ const SocialPanel = () => {
                 }
             } else if (handle) {
                 const response = await getSessionUser();
-                setSession_user_id(response.data.user_id);
+                setsessionUserPublicKey(response.data.publicKey);
                 setCurrentHandle(handle);
-                setSession_user_handle(response.data.handle);
                 setIsHandleSet(true);
             }
         };
         fetchSessionUser();
     }, [handle, isHandleSet]);
 
-    // Fetch profile and posts once the current handle is determined
-    useEffect(() => {
-        if (currentHandle && isHandleSet) {
-            const fetchData = async () => {
-                try {
-                    console.log("Fetching profile and posts for handle:", currentHandle);
-                    const [profileData] = await Promise.all([
-                        getProfile(currentHandle),
-                    ]);
-                    console.log("Profile Data after getProfile() fetching is:", profileData);
-                    setProfile(profileData);
-
-                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
-                    console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
-                    setIsFollowing(isCurrentlyFollowing);
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                }
-            };
-
-            fetchData();
+    useEffect( () => {
+        const fetchUserData = async () => {
+            try {
+                console.log("Fetching userData for publicKey: ", sessionUserPublicKey)
+                const userData = await getUser(sessionUserPublicKey)
+                console.log('userData: ', userData)
+                setDisplayName(userData.displayName)
+                setBio(userData.bio);
+                setProfilePicture(userData.profilePicture);
+                const isCurrentlyFollowing = await followCheck(userData.publicKey);
+                console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
+                setIsFollowing(isCurrentlyFollowing);
+            } catch (error) {
+                console.error("Error fetching userData:", error);
+            }
         }
-    }, [currentHandle, isHandleSet]);
+        fetchUserData();
+    }, [sessionUserPublicKey])
 
     useEffect(() => {
         const fetchFollowerCount = async () => {
             try {
-                const fetchedFollowerCount = await getFollowerCount(session_user_id);
-                setFollowerCount(fetchedFollowerCount.result.follower_count);
+                const fetchedFollowerCount = await getFollowerCount(sessionUserPublicKey);
+                setFollowerCount(fetchedFollowerCount.result);
             } catch (error) {
                 console.error("Error fetching follower count:", error);
             }
         }
         fetchFollowerCount();
-    }, [session_user_id]);
+    }, [sessionUserPublicKey]);
 
     useEffect(() => {
         const fetchFollowingCount = async () => {
             try {
-                const fetchedFollowingCount = await getFollowingCount(session_user_id);
-                setFollowingCount(fetchedFollowingCount.result.following_count);
+                const fetchedFollowingCount = await getFollowingCount(sessionUserPublicKey);
+                setFollowingCount(fetchedFollowingCount.result);
             } catch (error) {
-                console.error("Error fetching follower count:", error);
+                console.error("Error fetching following count:", error);
             }
         }
         fetchFollowingCount();
-    }, [session_user_id]);
+    }, [sessionUserPublicKey]);
 
 
     return (
@@ -119,8 +115,8 @@ const SocialPanel = () => {
                     </div>
                     <img
                         className={`relative -top-16 w-48 lg:w-16 lg:-top-8 xl:w-32 mb-0 pb-0`}
-                        src={profile.profile_picture}
-                        alt={`${profile.display_name}'s profile picture`}
+                        src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
+                        alt={`${displayName}'s profile picture`}
                     />
                     <div className={`flex flex-col items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
                         <p className={`px-4 lg:px-2 xl:px-4 `}>{followingCount}</p>
@@ -128,11 +124,11 @@ const SocialPanel = () => {
                     </div>
                 </div>
                 <div className={`relative flex flex-col py-2 md:-top-8 -top-16 items-center text-foreground`}>
-                    <p className={`md:text-2xl xl:text-3xl`}>{profile.display_name}</p>
+                    <p className={`md:text-2xl xl:text-3xl`}>{displayName}</p>
                     <p className={`md:text-lg xl:text-xl text-brand`}>@{currentHandle}</p>
                 </div>
                 <div className={`relative text-lg md:text-sm -top-8 flex flex-col  items-center`}>
-                    <p>{profile.profile_bio}</p>
+                    <p>{bio}</p>
                 </div>
 
             </div>

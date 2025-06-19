@@ -7,10 +7,10 @@ export const getMessages = async (req, res) => {
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { user_id } = req.session.user; // Get the current user's ID
+    const { publicKey } = req.session.user; // Get the current user's ID
     const { conversation_id } = req.query;
 
-    if(!user_id) {
+    if(!publicKey) {
         return res.status(401).json({ error: 'User not authenticated' });
     }
 
@@ -29,13 +29,13 @@ export const createMessage = async (req, res) => {
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { user_id } = req.session.user; // Get the current user's ID
+    const { publicKey } = req.session.user; // Get the current user's ID
     const { conversation_id } = req.body;
     const { message } = req.body;
     const participant_id = message.participant_id;
     const content = message.content;
 
-    if(!user_id) {
+    if(!publicKey) {
         return res.status(401).json({ error: 'User not authenticated' });
     }
 
@@ -43,7 +43,7 @@ export const createMessage = async (req, res) => {
         return res.status(400).json({ error: 'Missing conversation_id or content' });
     }
 
-    const result = await Message.createMessage(user_id, conversation_id, message, participant_id, content);
+    const result = await Message.createMessage(publicKey, conversation_id, message, participant_id, content);
     return res.status(200).json(result);
 }
 

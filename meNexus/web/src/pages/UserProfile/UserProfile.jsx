@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {refreshComments, refreshPosts} from '../../utils/apiUtils.js';
 import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
-import useGetProfile from '../../api/hooks/useGetProfile.js';
 import useGetUserPosts from '../../api/hooks/useGetUserPosts.js';
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
@@ -11,11 +10,12 @@ import useCreateNotification from "../../api/hooks/useCreateNotification.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 import { IoLocationSharp } from "react-icons/io5";
+import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
 
 
 const UserProfile = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getUserByHandle, loading: userLoading, error: userError } = useGetUserByHandle();
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { createNotification } = useCreateNotification();
@@ -30,26 +30,27 @@ const UserProfile = () => {
     } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
 
     const { handle } = useParams();
+    const [user, setUser] = useState(null)
+    const [profilePicture, setProfilePicture] = useState('');
     const [currentHandle, setCurrentHandle] = useState(handle || null);
-    const [session_user_id, setSession_user_id] = useState(null);
-    const [session_user_handle, setSession_user_handle] = useState(null);
-    const [profile, setProfile] = useState({});
+    const [sessionPublicKey, setSessionPublicKey] = useState(null);
+    const [sessionUserHandle, setSessionUserHandle] = useState(null);
     const [posts, setPosts] = useState([]);
     const [isHandleSet, setIsHandleSet] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
     const navigate = useNavigate();
 
     const handleFollow = async () => {
-        console.log("handleFollow for followed_id: ", profile.user_id);
+        console.log("handleFollow for followed_id: ", user.publicKey);
         const notification = {
-            user_id: profile.user_id,
-            actor_id: session_user_id,
+            public_key: user.publicKey,
+            actor_public_key: sessionPublicKey,
             resource_type: "FOLLOW",
-            resource_id: session_user_id,
+            resource_id: sessionPublicKey,
             action: "FOLLOW",
         }
         try {
-            await followUser(profile.user_id);
+            await followUser(user.publicKey);
             setIsFollowing(true);
             await createNotification(notification);
         } catch (err) {
@@ -58,9 +59,9 @@ const UserProfile = () => {
     };
 
     const handleUnfollow = async () => {
-        console.log("handleUnFollow for followed_id: ", profile.user_id);
+        console.log("handleUnFollow for followed_id: ", user.publicKey);
         try {
-            await unfollowUser(profile.user_id);
+            await unfollowUser(user.publicKey);
             setIsFollowing(false);
         } catch (err) {
             console.error('Error unfollowing user:', err);
@@ -74,13 +75,16 @@ const UserProfile = () => {
                 try {
                     console.log("Fetching current user session...");
                     const response = await getSessionUser();
-
+                    const userData = await getUserByHandle(handle);
+                    setUser(userData);
+                    console.log('userData: ', userData);
                     if (response.status === 200 && response.data.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle);
                         setIsHandleSet(true);
-                        setSession_user_id(response.data.user_id);
-                        setSession_user_handle(response.data.handle);
+                        setSessionPublicKey(response.data.publicKey);
+                        setSessionUserHandle(response.data.handle);
+                        setProfilePicture(userData.profilePicture);
                         navigate(`/profile/${response.data.handle}`);
                     } else {
                         console.error("Invalid session, redirecting to login.");
@@ -92,50 +96,35 @@ const UserProfile = () => {
                 }
             } else if (handle) {
                 const response = await getSessionUser();
-                setSession_user_id(response.data.user_id);
-                setCurrentHandle(handle);
-                setSession_user_handle(response.data.handle);
+                const userData = await getUserByHandle(handle);
+                setSessionPublicKey(response.data.publicKey);
+                setSessionUserHandle(response.data.handle);
+                setProfilePicture(userData.profilePicture);
                 setIsHandleSet(true);
+                setUser(userData);
             }
         };
-
         fetchSessionUser();
-    }, [handle, navigate, isHandleSet]);
+    }, [handle]);
 
     // Fetch profile and posts once the current handle is determined
     useEffect(() => {
-        if (currentHandle && isHandleSet) {
+        if (currentHandle && isHandleSet && user) {
             const fetchData = async () => {
                 try {
-                    console.log("Fetching profile and posts for handle:", currentHandle);
-                    const [profileData, userPostsData] = await Promise.all([
-                        getProfile(currentHandle),
-                        getUserPosts(currentHandle),
-                    ]);
-                    console.log("Profile Data after getProfile() fetching is:", profileData);
-                    setProfile(profileData);
+                    const userPostsData = await getUserPosts(user.publicKey);
                     setPosts(userPostsData);
-
-                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
+                    const isCurrentlyFollowing = await followCheck(user.publicKey);
+                    console.log('userProfile calling followCheck for followedPublicKey: ', user.publicKey);
                     console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
                     setIsFollowing(isCurrentlyFollowing);
                 } catch (error) {
                     console.error("Error fetching data:", error);
                 }
             };
-
             fetchData();
         }
-    }, [currentHandle, isHandleSet]);
-
-    // Handle loading and error states for profile
-    if (profileLoading) {
-        return <div>Loading profile...</div>;
-    }
-
-    if (profileError) {
-        return <div>Error loading profile: {profileError.message}</div>;
-    }
+    }, [currentHandle, isHandleSet, user]);
 
     // Handle loading and error states for posts
     if (userPostsLoading) {
@@ -146,14 +135,18 @@ const UserProfile = () => {
         return <div>Error loading posts: {userPostsError.message}</div>;
     }
 
-    const isOwner = currentHandle === session_user_handle;
+    if (!user) {
+        return <div>Loading user...</div>
+    }
 
-    return currentHandle ? (
+    const isOwner = user?.publicKey === sessionPublicKey;
+    return user ? (
         <div className="user-profile__container flex flex-col lg:grid grid-cols-12 p-16  ">
             <div className="user-profile__data flex flex-col lg:col-span-3 p-4 items-center
             bg-surface text-foreground rounded-2xl">
                 <div className="user-profile__picture w-32 items-center">
-                    <img src={profile.profile_picture}
+                    <img
+                        src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
                          alt="Profile Picture" />
                 </div>
                 {!isOwner && (
@@ -164,11 +157,12 @@ const UserProfile = () => {
                     </button>
                 )}
                 <div className="user-profile__info p-4 ">
-                    <h2 className="user-profile__name text-4xl">{profile.profile_name}</h2>
-                    <p className="user-profile__bio text-2xl">{profile.profile_bio}</p>
+                    <h2 className="user-profile__name text-4xl">{user.profileName}</h2>
+                    <h3 className="user-profile__handle text-4xl">{handle}</h3>
+                    <p className="user-profile__bio text-2xl">{user.bio}</p>
                     <div className={`text-2xl flex items-center gap-2`} >
                         <IoLocationSharp />
-                        <p className="user-profile__location ">{profile.profile_location}</p>
+                        <p className="user-profile__location ">{user.location}</p>
 
                     </div>
 
@@ -189,11 +183,11 @@ const UserProfile = () => {
                             .map((post, index) => (
                                 <Post
                                     key={index}
-                                    post_id={post.post_id}
-                                    user_id={post.user_id}
-                                    session_user_id={session_user_id}
+                                    postId={post.post_id}
+                                    publicKey={post.public_key}
+                                    sessionPublicKey={sessionPublicKey}
                                     handle={post.handle}
-                                    display_name={post.display_name}
+                                    displayName={post.displayName}
                                     date={post.created_at}
                                     content={post.content}
                                     comments={0}

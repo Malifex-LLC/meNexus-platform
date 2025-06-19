@@ -73,7 +73,7 @@ const ConversationMenu = ({
                                 key={conversation.conversation_id}
                                 className={`conversation-menu__conversation  p-8 mx-4 rounded-xl ${
                                     activeConversationId === conversation.conversation_id ? 'active bg-brand text-black' : ''
-                                }${conversation.has_unread_messages ? 'conversation-menu__conversation--unread' : ''}`}
+                                }${conversation.has_unread_messages ? 'conversation-menu__conversation--unread bg-red-700' : ''}`}
                                 onClick={() => handleConversationClick(conversation)}
                             >
                                 <p>{conversation.participant_handle}</p>

@@ -8,13 +8,14 @@ import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
 import useEditComment from "../../../api/hooks/useEditComment.js"
 import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
-import useGetProfile from "../../../api/hooks/useGetProfile.js";
+import useGetUser from "../../../api/hooks/useGetUser.js";
+import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
 
 const Post = ({
-                  post_id,
-                  user_id,
-                  session_user_id,
-                  display_name,
+                  postId,
+                  publicKey,
+                  sessionPublicKey,
+                  displayName,
                   handle,
                   date,
                   content,
@@ -27,15 +28,13 @@ const Post = ({
                   onSave,
                   refreshComments,
               }) => {
-    const isOwner = user_id === session_user_id;
-    console.log("isOwner for post: ", isOwner);
+    const isOwner = sessionPublicKey && publicKey === sessionPublicKey;
 
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { getComments, commentsData } = useGetComments();
     const { createNotification } = useCreateNotification();
-    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, post_id, getComments, setComments));
-    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
-
+    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, postId, getComments, setComments));
+    const { getUser, loading: userLoading, error: userError } = useGetUser();
 
     const {
         handleCommentEdit,
@@ -43,10 +42,13 @@ const Post = ({
         editingCommentId,
         editedCommentContent,
         setEditedCommentContent,
-    } = useEditComment(() => refreshComments(resource_type, post_id, getComments, setComments));
+    } = useEditComment(() => refreshComments(resource_type, postId, getComments, setComments));
 
+    const [user, setUser] = useState(null);
+    const [sessionUserPublicKey, setsessionUserPublicKey] = useState(null);
     const [currentHandle, setCurrentHandle] = useState(handle || null);
-    const [profile, setProfile] = useState({});
+    const [profilePicture, setProfilePicture] = useState('');
+
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [comments, setComments] = useState([]);
@@ -54,16 +56,16 @@ const Post = ({
     const resource_type = "POST";
 
     const handleFollow = async () => {
-        console.log("handleFollow for followed_id: ", user_id);
+        console.log("handleFollow for followed_id: ", publicKey);
         const notification = {
-            user_id: user_id,
-            actor_id: session_user_id,
+            public_key: publicKey,
+            actor_public_key: sessionPublicKey,
             resource_type: "FOLLOW",
-            resource_id: session_user_id,
+            resource_id: sessionPublicKey,
             action: "FOLLOW",
         }
         try {
-            await followUser(user_id);
+            await followUser(publicKey);
             setIsFollowing(true);
             await createNotification(notification);
         } catch (err) {
@@ -72,9 +74,9 @@ const Post = ({
     };
 
     const handleUnfollow = async () => {
-        console.log("handleUnFollow for followed_id: ", user_id);
+        console.log("handleUnFollow for followed_id: ", publicKey);
         try {
-            await unfollowUser(user_id);
+            await unfollowUser(publicKey);
             setIsFollowing(false);
         } catch (err) {
             console.error('Error unfollowing user:', err);
@@ -82,26 +84,39 @@ const Post = ({
     };
 
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUser(publicKey);
+                setUser(userData);
+                setProfilePicture(userData.profilePicture);
+            } catch (error) {
+                console.error("Error fetching userData: ", error);
+            }
+        }
+        fetchUserData();
+    }, [publicKey])
+
+    useEffect(() => {
         const fetchFollowStatus = async () => {
             try {
-                const isCurrentlyFollowing = await followCheck(user_id);
+                const isCurrentlyFollowing = await followCheck(publicKey);
+                console.log('Post calling followCheck for followedPublicKey: ', publicKey);
+                console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
                 setIsFollowing(isCurrentlyFollowing);
             } catch (error) {
                 console.error("Error fetching follow status:", error);
             }
         };
-
         fetchFollowStatus();
-    }, [user_id]);
+    }, [publicKey]);
 
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const newComments = await getComments(resource_type, post_id);
+                const newComments = await getComments(resource_type, postId);
                 setComments(newComments);
-
             } catch (err) {
-                console.error("Error fetching comments for post_id: ", post_id, err);
+                console.error("Error fetching comments for postId: ", postId, err);
             }
         }
         fetchComments(); // Only fetchComments if they are displayed
@@ -111,47 +126,21 @@ const Post = ({
         setShowComments((prev) => !prev); // Toggle visibility
     };
 
-    // Fetch profile and posts once the current handle is determined
-    useEffect(() => {
-        setCurrentHandle(handle)
-        if (currentHandle) {
-            const fetchData = async () => {
-                try {
-                    console.log("Fetching profile and posts for handle:", currentHandle);
-                    const [profileData] = await Promise.all([
-                        getProfile(currentHandle),
-                    ]);
-                    console.log("Profile Data after getProfile() fetching is:", profileData);
-                    setProfile(profileData);
-
-                    const isCurrentlyFollowing = await followCheck(profileData.user_id);
-                    console.log("isCurrentlyFollowing: ", isCurrentlyFollowing);
-                    setIsFollowing(isCurrentlyFollowing);
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                }
-            };
-
-            fetchData();
-        }
-    }, [currentHandle]);
-
-
     return (
         <div className={`user-post w-full ${isEditing ? "user-post--editing   border border-is-editing " : ""} 
         p-4 lg:p-8 mb-16 w-full rounded-xl bg-surface text-foreground`}>
             <div className={`flex  gap-4`}>
                 <img
                     className={`relative w-16 h-16 md:w-24 md:h-auto`}
-                    src={profile.profile_picture}
-                    alt={`${profile.display_name}'s profile picture`}
+                    src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
+                    alt={`${displayName}'s profile picture`}
                 />
                 <div className="user-post__identity flex flex-col w-auto">
                     <Link
                         className="user-post__display-name text-md md:text-2xl hover:cursor-pointer hover:underline"
                         to={`/profile/${handle}`}
                     >
-                        {display_name}
+                        {displayName}
                     </Link>
                     <Link
                         className="user-post__handle text-sm md:text-xl text-brand hover:cursor-pointer"
@@ -230,9 +219,9 @@ const Post = ({
                             .map((comment, index) => (
                                 <Comment
                                     key={index}
-                                    user_id={comment.comment_user_id}
-                                    session_user_id={session_user_id}
-                                    display_name={comment.display_name}
+                                    publicKey={comment.comment_public_key}
+                                    sessionPublicKey={sessionPublicKey}
+                                    displayName={comment.displayName}
                                     handle={comment.handle}
                                     date={comment.comment_created_at}
                                     content={comment.comment_content}
@@ -251,10 +240,10 @@ const Post = ({
                     )}
                     <div className="user-post__comment-form w-full">
                         <CommentForm
-                            user_id={user_id}
-                            session_user_id={session_user_id}
+                            publicKey={publicKey}
+                            sessionPublicKey={sessionPublicKey}
                             resource_type={resource_type}
-                            resource_id={post_id}
+                            resource_id={postId}
                             getComments={getComments}
                             setComments={setComments}
                             refreshComments={refreshComments}

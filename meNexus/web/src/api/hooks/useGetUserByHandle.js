@@ -1,35 +1,33 @@
 import useAxios from './useAxios.js';
-import { ENDPOINTS } from '../../config/endpoints.js';
-import { replaceParams } from "../../utils/apiUtils.js";
+import { ENDPOINTS } from '../config.js';
 
-const useGetUser = () => {
+const useGetUserByHandle = () => {
     console.log("useGetUser called");
     const{ sendRequest, data, loading, error } = useAxios();
 
-    const getUser = async (publicKey) => {
-        const url = replaceParams(ENDPOINTS.GET_USER, { user_id: publicKey });
-
+    const getUserByHandle = async (handle) => {
+        console.log('getUser called for handle: ', handle);
         try {
             const response = await sendRequest({
                 method: "GET",
-                url: url,
-                params: { publicKey },
+                url: ENDPOINTS.GET_USER_BY_HANDLE,
+                params: {handle} ,
                 withCredentials: true
             });
 
-            console.log(response);
+            console.log('getUser response: ', response);
             return response.data;
         } catch (error) {
-            console.error(error);
+            console.error('getUser error: ', error);
         }
     };
 
     return {
-        getUser,
+        getUserByHandle,
         user: data,
         loading,
         error
     };
 };
 
-export default useGetUser;
+export default useGetUserByHandle;

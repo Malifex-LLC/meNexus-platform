@@ -1,5 +1,10 @@
 import multer from "multer";
 import path from 'path'
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Configure Multer storage
 export const storage = multer.diskStorage({
@@ -9,11 +14,11 @@ export const storage = multer.diskStorage({
 
         let folderPath;
         if (uploadType === 'profilePicture') {
-            folderPath = path.join(__dirname, '../uploads/profile_pictures');
+            folderPath = path.join(__dirname, '../../uploads/profile_pictures');
         } else if (uploadType === 'postMedia') {
-            folderPath = path.join(__dirname, '../uploads/post_media');
+            folderPath = path.join(__dirname, '../../uploads/post_media');
         } else {
-            folderPath = path.join(__dirname, '../uploads/others'); // Fallback folder
+            folderPath = path.join(__dirname, '../../uploads/others'); // Fallback folder
         }
 
         cb(null, folderPath); // Set the folder path

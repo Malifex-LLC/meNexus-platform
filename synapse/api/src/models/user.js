@@ -1,116 +1,51 @@
 // Import orbitdb connection
 import meNexus from '../../config/mysql.js';
+import { createGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
 // Import orbitDB userPublicKeys orbitdb wrapper function
 import { storePublicKeyInDB } from '#src/orbitdb/userPublicKeys.js';
 
-// TODO not all functions are written in the return new Promise() format
-
-// Function to create a new user
 export const createUser = async (publicKey, handle, displayName) => {
-    console.log('createUser called for handle: ', handle);
-    console.log('createUser called with publicKey: ', publicKey);
-
+    console.log("Create User called for publicKey:", publicKey);
     try {
-        // Insert the new user into the Users table
-        const userQuery = `
-            INSERT INTO Users (handle, display_name, created_at) 
-            VALUES (?, ?, NOW())
-        `;
-
-        const userParams = [handle, displayName];
-        const userResult = await executeQuery(userQuery, userParams);
-
-        const userID = userResult.insertId;
-        console.log('User created with ID:', userID);
-
-        await storePublicKeyInDB(userID, publicKey);
-
-        // Create a default profile for the new user
-        await createProfile(userID, handle);
-
-        return userID;
+        const user = await createGlobalUser(publicKey, handle, displayName);
+        return user;
     } catch (error) {
-        console.error("Error creating user:", error.message);
-        throw new Error('Failed to create user');
+        console.error('Error creating user: ', error);
+        throw new Error('Failed to create User called for publicKey');
     }
-};
 
-// Function to create a default profile for a user
-const createProfile = async (userID, handle) => {
-    console.log('createProfile called for user ID:', userID);
+}
+
+export const getAllUsers = async () => {
     try {
-        const profileQuery = `
-            INSERT INTO Profiles (user_id, profile_name, profile_bio, profile_location, profile_picture, profile_banner, custom_css, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
-        `;
-
-        const defaultProfileName = handle;
-        const defaultProfileBio = 'Update your bio!';
-        const defaultProfileLocation = 'Update your location';
-        const defaultProfilePicture = '/uploads/profile_pictures/default_avatar.jpeg';
-        const defaultProfileBanner = '/assets/default_profile_banner.jpg';
-        const defaultCSS = '';
-
-        const profileParams = [
-            userID,
-            defaultProfileName,
-            defaultProfileBio,
-            defaultProfileLocation,
-            defaultProfilePicture,
-            defaultProfileBanner,
-            defaultCSS
-        ];
-
-        const result = await executeQuery(profileQuery, profileParams);
-        console.log('Default profile created with ID:', result.insertId);
-
-        return result.insertId;
-    } catch (err) {
-        console.error("Error creating default profile: ", err.message);
-        throw new Error('Failed to create default profile');
+        const users = await getAllUsersFromDB();
+        return users;
+    } catch (error) {
+        console.error('Failed to get all users:', error);
+        throw new Error('Failed to get all users.');
     }
 };
 
-export const getAllUsers = () => {
-    return new Promise((resolve, reject) => {
-        const query = 'SELECT * FROM Users';
-        meNexus.query(query, (err, results) => {
-            if (err) {
-                console.error('Database error in getAllUsers: ', err);
-                return reject(err);
-            }
-            resolve(results);
-        });
-    });
-};
+export const getUserByPublicKey = async (publicKey) => {
+    try {
+        const user = await getUserByPublicKeyFromDB(publicKey);
+        return user;
+    } catch (error) {
+        console.error('Failed to get user by publicKey:', error);
+        throw new Error('Failed to get user by publicKey');
+    }
+}
 
-// Fetch user details by user_id
-export const getUserById = (userId) => {
-    return new Promise((resolve, reject) => {
-        const query = 'SELECT * FROM Users WHERE user_id = ?';
-        meNexus.query(query, [userId], (err, results) => {
-            if (err) {
-                console.error('Database error in getUserById:', err);
-                return reject(err);
-            }
-            resolve(results[0]); // Return the first result (or undefined if none found)
-        });
-    });
-};
-
-// Fetch user by handle
 export const getUserByHandle = async (handle) => {
-    console.log("getUserByHandle called for handle:", handle);
     try {
-        const query = 'SELECT * FROM Users WHERE handle = ?';
-        const result = await executeQuery(query, [handle]);
-        return result.length > 0 ? result[0] : null; // Return user or null
+        const user = await getUserByHandleFromDB(handle);
+        return user;
     } catch (error) {
-        console.error("Error in getUserByHandle:", error.message);
-        throw new Error('Failed to fetch user by handle');
+        console.error('Failed to get user by handle:', error);
+        throw new Error('Failed to get user by handle');
     }
-};
+}
 
 // Generic query execution
 const executeQuery = (query, params) => {
@@ -196,7 +131,7 @@ export const updateProfile = (profileFields, profileValues) => {
 export default {
     createUser,
     getAllUsers,
-    getUserById,
+    getUserByPublicKey,
     getUserByHandle,
     getProfile,
     updateUser,

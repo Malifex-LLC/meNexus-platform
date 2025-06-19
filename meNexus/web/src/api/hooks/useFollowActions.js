@@ -5,12 +5,12 @@ import { replaceParams } from "../../utils/apiUtils.js";
 const useFollowActions = () => {
     const { sendRequest, loading, error } = useAxios();
 
-    const followUser = async (followed_id) => {
+    const followUser = async (followedPublicKey) => {
         try {
             const response = await sendRequest({
                 method: 'POST',
                 url: ENDPOINTS.FOLLOW_USER,
-                data: {followed_id: followed_id},
+                data: {followedPublicKey},
                 withCredentials: true,
             });
 
@@ -21,14 +21,14 @@ const useFollowActions = () => {
         }
     };
 
-    const unfollowUser = async (followed_id) => {
+    const unfollowUser = async (followedPublicKey) => {
         try {
-            const url = replaceParams(ENDPOINTS.UNFOLLOW_USER, {followed_id});
+            const url = replaceParams(ENDPOINTS.UNFOLLOW_USER, {followedPublicKey});
 
             const response = await sendRequest({
                 method: 'DELETE',
                 url: url,
-                data: {followed_id: followed_id},
+                data: {followedPublicKey},
                 withCredentials: true,
             });
             return response.data;
@@ -38,12 +38,11 @@ const useFollowActions = () => {
         }
     };
 
-    const followCheck = async (followed_id) => {
-        console.log("followCheck called for user:", followed_id);
+    const followCheck = async (followedPublicKey) => {
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.FOLLOW_CHECK,
-            params: {followed_id: followed_id},
+            params: {followedPublicKey},
             withCredentials: true,
         });
         return response.data.isFollowing;

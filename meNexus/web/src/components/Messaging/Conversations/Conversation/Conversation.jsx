@@ -16,7 +16,7 @@ const Conversation = ({
                           setSelectedConversation,
                           participant_id
 }) => {
-    const [sessionUserId, setSessionUserId] = useState(null);
+    const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const [isSessionUserIdSet, setIsSessionUserIdSet] = useState(null);
     const [participants, setParticipants] = useState( "");
     const [messages, setMessages] = useState([]);
@@ -30,28 +30,28 @@ const Conversation = ({
 
     useEffect(() => {
         const fetchSessionUser = async () => {
-            if (!sessionUserId && !isSessionUserIdSet) {
+            if (!sessionPublicKey && !isSessionUserIdSet) {
                 try {
                     console.log("Fetching current user session...");
                     const response = await getSessionUser();
                     console.log(response);
 
-                    if (response.status === 200 && response.data.user_id) {
+                    if (response.status === 200 && response.data.publicKey) {
                         console.log("Session user handle:", response.data.handle);
-                        setSessionUserId(response.data.user_id);
+                        setSessionPublicKey(response.data.publicKey);
                     } else {
                         console.error("Invalid session");
                     }
                 } catch (error) {
                     console.error("Error fetching current user session:", error);
                 }
-            } else if (sessionUserId) {
-                setSessionUserId(sessionUserId);
+            } else if (sessionPublicKey) {
+                setSessionPublicKey(sessionPublicKey);
             }
         };
 
         fetchSessionUser();
-    }, [sessionUserId, isSessionUserIdSet]);
+    }, [sessionPublicKey, isSessionUserIdSet]);
 
     // Fetch Messages data
     useEffect(() => {
@@ -111,7 +111,7 @@ const Conversation = ({
 
     // TODO Need to fix WebSockets in prod, constantly connecting and disconnecting and reconnecting etc
     //console.log("useMessagesWebSocket attempting to connect");
-    //connectMessagesWebSocket(sessionUserId, handleNewMessage);
+    //connectMessagesWebSocket(sessionPublicKey, handleNewMessage);
 
     return (
         <div className="conversation  h-full w-full flex flex-col p-8">
@@ -144,10 +144,10 @@ const Conversation = ({
                             .map((message, index) => (
                                 <Message
                                     key={index}
-                                    session_user_id={sessionUserId}
+                                    sessionPublicKey={sessionPublicKey}
                                     conversation_id={message.conversation_id}
                                     message_id={message.message_id}
-                                    sender_id={message.sender_id}
+                                    sender_public_key={message.sender_public_key}
                                     content={message.content}
                                     is_read={message.is_read}
                                     created_at={message.created_at}

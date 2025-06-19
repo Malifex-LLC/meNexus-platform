@@ -2,9 +2,9 @@ import { formatDate } from "../../../utils/dateUtils.js";
 import {NavLink} from "react-router-dom";
 
 const Comment = ({
-    user_id,
-    session_user_id,
-    display_name,
+    publicKey,
+    sessionPublicKey,
+    displayName,
     handle,
     date,
     content,
@@ -15,7 +15,7 @@ const Comment = ({
     onContentChange,
     onSave,
 }) => {
-    const isOwner = user_id === session_user_id;
+    const isOwner = publicKey === sessionPublicKey;
     console.log("isOwner for comment: ", isOwner);
 
     return (
@@ -26,7 +26,7 @@ const Comment = ({
                     className="user-comment__display-name"
                     to={`/profile/${handle}`}
                 >
-                    {display_name}
+                    {displayName}
                 </NavLink>
                 <NavLink
                     className="user-comment__handle text-brand"

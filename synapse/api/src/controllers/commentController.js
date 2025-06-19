@@ -6,10 +6,10 @@ export const createComment = async (req, res) => {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-    const { user_id } = req.session.user
+    const { publicKey } = req.session.user
     const { resource_type, resource_id, content } = req.body;
 
-    const result = await Comment.createComment(user_id, resource_type, resource_id, content);
+    const result = await Comment.createComment(publicKey, resource_type, resource_id, content);
 
     if (result.affectedRows === 0) {
         return res.status(500).json({error: 'Failed to create a comment'});
