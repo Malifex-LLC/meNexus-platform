@@ -41,7 +41,8 @@ const Synapse = () => {
         const publicKey = sessionPublicKey
         const post = {publicKey, content, synapsePublicKey};
         await createSynapsePost(post);
-        await refreshPosts(getSynapsePosts(publicKey), publicKey, setPosts);
+        const updatedPosts = await getSynapsePosts(synapsePublicKey);
+        setPosts(updatedPosts)
     }
 
     useEffect(() => {
