@@ -6,11 +6,12 @@ const useCreateSynapsePost = (refreshPosts) => {
     const { sendRequest, loading, error } = useAxios();
 
     const createSynapsePost = async (post) => {
+        console.log('createSynapsePost called for post:', post);
         try {
             const response = await sendRequest({
                 method: 'POST',
-                url: ENDPOINTS.CREATE_POST,
-                data: post,
+                url: ENDPOINTS.CREATE_SYNAPSE_POST,
+                data: post
             });
             console.log("Post created:", response);
             if (refreshPosts) {

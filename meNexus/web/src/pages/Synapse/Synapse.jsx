@@ -16,7 +16,7 @@ const Synapse = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
     const [currentHandle, setCurrentHandle] = useState(handle || null); // State for the current handle
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
-    const [session_user_id, setSession_user_id] = useState(null);
+    const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [synapseMetadata, setSynapseMetadata] = useState(null);
     const navigate = useNavigate(); // React Router navigate
@@ -36,6 +36,14 @@ const Synapse = () => {
     const { handleDelete } = useDeletePost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
     const { createSynapsePost, createPostLoading, createPostError } = useCreateSynapsePost();
 
+    const handleCreatePost = async ({ content }) => {
+        const synapsePublicKey = synapseMetadata.identity.publicKey;
+        const publicKey = sessionPublicKey
+        const post = {publicKey, content, synapsePublicKey};
+        await createSynapsePost(post);
+        await refreshPosts(getSynapsePosts(publicKey), publicKey, setPosts);
+    }
+
     useEffect(() => {
         const fetchSessionUser = async () => {
             if (!handle && !isHandleSet) {
@@ -47,7 +55,7 @@ const Synapse = () => {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle); // Set the handle
                         setIsHandleSet(true); // Mark handle as set
-                        setSession_user_id(response.data.user_id);
+                        setSessionPublicKey(response.data.publicKey);
                     } else {
                         console.error("Invalid session, redirecting to login.");
                         navigate('/login'); // Redirect to login if session is invalid
@@ -59,7 +67,7 @@ const Synapse = () => {
             } else if (handle) {
                 setCurrentHandle(handle); // If handle exists in URL, set it as current
                 const response = await getSessionUser();
-                setSession_user_id(response.data.user_id);
+                setSessionPublicKey(response.data.user_id);
                 setIsHandleSet(true);
             }
         };
@@ -107,7 +115,7 @@ const Synapse = () => {
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
                         publicKey={publicKey}
-                        createPost={createSynapsePost}
+                        createPost={handleCreatePost}
                         loading={createPostLoading}
                         error={createPostError}
                         refreshPosts={() => refreshPosts(getSynapsePosts(publicKey), publicKey, setPosts)}
@@ -121,7 +129,7 @@ const Synapse = () => {
                                 key={index}
                                 post_id={post.post_id}
                                 user_id={post.user_id}
-                                session_user_id={session_user_id}
+                                session_user_id={sessionPublicKey}
                                 handle={post.handle}
                                 display_name={post.display_name}
                                 date={post.created_at}

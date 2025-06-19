@@ -145,6 +145,7 @@ export const createSynapsePost = async (req, res) => {
     if (!publicKey || !content || !synapsePublicKey) {
         return res.status(400).json({error: 'publicKey or content not found.'});
     }
+    console.log('createSynapsePost called for synapsePublicKey: ', synapsePublicKey)
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!peerId) {
         return res.status(400).json({error: 'peerId not found.'});

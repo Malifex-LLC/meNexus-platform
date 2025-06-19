@@ -389,12 +389,12 @@ const processMessage = async (message) => {
             if (message.actionType === ACTION_TYPES.RESOURCE.CREATE) {
                 console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
                 if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.POST) {
-                    console.log('Received POST request from ${message.meta.sender}.');
+                    console.log(`Received POST request from ${message.meta.sender}.`);
                     const { publicKey, content } = message.payload;
                     const response = await sendRequest({
                         method: 'POST',
                         url: ENDPOINTS.CREATE_POST,
-                        data: content
+                        data: {publicKey, content},
                     });
                     console.log("CREATE_POST response ", response);
                     const post = response.data;
