@@ -14,7 +14,8 @@
     "#config/*": "./config/*",
     "#protocols/*": "./protocols/*",
     "#src/*": "./src/*",
-    "#utils/*": "./utils/*"
+    "#utils/*": "./utils/*",
+    "#uploads/*": "./uploads/*"
   },
   "dependencies": {
     "@chainsafe/libp2p-gossipsub": "^14.1.0",

@@ -44,9 +44,11 @@ const Post = ({
         setEditedCommentContent,
     } = useEditComment(() => refreshComments(resource_type, postId, getComments, setComments));
 
+    const [user, setUser] = useState(null);
     const [sessionUserPublicKey, setsessionUserPublicKey] = useState(null);
     const [currentHandle, setCurrentHandle] = useState(handle || null);
-    const [profile, setProfile] = useState({});
+    const [profilePicture, setProfilePicture] = useState('');
+
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [comments, setComments] = useState([]);
@@ -80,6 +82,19 @@ const Post = ({
             console.error('Error unfollowing user:', err);
         }
     };
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUser(publicKey);
+                setUser(userData);
+                setProfilePicture(userData.profilePicture);
+            } catch (error) {
+                console.error("Error fetching userData: ", error);
+            }
+        }
+        fetchUserData();
+    }, [publicKey])
 
     useEffect(() => {
         const fetchFollowStatus = async () => {
@@ -117,8 +132,8 @@ const Post = ({
             <div className={`flex  gap-4`}>
                 <img
                     className={`relative w-16 h-16 md:w-24 md:h-auto`}
-                    src={profile.profile_picture}
-                    alt={`${profile.display_name}'s profile picture`}
+                    src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
+                    alt={`${displayName}'s profile picture`}
                 />
                 <div className="user-post__identity flex flex-col w-auto">
                     <Link

@@ -115,7 +115,7 @@ const SocialPanel = () => {
                     </div>
                     <img
                         className={`relative -top-16 w-48 lg:w-16 lg:-top-8 xl:w-32 mb-0 pb-0`}
-                        src={profilePicture}
+                        src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
                         alt={`${displayName}'s profile picture`}
                     />
                     <div className={`flex flex-col items-center text-xl lg:text-xs xl:text-md 2xl:text-2xl`}>
