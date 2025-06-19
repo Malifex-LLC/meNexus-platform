@@ -31,6 +31,7 @@ const UserProfile = () => {
 
     const { handle } = useParams();
     const [user, setUser] = useState(null)
+    const [profilePicture, setProfilePicture] = useState('');
     const [currentHandle, setCurrentHandle] = useState(handle || null);
     const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const [sessionUserHandle, setSessionUserHandle] = useState(null);
@@ -76,12 +77,14 @@ const UserProfile = () => {
                     const response = await getSessionUser();
                     const userData = await getUserByHandle(handle);
                     setUser(userData);
+                    console.log('userData: ', userData);
                     if (response.status === 200 && response.data.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle);
                         setIsHandleSet(true);
                         setSessionPublicKey(response.data.publicKey);
                         setSessionUserHandle(response.data.handle);
+                        setProfilePicture(userData.profilePicture);
                         navigate(`/profile/${response.data.handle}`);
                     } else {
                         console.error("Invalid session, redirecting to login.");
@@ -96,6 +99,7 @@ const UserProfile = () => {
                 const userData = await getUserByHandle(handle);
                 setSessionPublicKey(response.data.publicKey);
                 setSessionUserHandle(response.data.handle);
+                setProfilePicture(userData.profilePicture);
                 setIsHandleSet(true);
                 setUser(userData);
             }
@@ -141,7 +145,8 @@ const UserProfile = () => {
             <div className="user-profile__data flex flex-col lg:col-span-3 p-4 items-center
             bg-surface text-foreground rounded-2xl">
                 <div className="user-profile__picture w-32 items-center">
-                    <img src={user.profilePicture}
+                    <img
+                        src={`${import.meta.env.VITE_API_BASE_URL}${profilePicture}`}
                          alt="Profile Picture" />
                 </div>
                 {!isOwner && (
