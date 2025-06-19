@@ -5,10 +5,10 @@ import { createGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getA
 // Import orbitDB userPublicKeys orbitdb wrapper function
 import { storePublicKeyInDB } from '#src/orbitdb/userPublicKeys.js';
 
-export const createUser = async (publicKey, handle, displayName) => {
+export const createUser = async (publicKey, handle, displayName, synapsePublicKey) => {
     console.log("Create User called for publicKey:", publicKey);
     try {
-        const user = await createGlobalUser(publicKey, handle, displayName);
+        const user = await createGlobalUser(publicKey, handle, displayName, synapsePublicKey);
         return user;
     } catch (error) {
         console.error('Error creating user: ', error);

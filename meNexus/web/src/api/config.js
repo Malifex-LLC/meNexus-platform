@@ -57,4 +57,7 @@ export const ENDPOINTS = {
     GET_SYNAPSE_USERS: `${API_BASE_URL}/synapse/getSynapseUsers`,
     GET_SYNAPSE_POSTS: `${API_BASE_URL}/synapse/getSynapsePosts`,
     GET_SYNAPSE_USER_POSTS: `${API_BASE_URL}/synapse/getSynapseUserPosts`,
+    CREATE_SYNAPSE_POST: `${API_BASE_URL}/synapse/createSynapsePost`,
+    JOIN_SYNAPSE: `${API_BASE_URL}/synapse/joinSynapse`,
+    LEAVE_SYNAPSE: `${API_BASE_URL}/synapse/leaveSynapse`,
 };

@@ -17,7 +17,7 @@ export async function getGlobalUsersDB() {
 }
 
 // Create a new user (called when user registers)
-export async function createGlobalUser(publicKey, handle, displayName) {
+export async function createGlobalUser(publicKey, handle, displayName,synapsePublicKey) {
     const db = await getGlobalUsersDB();
 
     const userDoc = {
@@ -32,7 +32,7 @@ export async function createGlobalUser(publicKey, handle, displayName) {
         profileBanner: '/assets/default_profile_banner.jpg',
         followers: [],
         following: [],
-        synapses: [], // Will append Synapse publicKeys here when user logs in to other Synapses
+        synapses: [synapsePublicKey], // Will append Synapse publicKeys here when user logs in to other Synapses
         createdAt: new Date().toISOString(),
         is_online: false,
     };

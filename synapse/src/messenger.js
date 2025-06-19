@@ -386,6 +386,38 @@ const processMessage = async (message) => {
                     }
                 }
             }
+            if (message.actionType === ACTION_TYPES.RESOURCE.CREATE) {
+                console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
+                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.POST) {
+                    console.log('Received POST request from ${message.meta.sender}.');
+                    const { publicKey, content } = message.payload;
+                    const response = await sendRequest({
+                        method: 'POST',
+                        url: ENDPOINTS.CREATE_POST,
+                        data: content
+                    });
+                    console.log("CREATE_POST response ", response);
+                    const post = response.data;
+
+                    const createPostResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.RESOURCE.CREATE,
+                        { post },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, createPostResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peer-id - response not sent.');
+                    }
+
+                }
+            }
             break;
 
         case MESSAGE_TYPES.DATA.RESPONSE:

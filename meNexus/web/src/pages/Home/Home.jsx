@@ -7,6 +7,7 @@ import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
 import useGetPosts from "../../api/hooks/useGetPosts.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useCreatePost from "../../api/hooks/useCreatePost.js";
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
@@ -19,6 +20,7 @@ const Home = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getPosts, loading: postsLoading, error: postsError } = useGetPosts();
 
+
     // Hooks for editing and deleting posts
     const {
         editingPostId,
@@ -28,6 +30,7 @@ const Home = () => {
         handleSave,
     } = useEditPost(() => refreshPosts(getPosts, currentHandle, setPosts));
     const { handleDelete } = useDeletePost(() => refreshPosts(getPosts, currentHandle, setPosts));
+    const { createPost, createPostLoading, createPostError } = useCreatePost();
 
     // Redirect from /home to /home/:handle if no handle is provided
     useEffect(() => {
@@ -104,6 +107,9 @@ const Home = () => {
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
                         publicKey={sessionPublicKey}
+                        createPost={createPost}
+                        loading={createPostLoading}
+                        error={createPostError}
                         refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
                     />
                 </div>

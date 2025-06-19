@@ -8,6 +8,7 @@ import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useCreateSynapsePost from "../../api/hooks/useCreateSynapsePost.js";
 
 
 const Synapse = () => {
@@ -33,6 +34,7 @@ const Synapse = () => {
         handleSave,
     } = useEditPost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
     const { handleDelete } = useDeletePost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
+    const { createSynapsePost, createPostLoading, createPostError } = useCreateSynapsePost();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -104,8 +106,11 @@ const Synapse = () => {
             <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
-                        handle={currentHandle}
-                        refreshPosts={() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts)}
+                        publicKey={publicKey}
+                        createPost={createSynapsePost}
+                        loading={createPostLoading}
+                        error={createPostError}
+                        refreshPosts={() => refreshPosts(getSynapsePosts(publicKey), publicKey, setPosts)}
                     />
                 </div>
                 {posts.length > 0 ? (
