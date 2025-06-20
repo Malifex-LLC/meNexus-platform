@@ -257,7 +257,12 @@ const processMessage = async (message) => {
             console.log('Received HEALTH_CHECK');
             if (message.actionType === ACTION_TYPES.HEALTH.PING) {
                 console.log(`Received PING from ${message.meta.sender}. Sending PONG...`);
-                const pongMessage = createMessage(MESSAGE_TYPES.HEALTH.PONG, {}, { sender: libp2p.peerId.toString() });
+                const pongMessage = createMessage(
+                    MESSAGE_TYPES.HEALTH.PONG,
+                    ACTION_TYPES.HEALTH.PONG,
+                    RESOURCE_TYPES.HEALTH_STATUS,
+                    {},
+                    { sender: libp2p.peerId.toString() });
                 await sendMessage(message.meta.sender, pongMessage);
             }
 
@@ -283,6 +288,7 @@ const processMessage = async (message) => {
                     const metadataResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.DATA.AGGREGATE,
+                        RESOURCE_TYPES.SYNAPSE_METADATA,
                         { metadata },
                         {
                             sender: libp2p.peerId.toString(),
@@ -310,6 +316,7 @@ const processMessage = async (message) => {
                     const usersResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.DATA.AGGREGATE,
+                        RESOURCE_TYPES.ALL_USERS,
                         {users},
                         {
                             sender: libp2p.peerId.toString(),
@@ -338,6 +345,7 @@ const processMessage = async (message) => {
                     const postsResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.DATA.AGGREGATE,
+                        RESOURCE_TYPES.ALL_POSTS,
                         { posts },
                         {
                             sender: libp2p.peerId.toString(),
@@ -371,6 +379,7 @@ const processMessage = async (message) => {
                     const dataResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.DATA.AGGREGATE,
+                        RESOURCE_TYPES.ALL_POSTS,
                         { posts },
                         {
                             sender: libp2p.peerId.toString(),
@@ -402,6 +411,7 @@ const processMessage = async (message) => {
                     const createPostResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.RESOURCE.CREATE,
+                        RESOURCE_TYPES.POST,
                         { post },
                         {
                             sender: libp2p.peerId.toString(),
