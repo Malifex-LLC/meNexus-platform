@@ -7,10 +7,11 @@ import PostForm from '../../components/Posts/PostForm/PostForm.jsx';
 import useGetPosts from "../../api/hooks/useGetPosts.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
+import useCreatePost from "../../api/hooks/useCreatePost.js";
 
 const Home = () => {
     const { handle } = useParams(); // Extract handle from the URL (if available)
-    const [session_user_id, setSession_user_id] = useState(null);
+    const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const [currentHandle, setCurrentHandle] = useState(handle || null); // State for the current handle
     const [posts, setPosts] = useState([]); // State for user posts
     const [isHandleSet, setIsHandleSet] = useState(false); // Track if handle is set
@@ -18,6 +19,7 @@ const Home = () => {
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getPosts, loading: postsLoading, error: postsError } = useGetPosts();
+
 
     // Hooks for editing and deleting posts
     const {
@@ -28,6 +30,7 @@ const Home = () => {
         handleSave,
     } = useEditPost(() => refreshPosts(getPosts, currentHandle, setPosts));
     const { handleDelete } = useDeletePost(() => refreshPosts(getPosts, currentHandle, setPosts));
+    const { createPost, createPostLoading, createPostError } = useCreatePost();
 
     // Redirect from /home to /home/:handle if no handle is provided
     useEffect(() => {
@@ -42,7 +45,7 @@ const Home = () => {
                         console.log("Session user handle:", response.data.handle);
                         setCurrentHandle(response.data.handle); // Set the handle
                         setIsHandleSet(true); // Mark handle as set
-                        setSession_user_id(response.data.user_id);
+                        setSessionPublicKey(response.data.publicKey);
                         navigate(`/home/${response.data.handle}`); // Redirect to /home/:handle
                     } else {
                         console.error("Invalid session, redirecting to login.");
@@ -55,13 +58,13 @@ const Home = () => {
             } else if (handle) {
                 setCurrentHandle(handle); // If handle exists in URL, set it as current
                 const response = await getSessionUser();
-                setSession_user_id(response.data.user_id);
+                setSessionPublicKey(response.data.publicKey);
                 setIsHandleSet(true);
             }
         };
 
         if (!isHandleSet) fetchSessionUser();
-    }, [getSessionUser, handle, isHandleSet, navigate]);
+    }, [handle]);
 
     // Fetch posts once the `currentHandle` is determined
     useEffect(() => {
@@ -79,7 +82,7 @@ const Home = () => {
                 fetchPosts();
             }
         }
-    }, [currentHandle, getPosts, isHandleSet, posts.length]);
+    }, [currentHandle, isHandleSet]);
 
     // Handle loading and error states for posts
     if (postsLoading) {
@@ -103,7 +106,10 @@ const Home = () => {
             <div className="home__posts flex-1 overflow-y-auto px-8  py-2 space-y-16 ">
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-8 ">
                     <PostForm
-                        handle={currentHandle}
+                        publicKey={sessionPublicKey}
+                        createPost={createPost}
+                        loading={createPostLoading}
+                        error={createPostError}
                         refreshPosts={() => refreshPosts(getPosts, currentHandle, setPosts)}
                     />
                 </div>
@@ -113,11 +119,11 @@ const Home = () => {
                         .map((post, index) => (
                             <Post
                                 key={index}
-                                post_id={post.post_id}
-                                user_id={post.user_id}
-                                session_user_id={session_user_id}
+                                postId={post.post_id}
+                                publicKey={post.public_key}
+                                sessionPublicKey={sessionPublicKey}
                                 handle={post.handle}
-                                display_name={post.display_name}
+                                displayName={post.displayName}
                                 date={post.created_at}
                                 content={post.content}
                                 comments={0}

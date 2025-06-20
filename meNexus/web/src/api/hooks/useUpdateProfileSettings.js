@@ -5,8 +5,9 @@ import { replaceParams } from "../../utils/apiUtils.js";
 const useUpdateProfileSettings = () => {
     const { sendRequest, loading, error } = useAxios();
 
-    const updateProfileSettings = async (handle, updatedFields) => {
-        const url = replaceParams(ENDPOINTS.UPDATE_PROFILE_SETTINGS, {handle});
+    const updateProfileSettings = async (publicKey, updatedFields) => {
+        const url = replaceParams(ENDPOINTS.UPDATE_PROFILE_SETTINGS, {publicKey});
+        console.log('updateProfileSettings called for publicKey: ', publicKey);
         console.log('updateProfileSettings called for fields: ', updatedFields);
 
         try {

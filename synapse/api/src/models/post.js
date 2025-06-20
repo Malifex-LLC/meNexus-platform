@@ -1,35 +1,21 @@
 import meNexus from "../../config/mysql.js";
+import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createPost = (content, handle) => {
+export const createPost = (publicKey, content) => {
     return new Promise((resolve, reject) => {
-        // Fetch user_id from handle
-        const userSql = `
-            SELECT user_id 
-            FROM Users 
-            WHERE handle = ?
+        const sql = `
+            INSERT INTO Posts (public_key, content)
+            VALUES (?, ?)
         `;
 
-        meNexus.query(userSql, [handle], (err, results) => {
-            if (err) return reject(err);
-            if (results.length === 0) return reject(new Error('User not found'));
-
-            const userId = results[0].user_id;
-
-            // Insert the post
-            const postSql = `
-                INSERT INTO Posts (content, user_id) 
-                VALUES (?, ?)
-            `;
-
-            meNexus.query(postSql, [content, userId], (err, result) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                resolve(result.insertId); // Return the new post ID
-            });
-        })
-    })
+        meNexus.query(sql, [publicKey, content], (err, result) => {
+            if (err) {
+                console.error(err)
+                return reject(new Error('Database error'));
+            }
+            resolve(result.insertId); // Return the new post ID
+        });
+    });
 }
 
 export const updatePost = (postId, updatedContent) => {
@@ -59,63 +45,164 @@ export const deletePost = (postId) => {
             DELETE FROM Posts 
             WHERE post_id = ?
         `;
-
         meNexus.query(deleteSql, [postId], (deleteErr, deleteResult) => {
             if (deleteErr) {
                 console.error(deleteErr);
                 return reject(new Error('Database error')); // Reject with an error
             }
-
             resolve(deleteResult);
         });
     })
 }
 
-export const getPosts = (user_id) => {
+export const getPost = (postId) => {
+    console.log('getPost() called with postId:', postId);
     return new Promise((resolve, reject) => {
         const sql = `
-        SELECT Posts.*, Users.display_name, Users.handle
-        FROM Posts
-        INNER JOIN Users ON Posts.user_id = Users.user_id
-        WHERE Posts.user_id = ?
-        OR Posts.user_id IN (
-            SELECT followed_id
-            FROM Followers
-            WHERE follower_id = ?
-        )
-        ORDER BY Posts.created_at DESC
-    `;
-
-        meNexus.query(sql, [user_id, user_id], (err, results) => {
+            SELECT *
+            FROM Posts
+            WHERE Posts.post_id = ?
+        `;
+        meNexus.query(sql, [postId], async (err, result) => {
             if (err) {
-                console.error('Error fetching posts:', err);
-                return reject(new Error(err)); // Reject with an error
+                console.error('Error fetching post:', err);
+                return reject(new Error(err));
             }
-
-            resolve(results); // Return posts in descending order of creation time
-        });
-
+            try {
+                const enrichedPost = await Promise.all(result.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPost[0]);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
+        })
     })
 }
 
-export const getUserPosts = (handle) => {
+export const getAllPosts = async (req, res) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT *
+            FROM Posts
+            ORDER BY Posts.created_at DESC
+        `;
+        meNexus.query(query, async (err, results) => {
+            if (err) {
+                console.error('Database error in getAllPosts:', err);
+                return reject(err)
+            }
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
+        });
+    });
+};
+
+// TODO getUserByPublicKeyFromDB(post.public_key) in a loop is a performance bottleneck
+export const getPosts = async (publicKey) => {
+    try {
+        const user = await getUserByPublicKeyFromDB(publicKey);
+
+        if (!user) {
+            throw new Error(`User not found in globalUsers: ${publicKey}`);
+        }
+
+        // Combine own publicKey + following list
+        const publicKeysToQuery = [publicKey, ...(user.following || [])];
+
+        // If there's no one to query, return an empty array early
+        if (publicKeysToQuery.length === 0) {
+            return [];
+        }
+
+        // Create a dynamic placeholders string like (?, ?, ?)
+        const placeholders = publicKeysToQuery.map(() => '?').join(', ');
+
+        const sql = `
+            SELECT *
+            FROM Posts
+            WHERE public_key IN (${placeholders})
+            ORDER BY created_at DESC
+        `;
+
+        return await new Promise((resolve, reject) => {
+            meNexus.query(sql, publicKeysToQuery, async (err, results) => {
+                if (err) {
+                    console.error('Error fetching posts:', err);
+                    return reject(new Error(err));
+                }
+
+                try {
+                    const enrichedPosts = await Promise.all(
+                        results.map(async (post) => {
+                            const postUser = await getUserByPublicKeyFromDB(post.public_key);
+                            return {
+                                ...post,
+                                handle: postUser?.handle || 'Unknown',
+                                displayName: postUser?.displayName || 'Unknown'
+                            };
+                        })
+                    );
+                    resolve(enrichedPosts);
+                } catch (error) {
+                    console.error('Error enriching posts:', error);
+                    reject(error);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error in getPosts:', error);
+        throw error;
+    }
+};
+
+
+export const getUserPosts = (publicKey) => {
     return new Promise((resolve, reject) => {
         // SQL is performing an inner join on Posts and Users tables where post.user_id == users.user_id
         const sql = `
-            SELECT Posts.*, Users.display_name, Users.handle
+            SELECT *
             FROM Posts
-            INNER JOIN Users 
-            ON Posts.user_id = Users.user_id
-            WHERE Users.handle = ?
+            WHERE Posts.public_key = ?
     `;
-
-        meNexus.query(sql, [handle], (err, results) => {
+        meNexus.query(sql, publicKey, async (err, results) => {
             if (err) {
                 console.log('Error getting user posts:', err);
                 return reject(new Error(err)); // Reject with an error
             }
-
-            resolve(results);
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
         });
     })
 }
@@ -124,6 +211,8 @@ export default {
     createPost,
     updatePost,
     deletePost,
+    getPost,
+    getAllPosts,
     getPosts,
     getUserPosts,
 }

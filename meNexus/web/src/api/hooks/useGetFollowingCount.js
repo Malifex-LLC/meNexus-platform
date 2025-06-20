@@ -4,12 +4,12 @@ import { ENDPOINTS } from '../config.js';
 const useGetFollowingCount = () => {
     const { sendRequest, loading, error } = useAxios();
 
-    const getFollowingCount = async (user_id) => {
+    const getFollowingCount = async (publicKey) => {
         try {
             const response = await sendRequest({
                 method: 'GET',
                 url: ENDPOINTS.GET_FOLLOWING_COUNT,
-                params: {user_id},
+                params: {publicKey},
                 withCredentials: true,
             });
 

@@ -11,8 +11,8 @@ import { createWebSocketServer } from '../config/websocket.js';
 import sessionMiddleware         from './middlewares/session.js';
 // import sessionLogger           from './middlewares/sessionLogger.js'
 
-import { initializeOrbitDB,
-    closeOrbitDB }          from '../../config/orbitdb-service.js';
+import { initializeOrbitDB, closeOrbitDB } from '../../config/orbitdb-service.js';
+import { getGlobalUsersDB } from '../../src/orbitdb/globalUsers.js'
 
 // Route modules
 import authRoutes         from './routes/authRoutes.js';
@@ -26,7 +26,8 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import searchRoutes       from './routes/searchRoutes.js';
 import settingsRoutes     from './routes/settingsRoutes.js';
 import synapseRoutes      from './routes/synapseRoutes.js';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 /* ────────────────────────────────────────────────
    1.  The starter function
    ──────────────────────────────────────────────── */
@@ -38,7 +39,16 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     // app.use(sessionLogger);
 
     // Static uploads
-    app.use('/uploads', express.static('../uploads'));
+
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+// This points to meNexus/synapse/uploads
+    const uploadsPath = path.join(__dirname, '../../uploads');
+    console.log('Express serving uploads from: ', uploadsPath);
+
+    app.use('/uploads', express.static(uploadsPath));
 
     /* ---- REST routes ----------------------------------------------------- */
     app.use('/api/auth',         authRoutes);
@@ -67,6 +77,9 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     /* ---- OrbitDB --------------------------------------------------------- */
     await initializeOrbitDB();
     console.log('OrbitDB service running');
+    console.log('Getting publicKeysDB');
+    //await getPublicKeysDB();
+    await getGlobalUsersDB();
 
     process.once('SIGINT', async () => {
         await closeOrbitDB();

@@ -3,8 +3,8 @@ import useCreateComment from "../../../api/hooks/useCreateComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js";
 
 const CommentForm = ({
-                         user_id,
-                         session_user_id,
+                         publicKey,
+                         sessionPublicKey,
                          resource_type,
                          resource_id,
                          getComments,
@@ -14,7 +14,7 @@ const CommentForm = ({
     const [text, setText] = useState("Add a comment...");
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const actor_id = session_user_id;
+    const actor_id = sessionPublicKey;
     const action = "COMMENT";
 
 
@@ -29,8 +29,8 @@ const CommentForm = ({
         };
 
         const notification = {
-            user_id: user_id,
-            actor_id: actor_id,
+            public_key: publicKey,
+            actor_public_key: actor_id,
             resource_type: resource_type,
             resource_id: resource_id,
             action: action,
@@ -38,8 +38,9 @@ const CommentForm = ({
 
         console.log("Submitting comment:", comment);
         await createComment(comment);
-        if (user_id !== session_user_id) {
-            await createNotification(notification);
+        await createNotification(notification);
+
+        if (publicKey !== sessionPublicKey) {
         }
         setText(""); // Reset the text field after submission
     };

@@ -16,8 +16,8 @@ const NotificationsTray = ({
                         <div key={index} className={`my-2`}>
                             <Notification
                                 notification_id={notification.notification_id}
-                                user_id={notification.user_id}
-                                actor_id={notification.actor_id}
+                                public_key={notification.public_key}
+                                actor_public_key={notification.actor_public_key}
                                 resource_type={notification.resource_type}
                                 resource_id={notification.resource_id}
                                 summary={notification.summary}

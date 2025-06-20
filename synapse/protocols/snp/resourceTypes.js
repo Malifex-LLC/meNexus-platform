@@ -2,7 +2,10 @@
  * Resource types supported by the protocol
  */
 export const RESOURCE_TYPES = {
+    SYNAPSE_METADATA: 'SYNAPSE_METADATA',
+    PEER_PUBLIC_KEY: 'PEER_PUBLIC_KEY',
     USER: 'USER',
+    ALL_USERS: 'ALL_USERS',
     POST: 'POST',
     ALL_POSTS: 'ALL_POSTS',
     COMMENT: 'COMMENT',
@@ -10,6 +13,7 @@ export const RESOURCE_TYPES = {
     MESSAGE: 'MESSAGE',
     TOPIC: 'TOPIC',
     NOTIFICATION: 'NOTIFICATION',
+    HEALTH_STATUS: 'HEALTH_STATUS',
 };
 
 /**

@@ -4,9 +4,11 @@ import useGetProfile from "../../../api/hooks/useGetProfile.js";
 import {useNavigate} from "react-router-dom";
 import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
 import useUpdateProfileSettings from "../../../api/hooks/useUpdateProfileSettings.js";
+import useGetUserByHandle from "../../../api/hooks/useGetUserByHandle.js";
 
 const ProfileSettings = () => {
-    const [sessionUserId, setsessionUserId] = useState(null);
+    const [user, setUser] = useState(null)
+    const [sessionPublicKey, setsessionPublicKey] = useState(null);
     const [sessionUserHandle, setsessionUserHandle] = useState(null);
     const [newHandle, setNewHandle] = useState(null);
     const [sessionUserDisplayName, setSessionUserDisplayName] = useState(null);
@@ -18,7 +20,6 @@ const ProfileSettings = () => {
     const [sessionUserProfileLocation, setSessionUserProfileLocation] = useState(null);
     const [newProfileLocation, setNewProfileLocation] = useState(null);
     const [isHandleSet, setIsHandleSet] = useState(false);
-    const [profile, setProfile] = useState({});
     const [selectedFile, setSelectedFile] = useState(null);
     const [ isUpdateSuccess, setIsUpdateSuccess ] = useState(false);
     const [ isUpdateError, setIsUpdateError ] = useState(false);
@@ -28,7 +29,7 @@ const ProfileSettings = () => {
     const navigate = useNavigate();
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getProfile, loading: profileLoading, error: profileError } = useGetProfile();
+    const { getUserByHandle, loading: userLoading, error: userError } = useGetUserByHandle();
     const { uploadProfilePicture, profilePictureloading, profilePictureError } = useUploadProfilePicture();
     const { updateProfileSettings, profileSettingsUpdateLoading, profileSettingsUpdateError } = useUpdateProfileSettings();
 
@@ -39,19 +40,19 @@ const ProfileSettings = () => {
         const updatedFields = {};
 
         if (newDisplayName && newDisplayName !== sessionUserDisplayName) {
-            updatedFields.display_name = newDisplayName;
+            updatedFields.displayName = newDisplayName;
         }
         if (newHandle && newHandle !== sessionUserHandle) {
             updatedFields.handle = newHandle;
         }
         if (newProfileName && newProfileName !== sessionUserProfileName) {
-            updatedFields.profile_name = newProfileName;
+            updatedFields.profileName = newProfileName;
         }
         if (newProfileBio && newProfileBio !== sessionUserProfileBio) {
-            updatedFields.profile_bio = newProfileBio;
+            updatedFields.bio = newProfileBio;
         }
         if (newProfileLocation && newProfileLocation !== sessionUserProfileLocation) {
-            updatedFields.profile_location = newProfileLocation;
+            updatedFields.location = newProfileLocation;
         }
 
         // If no fields have been updated, return early
@@ -60,7 +61,7 @@ const ProfileSettings = () => {
             return;
         }
 
-        const response = await updateProfileSettings(sessionUserHandle, updatedFields);
+        const response = await updateProfileSettings(sessionPublicKey, updatedFields);
         if (response.status === 200) {
             console.log("Profile settings updated successfully");
             setIsUpdateSuccess(true);
@@ -122,12 +123,19 @@ const ProfileSettings = () => {
                 try {
                     console.log("Fetching current user session...");
                     const response = await getSessionUser();
-
+                    console.log('sessionUser response ', response);
+                    const userData = await getUserByHandle(response.data.handle);
+                    setUser(userData);
+                    console.log('userData response: ', userData);
                     if (response.status === 200 && response.data.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setIsHandleSet(true);
-                        setsessionUserId(response.data.user_id);
+                        setsessionPublicKey(response.data.publicKey);
                         setsessionUserHandle(response.data.handle);
+                        setSessionUserDisplayName(userData.displayName);
+                        setSessionUserProfileName(userData.profileName);
+                        setSessionUserProfileBio(userData.bio);
+                        setSessionUserProfileLocation(userData.location);
                     } else {
                         console.error("Invalid session, redirecting to login.");
                         navigate('/login');
@@ -136,40 +144,11 @@ const ProfileSettings = () => {
                     console.error("Error fetching current user session:", error);
                     navigate('/login');
                 }
-            } else if (sessionUserHandle) {
-                const response = await getSessionUser();
-                setsessionUserId(response.data.user_id);
-                setsessionUserHandle(response.data.handle);
-                setIsHandleSet(true);
             }
         };
 
         fetchSessionUser();
-    }, [sessionUserHandle, navigate, isHandleSet]);
-
-    // Fetch profile and posts once the current handle is determined
-    useEffect(() => {
-        if (sessionUserHandle && isHandleSet) {
-            const fetchData = async () => {
-                try {
-                    console.log("Fetching profile and posts for handle:", sessionUserHandle);
-                    const [profileData] = await Promise.all([
-                        getProfile(sessionUserHandle),
-                    ]);
-                    console.log("Profile Data after getProfile() fetching is:", profileData);
-                    setProfile(profileData);
-                    setSessionUserDisplayName(profileData.display_name);
-                    setSessionUserProfileName(profileData.profile_name);
-                    setSessionUserProfileBio(profileData.profile_bio);
-                    setSessionUserProfileLocation(profileData.profile_location);
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                }
-            };
-
-            fetchData();
-        }
-    }, [sessionUserHandle, isHandleSet]);
+    }, [sessionUserHandle, navigate, isHandleSet, user]);
 
     return (
         <div className="profile-settings__container flex-1  p-8 h-full  md:mx-16 text-foreground">

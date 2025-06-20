@@ -1,50 +1,57 @@
 import meNexus from "../../config/mysql.js";
+import { getUserByPublicKeyFromDB, getUserByHandleFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const getConversations = (user_id) => {
-    return new Promise((resolve, reject) => {
+export const getConversations = async (userPublicKey) => {
+    try {
         const sql = `
             SELECT
                 c.conversation_id,
-                u.user_id AS participant_id,
-                u.handle AS participant_handle,
+                cp2.public_key AS participant_id,
                 EXISTS (
-                           SELECT 1
-                           FROM Messages m
-                           WHERE m.conversation_id = c.conversation_id AND m.is_read = FALSE
-                       ) AS has_unread_messages
-            
-            FROM
-                Conversations c
-                    JOIN
-                ConversationParticipants cp ON c.conversation_id = cp.conversation_id
-                    JOIN
-                Users u ON cp.user_id = u.user_id
-                    LEFT JOIN
-                Messages m ON c.conversation_id = m.conversation_id
-            WHERE
-                cp.conversation_id IN (
-                    SELECT conversation_id
-                    FROM ConversationParticipants
-                    WHERE user_id = ?
-                )
-              AND u.user_id != ?
-            GROUP BY
-                c.conversation_id, participant_id
+                    SELECT 1
+                    FROM Messages m
+                    WHERE m.conversation_id = c.conversation_id AND m.is_read = FALSE AND m.receiver_public_key = ?
+                ) AS has_unread_messages
+            FROM Conversations c
+                JOIN ConversationParticipants cp1 ON c.conversation_id = cp1.conversation_id
+                JOIN ConversationParticipants cp2 ON c.conversation_id = cp2.conversation_id
+            WHERE cp1.public_key = ?
+              AND cp2.public_key != ?
         `;
 
-        meNexus.query(sql, [user_id, user_id], (err, results) => {
-            if (err) {
-                console.error('Error fetching conversations', err);
-                return reject(err);
-            }
-
-            console.log('/getConversations results:', results);
-            resolve(results);
+        const results = await new Promise((resolve, reject) => {
+            meNexus.query(sql, [userPublicKey, userPublicKey, userPublicKey], (err, rows) => {
+                if (err) {
+                    console.error('Error fetching conversations:', err);
+                    return reject(err);
+                }
+                resolve(rows);
+            });
         });
-    });
+
+        // Enrich each result with globalUsers data
+        const enrichedResults = await Promise.all(
+            results.map(async (row) => {
+                const participant = await getUserByPublicKeyFromDB(row.participant_id);
+                return {
+                    ...row,
+                    participant_handle: participant?.handle || null,
+                    participant_profileName: participant?.profileName || null,
+                    participant_profilePicture: participant?.profilePicture || null,
+                };
+            })
+        );
+
+        console.log('/getConversations enriched:', enrichedResults);
+        return enrichedResults;
+
+    } catch (err) {
+        console.error("Error in getConversations:", err);
+        throw err;
+    }
 };
 
-export const createConversation = (user_id) => {
+export const createConversation = (publicKey) => {
     return new Promise((resolve, reject) => {
         let newConversationId;
 
@@ -64,11 +71,11 @@ export const createConversation = (user_id) => {
 
             const addSenderParticipantSql = `
                 INSERT INTO 
-                    ConversationParticipants (conversation_id, user_id) 
+                    ConversationParticipants (conversation_id, public_key) 
                 VALUES (?, ?);
             `;
 
-            meNexus.query(addSenderParticipantSql, [newConversationId, user_id], (err, results) => {
+            meNexus.query(addSenderParticipantSql, [newConversationId, publicKey], (err, results) => {
                 if (err) {
                     console.error('Error adding sender to  ConversationParticipants', err);
                     return reject(err);
@@ -80,42 +87,29 @@ export const createConversation = (user_id) => {
     });
 }
 
-export const updateConversationParticipants = (conversation_id, newParticipantsHandle) => {
-    return new Promise((resolve, reject) => {
-        const getParticipantUserIdSql = `
-            SELECT user_id 
-            from Users 
-            WHERE handle = ?;
-        `;
+export const updateConversationParticipants = async (conversation_id, newParticipantsHandle) => {
+    try {
+        const user = await getUserByHandleFromDB(newParticipantsHandle);
+        const participantPublicKey = user.publicKey;
 
-        meNexus.query(getParticipantUserIdSql, [newParticipantsHandle], (err, result) => {
-            if (err) {
-                console.error(`Error getting new participant's user_id`, err);
-                return reject(err);
-            }
+        const addParticipantsSql = `
+                    INSERT INTO ConversationParticipants (conversation_id, public_key)
+                    VALUES (?, ?);
+                `;
+        const result = await new Promise((resolve, reject) => {
+            meNexus.query(addParticipantsSql, [conversation_id, participantPublicKey], (err, result) => {
+                if (err) {
+                    console.error('Error updating conversation participants', err);
+                    return reject(err);
+                }
+                resolve({result});
+            })
+        })
+    } catch (err) {
+        console.error("Error updating conversation participants", err);
+        throw err;
+    }
 
-            if (result && result.length > 0 && result[0].user_id) {
-                const newParticipantsUserId = result[0].user_id;
-
-                const addParticipantsSql = `
-                INSERT INTO ConversationParticipants (conversation_id, user_id) 
-                VALUES (?, ?);
-            `;
-
-                meNexus.query(addParticipantsSql, [conversation_id, newParticipantsUserId], (err, result) => {
-                    if (err) {
-                        console.error('Error updating conversation participants', err);
-                        return reject(err);
-                    }
-
-                    resolve({result});
-                })
-            } else {
-                console.error("No user found with the provided handle")
-                return reject(new Error("No user_id found for the provided handle"));
-            }
-        });
-    });
 }
 
 export default {

@@ -1,21 +1,22 @@
 import { useState } from "react";
 import useCreatePost from '../../../api/hooks/useCreatePost.js';
 
-const PostForm = ({ handle, refreshPosts }) => {
+const PostForm = ({ publicKey, createPost, loading, error, refreshPosts }) => {
     const [text, setText] = useState(`What's on your mind?`);
     const [formClicked, setFormClicked] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const { createPost, loading, error } = useCreatePost(refreshPosts);
+    //const { createPost, loading, error } = useCreatePost(refreshPosts);
 
     const handleSubmit = async () => {
         const post = {
-            handle: handle,
+            publicKey: publicKey,
             content: text,
         };
         console.log("Submitting post:", post);
         await createPost(post);
         setText(""); // Reset the text field after submission
+        refreshPosts();
     };
 
     const handleFormClick = () => {

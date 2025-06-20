@@ -13,8 +13,10 @@ export const ENDPOINTS = {
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
 
     CREATE_USER: `${API_BASE_URL}/api/auth/createUser`,
+    GET_ALL_USERS: `${API_BASE_URL}/api/user/getAllUsers`,
     GET_SESSION_USER: `${API_BASE_URL}/api/user/getSessionUser`,
-    GET_USER: `${API_BASE_URL}/api/user/getUserById/:user_id`,
+    GET_USER: `${API_BASE_URL}/api/user/getUserByPublicKey`,
+    GET_USER_BY_HANDLE: `${API_BASE_URL}/api/user/getUserByHandle`,
     GET_PROFILE: `${API_BASE_URL}/api/user/getProfile/:handle`,
 
     UPDATE_ACCOUNT_SETTINGS: `${API_BASE_URL}/api/auth/updateAccountSettings`,
@@ -27,8 +29,9 @@ export const ENDPOINTS = {
     CREATE_POST: `${API_BASE_URL}/api/post/createPost`,
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
+    GET_ALL_POSTS: `${API_BASE_URL}/api/post/getAllPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
-    GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts/:handle`,
+    GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
     UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,
@@ -50,4 +53,13 @@ export const ENDPOINTS = {
     UPLOAD_PROFILE_PICTURE: `${API_BASE_URL}/api/settings/uploadProfilePicture`,
 
     SEARCH: `${API_BASE_URL}/api/search/search`,
+
+    /* ---- SYNAPSE ROUTES ----------------------------------------------------- */
+    GET_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getSynapseMetadata`,
+    GET_LOCAL_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getLocalSynapseMetadata`,
+    GET_SYNAPSE_USERS: `${API_BASE_URL}/synapse/getSynapseUsers`,
+    GET_SYNAPSE_POSTS: `${API_BASE_URL}/synapse/getSynapsePosts`,
+    GET_SYNAPSE_USER_POSTS: `${API_BASE_URL}/synapse/getSynapseUserPosts`,
+    JOIN_SYNAPSE: `${API_BASE_URL}/synapse/joinSynapse`,
+    LEAVE_SYNAPSE: `${API_BASE_URL}/synapse/leaveSynapse`,
 };

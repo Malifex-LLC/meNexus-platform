@@ -21,7 +21,7 @@ const Search = () => {
     const [error, setError] = useState(null);
     const {search} = useSearch();
     const navigate = useNavigate();
-    const [session_user_id, setSession_user_id] = useState(null);
+    const [sessionPublicKey, setsessionPublicKey] = useState(null);
 
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
@@ -60,8 +60,8 @@ const Search = () => {
             try {
                 const response = await getSessionUser();
 
-                if (response.status === 200 && response.data.user_id) {
-                    setSession_user_id(response.data.user_id);
+                if (response.status === 200 && response.data.publicKey) {
+                    setsessionPublicKey(response.data.publicKey);
                 } else {
                     console.error("Invalid session, redirecting to login.");
                     navigate ("/login");
@@ -91,7 +91,11 @@ const Search = () => {
                             <div className="search-results__users-container flex-1 overflow-y-auto p-4 space-y-8 ">
                                 <h1 className={`font-semibold`}>Users Found:</h1>
                                 {userResults.map((user, index) => (
-                                    <ProfileCard key={index} handle={user.handle} />
+                                    <ProfileCard
+                                        key={index}
+                                        publicKey={user.publicKey}
+                                        handle={user.handle}
+                                    />
                                 ))}
                             </div>
                         )}
@@ -105,10 +109,10 @@ const Search = () => {
                                     <Post
                                         key={index}
                                         post_id={post.post_id}
-                                        user_id={post.user_id}
-                                        session_user_id={session_user_id}
+                                        publicKey={post.public_key}
+                                        sessionPublicKey={sessionPublicKey}
                                         handle={post.handle}
-                                        display_name={post.display_name}
+                                        displayName={post.displayName}
                                         date={post.created_at}
                                         content={post.content}
                                         comments={0}

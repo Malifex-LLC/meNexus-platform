@@ -4,15 +4,16 @@ import { ENDPOINTS } from '../config.js';
 const useGetFollowerCount = () => {
     const { sendRequest, loading, error } = useAxios();
 
-    const getFollowerCount = async (user_id) => {
+    const getFollowerCount = async (publicKey) => {
         try {
             const response = await sendRequest({
                 method: 'GET',
                 url: ENDPOINTS.GET_FOLLOWER_COUNT,
-                params: {user_id},
+                params: {publicKey},
                 withCredentials: true,
             });
 
+            console.log('getFollowerCount response: ', response);
             return response.data;
         } catch (err) {
             console.error('Error getting follower count: ', err);

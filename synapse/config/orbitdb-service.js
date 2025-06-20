@@ -10,6 +10,8 @@ import { tcp } from '@libp2p/tcp';
 import { webSockets } from '@libp2p/websockets';
 import { noise } from '@chainsafe/libp2p-noise'; // For encryption
 import { mplex } from '@libp2p/mplex';
+import { mdns } from '@libp2p/mdns';
+import { bootstrap } from '@libp2p/bootstrap';
 
 let orbitdbInstance = null; // To hold the OrbitDB instance
 let ipfsInstance = null;
@@ -46,21 +48,31 @@ export async function initializeOrbitDB() {
             }),
             identify: identify(),
         },
-        peerDiscovery: [] // Disable peer discovery for now
+        peerDiscovery: [
+            bootstrap({
+                list: [
+                    '/ip4/192.168.1.60/tcp/4001/p2p/12D3KooWMgmyd1zh7pB4srggFNiKVb1BbzWzKfBtUnEzbZds8iSe',
+                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWPPHrMDJBJHwxcKgkWSLwphZS9V3X3wDAthpYe1CiDo6Z',
+                ],
+            }),
+            mdns({
+                interval: 2000,
+            }),
+        ],
     });
     console.log('Listening addresses:', libp2p.getMultiaddrs().map(addr => addr.toString()));
 
-    const directory = '../../src/orbitdb'
+    const directory = '../src/orbitdb'
     const blockstore = new LevelBlockstore(`${directory}/ipfs/blocks`)
 
-    const keystorePath = '../../src/orbitdb/keystore';
+    const keystorePath = '../src/orbitdb/keystore';
     const keystore = await KeyStore({ path: keystorePath });
 
-    const id = 'meNexus-orbitdb'
-    const identities = await Identities({ keystore });
-    const identity = identities.createIdentity({ id })
-
     ipfsInstance = await createHelia({ libp2p, blockstore, blockBrokers: [bitswap()] })
+
+    const id = 'meNexus-orbitdb'
+    const identities = await Identities({ keystore, ipfs: ipfsInstance });
+    const identity = identities.createIdentity({ id })
 
     orbitdbInstance = await createOrbitDB({
         ipfs: ipfsInstance,
@@ -82,15 +94,35 @@ export async function initializeOrbitDB() {
 
     console.log('Connected peers:', libp2p.getPeers());
 
-    const db = await orbitdbInstance.open('meNexus-publicKeys', {
-        type: 'documents',
-        accessController: {
-            type: 'orbitdb',
-            write: [
-                '*',
-            ]
-        }
-    })
+    //
+    // console.log('Database Address:', db.address);
+    console.log('Identity:', orbitdbInstance.identity);
+
+    return orbitdbInstance;
+}
+
+export function getIPFSInstance() {
+    if (!ipfsInstance) {
+        throw new Error('IPFS instance is not initialized. Call initializeOrbitDB first.');
+    }
+    return ipfsInstance;
+}
+
+// Open or create a orbitdb
+export async function getDatabase(nameOrAddr, type = 'documents', options = {}) {
+    if (!orbitdbInstance) {
+        throw new Error('OrbitDB is not initialized. Call initializeOrbitDB first.');
+    }
+
+    if (databases[nameOrAddr]) {
+        console.log(`Database "${nameOrAddr}" already opened.`);
+        return databases[nameOrAddr];
+    }
+
+    console.log(`Opening database "${nameOrAddr}" of type "${type}"...`);
+    const db = await orbitdbInstance.open(nameOrAddr, { type, ...options });
+    databases[nameOrAddr] = db; // Store reference to the orbitdb
+    console.log('Databases object:', databases);
 
     db.events.on('replicate', (address) => {
         console.log(`[Replicate] Starting replication for database: ${address}`);
@@ -107,35 +139,6 @@ export async function initializeOrbitDB() {
     db.events.on('replicated', (address) => {
         console.log(`[Replicated] Replication complete for database: ${address}`);
     });
-
-    console.log('Database Address:', db.address);
-    console.log('Identity:', orbitdbInstance.identity);
-
-    return orbitdbInstance;
-}
-
-export function getIPFSInstance() {
-    if (!ipfsInstance) {
-        throw new Error('IPFS instance is not initialized. Call initializeOrbitDB first.');
-    }
-    return ipfsInstance;
-}
-
-// Open or create a orbitdb
-export async function getDatabase(name, type = 'documents', options = {}) {
-    if (!orbitdbInstance) {
-        throw new Error('OrbitDB is not initialized. Call initializeOrbitDB first.');
-    }
-
-    if (databases[name]) {
-        console.log(`Database "${name}" already opened.`);
-        return databases[name];
-    }
-
-    console.log(`Opening database "${name}" of type "${type}"...`);
-    const db = await orbitdbInstance.open(name, { type, ...options });
-    databases[name] = db; // Store reference to the orbitdb
-    console.log('Databases object:', databases);
     return db;
 }
 
