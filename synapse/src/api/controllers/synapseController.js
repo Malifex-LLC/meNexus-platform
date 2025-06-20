@@ -4,11 +4,18 @@ import { MESSAGE_TYPES} from "#protocols/snp/messageTypes.js";
 import { ACTION_TYPES } from '#protocols/snp/actionTypes.js'
 import { RESOURCE_TYPES} from "#protocols/snp/resourceTypes.js";
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
-const CONFIG_FILE = '#config/synapse-config.json';
 import * as peerStateManager from '#src/core/peerStateManager.js'
-import path from "path";
 import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
 import Post from "#src/api/models/post.js";
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, '../../../config/synapse-config.json');
 
 
 // console.log('peerStateManager instance:', import.meta.url);
