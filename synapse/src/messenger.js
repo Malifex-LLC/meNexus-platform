@@ -236,6 +236,7 @@ const processMessage = async (message) => {
                 const publicKeyResponse = createMessage(
                     MESSAGE_TYPES.PEER.RESPONSE,
                     ACTION_TYPES.PEER.RESPONSE_PUBLIC_KEY,
+                    RESOURCE_TYPES.PEER_PUBLIC_KEY,
                     {publicKey: process.env.PUBLIC_KEY},
                     {sender: libp2p.peerId.toString()}
                 );
