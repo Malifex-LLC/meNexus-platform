@@ -1,7 +1,8 @@
 import { SNP_VERSION } from './version.js';
 import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
 import { ACTION_TYPES, isValidActionType } from './actionTypes.js';
-import { v4 as uuidv4 } from 'uuid'; // Use UUID for unique request IDs
+import { v4 as uuidv4 } from 'uuid';
+import {isValidResourceType} from "#protocols/snp/resourceTypes.js"; // Use UUID for unique request IDs
 
 
 /**
@@ -12,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'; // Use UUID for unique request IDs
  * @param {object} meta - Additional metadata (e.g., timestamp)
  * @returns {object} - The constructed message
  */
-export const createMessage = (messageType, actionType = {}, payload = {}, meta = {}) => {
+export const createMessage = (messageType, actionType = {}, resourceType = {}, payload = {}, meta = {}) => {
     //console.log('createMessage: ', messageType, actionType, payload, meta);
     if (!isValidMessageType(messageType)) {
         throw new Error(`Invalid message type: ${messageType}`);
@@ -24,11 +25,17 @@ export const createMessage = (messageType, actionType = {}, payload = {}, meta =
     }
     console.log('Valid action type: ', actionType);
 
+    if (!isValidResourceType(resourceType)) {
+        throw new Error(`Invalid resource type: ${resourceType}`);
+    }
+    console.log('Valid resource type: ', resourceType);
+
     return {
         protocol: 'SNP',
         version: SNP_VERSION,
         messageType,
         actionType,
+        resourceType,
         payload,
         meta: {
             requestId: meta.requestId ?? uuidv4(),

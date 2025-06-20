@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import User from "../models/user.js" ;
 import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
+import { loadConfig, saveConfig } from '../../../utils/configUtils.js';
+const CONFIG_FILE = '../config/synapse-config.json';
 
 // Account registration logic
 // TODO Move createUser to userController? and call createUser by authController?
@@ -17,8 +19,12 @@ export const createUser = async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
+        // Get local Synapse publicKey
+        const metadata = await loadConfig(CONFIG_FILE);
+        const synapsePublicKey = metadata.identity.publicKey;
+
         // Call the createUser function from the User model
-        const newUserId = await User.createUser(publicKey, handle, display_name);
+        const newUserId = await User.createUser(publicKey, handle, display_name, synapsePublicKey);
         console.log("New user created with ID:", newUserId);
 
         // Return a success response

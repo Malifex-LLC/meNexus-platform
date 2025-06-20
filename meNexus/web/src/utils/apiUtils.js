@@ -11,6 +11,7 @@ export const refreshPosts = async (getUserPosts, handle, setPosts) => {
     try {
         const userPostsData = await getUserPosts(handle);
         setPosts(userPostsData);
+        return userPostsData;
     } catch (error) {
         console.log("Error refreshing posts:", error);
     }

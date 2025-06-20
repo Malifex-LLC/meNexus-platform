@@ -11,6 +11,7 @@ import Post from "../../components/Posts/Post/Post.jsx";
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 import { IoLocationSharp } from "react-icons/io5";
 import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
+import useCreatePost from "../../api/hooks/useCreatePost.js";
 
 
 const UserProfile = () => {
@@ -19,7 +20,7 @@ const UserProfile = () => {
     const { getUserPosts, loading: userPostsLoading, error: userPostsError } = useGetUserPosts();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { createNotification } = useCreateNotification();
-    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, sessionPublicKey, setPosts));
 
     const {
         editingPostId,
@@ -27,7 +28,8 @@ const UserProfile = () => {
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+    } = useEditPost(() => refreshPosts(getUserPosts, sessionPublicKey, setPosts));
+    const { createPost, createPostLoading, createPostError } = useCreatePost();
 
     const { handle } = useParams();
     const [user, setUser] = useState(null)
@@ -173,8 +175,11 @@ const UserProfile = () => {
                     {isOwner && (
                         <div className="user-profile__post-form bg-surface p-4 rounded-xl mt-8 ">
                             <PostForm
-                                handle={currentHandle}
-                                refreshPosts={() => refreshPosts(getUserPosts, currentHandle, setPosts)} />
+                                publicKey={sessionPublicKey}
+                                createPost={createPost}
+                                loading={createPostLoading}
+                                error={createPostError}
+                                refreshPosts={() => refreshPosts(getUserPosts, sessionPublicKey, setPosts)} />
                         </div>
                     )}
                     {posts.length > 0 ? (

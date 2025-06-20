@@ -8,7 +8,7 @@ import useCreateNotification from "../../api/hooks/useCreateNotification.js";
 
 const ProfileCard = ({publicKey, handle}) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const {getUser } = useGetUser();
+    const { getUser } = useGetUser();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { createNotification } = useCreateNotification();
 
