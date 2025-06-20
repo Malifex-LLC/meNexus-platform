@@ -26,11 +26,11 @@ export const getSynapseMetadata = async (req, res) => {
     if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
     }
-    const resource = RESOURCE_TYPES.SYNAPSE_METADATA;
     const metadataRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
-        { resource },
+        RESOURCE_TYPES.SYNAPSE_METADATA,
+        {},
         {sender: process.env.PUBLIC_KEY}
     );
     try {
@@ -59,14 +59,11 @@ export const getSynapseUsers = async (req, res) => {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
     }
 
-    const resource = RESOURCE_TYPES.ALL_USERS;
-
     const usersRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
-        {
-            resource,
-        },
+        RESOURCE_TYPES.ALL_USERS,
+        {},
         {sender: process.env.PUBLIC_KEY}
     )
     try {
@@ -90,6 +87,7 @@ export const getSynapsePosts = async (req, res) => {
     const postsRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
+        RESOURCE_TYPES.ALL_POSTS,
         {
             resource,
         },
@@ -117,13 +115,11 @@ export const getSynapseUserPosts = async (req, res) => {
     console.log('getSynapseUserPosts synapsePublicKey: ', synapsePublicKey);
     console.log('getSynapseUserPosts peerId: ', peerId);
 
-    const resource = RESOURCE_TYPES.ALL_POSTS
-
     const postsRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.RESOURCE.FETCH,
+        RESOURCE_TYPES.ALL_POSTS,
         {
-            resource,
             handle
         },
         {sender: process.env.PUBLIC_KEY}
@@ -150,13 +146,12 @@ export const createSynapsePost = async (req, res) => {
     if (!peerId) {
         return res.status(400).json({error: 'peerId not found.'});
     }
-    const resource = RESOURCE_TYPES.POST;
 
     const createPostRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.RESOURCE.CREATE,
+        RESOURCE_TYPES.POST,
         {
-            resource,
             publicKey,
             content
         },

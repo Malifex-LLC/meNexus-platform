@@ -277,7 +277,7 @@ const processMessage = async (message) => {
             console.log(`Received DATA_REQUEST from ${message.meta.sender}.`);
             if (message.actionType === ACTION_TYPES.DATA.QUERY) {
                 console.log(`Received DATA_QUERY from ${message.meta.sender}.`);
-                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.SYNAPSE_METADATA) {
+                if (message.resourceType === RESOURCE_TYPES.SYNAPSE_METADATA) {
                     console.log(`Received SYNAPSE_METADATA request from ${message.meta.sender}.`);
                     const response = await sendRequest({
                         method: 'GET',
@@ -304,7 +304,7 @@ const processMessage = async (message) => {
                         console.warn('Cannot map publicKey to peerId - response not sent.');
                     }
                 }
-                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_USERS) {
+                if (message.resourceType === RESOURCE_TYPES.ALL_USERS) {
                     console.log(`Received ALL_USERS request from ${message.meta.sender}.`);
                     const response = await sendRequest({
                         method: 'GET',
@@ -333,7 +333,7 @@ const processMessage = async (message) => {
                         console.warn('Cannot map publicKey to peerId - response not sent.');
                     }
                 }
-                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
+                if (message.resourceType === RESOURCE_TYPES.ALL_POSTS) {
                     console.log(`Received ALL_POSTS request from ${message.meta.sender}.`);
                     const response = await sendRequest({
                         method: 'GET',
@@ -364,7 +364,7 @@ const processMessage = async (message) => {
             }
             if (message.actionType === ACTION_TYPES.RESOURCE.FETCH) {
                 console.log(`Received RESOURCE_FETCH from ${message.meta.sender}.`);
-                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.ALL_POSTS) {
+                if (message.resourceType === RESOURCE_TYPES.ALL_POSTS) {
                     console.log(`Received ALL_POSTS request from ${message.meta.sender}.`);
                     const { handle } = message.payload;
                     const url = ENDPOINTS.GET_USER_POSTS.replace(':handle', encodeURIComponent(handle));
@@ -399,7 +399,7 @@ const processMessage = async (message) => {
             }
             if (message.actionType === ACTION_TYPES.RESOURCE.CREATE) {
                 console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
-                if (message.payload.resource && message.payload.resource === RESOURCE_TYPES.POST) {
+                if (message.resourceType === RESOURCE_TYPES.POST) {
                     console.log(`Received POST request from ${message.meta.sender}.`);
                     const { publicKey, content } = message.payload;
                     const response = await sendRequest({
