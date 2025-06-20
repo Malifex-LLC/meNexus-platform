@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import User from "../models/user.js" ;
 import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
-import { loadConfig, saveConfig } from '../../../utils/configUtils.js';
-const CONFIG_FILE = '../config/synapse-config.json';
+import { loadConfig, saveConfig } from '#utils/configUtils.js';
+const CONFIG_FILE = '#config/synapse-config.json';
 
 // Account registration logic
 // TODO Move createUser to userController? and call createUser by authController?

@@ -1,14 +1,14 @@
 import { createMessage } from '#protocols/snp/messageUtils.js'
-import { sendMessageWithResponse } from "#src/messenger.js";
+import { sendMessageWithResponse } from "#core/messenger.js";
 import { MESSAGE_TYPES} from "#protocols/snp/messageTypes.js";
 import { ACTION_TYPES } from '#protocols/snp/actionTypes.js'
 import { RESOURCE_TYPES} from "#protocols/snp/resourceTypes.js";
-import { loadConfig, saveConfig } from '../../../utils/configUtils.js';
-const CONFIG_FILE = '../config/synapse-config.json';
-import * as peerStateManager from '#src/peerStateManager.js'
+import { loadConfig, saveConfig } from '#utils/configUtils.js';
+const CONFIG_FILE = '#config/synapse-config.json';
+import * as peerStateManager from '#src/core/peerStateManager.js'
 import path from "path";
 import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
-import Post from "#api/src/models/post.js";
+import Post from "#src/api/models/post.js";
 
 
 // console.log('peerStateManager instance:', import.meta.url);

@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
-import { createLibp2pInstance } from '../config/libp2p.js'
-import { isValidMessageType } from '../protocols/snp/messageTypes.js'
-import { isValidActionType } from '../protocols/snp/actionTypes.js'
-import { isValidResourceType } from '../protocols/snp/resourceTypes.js'
+import { createLibp2pInstance } from '#config/libp2p.js'
+import { isValidMessageType } from '#protocols/snp/messageTypes.js'
+import { isValidActionType } from '#protocols/snp/actionTypes.js'
+import { isValidResourceType } from '#protocols/snp/resourceTypes.js'
 
 // SNP message validation function
 const validateMessage = (message) => {

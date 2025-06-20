@@ -1,4 +1,4 @@
-import meNexus from '../../config/mysql.js';
+import meNexus from '../config/mysql.js';
 
 // Fetch authentication details by email
 export const getAuthByEmail = (email) => {

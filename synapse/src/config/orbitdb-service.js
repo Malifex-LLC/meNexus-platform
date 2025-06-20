@@ -12,6 +12,8 @@ import { noise } from '@chainsafe/libp2p-noise'; // For encryption
 import { mplex } from '@libp2p/mplex';
 import { mdns } from '@libp2p/mdns';
 import { bootstrap } from '@libp2p/bootstrap';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 let orbitdbInstance = null; // To hold the OrbitDB instance
 let ipfsInstance = null;
@@ -62,10 +64,16 @@ export async function initializeOrbitDB() {
     });
     console.log('Listening addresses:', libp2p.getMultiaddrs().map(addr => addr.toString()));
 
-    const directory = '../src/orbitdb'
-    const blockstore = new LevelBlockstore(`${directory}/ipfs/blocks`)
 
-    const keystorePath = '../src/orbitdb/keystore';
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+// Absolute paths to orbitdb folder
+    const directory = path.resolve(__dirname, '../orbitdb');
+    const keystorePath = path.resolve(directory, 'keystore');
+
+    const blockstore = new LevelBlockstore(`${directory}/ipfs/blocks`)
     const keystore = await KeyStore({ path: keystorePath });
 
     ipfsInstance = await createHelia({ libp2p, blockstore, blockBrokers: [bitswap()] })

@@ -1,5 +1,5 @@
 // Import orbitdb connection
-import meNexus from '../../config/mysql.js';
+import meNexus from '../config/mysql.js';
 import { createGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
 // Import orbitDB userPublicKeys orbitdb wrapper function

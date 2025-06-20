@@ -2,7 +2,7 @@ import { SNP_VERSION } from './version.js';
 import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
 import { ACTION_TYPES, isValidActionType } from './actionTypes.js';
 import { v4 as uuidv4 } from 'uuid';
-import {isValidResourceType} from "#protocols/snp/resourceTypes.js"; // Use UUID for unique request IDs
+import {isValidResourceType} from "#src/protocols/snp/resourceTypes.js"; // Use UUID for unique request IDs
 
 
 /**

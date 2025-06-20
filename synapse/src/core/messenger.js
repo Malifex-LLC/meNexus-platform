@@ -7,7 +7,7 @@ import { createMessage, encodeMessage, decodeMessage, validateMessage} from '#pr
 import { sendRequest } from '#utils/apiUtils.js'
 import { createLibp2pInstance } from '#config/libp2p.js'; // Import the configured libp2p constructor
 import { multiaddr } from 'multiaddr';
-import * as peerStateManager from '#src/peerStateManager.js'
+import * as peerStateManager from '#core/peerStateManager.js'
 
 // console.log('peerStateManager instance:', import.meta.url);
 // console.log('peerStateManager instance in messenger:', peerStateManager);

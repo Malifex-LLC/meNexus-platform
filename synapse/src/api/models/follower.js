@@ -1,4 +1,4 @@
-import meNexus from "../../config/mysql.js"
+import meNexus from "../config/mysql.js"
 import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
 
 export const followUser = async (publicKey, followedPublicKey) => {

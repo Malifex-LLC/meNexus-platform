@@ -1,6 +1,14 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-dotenv.config({path: '../config/.env'});
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Resolve __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Explicitly point to your .env file
+dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 //Create mySQL Connection using data stored in .env file
 let meNexus = mysql.createConnection({

@@ -3,16 +3,16 @@
    ------------------------------------------------- */
 
 import dotenv from 'dotenv';
-dotenv.config({ path: '../config/.env' });
+dotenv.config({ path: './config/.env' });
 
 import express from 'express';
-import { createExpressApp }     from '../config/express.js';
-import { createWebSocketServer } from '../config/websocket.js';
+import { createExpressApp }     from './config/express.js';
+import { createWebSocketServer } from './config/websocket.js';
 import sessionMiddleware         from './middlewares/session.js';
 // import sessionLogger           from './middlewares/sessionLogger.js'
 
-import { initializeOrbitDB, closeOrbitDB } from '../../config/orbitdb-service.js';
-import { getGlobalUsersDB } from '../../src/orbitdb/globalUsers.js'
+import { initializeOrbitDB, closeOrbitDB } from '#config/orbitdb-service.js';
+import { getGlobalUsersDB } from '#src/orbitdb/globalUsers.js'
 
 // Route modules
 import authRoutes         from './routes/authRoutes.js';

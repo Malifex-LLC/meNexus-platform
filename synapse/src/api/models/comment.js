@@ -1,4 +1,4 @@
-import meNexus from "../../config/mysql.js";
+import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
 export const createComment = (publicKey, resource_type, resource_id, content) => {

@@ -1,5 +1,5 @@
-import meNexus from "../../config/mysql.js";
-import  { clients } from '../../config/websocket.js';
+import meNexus from "../config/mysql.js";
+import  { clients } from '../config/websocket.js';
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
 // Helper to send notifications via WebSocket

@@ -3,7 +3,7 @@ const router = express.Router();
 import settingsController from '../controllers/settingsController.js'
 
 // Import Multer upload config
-import {upload}  from '../../config/multer.js'
+import {upload}  from '../config/multer.js'
 
 // Define settingsRoutes and link them to corresponding controller functions
 

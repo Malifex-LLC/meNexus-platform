@@ -1,5 +1,5 @@
-import meNexus from "../../config/mysql.js";
-import { clients } from '../../config/websocket.js';
+import meNexus from "../config/mysql.js";
+import { clients } from '../config/websocket.js';
 
 // Helper to send messages via WebSocket
 const sendMessage = (userId, message) => {

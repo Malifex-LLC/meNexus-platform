@@ -1,4 +1,4 @@
-import meNexus from "../../config/mysql.js";
+import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
 
