@@ -53,6 +53,7 @@ export const initializeMessenger = async () => {
         const publicKeyRequest = createMessage(
             MESSAGE_TYPES.PEER.REQUEST,
             ACTION_TYPES.PEER.REQUEST_PUBLIC_KEY,
+            RESOURCE_TYPES.PEER_PUBLIC_KEY,
             {},
             {sender: libp2p.peerId.toString()}
         );
