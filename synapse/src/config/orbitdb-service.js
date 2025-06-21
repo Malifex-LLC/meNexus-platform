@@ -53,8 +53,8 @@ export async function initializeOrbitDB() {
         peerDiscovery: [
             bootstrap({
                 list: [
-                    '/ip4/192.168.1.60/tcp/4001/p2p/12D3KooWMgmyd1zh7pB4srggFNiKVb1BbzWzKfBtUnEzbZds8iSe',
-                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWPPHrMDJBJHwxcKgkWSLwphZS9V3X3wDAthpYe1CiDo6Z',
+                    '/ip4/192.168.1.60/tcp/4002/p2p/12D3KooWMgmyd1zh7pB4srggFNiKVb1BbzWzKfBtUnEzbZds8iSe',
+                    '/ip4/192.168.1.188/tcp/4002/p2p/12D3KooWPPHrMDJBJHwxcKgkWSLwphZS9V3X3wDAthpYe1CiDo6Z',
                 ],
             }),
             mdns({
