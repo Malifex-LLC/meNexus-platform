@@ -54,12 +54,15 @@ export const ENDPOINTS = {
 
     SEARCH: `${API_BASE_URL}/api/search/search`,
 
-    /* ---- SYNAPSE ROUTES ----------------------------------------------------- */
-    GET_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getSynapseMetadata`,
-    GET_LOCAL_SYNAPSE_METADATA: `${API_BASE_URL}/synapse/getLocalSynapseMetadata`,
-    GET_SYNAPSE_USERS: `${API_BASE_URL}/synapse/getSynapseUsers`,
-    GET_SYNAPSE_POSTS: `${API_BASE_URL}/synapse/getSynapsePosts`,
-    GET_SYNAPSE_USER_POSTS: `${API_BASE_URL}/synapse/getSynapseUserPosts`,
-    JOIN_SYNAPSE: `${API_BASE_URL}/synapse/joinSynapse`,
-    LEAVE_SYNAPSE: `${API_BASE_URL}/synapse/leaveSynapse`,
+    GET_SYNAPSE_METADATA: `${API_BASE_URL}/api/synapse/getSynapseMetadata`,
+
+
+    /* ---- REMOTE ROUTES ----------------------------------------------------- */
+    FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
+    FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
+    FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
+    FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
+    CREATE_REMOTE_POST: `${API_BASE_URL}/remote/createRemotePost`,
+    JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
+    LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
 };

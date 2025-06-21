@@ -26,6 +26,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import searchRoutes       from './routes/searchRoutes.js';
 import settingsRoutes     from './routes/settingsRoutes.js';
 import synapseRoutes      from './routes/synapseRoutes.js';
+import remoteRoutes      from './routes/remoteRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 /* ────────────────────────────────────────────────
@@ -61,7 +62,8 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     app.use('/api/notification', notificationRoutes);
     app.use('/api/search',       searchRoutes);
     app.use('/api/settings',     settingsRoutes);
-    app.use('/synapse',          synapseRoutes);
+    app.use('/api/synapse',      synapseRoutes);
+    app.use('/remote',           remoteRoutes);
 
     /* ---- Start listening ------------------------------------------------- */
     const httpServer = await new Promise(resolve => {

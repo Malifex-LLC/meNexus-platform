@@ -1,16 +1,15 @@
 import useAxios from './useAxios.js';
 import { ENDPOINTS } from "../config.js";
 
-
-const useGetSynapsePosts = () => {
-    console.log("useGetSynapsePosts called");
+const useFetchRemotePosts = () => {
+    console.log("useFetchRemotePosts called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const getSynapsePosts = async (publicKey) => {
+    const fetchRemotePosts = async (publicKey) => {
 
         const response = await sendRequest({
             method: 'GET',
-            url: ENDPOINTS.GET_SYNAPSE_POSTS,
+            url: ENDPOINTS.FETCH_REMOTE_POSTS,
             params: {publicKey},
             withCredentials: true,
         });
@@ -19,10 +18,10 @@ const useGetSynapsePosts = () => {
     };
 
     return {
-        getSynapsePosts,
+        fetchRemotePosts,
         posts: data,
         loading,
         error};
 };
 
-export default useGetSynapsePosts;
+export default useFetchRemotePosts;

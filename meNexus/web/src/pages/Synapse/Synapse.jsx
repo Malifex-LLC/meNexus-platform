@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useGetSynapsePosts from "../../api/hooks/useGetSynapsePosts.js"
+import useFetchRemotePosts from "../../api/hooks/useFetchRemotePosts.js"
 import PostForm from "../../components/Posts/PostForm/PostForm.jsx";
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
 import Post from "../../components/Posts/Post/Post.jsx";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
+import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import useCreateSynapsePost from "../../api/hooks/useCreateSynapsePost.js";
+import useCreateRemotePost from "../../api/hooks/useCreateRemotePost.js";
 
 
 const Synapse = () => {
@@ -22,8 +22,8 @@ const Synapse = () => {
     const navigate = useNavigate(); // React Router navigate
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getSynapseMetadata, loading, error } = useGetSynapseMetadata();
-    const { getSynapsePosts, loading: synapsePostsLoading, error: synapsePostsError } = useGetSynapsePosts();
+    const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
+    const { getSynapsePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
 
     // Hooks for editing and deleting posts
     const {
@@ -34,7 +34,7 @@ const Synapse = () => {
         handleSave,
     } = useEditPost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
     const { handleDelete } = useDeletePost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
-    const { createSynapsePost, createPostLoading, createPostError } = useCreateSynapsePost();
+    const { createSynapsePost, createPostLoading, createPostError } = useCreateRemotePost();
 
     const handleCreatePost = async ({ content }) => {
         const synapsePublicKey = synapseMetadata.identity.publicKey;
@@ -80,7 +80,7 @@ const Synapse = () => {
             try {
                 const synapsePostsData = await getSynapsePosts(publicKey);
                 setPosts(synapsePostsData);
-                const synapseMetadataResponse = await getSynapseMetadata(publicKey);
+                const synapseMetadataResponse = await fetchRemoteSynapseMetadata(publicKey);
                 setSynapseMetadata(synapseMetadataResponse);
             } catch (error) {
                 console.error("Error fetching Synapse posts", error);

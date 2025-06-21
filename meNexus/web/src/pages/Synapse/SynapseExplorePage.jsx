@@ -2,14 +2,16 @@ import SynapseExploreLayout from "../../layouts/SynapseLayout/SynapseExploreLayo
 import SynapseCard from "../../components/SynapseCard/SynapseCard.jsx";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useGetUser from "../../api/hooks/useGetUser.js";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
+import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 
 const SynapseExplorePage = () => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getUser } = useGetUser();
     const { getSynapseMetadata } = useGetSynapseMetadata();
+    const { fetchRemoteSynapseMetadata } = useFetchRemoteSynapseMetadata();
 
     const [user, setUser] = useState(null)
     const [synapses, setSynapses] = useState([]);
@@ -32,9 +34,13 @@ const SynapseExplorePage = () => {
 
     useEffect(() => {
         const fetchAllMetadata = async () => {
+            const localSynapseMetadata = await getSynapseMetadata();
             const results = await Promise.all(
                 synapses.map(async (synapse) => {
-                    return await getSynapseMetadata(synapse);
+                    if (synapse === localSynapseMetadata.identity.publicKey) {
+                        return localSynapseMetadata;
+                    }
+                    return await fetchRemoteSynapseMetadata(synapse);
                 })
             );
             setSynapseMetadataList(results);
