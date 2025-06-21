@@ -77,7 +77,7 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     /* ---- OrbitDB --------------------------------------------------------- */
     await initializeOrbitDB();
     console.log('OrbitDB service running');
-    console.log('Getting publicKeysDB');
+    console.log('Getting globalUsersDB');
     //await getPublicKeysDB();
     await getGlobalUsersDB();
 

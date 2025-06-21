@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CONFIG_FILE = path.resolve(__dirname, '../../../config/synapse-config.json');
+const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 
 // console.log('peerStateManager instance:', import.meta.url);
@@ -192,7 +192,21 @@ export const joinSynapse = async (req, res) => {
 }
 
 export const leaveSynapse = async (req, res) => {
-
+    const {publicKey, synapsePublicKey} = req.query;
+    if (!publicKey || !synapsePublicKey) {
+        return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});
+    }
+    const db = await getGlobalUsersDB();
+    const [updatedUser] = await db.query(doc => doc._id === publicKey);
+    if(updatedUser) {
+        try {
+            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== synapsePublicKey);
+            await db.put(updatedUser);
+            res.status(200).json(updatedUser);
+        } catch (err) {
+            console.error('Error leaving Synapse: ', err);
+        }
+    }
 }
 
 export default {

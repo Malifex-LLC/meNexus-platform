@@ -147,6 +147,11 @@ export async function getDatabase(nameOrAddr, type = 'documents', options = {}) 
     db.events.on('replicated', (address) => {
         console.log(`[Replicated] Replication complete for database: ${address}`);
     });
+
+    db.events.on('update', (entry) => {
+        console.log(`[Update] New entry received:`, entry);
+    });
+
     return db;
 }
 
