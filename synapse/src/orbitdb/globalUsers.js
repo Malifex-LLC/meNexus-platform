@@ -1,5 +1,14 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '../.env' });
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load the .env file from synapse/src/api/config/.env
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 
 import { getDatabase} from '#config/orbitdb-service.js';
 

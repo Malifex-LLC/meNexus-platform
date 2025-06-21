@@ -10,11 +10,14 @@
   "author": "",
   "license": "ISC",
   "imports": {
-    "#api/*": "./api/*",
-    "#config/*": "./config/*",
-    "#protocols/*": "./protocols/*",
+    "#core/*": "./src/core/*",
+    "#api/*": "./src/api/*",
+    "#config/*": "./src/config/*",
+    "#protocols/*": "./src/protocols/*",
     "#src/*": "./src/*",
-    "#utils/*": "./utils/*",
+    "#handlers/*": "./src/handlers/*",
+    "#remotes/*": "./src/remotes/*",
+    "#utils/*": "./src/utils/*",
     "#uploads/*": "./uploads/*"
   },
   "dependencies": {

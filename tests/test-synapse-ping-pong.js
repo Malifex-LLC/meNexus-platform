@@ -1,4 +1,4 @@
-import { initializeMessenger, sendMessage } from '../synapse/src/messenger.js';
+import { initializeMessenger, sendMessage } from '../synapse/src/core/messenger.js';
 
 (async () => {
     console.log('Initializing Messenger...');

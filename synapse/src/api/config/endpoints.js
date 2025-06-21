@@ -1,32 +1,35 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
+export const API_BASE_URL = "http://localhost:3001";
 
 export const ENDPOINTS = {
 
-    WEBSOCKET: WS_BASE_URL,
+    WEBSOCKET: "ws://localhost:3001?user_id=",
 
+    REGISTER_PUBLIC_KEY: `${API_BASE_URL}/api/auth/registerPublicKey`,
+    STORE_PUBLIC_KEY: `${API_BASE_URL}/api/auth/storePublicKey`,
+    GET_PUBLIC_KEY: `${API_BASE_URL}/api/auth/getPublicKey`,
+    GET_CRYPTO_CHALLENGE: `${API_BASE_URL}/api/auth/getCryptoChallenge`,
+    VERIFY_CRYPTO_SIGNATURE: `${API_BASE_URL}/api/auth/verifyCryptoSignature`,
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
 
     CREATE_USER: `${API_BASE_URL}/api/auth/createUser`,
+    GET_ALL_USERS: `${API_BASE_URL}/api/user/getAllUsers`,
     GET_SESSION_USER: `${API_BASE_URL}/api/user/getSessionUser`,
     GET_USER: `${API_BASE_URL}/api/user/getUserByPublicKey`,
     GET_USER_BY_HANDLE: `${API_BASE_URL}/api/user/getUserByHandle`,
     GET_PROFILE: `${API_BASE_URL}/api/user/getProfile/:handle`,
 
     UPDATE_ACCOUNT_SETTINGS: `${API_BASE_URL}/api/auth/updateAccountSettings`,
-    UPDATE_PROFILE_SETTINGS: `${API_BASE_URL}/api/user/updateProfileSettings/:publicKey`,
+    UPDATE_PROFILE_SETTINGS: `${API_BASE_URL}/api/user/updateProfileSettings/:handle`,
 
     FOLLOW_USER: `${API_BASE_URL}/api/follow/followUser`,
     UNFOLLOW_USER: `${API_BASE_URL}/api/follow/unfollowUser`,
     FOLLOW_CHECK: `${API_BASE_URL}/api/follow/followCheck`,
-    GET_FOLLOWER_COUNT: `${API_BASE_URL}/api/follow/getFollowerCount`,
-    GET_FOLLOWING_COUNT: `${API_BASE_URL}/api/follow/getFollowingCount`,
 
     CREATE_POST: `${API_BASE_URL}/api/post/createPost`,
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
-    GET_POST: `${API_BASE_URL}/api/post/getPost/:postId`,
+    GET_ALL_POSTS: `${API_BASE_URL}/api/post/getAllPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
 
@@ -56,9 +59,9 @@ export const ENDPOINTS = {
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
-    FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/fetchRemoteUsers`,
-    FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/fetchRemotePosts`,
-    FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/fetchRemoteUserPosts`,
+    FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
+    FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
+    FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
     CREATE_REMOTE_POST: `${API_BASE_URL}/remote/createRemotePost`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
     LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
