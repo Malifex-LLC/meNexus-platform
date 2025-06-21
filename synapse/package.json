@@ -15,6 +15,7 @@
     "#config/*": "./src/config/*",
     "#protocols/*": "./src/protocols/*",
     "#src/*": "./src/*",
+    "#handlers/*": "./src/handlers/*",
     "#utils/*": "./src/utils/*",
     "#uploads/*": "./uploads/*"
   },
