@@ -23,7 +23,7 @@ const Synapse = () => {
 
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
-    const { getSynapsePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
+    const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
 
     // Hooks for editing and deleting posts
     const {
@@ -32,16 +32,16 @@ const Synapse = () => {
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
-    const { handleDelete } = useDeletePost(() => refreshPosts(getSynapsePosts(publicKey), currentHandle, setPosts));
-    const { createSynapsePost, createPostLoading, createPostError } = useCreateRemotePost();
+    } = useEditPost(() => refreshPosts(fetchRemotePosts(publicKey), currentHandle, setPosts));
+    const { handleDelete } = useDeletePost(() => refreshPosts(fetchRemotePosts(publicKey), currentHandle, setPosts));
+    const { createRemotePost, createPostLoading, createPostError } = useCreateRemotePost();
 
     const handleCreatePost = async ({ content }) => {
         const synapsePublicKey = synapseMetadata.identity.publicKey;
         const publicKey = sessionPublicKey
         const post = {publicKey, content, synapsePublicKey};
-        await createSynapsePost(post);
-        const updatedPosts = await getSynapsePosts(synapsePublicKey);
+        await createRemotePost(post);
+        const updatedPosts = await fetchRemotePosts(synapsePublicKey);
         setPosts(updatedPosts)
     }
 
@@ -78,12 +78,12 @@ const Synapse = () => {
     useEffect(() => {
         const fetchSynapseData = async () => {
             try {
-                const synapsePostsData = await getSynapsePosts(publicKey);
+                const synapsePostsData = await fetchRemotePosts(publicKey);
                 setPosts(synapsePostsData);
                 const synapseMetadataResponse = await fetchRemoteSynapseMetadata(publicKey);
                 setSynapseMetadata(synapseMetadataResponse);
             } catch (error) {
-                console.error("Error fetching Synapse posts", error);
+                console.error("Error fetching Synapse data", error);
             }
         };
         fetchSynapseData();
@@ -119,7 +119,7 @@ const Synapse = () => {
                         createPost={handleCreatePost}
                         loading={createPostLoading}
                         error={createPostError}
-                        refreshPosts={() => refreshPosts(getSynapsePosts(publicKey), publicKey, setPosts)}
+                        refreshPosts={() => refreshPosts(fetchRemotePosts(publicKey), publicKey, setPosts)}
                     />
                 </div>
                 {posts.length > 0 ? (
