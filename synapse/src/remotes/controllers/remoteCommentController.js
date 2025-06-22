@@ -26,6 +26,13 @@ export const createRemotePostComment = async (req, res) => {
             publicKey
         }
     )
+    try {
+        const response = await sendMessageWithResponse(peerId, createPostCommentRequest);
+        res.status(200).json(response.payload.comment);
+    } catch (error) {
+        console.error('Error creating remote post comment', error);
+        res.status(500).json({error: 'Failed to create remote post comment'});
+    }
 }
 
 export const fetchRemotePostComments = async (req, res) => {
