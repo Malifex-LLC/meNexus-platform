@@ -9,7 +9,7 @@ const useFetchRemoteComments = () => {
 
         const response = await sendRequest( {
             method: 'GET',
-            url: ENDPOINTS.GET_COMMENTS,
+            url: ENDPOINTS.FETCH_REMOTE_POST_COMMENTS,
             params: {resourceType, resourceId, synapsePublicKey},
             withCredentials: true,
         });

@@ -46,13 +46,13 @@ export const deleteComment = async (req, res) => {
 }
 
 export const getComments = async (req, res) => {
-    const {resource_type, resource_id } = req.query;
+    const {resourceType, resourceId } = req.query;
 
-    if (!resource_id || resource_id.trim() === "") {
+    if (!resourceType || resourceId.trim() === "") {
         return res.status(400).json({ error: "Invalid getComments query." });
     }
 
-    const results = await Comment.getComments(resource_type, resource_id);
+    const results = await Comment.getComments(resourceType, resourceId);
     return res.status(200).json(results);
 }
 

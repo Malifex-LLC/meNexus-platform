@@ -28,6 +28,35 @@ export const createRemotePostComment = async (req, res) => {
     )
 }
 
+export const fetchRemotePostComments = async (req, res) => {
+    const {resourceType, resourceId, synapsePublicKey} = req.query;
+    if (!resourceType || !resourceId || !synapsePublicKey) {
+        return res.status(400).json({error: 'No resourceType, resourceId, or synapsePublicKey provided.'});
+    }
+    console.log('fetchRemotePostsComments called: ', resourceType, resourceId, synapsePublicKey);
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        console.error('Error fetching peerId for synapsePublicKey: ', synapsePublicKey );
+        res.status(400).json({error: 'Error fetching peerId for synapsePublicKey: ', synapsePublicKey});
+    }
+
+    const commentsRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.RESOURCE.FETCH,
+        RESOURCE_TYPES.COMMENTS,
+        {resourceType, resourceId},
+        {sender: process.env.PUBLIC_KEY}
+    )
+    try {
+        const response = await sendMessageWithResponse(peerId, commentsRequest);
+        res.status(200).json(response.payload.comments);
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({error: 'Failed to fetch comments from the Synapse.'});
+    }
+}
+
 export default {
     createRemotePostComment,
+    fetchRemotePostComments
 }
