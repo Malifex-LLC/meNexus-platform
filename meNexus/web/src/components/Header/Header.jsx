@@ -14,6 +14,8 @@ import { FaEnvelope } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import {Link, useLocation} from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { RxDashboard } from "react-icons/rx";
 
 const Header = () => {
 
@@ -89,10 +91,10 @@ const Header = () => {
 
     return (
         <div className="header__container flex fixed top-0 left-0 w-full p-4 gap-4 justify-center
-         bg-header-bg text-foreground z-100">
+         bg-header-bg text-foreground border-b border-border z-100">
             <div className={`flex-1 flex justify-center gap-8 text-3xl md:text-4xl ml-[175px]`}>
-                <Link to={'/home'} className={isActive('/home')}>
-                    <FaHome />
+                <Link to={'/dashboard'} className={isActive('/home')}>
+                    <RxDashboard />
                 </Link>
                 <Link to={'/synapse/explore'} className={isActive('/synapse/')}>
                     <FaNetworkWired />

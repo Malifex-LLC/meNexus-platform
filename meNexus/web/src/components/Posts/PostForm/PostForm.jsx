@@ -1,22 +1,38 @@
 import { useState } from "react";
 import useCreatePost from '../../../api/hooks/useCreatePost.js';
+import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
 
-const PostForm = ({ publicKey, createPost, loading, error, refreshPosts }) => {
+const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) => {
     const [text, setText] = useState(`What's on your mind?`);
     const [formClicked, setFormClicked] = useState(false);
-    const [expanded, setExpanded] = useState(false);
 
-    //const { createPost, loading, error } = useCreatePost(refreshPosts);
+    const { createPost, loading, error } = useCreatePost(refreshPosts);
+    const { createRemotePost } = useCreateRemotePost(refreshPosts);
 
     const handleSubmit = async () => {
-        const post = {
-            publicKey: publicKey,
-            content: text,
-        };
-        console.log("Submitting post:", post);
-        await createPost(post);
-        setText(""); // Reset the text field after submission
-        refreshPosts();
+        console.log('handleSubmit called.');
+        console.log('isLocalSynapse', isLocalSynapse);
+        console.log('synapsePublicKey', synapsePublicKey);
+        if (isLocalSynapse) {
+            const post = {
+                publicKey: publicKey,
+                content: text,
+            };
+            console.log("Submitting post:", post);
+            await createPost(post);
+            setText(""); // Reset the text field after submission
+            refreshPosts();
+        } else {
+            const post = {
+                publicKey: publicKey,
+                content: text,
+                synapsePublicKey: synapsePublicKey,
+            };
+            console.log("Submitting remote post:", post);
+            await createRemotePost(post);
+            setText(""); // Reset the text field after submission
+            refreshPosts();
+        }
     };
 
     const handleFormClick = () => {
