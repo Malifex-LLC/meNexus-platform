@@ -2,10 +2,6 @@
 import Comment from '../models/comment.js';
 
 export const createComment = async (req, res) => {
-    if (!req.session || !req.session.user) {
-        console.log("User not authenticated or session missing");
-        return res.status(401).json({ error: "User not authenticated" });
-    }
     const { resourceType, resourceId, content, publicKey} = req.body;
     console.log('createComment called from controller:', resourceType, resourceId, content, publicKey);
     if (!resourceType || !resourceId || !content || !publicKey) {
