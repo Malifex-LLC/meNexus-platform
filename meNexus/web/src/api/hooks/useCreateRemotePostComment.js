@@ -6,7 +6,7 @@ const useCreateRemotePostComment = (refreshComments) => {
     const { sendRequest, loading, error } = useAxios();
 
     const createRemotePostComment = async (comment) => {
-        console.log("creating comment:", comment);
+        console.log("creating remote comment:", comment);
         try {
             const response = await sendRequest ( {
                 method: "POST",
