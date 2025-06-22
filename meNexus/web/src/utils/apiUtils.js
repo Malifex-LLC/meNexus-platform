@@ -18,9 +18,9 @@ export const refreshPosts = async (getPosts, setPosts) => {
 };
 
 // Refreshes rendered comments, commonly after a comment is created or deleted
-export const refreshComments = async (resource_type, resource_id, getComments, setComments) => {
+export const refreshComments = async (getComments, setComments) => {
     try {
-        const userCommentsData = await getComments(resource_type, resource_id);
+        const userCommentsData = await getComments();
         setComments(userCommentsData);
     } catch (error) {
         console.log("Error refreshing posts:", error);

@@ -1,5 +1,7 @@
 import { formatDate } from "../../../utils/dateUtils.js";
 import {NavLink} from "react-router-dom";
+import {useEffect, useState} from "react";
+import useGetUser from "../../../api/hooks/useGetUser.js";
 
 const Comment = ({
     publicKey,
@@ -18,40 +20,74 @@ const Comment = ({
     const isOwner = publicKey === sessionPublicKey;
     console.log("isOwner for comment: ", isOwner);
 
+    const { getUser, loading: userLoading, error: userError } = useGetUser();
+    const [user, setUser] = useState(null);
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUser(publicKey);
+                console.log('Fetched userData:', userData);
+                setUser(userData);
+            } catch (error) {
+                console.error("Error fetching userData: ", error);
+            }
+        }
+        fetchUserData();
+    }, [publicKey])
+
+    if (!user) {
+        return (
+            <div>Loading...</div>
+        )
+    }
+
     return (
-        <div className={`user-comment relative flex flex-col p-4  mx-4 md:mx-16
-        border border-border mb-4 bg-background text-sm ${isEditing ? "user-comment--editing" : ""}`}>
+        <div className={`user-post flex w-full p-4 lg:p-8 mb-16 rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
             <div className="user-comment__identity flex flex-col">
+                {user.profilePicture ? (
+                    <img
+                        className="w-20 h-20 rounded-lg object-cover"
+                        src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                        alt={`${user.displayName}'s profile picture`}
+                    />
+                ) : (
+                    <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
+                )}
+            </div>
+            <div className="user-comment__content flex flex-col pl-6 w-full text-lg">
                 <NavLink
-                    className="user-comment__display-name"
-                    to={`/profile/${handle}`}
+                    className="text-md md:text-xl font-semibold hover:underline"
+                    to={`/profile/${user.handle}`}
                 >
                     {displayName}
                 </NavLink>
                 <NavLink
-                    className="user-comment__handle text-brand"
-                    to={`/profile/${handle}`}
+                    className="text-sm text-brand"
+                    to={`/profile/${user.handle}`}
                 >
-                    @{handle}
+                    @{user.handle}
                 </NavLink>
-                <div className="user-comment__date text-neutral">
+                <div className="user-comment__date text-xs text-neutral">
                     <p>{formatDate(date)}</p>
                 </div>
-
-            </div>
-            <div className="user-comment__content flex w-full mt-4 text-lg">
-                {isEditing ? (
-                    <textarea
-                        className="user-comment__textarea w-full border border-border p-4"
-                        value={editedContent}
-                        onChange={onContentChange}
-                    />
-                ) : (
-                    <p>{content}</p>
-                )}
+                <div className="mt-4">
+                    {isEditing ? (
+                        <textarea
+                            className="user-comment__textarea w-full border border-border p-2"
+                            value={editedContent}
+                            onChange={onContentChange}
+                        />
+                    ) : (
+                        <div className="text-md lg:text-3xl whitespace-pre-wrap">
+                            <p>{content}</p>
+                        </div>
+                    )}
+                </div>
             </div>
             {isOwner && (
-                <div className="flex justify-end gap-4 ">
+                <div className="flex justify-end mt-4 ">
                     {isEditing ?  (
                         <button
                             className="hover:underline"

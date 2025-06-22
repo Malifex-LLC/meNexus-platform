@@ -1,13 +1,15 @@
 import { useState } from "react";
 import useCreateComment from "../../../api/hooks/useCreateComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js";
+import useCreateRemotePostComment from "../../../api/hooks/useCreateRemotePostComment.js";
 
 const CommentForm = ({
+                         isLocalSynapse,
                          publicKey,
+                         synapsePublicKey,
                          sessionPublicKey,
-                         resource_type,
-                         resource_id,
-                         getComments,
+                         resourceType,
+                         resourceId,
                          setComments,
                          refreshComments,
                      }) => {
@@ -18,29 +20,43 @@ const CommentForm = ({
     const action = "COMMENT";
 
 
-    const { createComment, loading, error } = useCreateComment(() => refreshComments(resource_type, resource_id, getComments, setComments));
+    const { createComment, loading, error } = useCreateComment(refreshComments);
+
+    const { createRemotePostComment } = useCreateRemotePostComment();
     const { createNotification } = useCreateNotification();
 
     const handleSubmit = async () => {
-        const comment = {
-            resource_type: resource_type,
-            resource_id: resource_id,
-            content: text,
-        };
+        console.log('CommentForm handleSubmit isLocalSynapse: ', isLocalSynapse);
+        if (isLocalSynapse) {
+            const comment = {
+                resourceType: resourceType,
+                resourceId: resourceId,
+                content: text,
+                publicKey: publicKey,
+            };
 
-        const notification = {
-            public_key: publicKey,
-            actor_public_key: actor_id,
-            resource_type: resource_type,
-            resource_id: resource_id,
-            action: action,
-        }
+            const notification = {
+                public_key: publicKey,
+                actor_public_key: actor_id,
+                resource_type: resourceType,
+                resource_id: resourceId,
+                action: action,
+            }
+            console.log("Submitting comment:", comment);
+            await createComment(comment);
+            //await createNotification(notification);
+        } else {
+            const comment = {
+                resourceType: resourceType,
+                resourceId: resourceId,
+                content: text,
+                publicKey: publicKey,
+                synapsePublicKey: synapsePublicKey,
+            }
+            console.log("Submitting remote comment:", comment);
+            await createRemotePostComment(comment);
+            // TODO Create Remote Notification
 
-        console.log("Submitting comment:", comment);
-        await createComment(comment);
-        await createNotification(notification);
-
-        if (publicKey !== sessionPublicKey) {
         }
         setText(""); // Reset the text field after submission
     };

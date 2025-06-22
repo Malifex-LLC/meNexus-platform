@@ -1,13 +1,14 @@
 import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createComment = (publicKey, resource_type, resource_id, content) => {
+export const createComment = (resourceType, resourceId, content, publicKey) => {
+    console.log('createComment called from models:', resourceType, resourceId, content, publicKey);
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO PostComments (public_key, resource_type, resource_id, content) VALUES (?, ?, ?, ?)
+            INSERT INTO PostComments (resource_type, resource_id, content, public_key) VALUES (?, ?, ?, ?)
         `;
 
-        meNexus.query(sql, [publicKey, resource_type, resource_id, content], (error, result) => {
+        meNexus.query(sql, [resourceType, resourceId, content, publicKey], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);

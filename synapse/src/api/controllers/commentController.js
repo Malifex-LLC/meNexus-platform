@@ -6,15 +6,17 @@ export const createComment = async (req, res) => {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-    const { publicKey } = req.session.user
-    const { resource_type, resource_id, content } = req.body;
+    const { resourceType, resourceId, content, publicKey} = req.body;
+    console.log('createComment called from controller:', resourceType, resourceId, content, publicKey);
+    if (!resourceType || !resourceId || !content || !publicKey) {
+        return res.status(400).json({error: 'resourceType, resourceId, content, or publicKey not found.'});
+    }
 
-    const result = await Comment.createComment(publicKey, resource_type, resource_id, content);
+    const result = await Comment.createComment(resourceType, resourceId, content, publicKey);
 
     if (result.affectedRows === 0) {
         return res.status(500).json({error: 'Failed to create a comment'});
     }
-
     return res.status(200).json(result);
 }
 

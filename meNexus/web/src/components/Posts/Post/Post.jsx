@@ -10,8 +10,12 @@ import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
 import useGetUser from "../../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
+import useFetchRemoteComments from "../../../api/hooks/useFetchRemoteComments.js";
+import { refreshComments } from "../../../utils/apiUtils.js"
 
 const Post = ({
+                  isLocalSynapse,
+                  synapsePublicKey,
                   postId,
                   publicKey,
                   sessionPublicKey,
@@ -24,15 +28,28 @@ const Post = ({
                   editedContent,
                   onContentChange,
                   onSave,
-                  refreshComments,
               }) => {
     const isOwner = sessionPublicKey && publicKey === sessionPublicKey;
-
+    const [user, setUser] = useState(null);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
-    const { getComments, commentsData } = useGetComments();
+    const { getComments } = useGetComments();
+    const { fetchRemoteComments } = useFetchRemoteComments();
     const { createNotification } = useCreateNotification();
-    const { handleDeleteComment } = useDeleteComment(() => refreshComments(resource_type, postId, getComments, setComments));
     const { getUser, loading: userLoading, error: userError } = useGetUser();
+    const resource_type = "POST";
+
+    const handleRefreshComments = async () => {
+        if (isLocalSynapse) {
+            const updatedComments = await getComments(resource_type, postId);
+            setComments(updatedComments);
+        } else {
+            const updatedComments = await fetchRemoteComments(resource_type, postId, synapsePublicKey);
+            setComments(updatedComments);
+        }
+    };
 
     const {
         handleCommentEdit,
@@ -40,13 +57,9 @@ const Post = ({
         editingCommentId,
         editedCommentContent,
         setEditedCommentContent,
-    } = useEditComment(() => refreshComments(resource_type, postId, getComments, setComments));
+    } = useEditComment(handleRefreshComments);
 
-    const [user, setUser] = useState(null);
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [comments, setComments] = useState([]);
-    const [showComments, setShowComments] = useState(false);
-    const resource_type = "POST";
+    const { handleDeleteComment } = useDeleteComment(handleRefreshComments);
 
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", publicKey);
@@ -61,8 +74,8 @@ const Post = ({
             await followUser(publicKey);
             setIsFollowing(true);
             await createNotification(notification);
-        } catch (err) {
-            console.log('Error following user', err);
+        } catch (error) {
+            console.log('Error following user', error);
         }
     };
 
@@ -71,8 +84,8 @@ const Post = ({
         try {
             await unfollowUser(publicKey);
             setIsFollowing(false);
-        } catch (err) {
-            console.error('Error unfollowing user:', err);
+        } catch (error) {
+            console.error('Error unfollowing user:', error);
         }
     };
 
@@ -105,15 +118,24 @@ const Post = ({
 
     useEffect(() => {
         const fetchComments = async () => {
-            try {
-                const newComments = await getComments(resource_type, postId);
-                setComments(newComments);
-            } catch (err) {
-                console.error("Error fetching comments for postId: ", postId, err);
+            if (isLocalSynapse) {
+                try {
+                    const newComments = await getComments(resource_type, postId);
+                    setComments(newComments);
+                } catch (error) {
+                    console.error("Error fetching comments for postId: ", postId, error);
+                }
+            } else {
+                try {
+                    const newComments = await fetchRemoteComments(resource_type, postId, synapsePublicKey);
+                    setComments(newComments);
+                } catch (error) {
+                    console.error("Error fetching remote comments for postId: ", postId, error);
+                }
             }
         }
         fetchComments(); // Only fetchComments if they are displayed
-    },[])
+    },[postId])
 
     const toggleComments = () => {
         setShowComments((prev) => !prev); // Toggle visibility
@@ -222,13 +244,14 @@ const Post = ({
                             <div>No comments</div>
                         )}
                         <CommentForm
+                            isLocalSynapse={isLocalSynapse}
                             publicKey={publicKey}
+                            synapsePublicKey={synapsePublicKey}
                             sessionPublicKey={sessionPublicKey}
-                            resource_type="POST"
-                            resource_id={postId}
-                            getComments={getComments}
+                            resourceType="POST"
+                            resourceId={postId}
                             setComments={setComments}
-                            refreshComments={refreshComments}
+                            refreshComments={handleRefreshComments}
                         />
                     </div>
                 )}

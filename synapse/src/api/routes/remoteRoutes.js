@@ -3,6 +3,7 @@ const router = express.Router();
 import remoteSynapseController from '#remotes/controllers/remoteSynapseController.js'
 import remoteUserController from "#remotes/controllers/remoteUserController.js";
 import remotePostController from "#remotes/controllers/remotePostController.js"
+import remoteCommentController from "#remotes/controllers/remoteCommentController.js";
 
 // Define synapseRoutes and link them to corresponding controller functions
 
@@ -14,7 +15,9 @@ router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 
 router.get('/fetchRemotePosts', remotePostController.fetchRemotePosts);
 router.get('/fetchRemoteUserPosts', remotePostController.fetchRemoteUserPosts);
+router.get('/fetchRemoteComments', remotePostController.fetchRemoteComments);
 router.post('/createRemotePost', remotePostController.createRemotePost);
+router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
 
 
 

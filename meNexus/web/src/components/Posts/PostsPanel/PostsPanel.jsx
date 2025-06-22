@@ -1,5 +1,5 @@
 import PostForm from "../PostForm/PostForm.jsx";
-import {refreshComments, refreshPosts} from "../../../utils/apiUtils.js";
+import { refreshPosts } from "../../../utils/apiUtils.js";
 import Post from "../Post/Post.jsx";
 import useEditPost from "../../../api/hooks/useEditPost.js";
 import useFetchRemotePosts from "../../../api/hooks/useFetchRemotePosts.js";
@@ -47,7 +47,9 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
                     .map((post, index) => (
                         <Post
                             key={index}
-                            post_id={post.post_id}
+                            isLocalSynapse={isLocalSynapse}
+                            synapsePublicKey={synapsePublicKey}
+                            postId={post.post_id}
                             publicKey={post.public_key}
                             session_user_id={publicKey}
                             date={post.created_at}
@@ -62,7 +64,6 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
                                 setEditedPostContent(event.target.value)
                             }
                             onSave={handleSave}
-                            refreshComments={refreshComments}
                         />
                     ))
             ) : (
