@@ -18,8 +18,8 @@ const DashboardLayout = ({ children }) => {
         onSwipedRight: () => setActivePanel((prev) => Math.max(prev - 1, 0)),
     });
 
-    const [sessionUser, setSessionUser ] = useState({})
-    const [user, setUser] = useState({})
+    const [sessionUser, setSessionUser ] = useState(null)
+    const [user, setUser] = useState(null)
     const { getUser } = useGetUser();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
 
