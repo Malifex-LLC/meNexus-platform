@@ -24,6 +24,9 @@ export const createRemotePostComment = async (req, res) => {
             resourceId,
             content,
             publicKey
+        },
+        {
+            sender: process.env.PUBLIC_KEY
         }
     )
     try {
