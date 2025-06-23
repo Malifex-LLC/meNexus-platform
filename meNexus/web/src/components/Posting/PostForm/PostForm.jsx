@@ -43,7 +43,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) 
     };
 
     return (
-        <div className="post-form  text-center p-4 mt-4">
+        <div className="post-form  text-center  ">
             <div className={``}
                 onClick={handleFormClick}>
                 <textarea
@@ -52,7 +52,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) 
                     onChange={(e) => setText(e.target.value)}
                 />
             </div>
-            <button className="post-form__button mt-4 px-4 bg-brand rounded-lg" onClick={handleSubmit} disabled={loading}>
+            <button className="post-form__button mt-2 px-4 bg-brand rounded-lg" onClick={handleSubmit} disabled={loading}>
                 {loading ? "Posting..." : "Post"}
             </button>
             {error && <div className="error">Error: {error}</div>}

@@ -1,8 +1,9 @@
 import ProfileCard from "../ProfileCard/ProfileCard.jsx";
 
 const SynapseUsersPanel = () => {
+    // TODO Implement fetching logic for Synapse Users
     return (
-        <div className={'flex flex-col p-4 w-full h-full text-foreground'}>
+        <div className={'flex flex-col p-4 w-full h-screen text-foreground'}>
             <ProfileCard
                 publicKey={"0322fbd78cc138d265fd083e9cfd7ecdafa64747bfe41873513a76eda1267404cf"}
             />
@@ -15,132 +16,6 @@ const SynapseUsersPanel = () => {
             <ProfileCard
                 publicKey={"02cc482bc2dbad7c79a9d9f8dbc29f38c61f9134e4f5ee666098ab12f226a3e5de"}
             />
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
-            <div>
-                USER 1
-            </div>
-            <div>
-                USER 2
-            </div>
-            <div>
-                USER 3
-            </div>
         </div>
     );
 }

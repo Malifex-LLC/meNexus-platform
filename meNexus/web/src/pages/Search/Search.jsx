@@ -4,7 +4,7 @@ import "./Search.css";
 import "../../api/hooks/useSearch.js"
 import useSearch from "../../api/hooks/useSearch.js";
 import ProfileCard from "../../components/ProfileCard/ProfileCard.jsx";
-import Post from "../../components/Posts/Post/Post.jsx"
+import Post from "../../components/Posting/Post/Post.jsx"
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useGetPosts from "../../api/hooks/useGetPosts.js";

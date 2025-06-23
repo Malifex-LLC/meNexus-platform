@@ -42,9 +42,9 @@ const SocialPanel = ({user}) => {
 
 
     return (
-        <div className={`relative flex flex-col   p-4 items-center`}>
+        <div className={`relative flex flex-col p-4 items-center shadow-2xl`}>
             <div className={`p-24 md:p-12 xl:p-24 w-full relative top-2 bg-gradient-to-b from-background via-primary to-surface backdrop-blur-md rounded-2xl`}/>
-            <div className=" relative z-1  flex flex-col px-4 pb-0 w-full -top-8  justify-center rounded-2xl
+            <div className=" relative z-1  flex flex-col px-4 pb-0 w-full -top-8  justify-center rounded-xl shadow-md
             bg-surface text-foreground">
                 <div className={`flex  justify-center`}>
                     <div className={`flex flex-col relative  items-center text-md`}>
@@ -68,14 +68,15 @@ const SocialPanel = ({user}) => {
                 <div className={`relative text-lg md:text-sm -top-8 flex flex-col  items-center`}>
                     <p>{user.bio}</p>
                 </div>
-
             </div>
-            <div className={`flex text-foreground gap-4`}>
-
+            <div className={'flex flex-col w-full'}>
+                <div className={'border border-border rounded-xl mb-4'}>
+                    <JoinedSynapsesPanel synapses={user.synapses} />
+                </div>
+                <div className={'border border-border rounded-xl'}>
+                    <FollowedUsersPanel following={user.following} />
+                </div>
             </div>
-
-
-
         </div>
     );
 };

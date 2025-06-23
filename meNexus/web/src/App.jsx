@@ -11,6 +11,7 @@ import SearchPage from "./pages/Search/SearchPage.jsx";
 import MessagesPage from "./pages/Messages/MessagesPage.jsx";
 import PostPage from "./pages/Post/PostPage.jsx";
 import DashboardPage from "./pages/Dashboard/DashboardPage.jsx";
+import ExplorePage from "./pages/Explore/ExplorePage.jsx";
 
 function App() {
     return (
@@ -26,7 +27,8 @@ function App() {
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/home/:handle" element={<HomePage />} />
 
-                    <Route path="/synapse/explore" element={<SynapseExplorePage />} />
+                    <Route path="/explore" element={<ExplorePage />} />
+
                     <Route path="/synapse/:synapsePublicKey" element={<SynapsePage />} />
 
                     {/* /profile redirects to /profile/:handle based on session user */}

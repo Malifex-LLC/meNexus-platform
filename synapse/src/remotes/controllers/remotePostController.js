@@ -6,9 +6,12 @@ import * as peerStateManager from '#src/core/peerStateManager.js'
 
 export const fetchRemotePosts = async (req, res) => {
     const synapsePublicKey = req.query.synapsePublicKey;
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const postsRequest = createMessage(
@@ -31,9 +34,12 @@ export const fetchRemoteUserPosts = async (req, res) => {
     //console.log('Discovered Peers in getSynapseUserPosts: ', peerStateManager.getAllDiscoveredPeers());
     const handle = req.query.handle;
     const synapsePublicKey = req.query.publicKey;
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!handle || !synapsePublicKey) {
         return res.status(401).json({error: 'No user handle or Synapse publicKey provided.'});
+    }
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
     console.log('getSynapseUserPosts handle: ', handle);
     console.log('getSynapseUserPosts synapsePublicKey: ', synapsePublicKey);
@@ -68,7 +74,7 @@ export const createRemotePost = async (req, res) => {
     console.log('createSynapsePost called for synapsePublicKey: ', synapsePublicKey)
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!peerId) {
-        return res.status(400).json({error: 'peerId not found.'});
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const createPostRequest = createMessage(

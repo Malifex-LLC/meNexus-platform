@@ -42,7 +42,7 @@ export async function createGlobalUser(publicKey, handle, displayName,synapsePub
         followers: [],
         following: [],
         synapses: [synapsePublicKey], // Will append Synapse publicKeys here when user logs in to other Synapses
-        createdAt: new Date().toISOString(),
+        timestamp: new Date().toISOString(),
         is_online: false,
     };
 

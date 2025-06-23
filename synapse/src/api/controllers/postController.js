@@ -92,7 +92,7 @@ export const getPosts = async (req, res) => {
     try {
         console.log('Getting posts for publicKey: ', publicKey);
         const posts = await Post.getPosts(publicKey);
-        console.log('Posts found: ',posts);
+        console.log('Posting found: ',posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error in getPosts:', error);

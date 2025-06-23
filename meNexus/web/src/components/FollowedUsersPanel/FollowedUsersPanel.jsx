@@ -20,11 +20,11 @@ const FollowedUsersPanel = ({following}) => {
     }, [])
 
     return (
-        <div className={'bg-background text-foreground p-4 m-4'}>
-            <div className={'text-5xl '}>
+        <div className={'bg-background text-foreground p-4 m-4 text-center shadow-2xl'}>
+            <div className={'text-3xl '}>
                 Followed Users
             </div>
-            <div className={'p-4 m-4'}>
+            <div className={'p-4 m-4 text-left'}>
                 {allUsers.map((user) => (
                     <ProfileCard
                         publicKey={user.publicKey}

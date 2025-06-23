@@ -9,12 +9,16 @@ import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.js
 import SynapseUsersPanel from "../../components/SynapseUsersPanel/SynapseUsersPanel.jsx";
 import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import ChatPanel from "../../components/Chatting/ChatPanel/ChatPanel.jsx";
-import PostsPanel from "../../components/Posts/PostsPanel/PostsPanel.jsx";
+import PostsPanel from "../../components/Posting/PostingPanel/PostsPanel.jsx";
 import useFetchRemotePosts from "../../api/hooks/useFetchRemotePosts.js";
 import SynapseControlBar from "../../components/SynapseControlBar/SynapseControlBar.jsx";
 import JoinedSynapsesPanel from "../../components/JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
+import { CgFeed } from "react-icons/cg";
+import { FaUsersViewfinder } from "react-icons/fa6";
+
+
 
 const SynapseLayout =({ children }) => {
 
@@ -85,7 +89,7 @@ const SynapseLayout =({ children }) => {
             }
         };
         fetchSynapseMetadata();
-    },[]);
+    },[synapsePublicKey]);
 
     useEffect(() => {
         const fetchSynapsePosts = async () => {
@@ -111,19 +115,19 @@ const SynapseLayout =({ children }) => {
 
         };
         fetchSynapsePosts();
-    },[isLocalSynapse, synapseMetadata]);
+    },[synapsePublicKey, isLocalSynapse, synapseMetadata]);
 
 
     if (!user || !user.publicKey) {
-        return <>Loading dashboard...</>;
+        return <div className={'bg-background text-foreground'}>Loading dashboard...</div>;
     }
 
     if (synapsePostsLoading) {
-        return <div>Loading Synapse Posts...</div>
+        return <div className={'bg-background text-foreground'}>Loading Synapse Posts...</div>
     }
 
     if (synapsePostsError) {
-        return <div>Error Loading Synapse Posts: {synapsePostsError.message}</div>
+        return <div className={'bg-background text-foreground'}>Error Loading Synapse Posts: {synapsePostsError.message}</div>
     }
 
     return (
@@ -134,51 +138,42 @@ const SynapseLayout =({ children }) => {
             </div>
 
             {/* Main Grid */}
-            <div className="flex-1 w-full lg:grid lg:grid-cols-12 overflow-hidden">
-
-                {/* Social Panel (Left Column) */}
-                <div className="hidden lg:flex flex-col pt-17 border-r border-border lg:col-span-2 overflow-y-auto">
-                    <div className="">
-                        <SocialPanel user={user} />
-                    </div>
-
-                </div>
-
-
-
+            <div className="flex-1 min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden">
 
                 {/* Main Content (Center Column) */}
-                <div className="flex flex-col h-full w-full lg:col-span-8 overflow-hidden">
+                <div className="flex flex-col flex-1 min-h-0 w-full lg:col-span-9 overflow-hidden">
 
                     {/* Synapse Control Bar */}
-                    <div className="border-b border-border">
-                        <SynapseControlBar synapseMetadata={synapseMetadata} />
+                    <div className=" shadow-2xl border border-border rounded-xl">
+                        <SynapseControlBar synapses={user.synapses} />
                     </div>
 
-                    {/* Scrollable PostsPanel */}
-                    <div className={'hidden lg:flex flex-col  border-l border-border h-full lg:col-span-8 '}>
+                    {/* Scrollable PostingPanel */}
+                    <div className={'hidden lg:flex flex-col flex-1 min-h-0  lg:col-span-9 '}>
+
                         {/* Tab Switcher */}
-                        <div className={'flex justify-around border-b bg-background border-border p-2 text-sm text-foreground'}>
+                        <div className={'flex justify-around border-b bg-background border-border p-2 text-4xl ' +
+                            'text-foreground '}>
                             <button
-                                className={`w-full h-full border-r border-border hover:cursor-pointer
+                                className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
                                 ${activeMiddlebarTab === "feed" ? "text-brand font-bold" : "hover:text-brand"}`}
                                 onClick={() => setActiveMiddlebarTab("feed")}
                             >
-                                Feed
+                                <CgFeed />
                             </button>
                             <button
-                                className={` w-full h-full hover:cursor-pointer
+                                className={`flex justify-center w-full h-full gap-2 hover:cursor-pointer
                                 ${activeMiddlebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand"}`}
                                 onClick={() => setActiveMiddlebarTab("chat")}
                             >
-                                Chat
+                                <FaUsersViewfinder />
                             </button>
                         </div>
-                        {/* Content */}
 
-                        <div className={'flex h-full'}>
+                        {/* Content */}
+                        <div className={'flex flex-1 min-h-0 overflow-y-auto border-r border-border'}>
                             {activeMiddlebarTab === "feed" ? (
-                                <div className={'flex-1 overflow-y-auto'}>
+                                <div className={'m-4  rounded-xl shadow-2xl'}>
                                     <PostsPanel
                                         isLocalSynapse={isLocalSynapse}
                                         publicKey={sessionUser.publicKey}
@@ -188,12 +183,12 @@ const SynapseLayout =({ children }) => {
                                     />
                                 </div>
                             ) : activeMiddlebarTab === "chat" ? (
-                                <div className={'flex-1 overflow-hidden'}>
+                                <div className={'flex-1 overflow-hidden shadow-2xl rounded-xl'}>
                                     <ChatPanel synapsePublicKey={synapsePublicKey} />
                                 </div>
 
                             ) : (
-                                <div className="flex flex-col h-full w-full lg:col-span-6 ">
+                                <div className="flex flex-col  w-full lg:col-span-6 ">
                                     unknown tab content
                                 </div>
                             )}
@@ -202,9 +197,10 @@ const SynapseLayout =({ children }) => {
                 </div>
 
                 {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col pt-17 border-l border-border h-full lg:col-span-2 overflow-hidden">
+                <div className="hidden lg:flex flex-col pt-17  h-full lg:col-span-3 overflow-hidden">
                     {/* Tab Switcher */}
-                    <div className="flex justify-around border-b border-border p-2 text-sm text-foreground">
+                    <div className="flex justify-around border border-border
+                    p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl">
                         <button
                             onClick={() => setActiveSidebarTab("activity")}
                             className={`${activeSidebarTab === "activity" ? "text-brand font-bold" : "hover:text-brand"}`}
@@ -220,7 +216,7 @@ const SynapseLayout =({ children }) => {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 min-h-0 overflow-y-auto p-4 m-4 border border-border rounded-xl shadow-2xl mb-4">
                         {activeSidebarTab === "activity" ? (
                             <>
                                 <SynapseUsersPanel />

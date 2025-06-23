@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import useGetPost from "../../api/hooks/useGetPost.js";
-import Post from "../../components/Posts/Post/Post.jsx"
+import Post from "../../components/Posting/Post/Post.jsx"
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";

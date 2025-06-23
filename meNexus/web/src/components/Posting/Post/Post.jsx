@@ -142,18 +142,16 @@ const Post = ({
     };
 
     if (!user) {
-        return (
-            <div>Loading...</div>
-        )
+        return
     }
 
     return (
-        <div className={`user-post flex w-full p-4 lg:p-8 mb-16 rounded-xl bg-surface text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+        <div className={`user-post flex w-full p-4   rounded-xl bg-surface text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
             {/* Left Column: Profile */}
             <div className="flex flex-col items-center w-24 shrink-0">
                 {user.profilePicture ? (
                     <img
-                        className="w-20 h-20 rounded-lg object-cover"
+                        className="w-16 h-16 rounded-lg object-cover"
                         src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                         alt={`${user.displayName}'s profile picture`}
                     />
@@ -162,7 +160,7 @@ const Post = ({
                 )}
                 {!isOwner && (
                     <button
-                        className="mt-2 text-xs px-2 py-1 rounded-md bg-brand"
+                        className="mt-4 text-xs px-1 rounded-md bg-brand text-black"
                         onClick={isFollowing ? handleUnfollow : handleFollow}
                     >
                         {isFollowing ? "Unfollow" : "Follow"}
@@ -175,7 +173,7 @@ const Post = ({
                 {/* Identity */}
                 <div>
                     <Link
-                        className="text-md md:text-xl font-semibold hover:underline"
+                        className="text-md md:text-md font-semibold hover:underline"
                         to={`/profile/${user.handle}`}
                     >
                         {user.displayName}

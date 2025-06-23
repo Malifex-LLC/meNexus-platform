@@ -1,0 +1,42 @@
+@theme {
+    /* Foundations */
+    --color-background: #000000;   /* pure obsidian */
+    --color-surface:    #141414;   /* subtle lift for cards & modals */
+    --color-border:     #2A2A2A;   /* hairline separators */
+
+    /* Typography */
+    --color-foreground: #E5E5E5;   /* soft light-grey text */
+    --color-neutral:    #9CA3AF;   /* slate-400 secondary copy */
+
+    /* Brand & accents */
+    --color-brand: #FF6B6B;
+    --color-primary: #994040;
+    --color-accent: #FACC15;
+    --color-secondary: #cc5555;
+
+    /* Header / nav */
+    --color-header-bg: #000000;
+
+    /* Action states */
+    --color-edit:          #1E1E1E;   /* inline edit field */
+    --color-edit-hover:    #262626;
+    --color-is-editing:    #3B82F6;
+
+    --color-save:          #22C55E;   /* gentle green confirm */
+    --color-save-hover:    #16A34A;
+
+    --color-delete:        #EF4444;   /* soft crimson danger */
+    --color-delete-hover:  #B91C1C;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #FF6B6B; /* brand color */
+    border-radius: 6px;
+}

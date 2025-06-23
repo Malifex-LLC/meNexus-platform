@@ -12,24 +12,55 @@ const JoinedSynapsesPanel = ({synapses}) => {
 
     useEffect(() => {
         const fetchAllMetadata = async () => {
-            const localSynapseMetadata = await getSynapseMetadata();
+            const local = await getSynapseMetadata();
+
             const results = await Promise.all(
-                synapses.map(async (synapse) => {
-                    if (synapse === localSynapseMetadata.identity.publicKey) {
-                        return localSynapseMetadata;
+                synapses.map(async key => {
+                    if (key === local.identity.publicKey) return local;
+
+                    try {
+                        const remote = await fetchRemoteSynapseMetadata(key);
+                        return remote ?? makeFallback(key);
+                    } catch {
+                        return makeFallback(key);          // fetch threw → fallback
                     }
-                    return await fetchRemoteSynapseMetadata(synapse);
                 })
             );
+
             setSynapseMetadataList(results);
         };
 
-        if (synapses.length > 0) {
-            fetchAllMetadata();
-        }
+        if (synapses.length) fetchAllMetadata();
     }, [synapses]);
+
+    function makeFallback(key) {
+        return {
+            identity: { publicKey: key, privateKey: "" },
+            api: { port: "0000" },
+            metadata: {
+                name: "Unreachable Synapse",
+                description: "Unable to fetch Synapse metadata",
+            },
+        };
+    }
+
+    if (synapseMetadataList.length === 0) {
+        return (
+            <div className={' bg-background text-foreground p-4 w-full'}>
+                <div className={'text-3xl text-center'}>
+                    Joined Synapses
+                </div>
+                <div>
+                    <SynapseCard
+                        description={'Loading Joined Synapses...'}
+                    />
+                </div>
+            </div>
+        )
+    }
+
     return (
-        <div className={' bg-background text-foreground p-4'}>
+        <div className={' bg-background text-foreground p-4 shadow-lg'}>
             <div className={'text-3xl text-center'}>
                 Joined Synapses
             </div>

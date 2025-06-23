@@ -95,11 +95,12 @@ const ProfileCard = ({publicKey}) => {
     }, [user?.publicKey, sessionPublicKey]);
 
     if (!user) {
-        return <div>Loading user...</div>
+        return;
     }
 
     return (
-        <div className="profile-card flex p-4 my-2 rounded-xl bg-surface ">
+        <div className="profile-card flex p-4 my-2 rounded-xl bg-background shadow-lg
+        hover:bg-surface hover:translate-y-[-2px]">
             <div className="profile-card__identity flex flex-row gap-4">
                 <div className="profile-card__profile-picture w-8">
                     <Link

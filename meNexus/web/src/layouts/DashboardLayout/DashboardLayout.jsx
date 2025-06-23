@@ -8,6 +8,7 @@ import FollowedUsersPanel from "../../components/FollowedUsersPanel/FollowedUser
 import useGetUser from "../../api/hooks/useGetUser.js";
 import { useNavigate } from "react-router-dom"
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import FeedPanel from "../../components/GlobalFeed/FeedPanel.jsx";
 
 const DashboardLayout = ({ children }) => {
     const navigate = useNavigate(); // React Router navigate
@@ -57,10 +58,10 @@ const DashboardLayout = ({ children }) => {
 
     return (
         <div className='h-screen flex flex-col bg-background'>
-            <div className='sticky top-0 z-50 border-b border-border'>
+            <div className='sticky top-0 z-50 h-17 shrink-0 border-b border-border'>
                 <Header />
                 {/* Mobile Nav */}
-                <div className='flex lg:hidden justify-around pt-17 py-2 border-b border-border text-foreground'>
+                <div className='flex  lg:hidden justify-around py-2 border-b border-border text-foreground'>
                     <button
                         onClick={() => setActivePanel(0)}
                         className={`${activePanel === 0 ? 'text-[#FF6B6B] font-semibold' :
@@ -85,44 +86,37 @@ const DashboardLayout = ({ children }) => {
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="flex-1 w-full flex flex-col lg:grid lg:grid-cols-12 overflow-hidden"
-                 {...swipeHandlers}>
+            {/* DASHBOARD CONTENT AREA */}
+            <div className="flex-1 w-full flex flex-col lg:grid lg:grid-cols-12 overflow-hidden" {...swipeHandlers}>
 
-                {/* SOCIAL PANEL */}
+                {/* SIDEBAR — User Identity */}
                 <div className={`
-                ${activePanel === 0 ? 'flex' : 'hidden'} 
-                lg:flex flex-col pt-17 border-r border-border w-full lg:col-span-3`}
+        ${activePanel === 2 ? 'flex' : 'hidden'}
+        lg:flex flex-col flex-1 min-h-0 overflow-y-auto px-4 border-r border-border w-full lg:col-span-4`}
                 >
-                    <SocialPanel
-                        user={user}
-                    />
+                    <SocialPanel user={user} />
                 </div>
 
-                {/* Joined Synapses */}
-                <div
-                    className={`
-                    ${activePanel === 1 ? 'flex' : 'hidden'}
-                    lg:flex flex-col pt-17 px-8 overflow-y-auto flex-1 w-full lg:col-span-5`}
+                {/* MAIN FEED — Core Content */}
+                <div className={`
+        ${activePanel === 0 ? 'flex' : 'hidden'}
+        lg:flex flex-col flex-1 min-h-0 overflow-y-auto px-8  w-full lg:col-span-5`}
                 >
-                    Synapse Manager
-                    <JoinedSynapsesPanel
-                        synapses={user.synapses}
-                    />
+                    <FeedPanel />
                 </div>
 
-                {/* Followed Users */}
-                <div
-                    className={`
-                    ${activePanel === 2 ? 'flex' : 'hidden'}
-                    lg:flex flex-col pt-17 border-l border-border w-full items-center lg:col-span-4`}
+                {/* RIGHT RAIL — Synapse & Network Context */}
+                <div className={`
+        ${activePanel === 1 ? 'flex' : 'hidden'}
+        lg:flex flex-col flex-1 min-h-0 overflow-y-auto px-4 border-l border-border w-full lg:col-span-3`}
                 >
-                    <FollowedUsersPanel
-                        following={user.following}
-                    />
-                    <ActivityFeed/>
+
+                    <div className={'m-4 border border-border rounded-xl '}>
+                        <ActivityFeed />
+                    </div>
                 </div>
             </div>
+
 
         </div>
     );

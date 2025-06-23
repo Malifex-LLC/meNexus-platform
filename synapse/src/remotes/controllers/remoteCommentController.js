@@ -12,7 +12,7 @@ export const createRemotePostComment = async (req, res) => {
     console.log('createRemotePostComment called for synapsePublicKey: ', synapsePublicKey);
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!peerId) {
-        return res.status(400).json({error: 'peerId not found.'});
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const createPostCommentRequest = createMessage(
@@ -46,8 +46,7 @@ export const fetchRemotePostComments = async (req, res) => {
     console.log('fetchRemotePostsComments called: ', resourceType, resourceId, synapsePublicKey);
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!peerId) {
-        console.error('Error fetching peerId for synapsePublicKey: ', synapsePublicKey );
-        res.status(400).json({error: 'Error fetching peerId for synapsePublicKey: ', synapsePublicKey});
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const commentsRequest = createMessage(
