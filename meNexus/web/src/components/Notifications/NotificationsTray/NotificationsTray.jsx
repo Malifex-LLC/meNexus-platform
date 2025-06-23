@@ -8,7 +8,7 @@ const NotificationsTray = ({
                            }) => {
 
     return (
-        <div className="notifications-tray flex flex-col  m-4  bg-black text-brand rounded-lg">
+        <div className="notifications-tray flex flex-col  m-4   text-brand rounded-xl">
             {notifications.length > 0 ? (
                 notifications
                     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

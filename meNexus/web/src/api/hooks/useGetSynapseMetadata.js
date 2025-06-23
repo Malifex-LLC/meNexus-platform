@@ -5,11 +5,10 @@ const useGetSynapseMetadata = () => {
     console.log("useGetSynapseMetadata called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const getSynapseMetadata = async (publicKey) => {
+    const getSynapseMetadata = async () => {
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.GET_SYNAPSE_METADATA,
-            params: {publicKey},
             withCredentials: true,
         });
         return response.data;

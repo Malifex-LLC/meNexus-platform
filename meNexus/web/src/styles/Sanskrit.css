@@ -1,0 +1,42 @@
+@theme {
+    /* Foundations – warm sandalwood tones */
+    --color-background: #22180F;   /* espresso brown */
+    --color-surface:    #332416;   /* dark teak panel */
+    --color-border:     #3A2C1E;   /* aged mahogany divider */
+
+    /* Typography */
+    --color-foreground: #BAA997;  /* parchment ivory */
+    --color-neutral:    #BAA997;   /* palm-leaf taupe (requested hue) */
+
+    /* Brand & accents (earthy, no saffron) */
+    --color-brand:     #B78A5A;    /* roasted chestnut highlight */
+    --color-primary:   #8C6239;    /* deep sandalwood CTA buttons */
+    --color-accent:    #E89C00;    /* cacao-bean toggles / chips */
+    --color-secondary: #D2B48C;    /* light khaki badge / progress */
+
+    /* Header / nav */
+    --color-header-bg: #15100C;
+
+    /* Action states */
+    --color-edit:          #2B1E12;
+    --color-edit-hover:    #332416;
+    --color-is-editing:    #B78A5A;
+
+    --color-save:          #4C9A4D;   /* muted leaf-green confirm */
+    --color-save-hover:    #3C7C3D;
+
+    --color-delete:        #B64A3E;   /* terracotta danger */
+    --color-delete-hover:  #8F372F;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #22180F;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #B78A5A;  /* brand brown */
+    border-radius: 6px;
+}

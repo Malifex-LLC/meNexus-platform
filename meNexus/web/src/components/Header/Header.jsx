@@ -14,6 +14,21 @@ import { FaEnvelope } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import {Link, useLocation} from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { RxDashboard } from "react-icons/rx";
+import { IoMdGitNetwork } from "react-icons/io";
+import { RiHomeWifiLine } from "react-icons/ri";
+import { RiUser6Line } from "react-icons/ri";
+import { HiOutlineUser } from "react-icons/hi";
+import {BsEnvelope, BsMailboxFlag} from "react-icons/bs";
+import {GiSettingsKnobs} from "react-icons/gi";
+import {HiOutlineBellAlert} from "react-icons/hi2";
+import {LuScanSearch} from "react-icons/lu";
+
+
+
+
+
 
 const Header = () => {
 
@@ -89,36 +104,39 @@ const Header = () => {
 
     return (
         <div className="header__container flex fixed top-0 left-0 w-full p-4 gap-4 justify-center
-         bg-header-bg text-foreground z-100">
+         bg-header-bg text-foreground border-b border-border z-100 shadow-xs">
             <div className={`flex-1 flex justify-center gap-8 text-3xl md:text-4xl ml-[175px]`}>
-                <Link to={'/home'} className={isActive('/home')}>
-                    <FaHome />
+                <Link to={'/dashboard'} className={isActive('/dashboard')}>
+                    <RiHomeWifiLine />
                 </Link>
                 <Link to={'/synapse/explore'} className={isActive('/synapse/')}>
-                    <FaNetworkWired />
+                    <IoMdGitNetwork />
+                </Link>
+                <Link to={'/explore'} className={isActive('/explore')}>
+                    <LuScanSearch />
                 </Link>
                 <Link to={'/profile'} className={isActive('/profile')}>
-                    <IoPerson />
+                    <RiUser6Line />
                 </Link>
                 <Link to={'/messages'} className={isActive('/messages')}>
-                    <FaEnvelope />
+                    <BsMailboxFlag />
                 </Link>
                 <Link to={'/settings'} className={isActive('/settings')}>
-                    <IoSettings />
+                    <GiSettingsKnobs />
                 </Link>
                 <div className="header__notifications relative  text-foreground">
                     <div
                         className={`header__notifications-tray-toggle ${
                             showNotificationsTray ? 'header__notifications-tray-toggle--expanded ' : ''
-                        } ${unreadNotifications ? 'header__notifications-tray-toggle--has-notifications text-red-500' : ''}`}
+                        } ${unreadNotifications ? 'header__notifications-tray-toggle--has-notifications text-accent' : ''}`}
                         onClick={toggleNotificationsTray}
                     >
                         <div className={`text-3xl md:text-4xl cursor-pointer`}>
-                            <IoNotifications />
+                            <HiOutlineBellAlert />
                         </div>
                     </div>
                     {showNotificationsTray && (
-                        <div className="absolute right-0 mt-2 w-80 z-50 bg-black rounded-2xl shadow-lg">
+                        <div className="absolute right-0 mt-2 w-80 z-50 bg-header-bg/70 border border-border rounded-2xl shadow-lg">
                             <NotificationsTray
                                 user_id={sessionUserId}
                                 notifications={notifications}

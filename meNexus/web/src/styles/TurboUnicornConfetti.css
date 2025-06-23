@@ -1,0 +1,42 @@
+@theme {
+    /* Turbo Unicorn Confetti */
+    /* Ka-pow Canvas */
+    --color-background: #FF66FF;   /* cotton-candy magenta */
+    --color-surface:    #00FFEE;   /* glow-stick aqua cards */
+    --color-border:     #FFFF38;   /* lemon-zest outline */
+
+    /* Text (strap on shades) */
+    --color-foreground: #0D0D0D;   /* licorice black copy */
+    --color-neutral:    #383838;   /* charcoal for “quiet” bits—lol, quiet */
+
+    /* Party-popper spectrum */
+    --color-brand:     #FF00FF;    /* ultraviolet unicorn */
+    --color-primary:   #FF3366;    /* flamingo punch CTA */
+    --color-accent:    #33FFCE;    /* radioactive mint toggle */
+    --color-secondary: #FFD000;    /* banana-blast badge */
+
+    /* Header (sky-high and sparkling) */
+    --color-header-bg: #FF66FF;
+
+    /* Action states—hit the strobe */
+    --color-edit:          #33A8FF;  /* blue slush edit field */
+    --color-edit-hover:    #0090FF;  /* deeper ocean ripple */
+    --color-is-editing:    #FF00FF;  /* magenta laser outline */
+
+    --color-save:          #5CFF33;  /* slime-green success */
+    --color-save-hover:    #3EDD22;  /* forest-slime shade */
+
+    --color-delete:        #FF1654;  /* nuclear strawberry danger */
+    --color-delete-hover:  #D11246;  /* darker berry boom */
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #101631;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #33FFCE 0%, #33A8FF 50%, #FF00FF 100%);
+    border-radius: 6px;
+}

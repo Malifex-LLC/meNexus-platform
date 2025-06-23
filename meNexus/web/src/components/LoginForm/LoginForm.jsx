@@ -60,7 +60,7 @@ const LoginForm = () => {
             // Step 4: Fetch user session
             const sessionResponse = await getSessionUser();
             if (sessionResponse.status === 200 && sessionResponse.data.handle) {
-                navigate(`/home/${sessionResponse.data.handle}`);
+                navigate(`/dashboard`);
             } else {
                 throw new Error('Failed to retrieve session data');
             }

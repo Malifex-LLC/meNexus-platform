@@ -5,21 +5,20 @@ import { sendMessageWithResponse } from '#core/messenger.js'
 import * as peerStateManager from '#src/core/peerStateManager.js'
 
 export const fetchRemotePosts = async (req, res) => {
-    const remoteSynapsePublicKey = req.query.publicKey;
-    const { peerId } = peerStateManager.getPeerByPublicKey(remoteSynapsePublicKey);
-    if (!remoteSynapsePublicKey) {
+    const synapsePublicKey = req.query.synapsePublicKey;
+    if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
     }
-
-    const resource = RESOURCE_TYPES.ALL_POSTS;
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
+    }
 
     const postsRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
         RESOURCE_TYPES.ALL_POSTS,
-        {
-            resource,
-        },
+        {},
         {sender: process.env.PUBLIC_KEY}
     )
     try {
@@ -35,9 +34,12 @@ export const fetchRemoteUserPosts = async (req, res) => {
     //console.log('Discovered Peers in getSynapseUserPosts: ', peerStateManager.getAllDiscoveredPeers());
     const handle = req.query.handle;
     const synapsePublicKey = req.query.publicKey;
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!handle || !synapsePublicKey) {
         return res.status(401).json({error: 'No user handle or Synapse publicKey provided.'});
+    }
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
     console.log('getSynapseUserPosts handle: ', handle);
     console.log('getSynapseUserPosts synapsePublicKey: ', synapsePublicKey);
@@ -67,12 +69,12 @@ export const fetchRemoteUserPosts = async (req, res) => {
 export const createRemotePost = async (req, res) => {
     const { publicKey, content, synapsePublicKey } = req.body;
     if (!publicKey || !content || !synapsePublicKey) {
-        return res.status(400).json({error: 'publicKey or content not found.'});
+        return res.status(400).json({error: 'publicKey, synapsePublicKey, or content not found.'});
     }
     console.log('createSynapsePost called for synapsePublicKey: ', synapsePublicKey)
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!peerId) {
-        return res.status(400).json({error: 'peerId not found.'});
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const createPostRequest = createMessage(
@@ -93,6 +95,8 @@ export const createRemotePost = async (req, res) => {
         res.status(500).json({error: 'Failed to create post.'});
     }
 }
+
+
 
 export default {
     fetchRemotePosts,

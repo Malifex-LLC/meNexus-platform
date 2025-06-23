@@ -1,0 +1,41 @@
+@theme {
+    /* Hi-Vis Orange Theme
+    /* Foundations */
+    --color-background: #0B0B0B;   /* pitch-black canvas */
+    --color-foreground: #F8F8F8;   /* near-white text for crisp legibility */
+    --color-neutral:    #B5B5B5;   /* cool gray for sub-copy */
+    --color-surface:    #1A1A1A;   /* card & panel fill */
+    --color-border:     #333333;   /* low-key separators */
+
+    /* Hi-vis spectrum */
+    --color-brand:     #FF7A00;    /* blaze-orange spotlight */
+    --color-accent:    #FFC400;    /* traffic-cone amber for secondary bling */
+    --color-primary:   #FF5600;    /* richer orange—ideal on buttons w/ white text */
+    --color-secondary: #00C8FF;    /* electric cyan counterpoint for badges & links */
+
+    /* Header / nav */
+    --color-header-bg: #0B0B0B;
+
+    /* Action states */
+    --color-edit:         #2E2E2E;
+    --color-edit-hover:   #242424;
+    --color-is-editing:   #FF7A00;
+
+    --color-save:         #29CC7A; /* neon green confirmation */
+    --color-save-hover:   #20A864;
+
+    --color-delete:       #FF3B30; /* urgent red destructive */
+    --color-delete-hover: #C5302B;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #FF7A00; /* brand color */
+    border-radius: 6px;
+}

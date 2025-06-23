@@ -1,0 +1,41 @@
+@theme {
+    /* Indigo Theme */
+    /* Core palette */
+    --color-background: #0E0D19;   /* deep space indigo */
+    --color-foreground: #EAF6FF;   /* icy mist text */
+    --color-neutral: #A8A8B8;      /* soft steel */
+    --color-surface: #1B1A2A;      /* pane/section cards */
+    --color-border: #34345A;       /* muted midnight outline */
+
+    /* Accent spectrum */
+    --color-accent:   #00E0FF;     /* neon cyan pulse */
+    --color-brand:    #FF4F78;     /* hot pink signal */
+    --color-primary:  #7A34FF;     /* electric violet */
+    --color-secondary:#FF9E00;     /* cyber amber */
+
+    /* Header / nav */
+    --color-header-bg: #0E0D19;
+
+    /* Action states */
+    --color-edit:        #2D2C45;
+    --color-edit-hover:  #24233A;
+    --color-is-editing:  #FF4F78;
+
+    --color-save:        #00C853;  /* neon green */
+    --color-save-hover:  #00A645;
+
+    --color-delete:      #FF1744;  /* alert red */
+    --color-delete-hover:#C51137;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #00E0FF; /* brand color */
+    border-radius: 6px;
+}

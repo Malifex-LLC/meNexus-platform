@@ -1,0 +1,43 @@
+@theme {
+    /* Dracula */
+    /* Foundations */
+    --color-background: #282A36;   /* Dracula base */
+    --color-surface:    #343746;   /* tool-window / card surface */
+    --color-border:     #44475A;   /* pane splitters */
+
+    /* Text & neutrals */
+    --color-foreground: #F8F8F2;   /* primary text */
+    --color-neutral:    #6272A4;   /* comments / secondary labels */
+
+    /* “Syntax” spectrum mapped to UI roles */
+    --color-brand:     #FF79C6;    /* Dracula pink – headline & highlights */
+    --color-primary:   #BD93F9;    /* lavender – buttons / CTAs */
+    --color-accent:    #8BE9FD;    /* cyan – links, toggles */
+    --color-secondary: #FFB86C;    /* orange – badges / progress */
+
+    /* Header / nav */
+    --color-header-bg: #20212b;
+
+    /* Action states */
+    --color-edit:          #383A59;   /* inline edit fields */
+    --color-edit-hover:    #333555;
+    --color-is-editing:    #FF79C6;   /* editing border */
+
+    --color-save:          #50FA7B;   /* string-green success */
+    --color-save-hover:    #3ED867;
+
+    --color-delete:        #FF5555;   /* error red */
+    --color-delete-hover:  #CC4444;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #8BE9FD; /* brand color */
+    border-radius: 6px;
+}

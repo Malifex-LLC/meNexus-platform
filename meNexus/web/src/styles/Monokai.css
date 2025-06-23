@@ -1,0 +1,42 @@
+@theme {
+    /* Monokai Foundations */
+    --color-background: #272822;   /* Monokai base */
+    --color-surface:    #2E2F27;   /* side-panel / card surface */
+    --color-border:     #3E3D32;   /* subtle splitters */
+
+    /* Text & comments */
+    --color-foreground: #F8F8F2;   /* primary copy */
+    --color-neutral:    #75715E;   /* comment gray */
+
+    /* “Syntax” spectrum mapped to UI roles */
+    --color-brand:     #F92672;    /* hot pink keyword → brand */
+    --color-primary:   #FD971F;    /* orange operator → buttons/CTAs */
+    --color-accent:    #66D9EF;    /* cyan function → links/toggles */
+    --color-secondary: #A6E22E;    /* lime string → badges/progress */
+
+    /* Header / nav */
+    --color-header-bg: #1f201b;
+
+    /* Action states */
+    --color-edit:          #49483E;   /* selection gray */
+    --color-edit-hover:    #3E3D32;
+    --color-is-editing:    #F92672;   /* highlight border */
+
+    --color-save:          #A6E22E;   /* success green */
+    --color-save-hover:    #81C542;
+
+    --color-delete:        #FF5555;   /* error red */
+    --color-delete-hover:  #CC4444;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #F92672; /* brand color */
+    border-radius: 6px;
+}

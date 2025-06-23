@@ -131,12 +131,42 @@ export const handleData = async (libp2p, message) => {
                         console.warn('Cannot map publicKey to peer-id - response not sent.');
                     }
                 }
+                if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
+                    console.log(`Received COMMENTS request from ${message.meta.sender}.`);
+                    const { resourceType, resourceId } = message.payload;
+                    const response = await sendRequest({
+                        method: 'GET',
+                        url: ENDPOINTS.GET_COMMENTS,
+                        params: { resourceType, resourceId },
+                        withCredentials: true
+                    });
+
+                    console.log("COMMENTS response ", response);
+                    const comments = response.data;
+
+                    const commentsResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.DATA.AGGREGATE,
+                        RESOURCE_TYPES.COMMENTS,
+                        { comments },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, commentsResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peer-id - response not sent.');
+                    }
+                }
                 break;
 
             case ACTION_TYPES.RESOURCE.CREATE:
                 console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
                 if (message.resourceType === RESOURCE_TYPES.POST) {
-                    console.log(`Received POST request from ${message.meta.sender}.`);
+                    console.log(`Received Create POST request from ${message.meta.sender}.`);
                     const { publicKey, content } = message.payload;
                     const response = await sendRequest({
                         method: 'POST',
@@ -164,6 +194,40 @@ export const handleData = async (libp2p, message) => {
                         console.warn('Cannot map publicKey to peer-id - response not sent.');
                     }
 
+                }
+                if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
+                    console.log(`Received Create COMMENTS request from ${message.meta.sender}.`);
+                    const { resourceType, resourceId, content, publicKey } = message.payload;
+                    const response = await sendRequest({
+                        method: 'POST',
+                        url: ENDPOINTS.CREATE_COMMENT,
+                        data: {
+                            resourceType,
+                            resourceId,
+                            content,
+                            publicKey,
+                        },
+                    });
+                    console.log("CREATE_POST response ", response);
+                    const comment = response.data;
+
+                    const createCommentResponse = createMessage(
+                        MESSAGE_TYPES.DATA.RESPONSE,
+                        ACTION_TYPES.RESOURCE.CREATE,
+                        RESOURCE_TYPES.COMMENTS,
+                        { comment },
+                        {
+                            sender: libp2p.peerId.toString(),
+                            requestId: message.meta.requestId,
+                        }
+                    );
+
+                    const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                    if (peerId) {
+                        await sendMessage(peerId, createCommentResponse);
+                    } else {
+                        console.warn('Cannot map publicKey to peer-id - response not sent.');
+                    }
                 }
                 break;
 

@@ -1,0 +1,43 @@
+@theme {
+    /* Solarized Dark */
+    /* Base (background hierarchy) */
+    --color-background: #002B36;   /* base03 */
+    --color-surface:    #073642;   /* base02 */
+    --color-border:     #586E75;   /* base01 */
+
+    /* Text */
+    --color-foreground: #839496;   /* base0  – primary copy */
+    --color-neutral:    #657B83;   /* base00 – comments / secondary */
+
+    /* Solarized “syntax” spectrum → UI roles */
+    --color-brand:     #268BD2;    /* blue – headers / links */
+    --color-primary:   #B58900;    /* yellow – buttons / CTAs */
+    --color-accent:    #2AA198;    /* cyan – toggles, info pills */
+    --color-secondary: #D33682;    /* magenta – badges / progress */
+
+    /* Header / nav */
+    --color-header-bg: #002B36;
+
+    /* Action states */
+    --color-edit:          #094352;   /* slightly lighter than surface */
+    --color-edit-hover:    #083C4B;
+    --color-is-editing:    #268BD2;   /* blue outline */
+
+    --color-save:          #859900;   /* green – success */
+    --color-save-hover:    #6A7A00;
+
+    --color-delete:        #DC322F;   /* red – danger */
+    --color-delete-hover:  #B02826;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #2AA198; /* brand color */
+    border-radius: 6px;
+}

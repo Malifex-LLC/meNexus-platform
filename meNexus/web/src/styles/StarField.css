@@ -1,0 +1,42 @@
+@theme {
+    /* Foundations – star-field backdrop */
+    --color-background: #050617;   /* deep space */
+    --color-surface:    #101631;   /* spacecraft hull panels */
+    --color-border:     #27304F;   /* starlit rim */
+
+    /* Typography */
+    --color-foreground: #E6EEF8;   /* starlight white */
+    --color-neutral:    #A8B4D6;   /* cosmic dust gray */
+
+    /* Brand & nebular accents */
+    --color-brand:     #5D6BFF;    /* galactic indigo */
+    --color-primary:   #009BDF;    /* nebula cyan CTAs */
+    --color-accent:    #FF6FD8;    /* magenta-nova chips */
+    --color-secondary: #FFD66B;    /* supergiant amber badges */
+
+    /* Header / nav */
+    --color-header-bg: #050617;
+
+    /* Action states */
+    --color-edit:          #172042;   /* cockpit console */
+    --color-edit-hover:    #1D274F;
+    --color-is-editing:    #5D6BFF;
+
+    --color-save:          #37E28A;   /* oxygen-green confirm */
+    --color-save-hover:    #2CBC73;
+
+    --color-delete:        #FF5555;   /* red dwarf danger */
+    --color-delete-hover:  #D43E3E;
+}
+
+/* Meteor-trail scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #101631;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #5D6BFF 0%, #009BDF 50%, #FF6FD8 100%);
+    border-radius: 6px;
+}

@@ -1,0 +1,43 @@
+@theme {
+    /* One Dark Pro */
+    /* Foundations */
+    --color-background: #282C34;   /* editor gutter gray */
+    --color-surface:    #2C313C;   /* panels / cards */
+    --color-border:     #3E4452;   /* subtle splitters */
+
+    /* Text & neutrals */
+    --color-foreground: #ABB2BF;   /* primary copy */
+    --color-neutral:    #5C6370;   /* secondary copy / hints */
+
+    /* “Syntax” spectrum mapped to UI roles */
+    --color-brand:     #61AFEF;    /* aqua keyword → brand tint */
+    --color-primary:   #C678DD;    /* lavender function → buttons/CTAs */
+    --color-accent:    #D19A66;    /* orange constant → links/toggles */
+    --color-secondary: #E5C07B;    /* gold variable → badges/progress */
+
+    /* Header / nav */
+    --color-header-bg: #282C34;
+
+    /* Action states */
+    --color-edit:          #3B4048;
+    --color-edit-hover:    #353B45;
+    --color-is-editing:    #61AFEF;
+
+    --color-save:          #98C379;   /* “string green”—success */
+    --color-save-hover:    #7FAA64;
+
+    --color-delete:        #E06C75;   /* “error red”—destructive */
+    --color-delete-hover:  #B94F5A;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A; /* background */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #C678DD; /* brand color */
+    border-radius: 6px;
+}
