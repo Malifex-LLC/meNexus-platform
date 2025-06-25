@@ -6,7 +6,7 @@ import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useCreateNotification from "../../api/hooks/useCreateNotification.js";
 
-const ProfileCard = ({publicKey, handle}) => {
+const ProfileCard = ({publicKey}) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getUser } = useGetUser();
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
@@ -95,41 +95,36 @@ const ProfileCard = ({publicKey, handle}) => {
     }, [user?.publicKey, sessionPublicKey]);
 
     if (!user) {
-        return <div>Loading user...</div>
+        return;
     }
 
     return (
-        <div className="profile-card flex justify-start p-4  my-4 rounded-2xl bg-surface gap-4">
-            <div className="profile-card__identity flex gap-8 ">
-                <div className="profile-card__profile-picture w-32">
+        <div className="profile-card flex p-4 my-2 rounded-xl bg-background shadow-lg
+        hover:bg-surface hover:translate-y-[-2px]">
+            <div className="profile-card__identity flex flex-row gap-4">
+                <div className="profile-card__profile-picture w-8">
                     <Link
                         className="profile-card__display-name cursor-pointer"
                         to={`/profile/${user.publicKey}`}
                     >
-                        <img src={user.profilePicture} alt="Profile Picture"/>
+                        <img src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                             alt="Profile Picture"/>
                     </Link>
                 </div>
                 <div className={`flex flex-col`}>
                     <Link
-                        className="profile-card__display-name text-2xl cursor-pointer hover:underline"
+                        className="profile-card__display-name text-sm cursor-pointer hover:underline"
                         to={`/profile/${user.handle}`}
                     >
                         {user.displayName}
                     </Link>
                     <Link
-                        className="profile-card__handle text-xl text-brand cursor-pointer"
+                        className="profile-card__handle text-xs text-brand cursor-pointer"
                         to={`/profile/${user.handle}`}
                     >
                         @{user.handle}
                     </Link>
-                    <div className="profile-card__follow-actions py-4">
-                        <button
-                            className="profile-card__follow-button p-1 px-2 rounded-md bg-brand"
-                            onClick={isFollowing ? handleUnfollow : handleFollow}
-                        >
-                            {isFollowing ? "Unfollow" : "Follow"}
-                        </button>
-                    </div>
+
                 </div>
 
             </div>

@@ -5,12 +5,12 @@ const useFetchRemotePosts = () => {
     console.log("useFetchRemotePosts called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const fetchRemotePosts = async (publicKey) => {
+    const fetchRemotePosts = async (synapsePublicKey) => {
 
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.FETCH_REMOTE_POSTS,
-            params: {publicKey},
+            params: {synapsePublicKey},
             withCredentials: true,
         });
 

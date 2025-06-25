@@ -7,20 +7,20 @@ export const replaceParams = (url, params) => {
 };
 
 // Refreshes rendered posts, commonly after a post is created or deleted
-export const refreshPosts = async (getUserPosts, handle, setPosts) => {
+export const refreshPosts = async (getPosts, setPosts) => {
     try {
-        const userPostsData = await getUserPosts(handle);
-        setPosts(userPostsData);
-        return userPostsData;
+        const postsData = await getPosts();
+        setPosts(postsData);
+        return postsData;
     } catch (error) {
         console.log("Error refreshing posts:", error);
     }
 };
 
 // Refreshes rendered comments, commonly after a comment is created or deleted
-export const refreshComments = async (resource_type, resource_id, getComments, setComments) => {
+export const refreshComments = async (getComments, setComments) => {
     try {
-        const userCommentsData = await getComments(resource_type, resource_id);
+        const userCommentsData = await getComments();
         setComments(userCommentsData);
     } catch (error) {
         console.log("Error refreshing posts:", error);

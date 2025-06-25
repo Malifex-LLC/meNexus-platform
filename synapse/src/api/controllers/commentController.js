@@ -2,19 +2,17 @@
 import Comment from '../models/comment.js';
 
 export const createComment = async (req, res) => {
-    if (!req.session || !req.session.user) {
-        console.log("User not authenticated or session missing");
-        return res.status(401).json({ error: "User not authenticated" });
+    const { resourceType, resourceId, content, publicKey} = req.body;
+    console.log('createComment called from controller:', resourceType, resourceId, content, publicKey);
+    if (!resourceType || !resourceId || !content || !publicKey) {
+        return res.status(400).json({error: 'resourceType, resourceId, content, or publicKey not found.'});
     }
-    const { publicKey } = req.session.user
-    const { resource_type, resource_id, content } = req.body;
 
-    const result = await Comment.createComment(publicKey, resource_type, resource_id, content);
+    const result = await Comment.createComment(resourceType, resourceId, content, publicKey);
 
     if (result.affectedRows === 0) {
         return res.status(500).json({error: 'Failed to create a comment'});
     }
-
     return res.status(200).json(result);
 }
 
@@ -44,13 +42,13 @@ export const deleteComment = async (req, res) => {
 }
 
 export const getComments = async (req, res) => {
-    const {resource_type, resource_id } = req.query;
+    const {resourceType, resourceId } = req.query;
 
-    if (!resource_id || resource_id.trim() === "") {
+    if (!resourceType || resourceId.trim() === "") {
         return res.status(400).json({ error: "Invalid getComments query." });
     }
 
-    const results = await Comment.getComments(resource_type, resource_id);
+    const results = await Comment.getComments(resourceType, resourceId);
     return res.status(200).json(results);
 }
 

@@ -4,7 +4,7 @@ import Post from './PostObject.jsx';
 const PostPage = () => {
     return (
         <PostLayout>
-            <Post />
+
         </PostLayout>
     );
 };

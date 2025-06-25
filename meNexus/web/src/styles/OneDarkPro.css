@@ -1,0 +1,84 @@
+/* One Dark Pro */
+
+@theme {
+    /* Foundations */
+    --color-background:         #282C34;   /* Panel Background */
+    --color-surface:            #2C313C;   /* Panel/Card Surface */
+    --color-border:             #3E4452;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #282C34;   /* Header Background Color */
+
+    /* Typography */
+    --color-foreground:         #ABB2BF;   /* Primary Text */
+    --color-foreground-message: #ABB2BF;   /* Fallback to main copy color */
+    --color-neutral:            #5C6370;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #61AFEF;   /* Highlights / Nav */
+    --color-primary:            #C678DD;   /* Buttons / CTAs */
+    --color-accent:             #D19A66;   /* Alerts / Links */
+    --color-secondary:          #E5C07B;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #3B4048;
+    --color-edit-hover:         #353B45;
+    --color-is-editing:         #61AFEF;
+
+    --color-save:               #98C379;
+    --color-save-hover:         #7FAA64;
+
+    --color-delete:             #E06C75;
+    --color-delete-hover:       #B94F5A;
+}
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #282C34;
+}
+
+/* Gradient Background */
+/*body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-accent),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}*/
+
+/* Animated Background */
+/*body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-secondary),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 14s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}*/
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #C678DD;
+    border-radius: 6px;
+}

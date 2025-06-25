@@ -5,9 +5,12 @@ import {sendMessageWithResponse} from "#core/messenger.js";
 
 export const fetchRemoteUsers = async (req, res) => {
     const synapsePublicKey = req.query.publicKey;
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
     if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
+    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
 
     const usersRequest = createMessage(

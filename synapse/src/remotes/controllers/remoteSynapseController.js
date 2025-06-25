@@ -17,14 +17,17 @@ const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 export const fetchRemoteSynapseMetadata = async (req, res) => {
     const synapsePublicKey = req.query.publicKey;
+    if (!synapsePublicKey) {
+        return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
     console.log('getSynapseMetadata for synapsePublicKey: ', synapsePublicKey)
     const localMetadata = await loadConfig(CONFIG_FILE);
     if (synapsePublicKey === localMetadata.identity.publicKey) {
         return res.status(200).json(localMetadata);
     }
     const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
-    if (!synapsePublicKey) {
-        return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    if (!peerId) {
+        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
     }
     const metadataRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,

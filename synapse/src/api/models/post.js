@@ -178,7 +178,7 @@ export const getPosts = async (publicKey) => {
 
 export const getUserPosts = (publicKey) => {
     return new Promise((resolve, reject) => {
-        // SQL is performing an inner join on Posts and Users tables where post.user_id == users.user_id
+        // SQL is performing an inner join on Posting and Users tables where post.user_id == users.user_id
         const sql = `
             SELECT *
             FROM Posts
