@@ -29,14 +29,13 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
 
 
     return (
-        <div className="flex flex-row h-full ">
-            <div className={'bg-background p-4 m-4 rounded-xl mt-8 w-1/5 text-2xl text-foreground ' +
-                'border border-border shadow-2xl'}
+        <div className="flex flex-row h-full rounded-xl">
+            <div className={'bg-background p-4 mr-2  rounded-xl  w-1/5 text-2xl text-foreground border border-border shadow-2xl'}
             >
                 <PostBoardsPanel />
             </div>
-            <div className={'home__posts h-full flex-1 overflow-y-auto px-8  space-y-8'}>
-                <div className="home__post-form bg-surface p-4 rounded-xl mt-4 shadow-2xl">
+            <div className={'home__posts bg-background rounded-xl h-full flex-1 overflow-y-auto px-8 space-y-8 border border-border'}>
+                <div className="home__post-form bg-surface p-4 rounded-xl mt-4  shadow-2xl">
                     <PostForm
                         isLocalSynapse={isLocalSynapse}
                         publicKey={publicKey}
@@ -54,7 +53,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
                         .map((post, index) => (
                             <div
                                 key={index}
-                                className={'shadow-2xl'}
+                                className={'shadow-2xl mx-32'}
                             >
                                 <Post
                                     key={index}

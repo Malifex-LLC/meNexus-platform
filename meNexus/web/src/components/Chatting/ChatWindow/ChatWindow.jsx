@@ -209,16 +209,18 @@ const ChatWindow = () => {
 
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 w-full h-full space-y-4 shadow-2xl">
-            {messages.map((msg, i) => {
-                const isOwner = msg.publicKey === publicKey;
+        <div className={'bg-background'}>
+            <div className="flex-1 overflow-y-auto p-4  space-y-4 shadow-2xl ">
+                {messages.map((msg, i) => {
+                    const isOwner = msg.publicKey === publicKey;
 
-                return (
-                    <div key={i} className={`flex ${isOwner ? "justify-end" : "justify-start"}`}>
-                        <ChatMessage message={msg} isOwner={isOwner} />
-                    </div>
-                );
-            })}
+                    return (
+                        <div key={i} className={`flex ${isOwner ? "justify-end" : "justify-start"}`}>
+                            <ChatMessage message={msg} isOwner={isOwner} />
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

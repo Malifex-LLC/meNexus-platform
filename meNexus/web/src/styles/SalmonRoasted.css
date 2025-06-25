@@ -1,33 +1,88 @@
+/* Salmon Roasted */
+
 @theme {
-    --color-background: #1A1A1A;
-    --color-foreground: #EDEDED;
-    --color-neutral: #BAA997;
-    --color-surface: #282828;
-    --color-border: #3A3A3A;
-    --color-accent: #FACC15;
-    --color-brand: #FF6B6B;
-    --color-primary: #994040;
-    --color-secondary: #cc5555;
+    /* Foundations */
+    --color-background:         #1A1A1A;   /* Panel Background */
+    --color-surface:            #282828;   /* Panel/Card Surface */
+    --color-border:             #3A3A3A;   /* Pane Splitters */
 
-    --color-header-bg: #1A1A1A;
+    /* Header background */
+    --color-header-bg:          #1A1A1A;   /* Header Background Color */
 
-    --color-edit: #3F3F3F;
-    --color-edit-hover: #2F2F2F;
-    --color-is-editing: #FF6B6B;
-    --color-save: #28A745;
-    --color-save-hover: #28A745;
-    --color-delete: #DC3545;
-    --color-delete-hover: #AB4555;
+    /* Typography */
+    --color-foreground:         #EDEDED;   /* Primary Text */
+    --color-foreground-message: #EDEDED;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #BAA997;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #FF6B6B;   /* Headlines and Highlights */
+    --color-primary:            #994040;   /* Buttons / CTAs */
+    --color-accent:             #FACC15;   /* Notifications / Alerts */
+    --color-secondary:          #cc5555;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #3F3F3F;
+    --color-edit-hover:         #2F2F2F;
+    --color-is-editing:         #FF6B6B;
+
+    --color-save:               #28A745;
+    --color-save-hover:         #28A745;
+
+    --color-delete:             #DC3545;
+    --color-delete-hover:       #AB4555;
 }
 
-/* For WebKit (Chrome, Safari) */
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #1A1A1A;
+}
+
+/* Gradient Background */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Optional Animated Background */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-secondary),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 14s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+*/
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1A1A1A; /* background */
+    background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #994040; /* brand color */
+    background-color: #994040;
     border-radius: 6px;
 }

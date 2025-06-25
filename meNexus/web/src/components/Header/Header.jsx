@@ -1,73 +1,47 @@
 import '../Search/Search.jsx'
 import {useEffect, useState} from "react";
-import useGetSessionUser from '../../api/hooks/useGetSessionUser.js'
 import NotificationsTray from '../Notifications/NotificationsTray/NotificationsTray.jsx'
 import Search from "../Search/Search.jsx";
 import useGetNotifications from "../../api/hooks/useGetNotifications.js";
 import useNotificationsWebSocket from '../../api/hooks/useNotificationsWebSocket.js'
 import useSetNotificationAsRead from "../../api/hooks/useSetNotificationAsRead.js";
-import { FaHome } from "react-icons/fa";
-import { IoGitNetworkSharp } from "react-icons/io5";
-import { FaNetworkWired } from "react-icons/fa6";
-import { IoPerson } from "react-icons/io5";
-import { FaEnvelope } from "react-icons/fa";
-import { IoSettings } from "react-icons/io5";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import {Link, useLocation} from "react-router-dom";
-import { IoNotifications } from "react-icons/io5";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
-import { RxDashboard } from "react-icons/rx";
 import { IoMdGitNetwork } from "react-icons/io";
 import { RiHomeWifiLine } from "react-icons/ri";
 import { RiUser6Line } from "react-icons/ri";
-import { HiOutlineUser } from "react-icons/hi";
-import {BsEnvelope, BsMailboxFlag} from "react-icons/bs";
-import {GiSettingsKnobs} from "react-icons/gi";
-import {HiOutlineBellAlert} from "react-icons/hi2";
-import {LuScanSearch} from "react-icons/lu";
+import { BsMailboxFlag } from "react-icons/bs";
+import { GiSettingsKnobs } from "react-icons/gi";
+import { HiOutlineBellAlert } from "react-icons/hi2";
+import { LuScanSearch } from "react-icons/lu";
 
 
 
 
 
 
-const Header = () => {
+const Header = ({user}) => {
 
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getNotifications, loading, error } = useGetNotifications()
     const { setNotificationAsRead } = useSetNotificationAsRead()
     const { connectNotificationsWebSocket } = useNotificationsWebSocket();
 
-    const [sessionUserId, setSessionUserId] = useState(null);
-    const [isSessionUserIdSet, setIsSessionUserIdSet] = useState(null);
     const [showNotificationsTray, setShowNotificationsTray] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
+    const [synapseMetadata, setSynapseMetadata] = useState(null);
+    const { getSynapseMetadata } = useGetSynapseMetadata();
 
     const location = useLocation();
     const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
 
-
     useEffect(() => {
-        const fetchSessionUser = async () => {
-            if (!sessionUserId && !isSessionUserIdSet) {
-                try {
-                    console.log("Fetching current user session...");
-                    const response = await getSessionUser();
-                    console.log(response);
-
-                    if (response.status === 200 && response.data.user_id) {
-                        console.log("Session user handle:", response.data.handle);
-                        setSessionUserId(response.data.user_id);
-                        setIsSessionUserIdSet(true);
-                    }
-                } catch (error) {
-                    console.error("Error fetching current user session:", error);
-                }
-            }
-        };
-
-        fetchSessionUser();
-    }, [sessionUserId, isSessionUserIdSet]);
+        const fetchSynapseMetadata = async () => {
+            const localSynapseData = await getSynapseMetadata();
+            setSynapseMetadata(localSynapseData);
+        }
+        fetchSynapseMetadata()
+    }, [])
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -101,6 +75,11 @@ const Header = () => {
     //console.log("useNotificationsWebSocket attempting to connect for user_id: ", sessionUserId);
     //connectNotificationsWebSocket(sessionUserId, handleNewNotification);
 
+    if(!synapseMetadata){
+        return (
+            <div className={'bg-header-bg text-foreground'}></div>
+        )
+    }
 
     return (
         <div className="header__container flex fixed top-0 left-0 w-full p-4 gap-4 justify-center
@@ -109,13 +88,13 @@ const Header = () => {
                 <Link to={'/dashboard'} className={isActive('/dashboard')}>
                     <RiHomeWifiLine />
                 </Link>
-                <Link to={'/synapse/explore'} className={isActive('/synapse/')}>
+                <Link to={`/synapse/${synapseMetadata.identity.publicKey}`} className={isActive('/synapse/')}>
                     <IoMdGitNetwork />
                 </Link>
                 <Link to={'/explore'} className={isActive('/explore')}>
                     <LuScanSearch />
                 </Link>
-                <Link to={'/profile'} className={isActive('/profile')}>
+                <Link to={`/profile/${user.handle}`} className={isActive('/profile')}>
                     <RiUser6Line />
                 </Link>
                 <Link to={'/messages'} className={isActive('/messages')}>
@@ -138,7 +117,7 @@ const Header = () => {
                     {showNotificationsTray && (
                         <div className="absolute right-0 mt-2 w-80 z-50 bg-header-bg/70 border border-border rounded-2xl shadow-lg">
                             <NotificationsTray
-                                user_id={sessionUserId}
+                                user_id={user.publicKey}
                                 notifications={notifications}
                             />
                         </div>

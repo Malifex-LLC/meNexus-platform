@@ -1,40 +1,87 @@
+/* Salmon Fresh */
+
 @theme {
     /* Foundations */
-    --color-background: #F9FAFC;   /* soft paper */
-    --color-surface:    #FFFFFF;   /* cards / panels */
-    --color-border:     #E5E7EB;   /* subtle divider */
+    --color-background:         #F9FAFC;   /* Background */
+    --color-surface:            #FFFFFF;   /* Panel/Card Surface */
+    --color-border:             #E5E7EB;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #FFFFFF;   /* Header Background */
 
     /* Typography */
-    --color-foreground: #1F2937;   /* near-black text */
-    --color-neutral:    #6B7280;   /* muted secondary */
+    --color-foreground:         #1F2937;   /* Primary Text */
+    --color-foreground-message: #1F2937;   /* Message Text */
+    --color-neutral:            #6B7280;   /* Secondary Text */
 
-    /* Brand & accents */
-    --color-brand:     #FF6B6B;    /* coral brand hue */
-    --color-primary:   #E05858;    /* slightly deeper coral for CTAs */
-    --color-accent:    #3C6FA3;    /* dusty blue toggles / chips */
-    --color-secondary: #FF6B6B;    /* warm sand badge / progress */
+    /* Brand & Accents */
+    --color-brand:              #FF6B6B;   /* Brand Highlights */
+    --color-primary:            #E05858;   /* CTA Buttons */
+    --color-accent:             #3C6FA3;   /* Alert / Notification */
+    --color-secondary:          #FF6B6B;   /* Secondary Elements */
 
-    /* Header / nav */
-    --color-header-bg: #FFFFFF;
+    /* Action States */
+    --color-edit:               #EFF3F8;   /* Inline Edit Field */
+    --color-edit-hover:         #E2E8F0;
+    --color-is-editing:         #FF6B6B;
 
-    /* Action states */
-    --color-edit:          #EFF3F8;
-    --color-edit-hover:    #E2E8F0;
-    --color-is-editing:    #FF6B6B;
+    --color-save:               #2F855A;   /* Confirm Action */
+    --color-save-hover:         #276749;
 
-    --color-save:          #2F855A;   /* confirm green */
-    --color-save-hover:    #276749;
-
-    --color-delete:        #C53030;   /* danger red */
-    --color-delete-hover:  #9B2C2C;
+    --color-delete:             #C53030;   /* Destructive Action */
+    --color-delete-hover:       #9B2C2C;
 }
 
-/* Custom scrollbars */
+/* Options for the actual window background. Solid, gradient, animated. */
+
+
+/* Solid Background */
+body {
+    background: var(--color-background);
+}
+
+/* Gradient Background (optional) */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-accent),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Animated Background (optional) */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-secondary),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 14s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+*/
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #F9FAFC;
+    background: var(--color-background);
 }
 ::-webkit-scrollbar-thumb {
     background-color: #C0CAD4;

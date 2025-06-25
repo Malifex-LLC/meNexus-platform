@@ -6,7 +6,7 @@ const PostBoardsPanel = () => {
     const [activeChannel, setActiveChannel] = useState("Main Chat");
 
     return (
-        <div>
+        <div className={''}>
             <div className="text-center rounded-xl border-b border-border">
                 Boards
             </div>

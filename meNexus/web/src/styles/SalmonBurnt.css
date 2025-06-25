@@ -1,42 +1,85 @@
+/* Salmon Burnt */
+
 @theme {
     /* Foundations */
-    --color-background: #000000;   /* pure obsidian */
-    --color-surface:    #141414;   /* subtle lift for cards & modals */
-    --color-border:     #2A2A2A;   /* hairline separators */
+    --color-background:         #000000;   /* Panel Background */
+    --color-surface:            #141414;   /* Panel/Card Surface */
+    --color-border:             #2A2A2A;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #000000;   /* Header Background Color */
 
     /* Typography */
-    --color-foreground: #E5E5E5;   /* soft light-grey text */
-    --color-neutral:    #9CA3AF;   /* slate-400 secondary copy */
+    --color-foreground:         #E5E5E5;   /* Primary Text */
+    --color-foreground-message: #E5E5E5;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #9CA3AF;   /* Secondary Labels */
 
-    /* Brand & accents */
-    --color-brand: #FF6B6B;
-    --color-primary: #994040;
-    --color-accent: #FACC15;
-    --color-secondary: #cc5555;
-
-    /* Header / nav */
-    --color-header-bg: #000000;
+    /* Brand & Accents */
+    --color-brand:              #FF6B6B;   /* Headlines and Highlights */
+    --color-primary:            #994040;   /* Buttons / CTAs */
+    --color-accent:             #FACC15;   /* Notifications / Alerts */
+    --color-secondary:          #CC5555;   /* Secondary */
 
     /* Action states */
-    --color-edit:          #1E1E1E;   /* inline edit field */
-    --color-edit-hover:    #262626;
-    --color-is-editing:    #3B82F6;
+    --color-edit:               #1E1E1E;
+    --color-edit-hover:         #262626;
+    --color-is-editing:         #3B82F6;
 
-    --color-save:          #22C55E;   /* gentle green confirm */
-    --color-save-hover:    #16A34A;
+    --color-save:               #22C55E;
+    --color-save-hover:         #16A34A;
 
-    --color-delete:        #EF4444;   /* soft crimson danger */
-    --color-delete-hover:  #B91C1C;
+    --color-delete:             #EF4444;
+    --color-delete-hover:       #B91C1C;
 }
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #000000;
+}
+
+/* Gradient Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*            to bottom,*/
+/*            var(--color-background),*/
+/*            var(--color-primary),*/
+/*            var(--color-background)*/
+/*    );*/
+/*    backdrop-filter: blur(1rem);*/
+/*}*/
+
+/* Animated Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*            270deg,*/
+/*            var(--color-background),*/
+/*            var(--color-primary),*/
+/*            var(--color-secondary),*/
+/*            var(--color-background)*/
+/*    );*/
+/*    background-size: 600% 600%;*/
+/*    animation: gradientShift 10s ease infinite;*/
+/*    backdrop-filter: blur(16px);*/
+/*}*/
+
+/*@keyframes gradientShift {*/
+/*    0% { background-position: 0% 50%; }*/
+/*    50% { background-position: 100% 50%; }*/
+/*    100% { background-position: 0% 50%; }*/
+/*}*/
+
+/* Scrollbar Styling */
 
 /* For WebKit (Chrome, Safari) */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1A1A1A; /* background */
+    background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #FF6B6B; /* brand color */
+    background-color: #FF6B6B;
     border-radius: 6px;
 }

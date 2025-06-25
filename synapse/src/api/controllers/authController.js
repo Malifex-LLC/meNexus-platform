@@ -3,7 +3,14 @@ import User from "../models/user.js" ;
 import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
-const CONFIG_FILE = '#config/synapse-config.json';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 // Account registration logic
 // TODO Move createUser to userController? and call createUser by authController?

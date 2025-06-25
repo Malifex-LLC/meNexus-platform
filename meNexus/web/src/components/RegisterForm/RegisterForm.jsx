@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './RegisterForm.css'
 import useCreateUser from '../../hooks/api/useCreateUser.js'
 import useGenerateCryptoKeys from "../../hooks/api/useGenerateCryptoKeys.js";
 
@@ -42,7 +41,7 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="register__main-content">
+        <div className="register__main-content flex flex-col items-center  justify-center p-8 rounded-xl ">
             {keysGenerated && (
                 <label className="register__keys">
                     <p>public key: {cryptoKeys.publicKey}</p>
@@ -53,6 +52,7 @@ const RegisterForm = () => {
                 <label>
                     Handle:
                     <input
+                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2`}
                         type="text"
                         value={handle}
                         onChange={(e) => setHandle(e.target.value)} />
@@ -61,13 +61,19 @@ const RegisterForm = () => {
                 <label>
                     Display Name:
                     <input
+                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2`}
                         type="text"
                         value={display_name}
                         onChange={(e) => setDisplay_name(e.target.value)} />
                 </label>
                 <br />
                 {error && <p>{error}</p>}
-                <button type="submit">Register</button>
+                <button
+                    className={`w-full p-2 rounded-md bg-brand cursor-pointer hover:bg-primary`}
+                    type="submit"
+                >
+                    Register
+                </button>
             </form>
         </div>
     );

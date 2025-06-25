@@ -8,8 +8,9 @@ import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import FollowedUsersPanel from "../FollowedUsersPanel/FollowedUsersPanel.jsx";
 import JoinedSynapsesPanel from "../JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
+import {IoLocationSharp} from "react-icons/io5";
 
-const SocialPanel = ({user}) => {
+const ControlPanel = ({user}) => {
     const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
     const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
 
@@ -52,7 +53,7 @@ const SocialPanel = ({user}) => {
                         <p className={`px-4 lg:px-2  xl:px-4`}>Followers</p>
                     </div>
                     <img
-                        className={`relative -top-16 w-24 mb-0 pb-0`}
+                        className={`relative -top-16 w-32 mb-0 pb-0`}
                         src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                         alt={`${user.displayName}'s profile picture`}
                     />
@@ -64,9 +65,6 @@ const SocialPanel = ({user}) => {
                 <div className={`relative flex flex-col py-2 md:-top-8 -top-16 items-center text-foreground`}>
                     <p className={`md:text-2xl xl:text-3xl`}>{user.displayName}</p>
                     <p className={`md:text-lg xl:text-xl text-brand`}>@{user.handle}</p>
-                </div>
-                <div className={`relative text-lg md:text-sm -top-8 flex flex-col  items-center`}>
-                    <p>{user.bio}</p>
                 </div>
             </div>
             <div className={'flex flex-col w-full'}>
@@ -81,4 +79,4 @@ const SocialPanel = ({user}) => {
     );
 };
 
-export default SocialPanel;
+export default ControlPanel;

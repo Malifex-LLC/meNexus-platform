@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "../../components/Header/Header.jsx";
 import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
-import SocialPanel from "../../components/SocialPanel/SocialPanel.jsx";
+import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import { useSwipeable } from 'react-swipeable';
 
 
@@ -53,7 +53,7 @@ const HomeLayout = ({ children }) => {
                 ${activePanel === 0 ? 'flex' : 'hidden'} 
                 lg:flex flex-col pt-17 border-r border-border w-full lg:col-span-3`}
                 >
-                    <SocialPanel />
+                    <ControlPanel />
                 </div>
 
                 {/* MAIN CONTENT */}

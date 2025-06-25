@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import {useNavigate, useParams} from "react-router-dom";
-import SocialPanel from "../../components/SocialPanel/SocialPanel.jsx";
+import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import {useSwipeable} from "react-swipeable";
 import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
 import SynapseUsersPanel from "../../components/SynapseUsersPanel/SynapseUsersPanel.jsx";
@@ -119,7 +119,7 @@ const SynapseLayout =({ children }) => {
 
 
     if (!user || !user.publicKey) {
-        return <div className={'bg-background text-foreground'}>Loading dashboard...</div>;
+        return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
     }
 
     if (synapsePostsLoading) {
@@ -131,20 +131,25 @@ const SynapseLayout =({ children }) => {
     }
 
     return (
-        <div className="home-layout h-screen flex flex-col bg-background">
+        <div className="home-layout h-screen flex flex-col ">
+            {/* Remove the bg-background above to see the magic below */}
+            {/*<div className={`absolute top-0 left-o -z-1 pt-17 h-screen w-screen bg-gradient-to-b from-background via-primary to-background backdrop-blur-lg `}/>*/}
+
             {/* Header */}
-            <div className="sticky top-0 z-50 border-b border-border">
-                <Header />
+            <div className="sticky top-0 h-17 z-50 border-b border-border">
+                <Header
+                    user={user}
+                />
             </div>
 
             {/* Main Grid */}
-            <div className="flex-1 min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden">
+            <div className="flex-1 min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden ">
 
                 {/* Main Content (Center Column) */}
-                <div className="flex flex-col flex-1 min-h-0 w-full lg:col-span-9 overflow-hidden">
+                <div className="flex flex-col flex-1 p-4 min-h-0 w-full lg:col-span-9 overflow-hidden">
 
                     {/* Synapse Control Bar */}
-                    <div className=" shadow-2xl border border-border rounded-xl">
+                    <div className=" mx-4 shadow-2xl border border-border rounded-xl">
                         <SynapseControlBar synapses={user.synapses} />
                     </div>
 
@@ -152,7 +157,7 @@ const SynapseLayout =({ children }) => {
                     <div className={'hidden lg:flex flex-col flex-1 min-h-0  lg:col-span-9 '}>
 
                         {/* Tab Switcher */}
-                        <div className={'flex justify-around border-b bg-background border-border p-2 text-4xl ' +
+                        <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-background  p-2 text-4xl ' +
                             'text-foreground '}>
                             <button
                                 className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
@@ -171,9 +176,9 @@ const SynapseLayout =({ children }) => {
                         </div>
 
                         {/* Content */}
-                        <div className={'flex flex-1 min-h-0 overflow-y-auto border-r border-border'}>
+                        <div className={'flex flex-1 min-h-0 overflow-y-auto '}>
                             {activeMiddlebarTab === "feed" ? (
-                                <div className={'m-4  rounded-xl shadow-2xl'}>
+                                <div className={'mx-4 my-2  rounded-xl shadow-2xl'}>
                                     <PostsPanel
                                         isLocalSynapse={isLocalSynapse}
                                         publicKey={sessionUser.publicKey}
@@ -183,7 +188,7 @@ const SynapseLayout =({ children }) => {
                                     />
                                 </div>
                             ) : activeMiddlebarTab === "chat" ? (
-                                <div className={'flex-1 overflow-hidden shadow-2xl rounded-xl'}>
+                                <div className={'flex w-full h-full shadow-2xl rounded-xl'}>
                                     <ChatPanel synapsePublicKey={synapsePublicKey} />
                                 </div>
 
@@ -197,9 +202,9 @@ const SynapseLayout =({ children }) => {
                 </div>
 
                 {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col pt-17  h-full lg:col-span-3 overflow-hidden">
+                <div className="hidden lg:flex flex-col m-4 rounded-xl lg:col-span-3 overflow-hidden bg-background">
                     {/* Tab Switcher */}
-                    <div className="flex justify-around border border-border
+                    <div className="flex justify-around border border-border bg-background
                     p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl">
                         <button
                             onClick={() => setActiveSidebarTab("activity")}
@@ -216,7 +221,7 @@ const SynapseLayout =({ children }) => {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-h-0 overflow-y-auto p-4 m-4 border border-border rounded-xl shadow-2xl mb-4">
+                    <div className=" overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
                         {activeSidebarTab === "activity" ? (
                             <>
                                 <SynapseUsersPanel />
