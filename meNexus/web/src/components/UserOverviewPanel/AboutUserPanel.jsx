@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import {IoLocationSharp} from "react-icons/io5";
 
 const AboutUserPanel = ({user}) => {

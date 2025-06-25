@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import * as secp from '@noble/secp256k1';
 
 // Verify the challenge to signature to authenticate via private key

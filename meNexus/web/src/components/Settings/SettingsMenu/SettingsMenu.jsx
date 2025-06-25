@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { FaKey } from "react-icons/fa";
 import { FaDisplay } from "react-icons/fa6";
 import { TbLogout2 } from "react-icons/tb";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 // scripts/createPublicKeyDB.js
 import { initializeOrbitDB } from '../config/orbitdb-service.js';
 import { OrbitDBAccessController } from '@orbitdb/core'

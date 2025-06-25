@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import MessagesLayout from '../../layouts/MessagesLayout/MessagesLayout.jsx';
 import ConversationMenu from "../../components/Messaging/Conversations/ConversationMenu/ConversationMenu.jsx";
 import Conversation from '../../components/Messaging/Conversations/Conversation/Conversation.jsx'

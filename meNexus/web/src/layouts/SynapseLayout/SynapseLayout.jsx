@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import Header from "../../components/Header/Header.jsx";
 import {useEffect, useState} from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
@@ -17,8 +20,6 @@ import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
 import { CgFeed } from "react-icons/cg";
 import { FaUsersViewfinder } from "react-icons/fa6";
-
-
 
 const SynapseLayout =({ children }) => {
 

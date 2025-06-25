@@ -1,5 +1,6 @@
-// Import WebSocket library
-//import ws from 'ws'
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import {WebSocketServer} from "ws";
 // Store connected clients
 export const clients = new Map();

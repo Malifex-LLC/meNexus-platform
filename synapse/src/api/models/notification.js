@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import meNexus from "../config/mysql.js";
 import  { clients } from '../config/websocket.js';
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";

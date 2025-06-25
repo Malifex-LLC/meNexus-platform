@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import SynapseExploreLayout from "../../layouts/SynapseLayout/SynapseExploreLayout.jsx";
 import SynapseCard from "../../components/SynapseCard/SynapseCard.jsx";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";

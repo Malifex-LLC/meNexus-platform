@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { initializeMessenger, sendMessage } from '../synapse/src/core/messenger.js';
 
 (async () => {

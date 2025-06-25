@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import ChatMessageForm from "../ChatMessageForm/ChatMessageForm.jsx";
 import ChattingChannelsPanel from "../ChattingChannelsPanel/ChattingChannelsPanel.jsx";
 import ChatWindow from "../ChatWindow/ChatWindow.jsx";

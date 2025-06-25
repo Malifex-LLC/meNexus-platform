@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { useState, useEffect } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import "./Search.css";
 import "../../api/hooks/useSearch.js"
 import useSearch from "../../api/hooks/useSearch.js";
 import ProfileCard from "../../components/ProfileCard/ProfileCard.jsx";

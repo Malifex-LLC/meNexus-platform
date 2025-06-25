@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import {useEffect} from "react";
 import useCreateConversation from "../../../../api/hooks/useCreateConversation.js";
 import useSetMessagesAsRead from "../../../../api/hooks/useSetMessagesAsRead.js";

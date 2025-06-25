@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { useEffect, useState } from "react";
 import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
 import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";

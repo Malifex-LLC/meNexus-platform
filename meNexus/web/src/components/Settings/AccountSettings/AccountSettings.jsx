@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import {useState} from "react";
 import useUpdateAccountSettings from '../../../api/hooks/useUpdateAccountSettings.js'
 import {FaKey} from "react-icons/fa";

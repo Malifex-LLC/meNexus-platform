@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useGetSessionUser from '../../hooks/api/useGetSessionUser.js'
-import useGetCryptoChallenge from '../../hooks/api/useGetCryptoChallenge.js'
-import useVerifyCryptoSignature from '../../hooks/api/useVerifyCryptoSignature.js'
+import useGetSessionUser from '../../../src/api/hooks/useGetSessionUser.js'
+import useGetCryptoChallenge from '../../../src/api/hooks/useGetCryptoChallenge.js'
+import useVerifyCryptoSignature from '../../../src/api/hooks/useVerifyCryptoSignature.js'
 import * as secp from '@noble/secp256k1';
 
 const LoginForm = () => {

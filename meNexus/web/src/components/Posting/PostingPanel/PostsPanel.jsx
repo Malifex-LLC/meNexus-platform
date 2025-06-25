@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import PostForm from "../PostForm/PostForm.jsx";
 import { refreshPosts } from "../../../utils/apiUtils.js";
 import Post from "../Post/Post.jsx";

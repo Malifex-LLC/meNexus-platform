@@ -1,4 +1,6 @@
-// UserActivityPanel.jsx
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import React, { useMemo } from 'react';
 import Activity from '../Activity/Activity/Activity.jsx';
 

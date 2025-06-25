@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+   Copyright © 2025 Malifex LLC and contributors
+*/
+
 // replaceParams is used to construct URLs during API calls using api config ENDPOINTS
 export const replaceParams = (url, params) => {
     Object.keys(params).forEach((key) => {

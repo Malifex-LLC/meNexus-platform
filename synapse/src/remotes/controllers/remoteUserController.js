@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import * as peerStateManager from "#core/peerStateManager.js";
 import {ACTION_TYPES, createMessage, MESSAGE_TYPES, RESOURCE_TYPES} from "#protocols/snp/index.js";
 import {sendMessageWithResponse} from "#core/messenger.js";

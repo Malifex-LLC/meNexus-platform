@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import '../Search/Search.jsx'
 import {useEffect, useState} from "react";
 import NotificationsTray from '../Notifications/NotificationsTray/NotificationsTray.jsx'
@@ -14,11 +17,6 @@ import { BsMailboxFlag } from "react-icons/bs";
 import { GiSettingsKnobs } from "react-icons/gi";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { LuScanSearch } from "react-icons/lu";
-
-
-
-
-
 
 const Header = ({user}) => {
 

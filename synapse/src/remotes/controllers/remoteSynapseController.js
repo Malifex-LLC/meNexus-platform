@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 // TODO Need to fix so that the privateKey is not included in the Synapse Metadata returned
 import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
 import { MESSAGE_TYPES, ACTION_TYPES, RESOURCE_TYPES } from "#protocols/snp/index.js";

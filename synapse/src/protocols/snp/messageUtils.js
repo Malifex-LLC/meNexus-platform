@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { SNP_VERSION } from './version.js';
 import { MESSAGE_TYPES, isValidMessageType } from './messageTypes.js';
 import { ACTION_TYPES, isValidActionType } from './actionTypes.js';

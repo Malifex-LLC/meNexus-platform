@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
 

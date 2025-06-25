@@ -1,4 +1,6 @@
-// Synapse.js
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import fs from 'fs/promises';
 import path from 'path';
 import { exec, spawn } from 'child_process';

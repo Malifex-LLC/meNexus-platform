@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
 
 import {useEffect, useState} from "react";
 import Notification from '../Notification/Notification.jsx'

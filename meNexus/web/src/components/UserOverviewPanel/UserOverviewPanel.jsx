@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import AboutUserPanel from "./AboutUserPanel.jsx";
 import UserBadges from "./UserBadges.jsx";
 import { FaGlobe, FaGithub, FaSoundcloud } from "react-icons/fa";

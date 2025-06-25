@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { NavLink } from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import useLogout from '../../api/hooks/useLogout.js'

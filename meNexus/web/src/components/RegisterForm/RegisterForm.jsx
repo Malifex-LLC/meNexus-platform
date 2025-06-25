@@ -1,7 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCreateUser from '../../hooks/api/useCreateUser.js'
-import useGenerateCryptoKeys from "../../hooks/api/useGenerateCryptoKeys.js";
+import useCreateUser from '../../../src/api/hooks/useCreateUser.js'
+import useGenerateCryptoKeys from "../../../src/api/hooks/useGenerateCryptoKeys.js";
 
 const RegisterForm = () => {
 

@@ -1,9 +1,0 @@
-.nav__list-item::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 200%;
-    height: 5rem; /* adjust based on the visual gap */
-    z-index: 1;
-}

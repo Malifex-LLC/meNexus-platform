@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { createOrbitDB } from '@orbitdb/core';
 import { createHelia } from 'helia';
 import { createLibp2p } from 'libp2p';

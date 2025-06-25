@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
+
 import multer from "multer";
 import path from 'path'
 import { fileURLToPath } from "url";

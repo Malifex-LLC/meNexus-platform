@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
