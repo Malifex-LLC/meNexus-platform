@@ -47,7 +47,8 @@ const SynapseControlBar = ({synapses = []}) => {
     }
 
     return (
-        <div className=" p-4 mt-10  gap-6 bg-background text-foreground ">
+
+        <div className=" py-2 px-4 rounded-xl bg-background text-foreground ">
             <div>
                 {synapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">

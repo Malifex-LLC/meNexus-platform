@@ -1,41 +1,94 @@
+/* Hi-Vis Yellow */
+
 @theme {
-    /* Hi-Vis Yellow */
-    /* Base */
-    --color-background: #0E0E0E;   /* near-black backdrop */
-    --color-foreground: #F2F2F2;   /* soft light text */
-    --color-neutral:    #A6A6A6;   /* muted gray for secondary copy */
-    --color-surface:    #1A1A1A;   /* card / panel surface */
-    --color-border:     #2E2E2E;   /* subtle outlines */
+    /* Foundations */
+    --color-background:         #0E0E0E;   /* Panel Background */
+    --color-surface:            #1A1A1A;   /* Panel/Card Surface */
+    --color-border:             #2E2E2E;   /* Pane Splitters */
 
-    /* Brand & accents */
-    --color-brand:    #f9fd03;     /* neon yellow spotlight */
-    --color-accent:   #FF6B00;     /* complementary hot orange */
-    --color-primary:  #C2D600;     /* deeper yellow-green tint for buttons */
-    --color-secondary:#00C2FF;     /* cool cyan contrast for links / pills */
+    /* Header background */
+    --color-header-bg:          #0B0B0B;   /* Header Background Color */
 
-    /* Header / nav */
-    --color-header-bg: #0B0B0B;
+    /* Typography */
+    --color-foreground:         #F2F2F2;   /* Primary Text */
+    --color-foreground-message: #0E0E0E;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #A6A6A6;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #F9FD03;   /* Headlines and Highlights */
+    --color-primary:            #C2D600;   /* Buttons / CTAs */
+    --color-accent:             #FF6B00;   /* Notifications / Alerts */
+    --color-secondary:          #00C2FF;   /* Secondary */
 
     /* Action states */
-    --color-edit:        #323232;
-    --color-edit-hover:  #262626;
-    --color-is-editing:  #f9fd03;
+    --color-edit:               #323232;
+    --color-edit-hover:         #262626;
+    --color-is-editing:         #F9FD03;
 
-    --color-save:        #28C76F;  /* fresh green confirms */
-    --color-save-hover:  #1FA65B;
+    --color-save:               #28C76F;
+    --color-save-hover:         #1FA65B;
 
-    --color-delete:      #FF4747;  /* warning red */
-    --color-delete-hover:#C73A3A;
+    --color-delete:             #FF4747;
+    --color-delete-hover:       #C73A3A;
+
+    /* Opacity Levels */
+    --header-opacity:           0.3;
+    --panel-opacity:            0.5;
+    --post-opacity:             0.3;
+    --message-opacity:          0.3;
 }
 
-/* For WebKit (Chrome, Safari) */
+/* Options for the actual window background. Solid, gradient, animated. */
+
+
+/* Solid Background */
+body {
+    background: #0E0E0E;
+}
+
+/* Gradient Background */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Animated Background */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 10s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+*/
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1A1A1A; /* background */
+    background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #f9fd03; /* brand color */
+    background-color: #F9FD03;
     border-radius: 6px;
 }

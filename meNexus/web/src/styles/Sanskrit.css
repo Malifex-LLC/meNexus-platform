@@ -1,42 +1,93 @@
+/* Sanskrit */
+
 @theme {
-    /* Foundations – warm sandalwood tones */
-    --color-background: #22180F;   /* espresso brown */
-    --color-surface:    #332416;   /* dark teak panel */
-    --color-border:     #3A2C1E;   /* aged mahogany divider */
+    /* Foundations */
+    --color-background:         #22180F;   /* Panel Background */
+    --color-surface:            #332416;   /* Panel/Card Surface */
+    --color-border:             #3A2C1E;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #15100C;   /* Header Background Color */
 
     /* Typography */
-    --color-foreground: #BAA997;  /* parchment ivory */
-    --color-neutral:    #BAA997;   /* palm-leaf taupe (requested hue) */
+    --color-foreground:         #BAA997;   /* Primary Text */
+    --color-foreground-message: #BAA997;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #BAA997;   /* Secondary Labels */
 
-    /* Brand & accents (earthy, no saffron) */
-    --color-brand:     #B78A5A;    /* roasted chestnut highlight */
-    --color-primary:   #8C6239;    /* deep sandalwood CTA buttons */
-    --color-accent:    #E89C00;    /* cacao-bean toggles / chips */
-    --color-secondary: #D2B48C;    /* light khaki badge / progress */
-
-    /* Header / nav */
-    --color-header-bg: #15100C;
+    /* Brand & Accents */
+    --color-brand:              #B78A5A;   /* Headlines and Highlights */
+    --color-primary:            #8C6239;   /* Buttons / CTAs */
+    --color-accent:             #E89C00;   /* Notifications / Alerts */
+    --color-secondary:          #D2B48C;   /* Secondary */
 
     /* Action states */
-    --color-edit:          #2B1E12;
-    --color-edit-hover:    #332416;
-    --color-is-editing:    #B78A5A;
+    --color-edit:               #2B1E12;
+    --color-edit-hover:         #332416;
+    --color-is-editing:         #B78A5A;
 
-    --color-save:          #4C9A4D;   /* muted leaf-green confirm */
-    --color-save-hover:    #3C7C3D;
+    --color-save:               #4C9A4D;
+    --color-save-hover:         #3C7C3D;
 
-    --color-delete:        #B64A3E;   /* terracotta danger */
-    --color-delete-hover:  #8F372F;
+    --color-delete:             #B64A3E;
+    --color-delete-hover:       #8F372F;
 }
 
-/* Custom scrollbars */
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #22180F;
+}
+
+/* Gradient Background */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Animated Background */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-secondary),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 10s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+*/
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #22180F;
+    background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #B78A5A;  /* brand brown */
+    background-color: #B78A5A;
     border-radius: 6px;
 }

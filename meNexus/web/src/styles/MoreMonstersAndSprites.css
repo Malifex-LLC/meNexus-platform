@@ -1,0 +1,86 @@
+/*──────────────────────── More Monsters and Sprites ──────────────────────────*
+ * A follow-up theme inspired by Skrillex’s “More Monsters and Sprites” EP.    *
+ * Glitchy aquas, laser magentas, and deeper shadows echo the evolution of the *
+ * original sound—more refined, but still feral.                               *
+ *─────────────────────────────────────────────────────────────────────────────*/
+
+@theme {
+    /* Foundations */
+    --color-background:         #050505;   /* Panel Background */
+    --color-surface:            #121212;   /* Panel/Card Surface */
+    --color-border:             #2E2E2E;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #000000;   /* Header Background Color */
+
+    /* Typography */
+    --color-foreground:         #EAFDFF;   /* Primary Text */
+    --color-foreground-message: #000000;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #A9BFC5;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #00F2FF;   /* Headlines and Highlights */
+    --color-primary:            #00B5C3;   /* Buttons / CTAs */
+    --color-accent:             #FF2E2E;   /* Notifications / Alerts */
+    --color-secondary:          #7DFEFF;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #161616;
+    --color-edit-hover:         #1E1E1E;
+    --color-is-editing:         #00F2FF;
+
+    --color-save:               #12FFD9;
+    --color-save-hover:         #0BC7A7;
+
+    --color-delete:             #FF2E2E;
+    --color-delete-hover:       #C61616;
+}
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #050505;
+}
+
+/* Gradient Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*        to bottom,*/
+/*        var(--color-background),*/
+/*        var(--color-accent),*/
+/*        var(--color-background)*/
+/*    );*/
+/*    backdrop-filter: blur(1rem);*/
+/*}*/
+
+/* Animated Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*        270deg,*/
+/*        var(--color-background),*/
+/*        var(--color-accent),*/
+/*        var(--color-background)*/
+/*    );*/
+/*    background-size: 600% 600%;*/
+/*    animation: gradientShift 14s ease infinite;*/
+/*    backdrop-filter: blur(16px);*/
+/*}*/
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #121212;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00F2FF, #00B5C3);
+    border-radius: 6px;
+}

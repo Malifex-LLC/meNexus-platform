@@ -1,41 +1,88 @@
+/* Indigo */
+
 @theme {
-    /* Indigo Theme */
-    /* Core palette */
-    --color-background: #0E0D19;   /* deep space indigo */
-    --color-foreground: #EAF6FF;   /* icy mist text */
-    --color-neutral: #A8A8B8;      /* soft steel */
-    --color-surface: #1B1A2A;      /* pane/section cards */
-    --color-border: #34345A;       /* muted midnight outline */
+    /* Foundations */
+    --color-background:         #0E0D19;   /* Panel Background */
+    --color-surface:            #1B1A2A;   /* Panel/Card Surface */
+    --color-border:             #34345A;   /* Pane Splitters */
 
-    /* Accent spectrum */
-    --color-accent:   #00E0FF;     /* neon cyan pulse */
-    --color-brand:    #FF4F78;     /* hot pink signal */
-    --color-primary:  #7A34FF;     /* electric violet */
-    --color-secondary:#FF9E00;     /* cyber amber */
+    /* Header background */
+    --color-header-bg:          #0E0D19;   /* Header Background Color */
 
-    /* Header / nav */
-    --color-header-bg: #0E0D19;
+    /* Typography */
+    --color-foreground:         #EAF6FF;   /* Primary Text */
+    --color-foreground-message: #EAF6FF;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #A8A8B8;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #FF4F78;   /* Headlines and Highlights */
+    --color-primary:            #7A34FF;   /* Buttons / CTAs */
+    --color-accent:             #00E0FF;   /* Notifications / Alerts */
+    --color-secondary:          #FF9E00;   /* Secondary */
 
     /* Action states */
-    --color-edit:        #2D2C45;
-    --color-edit-hover:  #24233A;
-    --color-is-editing:  #FF4F78;
+    --color-edit:               #2D2C45;
+    --color-edit-hover:         #24233A;
+    --color-is-editing:         #FF4F78;
 
-    --color-save:        #00C853;  /* neon green */
-    --color-save-hover:  #00A645;
+    --color-save:               #00C853;
+    --color-save-hover:         #00A645;
 
-    --color-delete:      #FF1744;  /* alert red */
-    --color-delete-hover:#C51137;
+    --color-delete:             #FF1744;
+    --color-delete-hover:       #C51137;
 }
 
-/* For WebKit (Chrome, Safari) */
+/* Options for the actual window background. Solid, gradient, animated. */
+
+
+/* Solid Background */
+body {
+    background: #0E0D19;
+}
+
+/* Gradient Background */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Animated Background */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 12s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+*/
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1A1A1A; /* background */
+    background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #00E0FF; /* brand color */
+    background-color: #00E0FF;
     border-radius: 6px;
 }

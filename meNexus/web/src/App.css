@@ -2,13 +2,10 @@
 
 @tailwind/preflight;
 @tailwind utilities;
+@tailwind/utilities;
 
-@import './styles/SalmonRoasted.css';
+@import './styles/ScaryMonstersAndNiceSprites.css';
 
 #root {
   margin: 0;
 }
-
-
-
-

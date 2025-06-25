@@ -1,0 +1,85 @@
+/* Cappuccino */
+
+@theme {
+    /* Foundations */
+    --color-background:         #4b3832;   /* Panel Background */
+    --color-surface:            #3c2f2f;   /* Panel/Card Surface */
+    --color-border:             #854442;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #3c2f2f;   /* Header Background Color */
+
+    /* Typography */
+    --color-foreground:         #fff4e6;   /* Primary Text */
+    --color-foreground-message: #be9b7b;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #be9b7b;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #854442;   /* Headlines and Highlights */
+    --color-primary:            #854442;   /* Buttons / CTAs */
+    --color-accent:             #ebb587;   /* Notifications / Alerts */
+    --color-secondary:          #4b3832;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #5a403c;
+    --color-edit-hover:         #6b4b47;
+    --color-is-editing:         #854442;
+
+    --color-save:               #8cbf7f;
+    --color-save-hover:         #7aac6f;
+
+    --color-delete:             #cc5c5c;
+    --color-delete-hover:       #a44545;
+}
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #3c2f2f;
+}
+
+/* Gradient Background */
+/*body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}*/
+
+/* Animated Background */
+/*body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 10s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}*/
+
+/* Scrollbar Styling */
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #3c2f2f;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #be9b7b;
+    border-radius: 6px;
+}

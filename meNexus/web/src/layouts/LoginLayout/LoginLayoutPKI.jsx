@@ -5,7 +5,7 @@ import Header from "../../components/Header/Header.jsx";
 const LoginLayoutPKI = ({children}) => {
     return (
         <div className='login-layout'>
-            <Header/>
+
             <main className='login-layout__main-content'>
                 {children}
             </main>

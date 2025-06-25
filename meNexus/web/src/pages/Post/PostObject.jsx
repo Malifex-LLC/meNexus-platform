@@ -5,19 +5,21 @@ import Post from "../../components/Posting/Post/Post.jsx"
 import {refreshComments, refreshPosts} from "../../utils/apiUtils.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import {useNavigate} from "react-router-dom";
+import useGetUserPosts from "../../api/hooks/useGetUserPosts.js";
 
 
-const PostObject = () => {
+const PostObject = ({sessionUser}) => {
+    const [posts, setPosts ] = useState([]);
+    const {getUserPosts} = useGetUserPosts();
 
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getPost } = useGetPost();
-    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, currentHandle, setPosts));
+    const { handleDelete } = useDeletePost(() => refreshPosts(getUserPosts, sessionUser.publicKey, setPosts));
     const navigate = useNavigate();
 
-    const [sessionPublicKey, setSessionPublicKey] = useState(null);
     const {postId} = useParams();
+    console.log("postId from params:", postId);
+
     const [post, setPost] = useState(null);
 
     const {
@@ -42,21 +44,13 @@ const PostObject = () => {
             }
         }
         fetchPost();
-    }, []);
+    }, [postId]);
 
-    useEffect(() => {
-        const fetchSessionUser = async () => {
-            try {
-                const response = await getSessionUser();
-                setSessionPublicKey(response.data.publicKey);
-            } catch (error) {
-                console.error("Error fetching session user:", error);
-            }
-        };
-
-        fetchSessionUser();
-    }, []);
-
+    if (!sessionUser) {
+        return (
+            <div className={'h-screen bg-background text-foreground text-center p-4'}>Loading a post...</div>
+        )
+    }
 
     return (
         <div>
@@ -64,7 +58,7 @@ const PostObject = () => {
                 <Post
                     postId={post.post_id}
                     publicKey={post.public_key}
-                    sessionPublicKey={sessionPublicKey}
+                    sessionPublicKey={sessionUser.publicKey}
                     handle={post.handle}
                     displayName={post.displayName}
                     date={post.created_at}

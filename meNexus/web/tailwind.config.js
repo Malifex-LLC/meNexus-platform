@@ -7,4 +7,11 @@ export default {
     plugins: [
         scrollbar(),
     ],
+    theme: {
+        extend: {
+            colors: {
+                background: 'rgb(var(--color-background) / <alpha-value>)',
+            }
+        }
+    }
 };

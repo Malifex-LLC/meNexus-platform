@@ -21,7 +21,7 @@ const ChatMessage = ({ message, isOwner }) => {
                 className={`
           relative max-w-xs px-3 py-2 rounded-lg text-sm leading-snug
           ${isOwner
-                    ? "bg-brand text-[#EDEDED] after:border-l-brand"
+                    ? "bg-brand text-foreground-message after:border-l-brand"
                     : "bg-surface text-foreground after:border-r-surface"}
           after:content-[''] after:absolute after:-bottom-1
           ${isOwner

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import Header from "../../components/Header/Header.jsx";
 import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
-import SocialPanel from "../../components/SocialPanel/SocialPanel.jsx";
+import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import { useSwipeable } from 'react-swipeable';
 import JoinedSynapsesPanel from "../../components/JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
 import FollowedUsersPanel from "../../components/FollowedUsersPanel/FollowedUsersPanel.jsx";
@@ -57,9 +57,11 @@ const DashboardLayout = ({ children }) => {
     }
 
     return (
-        <div className='h-screen flex flex-col bg-background'>
+        <div className='h-screen flex flex-col '>
             <div className='sticky top-0 z-50 h-17 shrink-0 border-b border-border'>
-                <Header />
+                <Header
+                    user={user}
+                />
                 {/* Mobile Nav */}
                 <div className='flex  lg:hidden justify-around py-2 border-b border-border text-foreground'>
                     <button
@@ -94,7 +96,7 @@ const DashboardLayout = ({ children }) => {
         ${activePanel === 2 ? 'flex' : 'hidden'}
         lg:flex flex-col flex-1 min-h-0 overflow-y-auto px-4 border-r border-border w-full lg:col-span-4`}
                 >
-                    <SocialPanel user={user} />
+                    <ControlPanel user={user} />
                 </div>
 
                 {/* MAIN FEED — Core Content */}
@@ -112,7 +114,7 @@ const DashboardLayout = ({ children }) => {
                 >
 
                     <div className={'m-4 border border-border rounded-xl '}>
-                        <ActivityFeed />
+                        {/*<ActivityFeed />*/}
                     </div>
                 </div>
             </div>

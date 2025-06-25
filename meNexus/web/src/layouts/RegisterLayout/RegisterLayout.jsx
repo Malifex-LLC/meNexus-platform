@@ -5,7 +5,6 @@ import Header from "../../components/Header/Header.jsx";
 const RegisterLayout = ({children}) => {
     return (
         <div className='register-layout'>
-            <Header />
             <main className='register-layout__main-content'>
                 {children}
             </main>

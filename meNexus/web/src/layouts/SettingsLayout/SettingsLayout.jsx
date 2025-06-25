@@ -1,12 +1,15 @@
 import Header from "../../components/Header/Header.jsx";
 import Navigation from "../../components/Navigation/Navigation.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useSwipeable} from "react-swipeable";
-import SocialPanel from "../../components/SocialPanel/SocialPanel.jsx";
+import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import ProfileSettings from "../../components/Settings/ProfileSettings/ProfileSettings.jsx";
 import AccountSettings from "../../components/Settings/AccountSettings/AccountSettings.jsx";
 import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
 import DisplaySettings from "../../components/Settings/DisplaySettings/DisplaySettings.jsx";
+import useGetUser from "../../api/hooks/useGetUser.js";
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import {useNavigate} from "react-router-dom";
 
 const SettingsLayout = ({ children }) => {
     const [activePanel, setActivePanel] = useState(0); // 0: Profile, 1: Account, 2: Display
@@ -15,10 +18,50 @@ const SettingsLayout = ({ children }) => {
         onSwipedRight: () => setActivePanel((prev) => Math.max(prev - 1, 0)),
     });
 
+    const [sessionUser, setSessionUser ] = useState(null)
+    const [user, setUser] = useState(null)
+    const { getUser } = useGetUser();
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const navigate = useNavigate(); // React Router navigate
+
+
+    useEffect(() => {
+        const fetchSessionUser = async () => {
+            try {
+                console.log("Fetching current user session...");
+                const response = await getSessionUser();
+                setSessionUser(response.data)
+            } catch (error) {
+                console.error("Error fetching current session user:", error);
+                navigate('/login');
+            }
+        }
+        fetchSessionUser();
+    }, [])
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await getUser(sessionUser.publicKey);
+                setUser(response);
+            } catch (error) {
+                console.error("Error fetching current user:", error);
+            }
+        }
+        fetchUser();
+    }, [sessionUser])
+
+
+    if (!user || !user.publicKey) {
+        return <>Loading dashboard...</>;
+    }
+
     return (
         <div className='settings-layout h-screen  flex flex-col sm:items-center xl:items-start  bg-background '>
             <div className='sticky top-0 z-50 border-b border-border w-full'>
-                <Header />
+                <Header
+                    user={user}
+                />
                 {/* Mobile Nav */}
                 <div className='flex  w-full lg:hidden pt-17 py-2 justify-evenly border-b bg-background border-border text-foreground'>
                     <button
