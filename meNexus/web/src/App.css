@@ -4,7 +4,7 @@
 @tailwind utilities;
 @tailwind/utilities;
 
-@import './styles/ScaryMonstersAndNiceSprites.css';
+@import './styles/SalmonRoasted.css';
 
 #root {
   margin: 0;

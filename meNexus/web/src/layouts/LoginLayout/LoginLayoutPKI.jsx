@@ -1,16 +1,14 @@
-import './LoginLayoutPKI.css'
 import {Link} from "react-router-dom";
-import Header from "../../components/Header/Header.jsx";
 
 const LoginLayoutPKI = ({children}) => {
     return (
-        <div className='login-layout'>
+        <div className='login-layout flex flex-col w-screen h-screen items-center justify-center  bg-background'>
 
-            <main className='login-layout__main-content'>
+            <main className='login-layout__main-content mb-8'>
                 {children}
             </main>
-            <div className='login-layout__register-redirect'>
-                Don't have an account? <Link to="/register">Register!</Link>
+            <div className='login-layout__register-redirect text-xl text-foreground'>
+                Don't have an account? <Link to="/register" className={`text-brand`}>Register!</Link>
             </div>
         </div>
     );

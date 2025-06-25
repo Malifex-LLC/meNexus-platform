@@ -4,9 +4,9 @@ import LoginForm from "../../components/LoginForm/LoginForm.jsx";
 const LoginPage = () => {
     return(
         <LoginLayoutPKI>
-            <div className="register__main-content">
-                <h1>Welcome to meNexus</h1>
-                <p>Login to your account to get started!</p>
+            <div className="register__main-content p-4 w-md bg-surface text-forground text-center text-xl rounded-xl border border-border shadow-2xl">
+                <h1 className={'text-foreground text-5xl text-center font-bold p-4'}>Welcome to meNexus</h1>
+                <p className={'text-foreground text-xl text-center font-light p-4'}>Login to your account to get started!</p>
                 <LoginForm/>
             </div>
         </LoginLayoutPKI>
