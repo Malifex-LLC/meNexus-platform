@@ -4,7 +4,7 @@
 *A peer-to-peer social layer for the open internet*
 
 > ⚠️ **Note**: This document includes planned features that are not yet implemented. It outlines the intended vision 
-> and future capabilities of meNexus, alongside current functionality. See the [Roadmap](#8-roadmap-at-a-glance) for 
+> and future capabilities of meNexus, alongside current functionality. See the [Roadmap](#9-roadmap-at-a-glance) for 
 > development status.
 
 
@@ -99,7 +99,23 @@ A profile is more than a post timeline. It shows **who** you are and **how** you
 * **Synapses** – Complete list of communities the user belongs to.
 * **Activity** – Timeline of key events for that user: posts, comments, follows/unfollows, joins/leaves.
 
-## 5. Governance & Moderation
+## 5. Extended Capabilities
+Beyond its core social functionality, meNexus will include a set of powerful built-in features to support community 
+expression, monetization, and digital exchange:
+
+* **🎨 Expression & Community Culture** - Customize how your community looks, feels, and celebrates its members.
+  * **Custom badges & achievements** – Let Synapse admins create custom badges, emojis, flair, or reputation titles.
+  * **Event tools** – Create and promote community events (e.g. livestreams, drops, AMAs) natively within a Synapse.
+  * **Status-driven UX** – Show what users are “up to” (vibe coding, music, gaming) with presence-aware status badges.
+* **📁 Peer-to-Peer File Distribution** - Each Synapse can distribute files freely or for a fee:
+  * Share community zines, digital art, music packs, or tools directly 
+  * Optional pricing lets creators earn directly from their Synapse without needing third-party platforms
+* **🔐 Premium Access Controls** - Monetize content and access with built-in gating mechanisms:
+  * Restrict your entire Synapse behind a paywall (e.g., private creative networks, subscription communities)
+  * Lock individual boards, chat channels, or file downloads as premium content
+
+
+## 6. Governance & Moderation
 meNexus does not enforce a global code of conduct. Instead, each Synapse defines its own standards of acceptable 
 behavior. One community might restrict profanity, another might embrace it. This flexibility allows for diverse 
 cultures to flourish within the network. To support this, meNexus provides two key systems that empower Synapse 
@@ -120,7 +136,7 @@ hosts to shape and manage their communities:
       * Guard against bad actors who "grind" the reputation system for access, only to abuse their privileges.
 ---
 
-## 6. Extending meNexus
+## 7. Extending meNexus
 
 meNexus provides robust core functionality, but it's designed to be extended. Every Synapse runs on open-source 
 code giving you the freedom to tailor features to your community’s unique needs.
@@ -134,7 +150,7 @@ Fork it, self-host it, extend it, monetize it—or just hang out with friends.
 The network thrives when you own your community.
 ---
 
-## 7. Hosting Your Own Synapse
+## 8. Hosting Your Own Synapse
 
 meNexus is built to be easy to deploy and self-host. The goal is to ship Synapse as a Docker container (or similar), 
 enabling one-command deployment with minimal setup.
@@ -152,7 +168,7 @@ Whether you're creating a private space for a few friends or launching a public 
 owning the tools to build the space you envision.
 ---
 
-## 8. Roadmap at a glance
+## 9. Roadmap at a glance
 
 | Milestone                                                                               | Target   | Status  |
 |-----------------------------------------------------------------------------------------|----------|---------|
@@ -165,7 +181,7 @@ owning the tools to build the space you envision.
 
 ---
 
-## License & Contributor Terms
+## 10. License & Contributor Terms
 
 - **Code**: [GNU AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl-3.0.html)
 - **Docs & Assets**: [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
