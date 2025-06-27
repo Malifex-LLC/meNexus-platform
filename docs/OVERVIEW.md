@@ -56,7 +56,7 @@ inter-Synapse communication.
 
 ### Dashboard
 <p align="center">
-  <img src="docs/assets/screenshots/Dashboard.png" width="600" alt="Dashboard overview"/>
+  <img src="./assets/screenshots/Dashboard.png" width="600" alt="Dashboard overview"/>
   <br><em>Figure 1 – Global dashboard with feed and activity panels.</em>
 </p>
 
@@ -71,11 +71,11 @@ inter-Synapse communication.
 ### Synapse Page
 Feed view
 <p align="center">
-  <img src="docs/assets/screenshots/Synapse-Feed.png" width="600" alt="Synapse feed"/>
+  <img src="./assets/screenshots/Synapse-Feed.png" width="600" alt="Synapse feed"/>
 </p>  
 Chat view  
 <p align="center">
-  <img src="docs/assets/screenshots/Synapse-Chat.png" width="600" alt="Synapse chat"/>
+  <img src="./assets/screenshots/Synapse-Chat.png" width="600" alt="Synapse chat"/>
 </p>
 
 * **Synapse Toolbar** – Dropdown to hop between any of your joined Synapses.
@@ -86,7 +86,7 @@ Chat view
 
 ### User Profile
 <p align="center">
-  <img src="docs/assets/screenshots/UserProfileOverview.png" width="600" alt="User profile overview"/>
+  <img src="./assets/screenshots/UserProfileOverview.png" width="600" alt="User profile overview"/>
 </p>
 
 A profile is more than a post timeline. It shows **who** you are and **how** you contribute.
@@ -154,13 +154,13 @@ owning the tools to build the space you envision.
 
 ## 8. Roadmap at a glance
 
-| Milestone                                                                                  | Target   | Status  |
-|--------------------------------------------------------------------------------------------|----------|---------|
-| **v0.1 – Alpha**       | LAN peer discovery, local OrbitDB replication, web client MVP                      | 2025-Q3 | 🟢 In Progress |
-| **v0.15**              | WAN peer discovery via libp2p bootstrap nodes and relay support                     | 2025-Q4 | ⬜ Planned     |
-| **v0.2**               | Docker container release, cross-Synapse OrbitDB replication over WAN               | 2025-Q4 | ⬜ Planned     |
-| **v0.3**               | Admin Dashboard UI, Trust & Reputation system (ELO-style scoring)                  | 2026-Q1 | ⬜ Planned     |
-| **v1.0 – Beta 1**      | libp2p, OrbitDB, and SNP hardening; stable inter-Synapse interaction                | 2026-Q2 | ⬜ Planned     |
+| Milestone                                                                               | Target   | Status  |
+|-----------------------------------------------------------------------------------------|----------|---------|
+| **v0.1 – Alpha**:     LAN peer discovery, local OrbitDB replication, web client MVP     | 2025-Q3 | 🟢 In Progress |
+| **v0.15**:            WAN peer discovery via libp2p bootstrap nodes and relay support   | 2025-Q4 | ⬜ Planned     |
+| **v0.2**:             Docker container release, cross-Synapse OrbitDB replication over WAN | 2025-Q4 | ⬜ Planned     |
+| **v0.3**:             Admin Dashboard UI, Trust & Reputation system (ELO-style scoring) | 2026-Q1 | ⬜ Planned     |
+| **v1.0 – Beta 1**     libp2p, OrbitDB, and SNP hardening; stable inter-Synapse interaction | 2026-Q2 | ⬜ Planned     |
 
 
 ---
