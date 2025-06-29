@@ -1,0 +1,41 @@
+{
+  "name": "menexus-platform",
+  "version": "0.1.0-alpha.0",
+  "license": "AGPL-3.0-or-later",
+  "author": {
+    "name": "Jacob Ross",
+    "email": "jacob@malifex.dev",
+    "url": "https://malifex.dev"
+  },
+  "description": "A peer-to-peer social layer for the open internet",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "packageManager": "pnpm@10.12.3",
+  "engines": { "node": ">=18.18" },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.6.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "vite": "^6.3.5"
+  },
+  "scripts": {
+    "dev:client": "pnpm --filter @menexus/client-web run dev",
+    "dev:admin": "pnpm --filter @menexus/admin-web  run dev",
+    "dev:synapse": "pnpm --filter @menexus/synapse    run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test"
+  }
+}

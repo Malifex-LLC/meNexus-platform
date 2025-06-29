@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - services/*
+  - packages/*
+
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - bcrypt
+  - classic-level
+  - esbuild
+
+onlyBuiltDependencies:
+  - '@ipshipyard/node-datachannel'
