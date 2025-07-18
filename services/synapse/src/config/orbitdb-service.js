@@ -18,12 +18,22 @@ import { bootstrap } from '@libp2p/bootstrap';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { loadConfig, saveConfig } from '#utils/configUtils.js';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, './synapse-config.json');
+
 let orbitdbInstance = null; // To hold the OrbitDB instance
 let ipfsInstance = null;
 let databases = {}; // To store references to opened databases
 
 // Initialize OrbitDB and Libp2p/Helia
 export async function initializeOrbitDB() {
+    const synapseConfig = await loadConfig(CONFIG_FILE)
+
     if (orbitdbInstance) {
         console.log('OrbitDB already initialized');
         return orbitdbInstance;
@@ -32,10 +42,7 @@ export async function initializeOrbitDB() {
 
     const libp2p = await createLibp2p({
         addresses: {
-            listen: [
-                '/ip4/0.0.0.0/tcp/4002', // Listen on a TCP port
-                '/ip4/0.0.0.0/udp/0/quic-v1', // Listen on a random UDP port for QUIC
-            ]
+            listen: synapseConfig.orbitdb.multiaddrs
         },
         transports: [
             tcp(), // Add TCP transport
@@ -55,10 +62,7 @@ export async function initializeOrbitDB() {
         },
         peerDiscovery: [
             bootstrap({
-                list: [
-                    '/ip4/192.168.1.60/tcp/4002/p2p/12D3KooWQgHV3CqJV5oJctAe97eNqVPU4cxzJkopYyQPw7BbAWRc',
-                    '/ip4/192.168.1.188/tcp/4002/p2p/12D3KooWPWtGnKmxzX7KqJp7pLr5JHMaUhokkry8TfUwvh2EmEVK',
-                ],
+                list: synapseConfig.orbitdb.bootstrapPeers
             }),
             mdns({
                 interval: 2000,

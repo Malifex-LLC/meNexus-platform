@@ -104,6 +104,9 @@ importers:
       '@helia/block-brokers':
         specifier: ^4.0.2
         version: 4.2.2
+      '@libp2p/autonat':
+        specifier: ^2.0.37
+        version: 2.0.37
       '@libp2p/bootstrap':
         specifier: ^11.0.17
         version: 11.0.43
@@ -113,12 +116,18 @@ importers:
       '@libp2p/interface-peer-id':
         specifier: ^2.0.2
         version: 2.0.2
+      '@libp2p/kad-dht':
+        specifier: ^15.1.10
+        version: 15.1.10
       '@libp2p/mdns':
         specifier: ^11.0.17
         version: 11.0.43
       '@libp2p/mplex':
         specifier: ^11.0.16
         version: 11.0.43
+      '@libp2p/ping':
+        specifier: ^2.0.36
+        version: 2.0.36
       '@libp2p/tcp':
         specifier: ^10.0.15
         version: 10.1.17
@@ -724,8 +733,8 @@ packages:
   '@libp2p/interface@2.10.5':
     resolution: {integrity: sha512-Z52n04Mph/myGdwyExbFi5S/HqrmZ9JOmfLc2v4r2Cik3GRdw98vrGH19PFvvwjLwAjaqsweCtlGaBzAz09YDw==}
 
-  '@libp2p/kad-dht@15.1.7':
-    resolution: {integrity: sha512-Q5AisRteavqvj5wrdFc0OqmNFJ6ldrw/PAjLbEl6YQD98MnO0EH/wMfwXOnpMNXDLBjr8BBndy/uxJBY7H8ZRg==}
+  '@libp2p/kad-dht@15.1.10':
+    resolution: {integrity: sha512-0lZOLQ+I6fbmf01K3RwPScXgQOjB4gl+YUJQ5ys9VVfNsj1XU+PHgWSy4e+ZHvK/xTskcIqwLJGdkluFflw7Qg==}
 
   '@libp2p/keychain@5.2.8':
     resolution: {integrity: sha512-NIM4mNVO8dlgKEIMKn/p3Yens+qdIr4dRWFRunGD3Y1FouTyyQtkRKzYjS+ek4uAyvZovO7eDYa+2BVW7xSgrQ==}
@@ -4829,7 +4838,7 @@ snapshots:
       progress-events: 1.0.1
       uint8arraylist: 2.4.8
 
-  '@libp2p/kad-dht@15.1.7':
+  '@libp2p/kad-dht@15.1.10':
     dependencies:
       '@libp2p/crypto': 5.1.7
       '@libp2p/interface': 2.10.5
@@ -6890,7 +6899,7 @@ snapshots:
       '@libp2p/dcutr': 2.0.36
       '@libp2p/identify': 3.0.37
       '@libp2p/interface': 2.10.5
-      '@libp2p/kad-dht': 15.1.7
+      '@libp2p/kad-dht': 15.1.10
       '@libp2p/keychain': 5.2.8
       '@libp2p/mdns': 11.0.43
       '@libp2p/mplex': 11.0.43

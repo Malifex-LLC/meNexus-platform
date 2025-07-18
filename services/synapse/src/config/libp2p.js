@@ -10,15 +10,26 @@ import { gossipsub } from '@chainsafe/libp2p-gossipsub';
 import { bootstrap } from '@libp2p/bootstrap';
 import { mdns } from '@libp2p/mdns';
 import { identify } from '@libp2p/identify';
+import { kadDHT } from '@libp2p/kad-dht';
+import { ping } from '@libp2p/ping';
+import { autoNAT } from '@libp2p/autonat';
+
+import { loadConfig, saveConfig } from '#utils/configUtils.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, './synapse-config.json');
 
 // Configure libp2p2Instance for use by Synapse
 export const createLibp2pInstance = async () => {
+    const synapseConfig = await loadConfig(CONFIG_FILE)
     return await createLibp2p({
         addresses: {
-            listen: [
-                '/ip4/0.0.0.0/tcp/4001',
-                //'/ip4/0.0.0.0/ws'
-            ],
+            listen: synapseConfig.libp2p.multiaddrs
         },
         transports: [
             tcp(),
@@ -33,13 +44,16 @@ export const createLibp2pInstance = async () => {
                 heartbeatInterval: 1000,
             }),
             identify: identify(),
+            ping: ping(),
+            dht: kadDHT({
+                protocolPrefix: '/menexus',
+                clientMode: false,
+            }),
+            autonat: autoNAT(),
         },
         peerDiscovery: [
             bootstrap({
-                list: [
-                    '/ip4/192.168.1.60/tcp/4001/p2p/12D3KooWPvcjMadGeHvDboGL3uEFYdVRZNKzM9FpSYmTe1pXNkb9',
-                    '/ip4/192.168.1.188/tcp/4001/p2p/12D3KooWBvhuaCRJ4gJFK1rRJ78HqTtSB25C14CR7QwKt5Fqa4L7',
-                ],
+                list: synapseConfig.libp2p.bootstrapPeers
             }),
             mdns({
                 interval: 2000,
@@ -62,6 +76,7 @@ export const createLibp2pInstance = async () => {
         },
         nat: {
             enabled: true,
+            description: 'meNexus Synapse'
         },
     });
 };

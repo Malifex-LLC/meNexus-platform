@@ -11,10 +11,11 @@ export const fetchRemoteUsers = async (req, res) => {
     if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
     }
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
-    if (!peerId) {
-        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
     }
+    const { peerId } = peer;
 
     const usersRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,

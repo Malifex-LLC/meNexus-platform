@@ -13,10 +13,11 @@ export const createRemotePostComment = async (req, res) => {
         return res.status(400).json({error: 'resourceType, resourceId, content, publicKey, or synapsePublicKey not found.'});
     }
     console.log('createRemotePostComment called for synapsePublicKey: ', synapsePublicKey);
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
-    if (!peerId) {
-        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
     }
+    const { peerId } = peer;
 
     const createPostCommentRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
@@ -47,10 +48,11 @@ export const fetchRemotePostComments = async (req, res) => {
         return res.status(400).json({error: 'No resourceType, resourceId, or synapsePublicKey provided.'});
     }
     console.log('fetchRemotePostsComments called: ', resourceType, resourceId, synapsePublicKey);
-    const { peerId } = peerStateManager.getPeerByPublicKey(synapsePublicKey);
-    if (!peerId) {
-        return res.status(401).json({error: 'No peerId returned from peerStateManager.'});
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
     }
+    const { peerId } = peer;
 
     const commentsRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
