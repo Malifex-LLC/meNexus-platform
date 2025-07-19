@@ -152,7 +152,8 @@ export const sendMessage = async (peerId, message) => {
                 yield new TextEncoder().encode(encodedMessage); // Encode the message as Uint8Array
             }());
             console.log('Message successfully sent to:', peerId);
-            console.log('Discovered Peers after message sent: ', peerStateManager.getAllDiscoveredPeers());
+            //console.log('Discovered Peers after message sent: ', peerStateManager.getAllDiscoveredPeers());
+            await stream.close();
             return; // Exit after successful message
         } catch (error) {
             console.error(`Failed to dial ${addr}: ${error.message}`);
