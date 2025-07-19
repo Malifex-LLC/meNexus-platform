@@ -114,24 +114,23 @@ export const initializeMessenger = async () => {
 
 // Send a message
 export const sendMessage = async (peerIdStr, message) => {
-    console.log(`Sending message to peer: ${peerIdStr}`);
-
     const peerId = peerIdFromString(peerIdStr);
 
     try {
+        console.log(`Dialing new stream to peer ${peerIdStr}...`);
         const stream = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
 
         const encodedMessage = encodeMessage(message);
 
+        // Safely write a single message and close the stream
         await stream.sink(async function* () {
             yield new TextEncoder().encode(encodedMessage);
         }());
 
-        await stream.close?.();
-
-        console.log('Message successfully sent to:', peerIdStr);
+        await stream.close?.(); // graceful cleanup
+        console.log(`Message sent and stream closed: ${peerIdStr}`);
     } catch (error) {
-        console.error(`Failed to dial ${peerIdStr}:`, error.message);
+        console.error(`Failed to send message to ${peerIdStr}:`, error.message);
     }
 };
 
