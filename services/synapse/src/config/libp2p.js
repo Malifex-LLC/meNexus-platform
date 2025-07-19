@@ -13,6 +13,7 @@ import { identify } from '@libp2p/identify';
 import { kadDHT } from '@libp2p/kad-dht';
 import { ping } from '@libp2p/ping';
 import { autoNAT } from '@libp2p/autonat';
+import { createFromJSON, createFromPrivKey } from '@libp2p/peer-id-factory';
 
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
@@ -27,10 +28,21 @@ const CONFIG_FILE = path.resolve(__dirname, './synapse-config.json');
 // Configure libp2p2Instance for use by Synapse
 export const createLibp2pInstance = async () => {
     const synapseConfig = await loadConfig(CONFIG_FILE)
+    let peerId;
+    try {
+        peerId = await createFromJSON(synapseConfig.identity.peerId)
+        console.log('Created peerId from JSON: %s', peerId)
+    } catch (err) {
+        console.warn('[WARN] Failed to load peerId from config')
+    }
+
     return await createLibp2p({
+        peerId,
         addresses: {
-            listen: synapseConfig.libp2p.multiaddrs
+            listen: synapseConfig.libp2p.multiaddrs,
+            announce: synapseConfig.libp2p.announce,
         },
+
         transports: [
             tcp(),
             //webSockets()
@@ -76,6 +88,7 @@ export const createLibp2pInstance = async () => {
         },
         nat: {
             enabled: true,
+            externalPort: 4001,
             description: 'meNexus Synapse'
         },
     });

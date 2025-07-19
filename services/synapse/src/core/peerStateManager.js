@@ -3,7 +3,7 @@
 
 console.log('Initializing Peer State Manager...');
 
-import {discoveredPeers, connectedPeers} from "./peerState.js";
+import {discoveredPeers, connectedPeers, publicKeySentTo} from "./peerState.js";
 
 
 
@@ -62,6 +62,17 @@ export  const getPeerByPublicKey = (publicKey) => {
     }
     return null; // Return null if no peer with that publicKey is found
 };
+
+export const getPublicKeyByPeerId = (peerId) => {
+    console.log('🔎 Get publicKeyByPeerId:', peerId);
+    const data = discoveredPeers.get(peerId);
+    if (!data || !data.publicKey) return null;
+    return { publicKey: data.publicKey, ...data };
+};
+
+export const hasSentPublicKeyTo = (peerId) => publicKeySentTo.has(peerId);
+
+export const markPublicKeySentTo = (peerId) => publicKeySentTo.add(peerId);
 
 export const isPeerConnected = (peerId) => connectedPeers.has(peerId);
 

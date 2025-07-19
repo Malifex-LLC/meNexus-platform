@@ -8,6 +8,9 @@ dotenv.config(); // Load base environment variables
 import { generateCryptoKeysUtil } from '#utils/cryptoUtils.js'; // Utility for keypair generation
 import { initializeMessenger} from "./messenger.js";
 import { initializeSnpPubSub} from "./snpPubSub.js";
+import { createSecp256k1PeerId, exportToProtobuf } from '@libp2p/peer-id-factory';
+import { base64pad } from 'multiformats/bases/base64'; // needed to encode the keys
+
 
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
@@ -36,11 +39,23 @@ const initializeSynapse = async () => {
     } catch (error) {
         console.warn('No configuration found. Generating default configuration...');
         const { publicKey, privateKey } = await generateCryptoKeysUtil();
+        const peerId = await createSecp256k1PeerId();
+        const peerIdJson = {
+            id: peerId.toString(),
+            publicKey: base64pad.encode(peerId.publicKey),   // Uint8Array → base64 string
+            privateKey: base64pad.encode(peerId.privateKey) // needs non-null assertion
+        };
         config = {
-            identity: { publicKey, privateKey },
-            api: { port: process.env.EXPRESS_PORT || 4000 },
+            identity: {
+                publicKey,
+                privateKey,
+                peerId: peerIdJson
+            },
+            api: { port: process.env.EXPRESS_PORT || 3001 },
             metadata: { name: 'DefaultSynapse', description: 'A new Synapse instance' }
         };
+        console.log('peerId JSON:', peerId.toJSON());
+        console.log('config.identity.peerId BEFORE save:', config.identity.peerId);
         await saveConfig(CONFIG_FILE, config);
         console.log('Generated and saved new configuration:', config);
     }
