@@ -10,6 +10,8 @@ import { createLibp2pInstance } from '#config/libp2p.js'; // Import the configur
 import { multiaddr } from '@multiformats/multiaddr';
 import * as peerStateManager from '#core/peerStateManager.js';
 import { handleSnpMessage } from '#handlers/handleSnpMessage.js';
+import { peerIdFromString } from '@libp2p/peer-id'
+
 
 // console.log('peerStateManager instance:', import.meta.url);
 // console.log('peerStateManager instance in messenger:', peerStateManager);
@@ -111,53 +113,25 @@ export const initializeMessenger = async () => {
 };
 
 // Send a message
-export const sendMessage = async (peerId, message) => {
-    console.log(`Sending message to peer: ${peerId}`);
-    // if (!peerStateManager.getConnectedPeers().has(peerId)) {
-    //     console.error(`Peer ${peerId} is not currently connected.`);
-    //     return;
-    // }
-    const peer = peerStateManager.getPeer(peerId);
-    if (!peer || !peer.multiaddrs) {
-        console.error(`No known peer: ${peerId}`);
-        return;
-    }
+export const sendMessage = async (peerIdStr, message) => {
+    console.log(`Sending message to peer: ${peerIdStr}`);
 
-    const multiaddrs = peer.multiaddrs
+    const peerId = peerIdFromString(peerIdStr);
 
-    console.log('peer: ', peer);
-    if (!multiaddrs || multiaddrs.length === 0) {
-        console.error(`No known multiaddrs for peer: ${peerId}`);
-        return;
-    }
-    for (const addr of multiaddrs) {
-        try {
-            const peerAddress = multiaddr(addr);
-            console.log(`Dialing peerId: ${peerId} at: ${peerAddress.toString()}`);
-            const stream = await libp2p.dialProtocol(peerAddress, PROTOCOL_ID);
+    try {
+        const stream = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
 
-            if (!stream || stream.status !== 'open') {
-                console.error(`Failed to establish a stream for peer ${peerId} at ${peerAddress}`);
-                continue; // Try the next address
-            }
+        const encodedMessage = encodeMessage(message);
 
-            //console.log('Stream established:', stream);
+        await stream.sink(async function* () {
+            yield new TextEncoder().encode(encodedMessage);
+        }());
 
-            const encodedMessage = encodeMessage(message);
-            //console.log('Encoded message being sent:', encodedMessage);
+        await stream.close?.();
 
-            // Writing to the stream
-            const writer = stream.sink; // Correctly use stream sink
-            await writer(async function* () {
-                yield new TextEncoder().encode(encodedMessage); // Encode the message as Uint8Array
-            }());
-            console.log('Message successfully sent to:', peerId);
-            //console.log('Discovered Peers after message sent: ', peerStateManager.getAllDiscoveredPeers());
-            await stream.close();
-            return; // Exit after successful message
-        } catch (error) {
-            console.error(`Failed to dial ${addr}: ${error.message}`);
-        }
+        console.log('Message successfully sent to:', peerIdStr);
+    } catch (error) {
+        console.error(`Failed to dial ${peerIdStr}:`, error.message);
     }
 };
 
