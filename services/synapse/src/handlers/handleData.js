@@ -22,13 +22,13 @@ export const handleData = async (libp2p, message) => {
                         withCredentials: true,
                     });
                     console.log("GET_SYNAPSE_METADATA response ", response);
-                    const metadata = response.data;
+                    const localMetadata = response.data;
 
                     const metadataResponse = createMessage(
                         MESSAGE_TYPES.DATA.RESPONSE,
                         ACTION_TYPES.DATA.AGGREGATE,
                         RESOURCE_TYPES.SYNAPSE_METADATA,
-                        { metadata },
+                        { localMetadata },
                         {
                             sender: libp2p.peerId.toString(),
                             requestId: message.meta.requestId,
