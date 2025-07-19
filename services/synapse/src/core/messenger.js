@@ -11,6 +11,8 @@ import { multiaddr } from '@multiformats/multiaddr';
 import * as peerStateManager from '#core/peerStateManager.js';
 import { handleSnpMessage } from '#handlers/handleSnpMessage.js';
 import { peerIdFromString } from '@libp2p/peer-id'
+import { pipe } from 'it-pipe';
+
 
 
 // console.log('peerStateManager instance:', import.meta.url);
@@ -119,15 +121,15 @@ export const sendMessage = async (peerIdStr, message) => {
     try {
         console.log(`Dialing new stream to peer ${peerIdStr}...`);
         const stream = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
-
         const encodedMessage = encodeMessage(message);
+        const uint8Message = new TextEncoder().encode(encodedMessage);
 
-        // Safely write a single message and close the stream
-        await stream.sink(async function* () {
-            yield new TextEncoder().encode(encodedMessage);
-        }());
+        await pipe(
+            [uint8Message], // source: a single message
+            stream.sink     // sink: libp2p stream writer
+        );
 
-        await stream.close?.(); // graceful cleanup
+        await stream.close?.(); // just in case the stream supports this
         console.log(`Message sent and stream closed: ${peerIdStr}`);
     } catch (error) {
         console.error(`Failed to send message to ${peerIdStr}:`, error.message);
