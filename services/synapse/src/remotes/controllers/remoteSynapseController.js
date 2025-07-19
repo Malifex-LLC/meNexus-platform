@@ -42,7 +42,7 @@ export const fetchRemoteSynapseMetadata = async (req, res) => {
     );
     try {
         const response = await sendMessageWithResponse(peerId, metadataRequest);
-        res.status(200).json(response.payload.metadata);
+        res.status(200).json(response.payload.localMetadata);
     } catch (err) {
         console.error('Error fetching Synapse metadata:', err);
         res.status(500).json({error: 'Failed to fetch metadata from the synapse.'});
