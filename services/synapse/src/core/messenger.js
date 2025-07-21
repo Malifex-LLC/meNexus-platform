@@ -132,6 +132,8 @@ export const sendMessage = async (peerIdStr, message) => {
 
         await stream.close?.(); // just in case the stream supports this
         console.log(`Message sent and stream closed: ${peerIdStr}`);
+        await new Promise(r => setTimeout(r, 10)); // small delay
+
     } catch (error) {
         console.error(`Failed to send message to ${peerIdStr}:`, error.message);
     }
