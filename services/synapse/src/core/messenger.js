@@ -121,6 +121,7 @@ export const sendMessage = async (peerIdStr, message) => {
     try {
         console.log(`Dialing new stream to peer ${peerIdStr}...`);
         const stream = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
+        console.log('Got stream:', stream.id || stream); // check identity for debugging
         const encodedMessage = encodeMessage(message);
         const uint8Message = new TextEncoder().encode(encodedMessage);
 
