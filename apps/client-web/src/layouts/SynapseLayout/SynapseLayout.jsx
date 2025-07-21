@@ -111,7 +111,8 @@ const SynapseLayout =({ children }) => {
             } else {
                 try {
                     const synapsePostsData = await fetchRemotePosts(synapsePublicKey);
-                    setPosts(synapsePostsData);
+                    const filteredPosts = synapsePostsData.filter(post => post.board === activeBoard);
+                    setPosts(filteredPosts);
                 } catch (error) {
                     console.error("Error fetching remote Synapse posts: ", error);
                 }
