@@ -152,6 +152,7 @@ export const sendMessageWithResponse = async (peerId, message, timeout = 10000) 
     });
     try {
         await sendMessage(peerId, message);
+        await new Promise(r => setTimeout(r, 10)); // small delay for debugging
     } catch (error) {
         pendingRequests.delete(requestId); // Clean up if the send fails
         throw error;
