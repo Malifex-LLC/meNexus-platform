@@ -32,6 +32,8 @@ const SynapseLayout =({ children }) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
     const navigate = useNavigate(); // React Router navigate
+    const boards = ["Main Chat", "Bug Hunt", "Feature Request", "Gaming", "Music Share"];
+    const [activeBoard, setActiveBoard] = useState("Main Chat");
     const [posts, setPosts] = useState([]); // State for synapse posts
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
@@ -100,7 +102,8 @@ const SynapseLayout =({ children }) => {
             if (isLocalSynapse) {
                 try {
                     const synapsePostsData = await getAllPosts();
-                    setPosts(synapsePostsData);
+                    const filteredPosts = synapsePostsData.filter(post => post.board === activeBoard);
+                    setPosts(filteredPosts);
 
                 } catch (error) {
                     console.error("Error fetching Synapse posts: ", error);
@@ -116,7 +119,7 @@ const SynapseLayout =({ children }) => {
 
         };
         fetchSynapsePosts();
-    },[synapsePublicKey, isLocalSynapse, synapseMetadata]);
+    },[synapsePublicKey, isLocalSynapse, synapseMetadata, activeBoard]);
 
 
     if (!user || !user.publicKey) {
@@ -184,6 +187,9 @@ const SynapseLayout =({ children }) => {
                                         isLocalSynapse={isLocalSynapse}
                                         publicKey={sessionUser.publicKey}
                                         synapsePublicKey={synapsePublicKey}
+                                        boards={boards}
+                                        activeBoard={activeBoard}
+                                        setActiveBoard={setActiveBoard}
                                         posts={posts}
                                         setPosts={setPosts}
                                     />

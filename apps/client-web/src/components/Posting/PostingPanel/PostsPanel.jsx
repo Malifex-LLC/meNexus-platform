@@ -11,10 +11,12 @@ import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
 import useCreatePost from "../../../api/hooks/useCreatePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
 import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
+import {useState} from "react";
 
-const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPosts}) => {
+const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, activeBoard, setActiveBoard, posts, setPosts}) => {
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
+
     // Hooks for editing and deleting posts
     const {
         editingPostId,
@@ -35,7 +37,11 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
         <div className="flex flex-row h-full rounded-xl">
             <div className={'bg-background p-4 mr-2  rounded-xl  w-1/5 text-2xl text-foreground border border-border shadow-2xl'}
             >
-                <PostBoardsPanel />
+                <PostBoardsPanel
+                    boards={boards}
+                    activeBoard={activeBoard}
+                    setActiveBoard={setActiveBoard}
+                />
             </div>
             <div className={'home__posts bg-background rounded-xl h-full flex-1 overflow-y-auto px-8 space-y-8 border border-border'}>
                 <div className="home__post-form bg-surface p-4 rounded-xl mt-4  shadow-2xl">
@@ -43,6 +49,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, posts, setPost
                         isLocalSynapse={isLocalSynapse}
                         publicKey={publicKey}
                         synapsePublicKey={synapsePublicKey}
+                        activeBoard={activeBoard}
                         refreshPosts={() => (
                             isLocalSynapse
                                 ? refreshPosts(() => getAllPosts(), setPosts)

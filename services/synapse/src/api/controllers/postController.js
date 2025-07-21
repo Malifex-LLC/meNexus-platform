@@ -6,13 +6,14 @@ import Post from '../models/post.js';
 
 // Post creation logic
 export const createPost = async (req, res) => {
-    const { publicKey, content } = req.body;
-    if (!publicKey || !content) {
-        return res.status(400).json({error: 'publicKey or content not found.'});
+    const { publicKey, activeBoard, content } = req.body;
+    console.log('createPost activeBoard: ', activeBoard);
+    if (!publicKey || !activeBoard || !content) {
+        return res.status(400).json({error: 'publicKey, activeBoard or content not found.'});
     }
 
     try {
-        const postId = await Post.createPost(publicKey, content);
+        const postId = await Post.createPost(publicKey, activeBoard, content);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);

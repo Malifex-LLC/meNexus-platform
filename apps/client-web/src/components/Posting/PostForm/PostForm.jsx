@@ -5,7 +5,7 @@ import { useState } from "react";
 import useCreatePost from '../../../api/hooks/useCreatePost.js';
 import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
 
-const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) => {
+const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, refreshPosts }) => {
     const [text, setText] = useState(`What's on your mind?`);
     const [formClicked, setFormClicked] = useState(false);
 
@@ -19,6 +19,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) 
         if (isLocalSynapse) {
             const post = {
                 publicKey: publicKey,
+                activeBoard: activeBoard,
                 content: text,
             };
             console.log("Submitting post:", post);
@@ -28,6 +29,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, refreshPosts }) 
         } else {
             const post = {
                 publicKey: publicKey,
+                activeBoard: activeBoard,
                 content: text,
                 synapsePublicKey: synapsePublicKey,
             };

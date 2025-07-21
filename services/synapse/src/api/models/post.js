@@ -4,14 +4,14 @@
 import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createPost = (publicKey, content) => {
+export const createPost = (publicKey, activeBoard, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO Posts (public_key, content)
-            VALUES (?, ?)
+            INSERT INTO Posts (public_key, board, content)
+            VALUES (?, ?, ?)
         `;
 
-        meNexus.query(sql, [publicKey, content], (err, result) => {
+        meNexus.query(sql, [publicKey, activeBoard, content], (err, result) => {
             if (err) {
                 console.error(err)
                 return reject(new Error('Database error'));
