@@ -78,25 +78,16 @@ export const initializeMessenger = async () => {
 
     // Add a handler for incoming messages
     await libp2p.handle(PROTOCOL_ID, async ({ stream, connection }) => {
-        console.log(`Message received from peer: ${connection.remotePeer.toString()}`);
-        //console.log('Stream', stream);
         const peerId = connection.remotePeer.toString();
-
-        // A. single address from the connection object
-        peerStateManager.mergeMultiaddrs(peerId, [connection.remoteAddr])
+        peerStateManager.mergeMultiaddrs(peerId, [connection.remoteAddr]);
 
         const decoder = new TextDecoder();
 
         try {
             for await (const chunk of stream.source) {
-                console.log('Raw chunk received:', chunk);
-
-                // Convert Uint8ArrayList to a single Uint8Array
                 const rawMessage = decoder.decode(chunk.subarray());
-                console.log('Decoded raw message:', rawMessage);
                 try {
                     const message = decodeMessage(rawMessage);
-                    //console.log('Decoded message:', message);
                     validateMessage(message);
                     await handleSnpMessage(libp2p, message);
                 } catch (error) {
@@ -105,8 +96,16 @@ export const initializeMessenger = async () => {
             }
         } catch (error) {
             console.error('Error reading stream:', error.message);
+        } finally {
+            try {
+                await stream.sink([]); // drain sink gracefully
+                await stream.close?.(); // explicitly close if available
+            } catch (closeErr) {
+                console.warn('Stream already closed or error closing:', closeErr.message);
+            }
         }
     });
+
 
     console.log(`Handler registered for protocol: ${PROTOCOL_ID}`);
     console.log('libp2p Listening addresses:', libp2p.getMultiaddrs().map((addr) => addr.toString()));
@@ -121,6 +120,7 @@ export const sendMessage = async (peerIdStr, message) => {
     try {
         console.log(`Dialing new stream to peer ${peerIdStr}...`);
         const stream = await libp2p.dialProtocol(peerId, PROTOCOL_ID);
+        console.log('Got stream:', stream.id || stream); // check identity for debugging
         const encodedMessage = encodeMessage(message);
         const uint8Message = new TextEncoder().encode(encodedMessage);
 
@@ -131,6 +131,7 @@ export const sendMessage = async (peerIdStr, message) => {
 
         await stream.close?.(); // just in case the stream supports this
         console.log(`Message sent and stream closed: ${peerIdStr}`);
+
     } catch (error) {
         console.error(`Failed to send message to ${peerIdStr}:`, error.message);
     }

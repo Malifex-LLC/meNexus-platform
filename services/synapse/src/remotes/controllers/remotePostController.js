@@ -27,6 +27,7 @@ export const fetchRemotePosts = async (req, res) => {
     )
     try {
         const response = await sendMessageWithResponse(peerId, postsRequest);
+
         res.status(200).json(response.payload.posts);
     } catch (err) {
         console.error('Error fetching posts: ', err);
