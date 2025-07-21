@@ -35,6 +35,8 @@ export const createRemotePostComment = async (req, res) => {
     )
     try {
         const response = await sendMessageWithResponse(peerId, createPostCommentRequest);
+        await new Promise(r => setTimeout(r, 10)); // small delay
+
         res.status(200).json(response.payload.comment);
     } catch (error) {
         console.error('Error creating remote post comment', error);
@@ -63,6 +65,7 @@ export const fetchRemotePostComments = async (req, res) => {
     )
     try {
         const response = await sendMessageWithResponse(peerId, commentsRequest);
+        await new Promise(r => setTimeout(r, 10)); // small delay
         res.status(200).json(response.payload.comments);
     } catch (error) {
         console.error('Error fetching comments:', error);
