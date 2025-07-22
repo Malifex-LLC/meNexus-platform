@@ -58,6 +58,7 @@ export const ENDPOINTS = {
 
     GET_SYNAPSE_METADATA: `${API_BASE_URL}/api/synapse/getSynapseMetadata`,
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
+    
 
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */

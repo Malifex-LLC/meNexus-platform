@@ -148,7 +148,10 @@ const SynapseLayout =({ children }) => {
 
                     {/* Synapse Control Bar */}
                     <div className=" mx-4 shadow-2xl border border-border rounded-xl">
-                        <SynapseControlBar synapses={user.synapses} />
+                        <SynapseControlBar
+                            synapses={user.synapses}
+                            publicKey={user.publicKey}
+                        />
                     </div>
 
                     {/* Scrollable PostingPanel */}

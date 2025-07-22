@@ -7,16 +7,40 @@ import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapse
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import { IoMdArrowDropdown } from "react-icons/io";
 import JoinedSynapsesTray from "../JoinedSynapsesTray/JoinedSynapsesTray.jsx";
+import synapse from "../../pages/Synapse/Synapse.jsx";
+import useJoinSynapse from "../../api/hooks/useJoinSynapse.js";
+import useLeaveSynapse from "../../api/hooks/useLeaveSynapse.js";
 
-const SynapseControlBar = ({synapses = []}) => {
+
+const SynapseControlBar = ({synapses = [], publicKey}) => {
     const location = useLocation();
     const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
     const {synapsePublicKey} = useParams();
     const [synapseMetadataList, setSynapseMetadataList] = useState([]);
     const [synapseMetadata, setSynapseMetadata] = useState(null);
     const [showJoinedSynapsesTray, setShowJoinedSynapsesTray] = useState(false);
+    const [currentSynapseMetadata, setCurrentSynapseMetadata] = useState(null);
+    const [isSynapseMember, setIsSynapseMember] = useState(false);
     const { fetchRemoteSynapseMetadata } = useFetchRemoteSynapseMetadata();
     const { getSynapseMetadata } = useGetSynapseMetadata();
+    const { joinSynapse } = useJoinSynapse();
+    const { leaveSynapse } = useLeaveSynapse();
+
+    useEffect(() => {
+        const fetchCurrentSynapseMetadata = async () => {
+            const localSynapseMetadata = await getSynapseMetadata();
+            if (synapsePublicKey === localSynapseMetadata.publicKey) {
+                setCurrentSynapseMetadata(localSynapseMetadata);
+            }
+            const response = await fetchRemoteSynapseMetadata(synapsePublicKey);
+            setCurrentSynapseMetadata(response);
+
+            const isMember = synapses.includes(synapsePublicKey);
+            setIsSynapseMember(isMember);
+
+        }
+        fetchCurrentSynapseMetadata();
+    }, [synapsePublicKey, synapses])
 
     useEffect(() => {
         const fetchAllMetadata = async () => {
@@ -53,16 +77,37 @@ const SynapseControlBar = ({synapses = []}) => {
 
         <div className=" py-2 px-4 rounded-xl bg-background text-foreground ">
             <div>
-                {synapseMetadata && synapseMetadataList ? (
+                {currentSynapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">
                         <div>
-                            <h1 className="text-3xl text-brand font-bold">{synapseMetadata.metadata.name}</h1>
+                            <h1 className="text-3xl text-brand font-bold">{currentSynapseMetadata.metadata.name}</h1>
                             <p className="text-lg text-foreground">
-                                {synapseMetadata.metadata.description}
+                                {currentSynapseMetadata.metadata.description}
                             </p>
                             <p className="text-xs ">
-                                publicKey: {synapseMetadata.identity.publicKey}
+                                publicKey: {currentSynapseMetadata.identity.publicKey}
                             </p>
+                            {isSynapseMember ? (
+                                <button
+                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:cursor-pointer`}
+                                    onClick={async () => {
+                                        await leaveSynapse(publicKey, synapsePublicKey);
+                                        setIsSynapseMember(false);
+                                    }}
+                                >
+                                    Leave Synapse
+                                </button>
+                            ) : (
+                                <button
+                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:cursor-pointer`}
+                                    onClick={async () => {
+                                        await joinSynapse(publicKey, synapsePublicKey);
+                                        setIsSynapseMember(true);
+                                    }}
+                                >
+                                    Join Synapse
+                                </button>
+                            )}
                         </div>
                         <div className={'flex flex-col'}>
                             <div
