@@ -36,8 +36,7 @@ export const fetchRemotePosts = async (req, res) => {
 }
 
 export const fetchRemoteBoardPosts = async (req, res) => {
-    const synapsePublicKey = req.query.synapsePublicKey;
-    const board = req.query.board;
+    const { synapsePublicKey, board } = req.query;
     if (!synapsePublicKey || !board) {
         return res.status(401).json({error: 'No Synapse publicKey or board provided.'});
     }
