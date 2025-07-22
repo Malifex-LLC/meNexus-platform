@@ -8,5 +8,6 @@ import synapseController from "#api/controllers/synapseController.js";
 // Define userRoutes and link them to corresponding controller functions
 
 router.get('/getSynapseMetadata', synapseController.getSynapseMetadata);
+router.get('/getAllDiscoveredPeers', synapseController.getAllDiscoveredPeers);
 
 export default router;

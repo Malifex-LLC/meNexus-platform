@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+import * as peerStateManager from '#core/peerStateManager.js';
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -24,6 +25,14 @@ export const getSynapseMetadata = async (req, res) => {
     }
 }
 
+export const getAllDiscoveredPeers = async (req, res) => {
+    const discoveredPeers = await peerStateManager.getAllDiscoveredPeers();
+    const peersJSON = Object.fromEntries(discoveredPeers)
+    console.log("Discovered Peers response:", peersJSON);
+    res.status(200).json(peersJSON);
+}
+
 export default {
     getSynapseMetadata,
+    getAllDiscoveredPeers
 }
