@@ -101,9 +101,11 @@ export const handleData = async (libp2p, message) => {
                     }
                     if (message.resourceType === RESOURCE_TYPES.BOARD_POSTS) {
                         console.log(`Received BOARD_POSTS request from ${message.meta.sender}.`);
+                        const board = message.payload;
                         const response = await sendRequest({
                             method: 'GET',
                             url: ENDPOINTS.GET_BOARD_POSTS,
+                            params: { board },
                             withCredentials: true,
                         });
 

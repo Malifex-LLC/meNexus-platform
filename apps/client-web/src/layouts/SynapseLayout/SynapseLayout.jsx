@@ -41,10 +41,8 @@ const SynapseLayout =({ children }) => {
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
 
     const { getSynapseMetadata } = useGetSynapseMetadata();
-    const { getAllPosts } = useGetAllPosts();
     const { getBoardPosts } = useGetBoardPosts();
-    const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
-    const { fetchRemoteBoardPosts } = useFetchRemoteBoardPosts();
+    const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -129,13 +127,6 @@ const SynapseLayout =({ children }) => {
         return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
     }
 
-    if (synapsePostsLoading) {
-        return <div className={'bg-background text-foreground'}>Loading Synapse Posts...</div>
-    }
-
-    if (synapsePostsError) {
-        return <div className={'bg-background text-foreground'}>Error Loading Synapse Posts: {synapsePostsError.message}</div>
-    }
 
     return (
         <div className="home-layout h-screen flex flex-col ">

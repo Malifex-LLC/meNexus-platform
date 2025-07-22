@@ -51,7 +51,7 @@ export const fetchRemoteBoardPosts = async (req, res) => {
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
         RESOURCE_TYPES.BOARD_POSTS,
-        {},
+        {board},
         {sender: process.env.PUBLIC_KEY}
     )
     try {

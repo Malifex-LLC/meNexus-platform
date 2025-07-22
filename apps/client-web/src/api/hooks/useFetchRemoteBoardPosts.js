@@ -12,7 +12,7 @@ const useFetchRemoteBoardPosts = () => {
 
         const response = await sendRequest({
             method: 'GET',
-            url: ENDPOINTS.FETCH_REMOTE_POSTS,
+            url: ENDPOINTS.FETCH_REMOTE_BOARD_POSTS,
             params: {synapsePublicKey, board},
             withCredentials: true,
         });
