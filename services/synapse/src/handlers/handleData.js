@@ -201,11 +201,12 @@ export const handleData = async (libp2p, message) => {
                     console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
                     if (message.resourceType === RESOURCE_TYPES.POST) {
                         console.log(`Received Create POST request from ${message.meta.sender}.`);
-                        const { publicKey, content } = message.payload;
+                        console.log("Received Create POST payload:", message.payload);
+                        const { publicKey, activeBoard, content } = message.payload;
                         const response = await sendRequest({
                             method: 'POST',
                             url: ENDPOINTS.CREATE_POST,
-                            data: {publicKey, content},
+                            data: {publicKey, activeBoard, content},
                         });
                         console.log("CREATE_POST response ", response);
                         const post = response.data;
