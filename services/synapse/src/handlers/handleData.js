@@ -99,6 +99,36 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peerId - response not sent.');
                         }
                     }
+                    if (message.resourceType === RESOURCE_TYPES.BOARD_POSTS) {
+                        console.log(`Received BOARD_POSTS request from ${message.meta.sender}.`);
+                        const { board } = message.payload;
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_BOARD_POSTS,
+                            params: { board },
+                            withCredentials: true,
+                        });
+
+                        console.log("GET_BOARD_POSTS response ", response);
+                        const posts = response.data;
+
+                        const postsResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.BOARD_POSTS,
+                            { posts },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, postsResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+                    }
                     break;
 
                 case ACTION_TYPES.RESOURCE.FETCH:
@@ -171,11 +201,12 @@ export const handleData = async (libp2p, message) => {
                     console.log(`Received RESOURCE_CREATE from ${message.meta.sender}.`);
                     if (message.resourceType === RESOURCE_TYPES.POST) {
                         console.log(`Received Create POST request from ${message.meta.sender}.`);
-                        const { publicKey, content } = message.payload;
+                        console.log("Received Create POST payload:", message.payload);
+                        const { publicKey, activeBoard, content } = message.payload;
                         const response = await sendRequest({
                             method: 'POST',
                             url: ENDPOINTS.CREATE_POST,
-                            data: {publicKey, content},
+                            data: {publicKey, activeBoard, content},
                         });
                         console.log("CREATE_POST response ", response);
                         const post = response.data;

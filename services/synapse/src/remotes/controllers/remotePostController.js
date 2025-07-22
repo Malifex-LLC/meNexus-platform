@@ -35,6 +35,34 @@ export const fetchRemotePosts = async (req, res) => {
     }
 }
 
+export const fetchRemoteBoardPosts = async (req, res) => {
+    const { synapsePublicKey, board } = req.query;
+    if (!synapsePublicKey || !board) {
+        return res.status(401).json({error: 'No Synapse publicKey or board provided.'});
+    }
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
+    }
+    const { peerId } = peer;
+
+    const postsRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.DATA.QUERY,
+        RESOURCE_TYPES.BOARD_POSTS,
+        {board},
+        {sender: process.env.PUBLIC_KEY}
+    )
+    try {
+        const response = await sendMessageWithResponse(peerId, postsRequest);
+
+        res.status(200).json(response.payload.posts);
+    } catch (err) {
+        console.error('Error fetching posts: ', err);
+        res.status(500).json({error: 'Failed to fetch posts from the synapse.'});
+    }
+}
+
 export const fetchRemoteUserPosts = async (req, res) => {
     //console.log('Discovered Peers in getSynapseUserPosts: ', peerStateManager.getAllDiscoveredPeers());
     const handle = req.query.handle;
@@ -73,9 +101,9 @@ export const fetchRemoteUserPosts = async (req, res) => {
 }
 
 export const createRemotePost = async (req, res) => {
-    const { publicKey, content, synapsePublicKey } = req.body;
-    if (!publicKey || !content || !synapsePublicKey) {
-        return res.status(400).json({error: 'publicKey, synapsePublicKey, or content not found.'});
+    const { publicKey, activeBoard, content, synapsePublicKey } = req.body;
+    if (!publicKey || !activeBoard || !content || !synapsePublicKey) {
+        return res.status(400).json({error: 'publicKey, activeBoard, content, or synapsePublicKey not found.'});
     }
     console.log('createSynapsePost called for synapsePublicKey: ', synapsePublicKey)
     const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
@@ -90,6 +118,7 @@ export const createRemotePost = async (req, res) => {
         RESOURCE_TYPES.POST,
         {
             publicKey,
+            activeBoard,
             content
         },
         {sender: process.env.PUBLIC_KEY}
@@ -107,6 +136,7 @@ export const createRemotePost = async (req, res) => {
 
 export default {
     fetchRemotePosts,
+    fetchRemoteBoardPosts,
     fetchRemoteUserPosts,
     createRemotePost,
 }

@@ -4,9 +4,8 @@
 import PostBoard from '../PostBoard/PostBoard.jsx';
 import {useState} from "react";
 
-const PostBoardsPanel = () => {
-    const boards = ["Main Chat", "Bug Hunt", "Feature Request", "Gaming", "Music Share"];
-    const [activeChannel, setActiveChannel] = useState("Main Chat");
+const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
+
 
     return (
         <div className={''}>
@@ -14,17 +13,17 @@ const PostBoardsPanel = () => {
                 Boards
             </div>
 
-            {boards.map((channel) => (
+            {boards.map((board) => (
                 <button                       /* button = semantic + focus support  */
-                    key={channel}
-                    onClick={() => setActiveChannel(channel)}
+                    key={board}
+                    onClick={() => setActiveBoard(board)}
                     className={`
             rounded-xl p-2 mt-4 w-full text-left text-xl shadow-lg
             hover:bg-surface hover:translate-y-[-2px]
-            ${activeChannel === channel ? "bg-primary text-background" : "bg-background"}
+            ${activeBoard === board ? "bg-primary text-background" : "bg-background"}
           `}
                 >
-                    <PostBoard channel={channel} />
+                    <PostBoard channel={board} />
                 </button>
             ))}
         </div>

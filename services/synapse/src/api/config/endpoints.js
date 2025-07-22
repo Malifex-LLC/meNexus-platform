@@ -33,6 +33,7 @@ export const ENDPOINTS = {
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
     GET_ALL_POSTS: `${API_BASE_URL}/api/post/getAllPosts`,
+    GET_BOARD_POSTS: `${API_BASE_URL}/api/post/getBoardPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
 
@@ -64,6 +65,7 @@ export const ENDPOINTS = {
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
     FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
+    FETCH_REMOTE_BOARD_POSTS: `${API_BASE_URL}/remote/getRemoteBoardPosts`,
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
     CREATE_REMOTE_POST: `${API_BASE_URL}/remote/createRemotePost`,
     FETCH_REMOTE_POST_COMMENTS: `${API_BASE_URL}/remote/fetchRemotePostComments`,

@@ -6,13 +6,14 @@ import Post from '../models/post.js';
 
 // Post creation logic
 export const createPost = async (req, res) => {
-    const { publicKey, content } = req.body;
-    if (!publicKey || !content) {
-        return res.status(400).json({error: 'publicKey or content not found.'});
+    const { publicKey, activeBoard, content } = req.body;
+    console.log('createPost activeBoard: ', activeBoard);
+    if (!publicKey || !activeBoard || !content) {
+        return res.status(400).json({error: 'publicKey, activeBoard or content not found.'});
     }
 
     try {
-        const postId = await Post.createPost(publicKey, content);
+        const postId = await Post.createPost(publicKey, activeBoard, content);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);
@@ -80,6 +81,20 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
+export const getBoardPosts = async (req, res) => {
+    const { board } = req.query;
+    if (!board) {
+        return res.status(400).json({error: 'Board not found.'});
+    }
+    try {
+        const posts = await Post.getBoardPosts(board);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error in getBoardPosts:', error);
+        res.status(500).json({error: 'Failed to get board posts.'})
+    }
+}
+
 // Post fetching logic
 export const getPosts = async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -125,6 +140,7 @@ export default {
     deletePost,
     getPost,
     getAllPosts,
+    getBoardPosts,
     getPosts,
     getUserPosts,
 }

@@ -4,14 +4,14 @@
 import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 
-export const createPost = (publicKey, content) => {
+export const createPost = (publicKey, activeBoard, content) => {
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO Posts (public_key, content)
-            VALUES (?, ?)
+            INSERT INTO Posts (public_key, board, content)
+            VALUES (?, ?, ?)
         `;
 
-        meNexus.query(sql, [publicKey, content], (err, result) => {
+        meNexus.query(sql, [publicKey, activeBoard, content], (err, result) => {
             if (err) {
                 console.error(err)
                 return reject(new Error('Database error'));
@@ -97,6 +97,37 @@ export const getAllPosts = async (req, res) => {
             ORDER BY Posts.created_at DESC
         `;
         meNexus.query(query, async (err, results) => {
+            if (err) {
+                console.error('Database error in getAllPosts:', err);
+                return reject(err)
+            }
+            try {
+                const enrichedPosts = await Promise.all(results.map(async (post) => {
+                    const user = await getUserByPublicKeyFromDB(post.public_key);
+                    return {
+                        ...post,
+                        handle: user?.handle || 'Unknown',
+                        displayName: user?.displayName || 'Unknown'
+                    };
+                }));
+                resolve(enrichedPosts);
+            } catch (error) {
+                console.error('Error enriching posts:', error);
+                reject(error);
+            }
+        });
+    });
+};
+
+export const getBoardPosts = async (board) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT *
+            FROM Posts
+            WHERE Posts.board = ?
+            ORDER BY Posts.created_at DESC
+        `;
+        meNexus.query(query, board, async (err, results) => {
             if (err) {
                 console.error('Database error in getAllPosts:', err);
                 return reject(err)
@@ -216,6 +247,7 @@ export default {
     deletePost,
     getPost,
     getAllPosts,
+    getBoardPosts,
     getPosts,
     getUserPosts,
 }

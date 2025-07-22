@@ -12,13 +12,14 @@ import { identify } from '@libp2p/identify';
 import { tcp } from '@libp2p/tcp';
 import { webSockets } from '@libp2p/websockets';
 import { noise } from '@chainsafe/libp2p-noise'; // For encryption
-import { mplex } from '@libp2p/mplex';
+import { yamux } from '@chainsafe/libp2p-yamux';
 import { mdns } from '@libp2p/mdns';
 import { bootstrap } from '@libp2p/bootstrap';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
+import {createFromJSON} from "@libp2p/peer-id-factory";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -33,7 +34,13 @@ let databases = {}; // To store references to opened databases
 // Initialize OrbitDB and Libp2p/Helia
 export async function initializeOrbitDB() {
     const synapseConfig = await loadConfig(CONFIG_FILE)
-
+    let peerId;
+    try {
+        peerId = await createFromJSON(synapseConfig.identity.peerId)
+        console.log('Created peerId from JSON: %s', peerId)
+    } catch (err) {
+        console.warn('[WARN] Failed to load peerId from config')
+    }
     if (orbitdbInstance) {
         console.log('OrbitDB already initialized');
         return orbitdbInstance;
@@ -41,8 +48,10 @@ export async function initializeOrbitDB() {
     console.log('Initializing OrbitDB...');
 
     const libp2p = await createLibp2p({
+        peerId,
         addresses: {
-            listen: synapseConfig.orbitdb.multiaddrs
+            listen: synapseConfig.orbitdb.multiaddrs,
+            announce: synapseConfig.orbitdb.announce,
         },
         transports: [
             tcp(), // Add TCP transport
@@ -52,8 +61,8 @@ export async function initializeOrbitDB() {
             noise() // Ensure Noise is included for encryption
         ],
         streamMuxers: [
-            mplex()
-        ], // Use mplex for stream multiplexing, // Use mplex for stream multiplexing
+            yamux()
+        ],
         services: {
             pubsub: gossipsub({
                 allowPublishToZeroTopicPeers: true, // Allow single peer for testing
@@ -96,6 +105,7 @@ export async function initializeOrbitDB() {
         directory: directory,
     });
     console.log('OrbitDB initialized');
+    console.log('OrbitDB libp2p Peer ID:', libp2p.peerId.toString());
 
     // Log when a peer connects
     libp2p.addEventListener('peer:connect', ({ detail }) => {
