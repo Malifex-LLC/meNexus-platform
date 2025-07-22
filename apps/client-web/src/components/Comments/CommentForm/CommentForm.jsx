@@ -25,7 +25,7 @@ const CommentForm = ({
 
     const { createComment, loading, error } = useCreateComment(refreshComments);
 
-    const { createRemotePostComment } = useCreateRemotePostComment();
+    const { createRemotePostComment } = useCreateRemotePostComment(refreshComments);
     const { createNotification } = useCreateNotification();
 
     const handleSubmit = async () => {
@@ -35,7 +35,7 @@ const CommentForm = ({
                 resourceType: resourceType,
                 resourceId: resourceId,
                 content: text,
-                publicKey: publicKey,
+                publicKey: actor_id,
             };
 
             const notification = {
@@ -53,7 +53,7 @@ const CommentForm = ({
                 resourceType: resourceType,
                 resourceId: resourceId,
                 content: text,
-                publicKey: publicKey,
+                publicKey: actor_id,
                 synapsePublicKey: synapsePublicKey,
             }
             console.log("Submitting remote comment:", comment);
