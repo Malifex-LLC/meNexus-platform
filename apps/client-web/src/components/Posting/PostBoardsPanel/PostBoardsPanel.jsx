@@ -13,17 +13,17 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
                 Boards
             </div>
 
-            {boards.map((channel) => (
+            {boards.map((board) => (
                 <button                       /* button = semantic + focus support  */
-                    key={channel}
-                    onClick={() => setActiveBoard(channel)}
+                    key={board}
+                    onClick={() => setActiveBoard(board)}
                     className={`
             rounded-xl p-2 mt-4 w-full text-left text-xl shadow-lg
             hover:bg-surface hover:translate-y-[-2px]
-            ${activeBoard === channel ? "bg-primary text-background" : "bg-background"}
+            ${activeBoard === board ? "bg-primary text-background" : "bg-background"}
           `}
                 >
-                    <PostBoard channel={channel} />
+                    <PostBoard channel={board} />
                 </button>
             ))}
         </div>

@@ -33,6 +33,7 @@ export const ENDPOINTS = {
     UPDATE_POST: `${API_BASE_URL}/api/post/updatePost/:postId`,
     DELETE_POST: `${API_BASE_URL}/api/post/deletePost/:postId`,
     GET_ALL_POSTS: `${API_BASE_URL}/api/post/getAllPosts`,
+    GET_BOARD_POSTS: `${API_BASE_URL}/api/post/getBoardPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
 

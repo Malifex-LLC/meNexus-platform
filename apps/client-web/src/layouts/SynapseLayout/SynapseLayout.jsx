@@ -20,6 +20,8 @@ import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
 import { CgFeed } from "react-icons/cg";
 import { FaUsersViewfinder } from "react-icons/fa6";
+import useGetBoardPosts from "../../api/hooks/useGetBoardPosts.js";
+import useFetchRemoteBoardPosts from "../../api/hooks/useFetchRemoteBoardPosts.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -35,12 +37,14 @@ const SynapseLayout =({ children }) => {
     const boards = ["Main Chat", "Bug Hunt", "Feature Request", "Gaming", "Music Share"];
     const [activeBoard, setActiveBoard] = useState("Main Chat");
     const [posts, setPosts] = useState([]); // State for synapse posts
-    const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
 
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { getAllPosts } = useGetAllPosts();
+    const { getBoardPosts } = useGetBoardPosts();
+    const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
+    const { fetchRemoteBoardPosts } = useFetchRemoteBoardPosts();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -101,18 +105,16 @@ const SynapseLayout =({ children }) => {
             }
             if (isLocalSynapse) {
                 try {
-                    const synapsePostsData = await getAllPosts();
-                    const filteredPosts = synapsePostsData.filter(post => post.board === activeBoard);
-                    setPosts(filteredPosts);
+                    const boardPosts = await getBoardPosts(activeBoard);
+                    setPosts(boardPosts);
 
                 } catch (error) {
                     console.error("Error fetching Synapse posts: ", error);
                 }
             } else {
                 try {
-                    const synapsePostsData = await fetchRemotePosts(synapsePublicKey);
-                    const filteredPosts = synapsePostsData.filter(post => post.board === activeBoard);
-                    setPosts(filteredPosts);
+                    const remoteBoardPosts = await fetchRemoteBoardPosts(synapsePublicKey, activeBoard);
+                    setPosts(remoteBoardPosts);
                 } catch (error) {
                     console.error("Error fetching remote Synapse posts: ", error);
                 }
