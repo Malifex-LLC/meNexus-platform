@@ -49,7 +49,7 @@ export const initializeMessenger = async () => {
             return;
         }
         peerStateManager.addDiscoveredPeer(peerId, peerMultiaddrs);
-        console.log('Discovered Peers: ', peerStateManager.getAllDiscoveredPeers())
+        //console.log('Discovered Peers: ', peerStateManager.getAllDiscoveredPeers())
 
         const publicKeyRequest = createMessage(
             MESSAGE_TYPES.PEER.REQUEST,
@@ -62,15 +62,15 @@ export const initializeMessenger = async () => {
 
     });
 
-    libp2p.addEventListener('peer:connect', (event) => {
-        const peerId = event.detail.toString();
-        // const peerMultiaddrs = event.detail.multiaddrs.map((addr) => addr.toString());
-        // console.log(`Connected to peer: ${peerId}`);
+    libp2p.addEventListener('peer:connect', async (event) => {
+        const connection = event.detail;
+        // console.dir(connection, { depth: null })
+        // console.log("peer:connect event to peer: ", connection.publicKey.toString())
         // peerStateManager.addConnectedPeer(peerId, peerMultiaddrs);
     });
 
     libp2p.addEventListener('peer:disconnect', async (event) => {
-        const peerId = event.detail.toString();
+        const peerId = event.detail;
         console.log(`Disconnected from peer: ${peerId}`);
         peerStateManager.removeConnectedPeer(peerId);
         peerStateManager.removeDiscoveredPeer(peerId);

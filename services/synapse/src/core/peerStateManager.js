@@ -10,7 +10,7 @@ import {discoveredPeers, connectedPeers, publicKeySentTo} from "./peerState.js";
 export const addDiscoveredPeer = (peerId, multiaddrs) => {
     if (!discoveredPeers.has(peerId)) {
         discoveredPeers.set(peerId, { publicKey: null, multiaddrs });
-        console.log('Discovered Peers after addDiscoveredPeer:', discoveredPeers);
+        //console.log('Discovered Peers after addDiscoveredPeer:', discoveredPeers);
     }
 
 };
