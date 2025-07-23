@@ -241,6 +241,26 @@ export const getUserPosts = (publicKey) => {
     })
 }
 
+export const uploadPostMedia = async ({ postId, publicKey, mediaUrl, filename, mimetype }) => {
+
+    return new Promise((resolve, reject) => {
+        const sql = `
+            UPDATE Posts
+            SET media_url = ?
+            WHERE post_id = ?
+        `;
+
+        meNexus.query(sql, [mediaUrl, postId], (err, result) => {
+            if (err) {
+                console.error(err)
+                return reject(new Error('Database error'));
+            }
+            resolve(result);
+        });
+    });
+};
+
+
 export default {
     createPost,
     updatePost,
@@ -250,4 +270,5 @@ export default {
     getBoardPosts,
     getPosts,
     getUserPosts,
+    uploadPostMedia
 }

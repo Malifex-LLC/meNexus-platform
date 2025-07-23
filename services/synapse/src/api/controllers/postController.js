@@ -4,6 +4,10 @@
 // Import the Post model
 import Post from '../models/post.js';
 
+import Busboy from 'busboy';
+import fs from 'fs';
+import path from 'path';
+
 // Post creation logic
 export const createPost = async (req, res) => {
     const { publicKey, activeBoard, content } = req.body;
@@ -134,6 +138,100 @@ export const getUserPosts = async (req, res) => {
     }
 }
 
+export const uploadPostMedia = async (req, res) => {
+    try {
+        const busboy = Busboy({ headers: req.headers });
+
+        let publicKey = '';
+        let postId = '';
+
+        let savedFilePath = '';
+        let savedFileName = '';
+        let savedMimeType = '';
+        let fileBuffer = [];
+        let fileInfo = null;
+
+        let fileWritePromise = null;
+
+        busboy.on('field', (fieldname, val) => {
+            const value = typeof val === 'string' ? val : val.toString();
+            if (fieldname === 'postId') postId = value;
+            if (fieldname === 'publicKey') publicKey = value;
+        });
+
+        busboy.on('file', (fieldname, file, info) => {
+            if (fieldname !== 'post_media') {
+                file.resume();
+                return;
+            }
+
+            fileInfo = info;
+            file.on('data', (data) => {
+                fileBuffer.push(data);
+            });
+
+            file.on('end', async () => {
+                if (!publicKey || !postId) {
+                    console.error('File ended before fields were set');
+                    return res.status(400).json({ error: 'Fields not set before file received' });
+                }
+
+                const { filename, mimeType } = fileInfo;
+                savedFileName = filename;
+                savedMimeType = mimeType;
+
+                const uploadDir = path.join(process.cwd(), 'uploads', publicKey, 'posts', postId);
+                fs.mkdirSync(uploadDir, { recursive: true });
+
+                const filepath = path.join(uploadDir, filename);
+                savedFilePath = filepath;
+
+                const writeStream = fs.createWriteStream(filepath);
+                fileWritePromise = new Promise((resolve, reject) => {
+                    writeStream.on('finish', resolve);
+                    writeStream.on('error', reject);
+                });
+
+                for (const chunk of fileBuffer) {
+                    writeStream.write(chunk);
+                }
+                writeStream.end();
+            });
+        });
+
+        busboy.on('finish', async () => {
+            if (!publicKey || !postId || !savedFilePath) {
+                return res.status(400).json({ error: 'Missing required fields or file not uploaded.' });
+            }
+
+            try {
+                if (fileWritePromise) await fileWritePromise;
+
+                const mediaUrl = `/uploads/${publicKey}/posts/${postId}/${savedFileName}`;
+
+                await Post.uploadPostMedia({
+                    postId,
+                    publicKey,
+                    mediaUrl,
+                    filename: savedFileName,
+                    mimetype: savedMimeType
+                });
+
+                return res.status(200).json({ message: 'Media uploaded successfully.' });
+            } catch (err) {
+                console.error('Post model error:', err);
+                return res.status(500).json({ error: 'Database error during media upload.' });
+            }
+        });
+
+        req.pipe(busboy);
+    } catch (err) {
+        console.error('Upload controller error:', err);
+        res.status(500).json({ error: 'Unexpected server error.' });
+    }
+};
+
+
 export default {
     createPost,
     updatePost,
@@ -143,4 +241,5 @@ export default {
     getBoardPosts,
     getPosts,
     getUserPosts,
+    uploadPostMedia
 }

@@ -19,6 +19,7 @@ const useCreatePost = (refreshPosts) => {
             if (refreshPosts) {
                 refreshPosts(); // Refresh the posts if a callback is provided
             }
+            return response;
         } catch (err) {
             console.error("Error creating post:", err);
         }

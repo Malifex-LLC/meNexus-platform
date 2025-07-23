@@ -24,6 +24,7 @@ const Post = ({
                   sessionPublicKey,
                   date,
                   content,
+                  mediaUrl,
                   likes,
                   onEdit,
                   onDelete,
@@ -172,7 +173,7 @@ const Post = ({
             </div>
 
             {/* Right Column: Content */}
-            <div className="flex flex-col flex-1 pl-6">
+            <div className="flex flex-col w-full flex-1 pl-6">
                 {/* Identity */}
                 <div>
                     <Link
@@ -197,6 +198,18 @@ const Post = ({
                         <p className="text-md lg:text-3xl whitespace-pre-wrap">{content}</p>
                     )}
                 </div>
+
+                {/* Post Media */}
+                {mediaUrl ? (
+                    <div className="flex justify-center items-center mt-4">
+                        <img
+                            className="rounded-lg max-w-full h-auto object-contain"
+                            src={`${import.meta.env.VITE_API_BASE_URL}${mediaUrl}`}
+                            alt={`${postId}'s media`}
+                        />
+                    </div>
+                ) : null}
+
 
                 {/* Post Actions */}
                 {isOwner && (
