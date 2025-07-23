@@ -191,9 +191,7 @@ export const uploadRemotePostMedia = async (req, res) => {
                 MESSAGE_TYPES.DATA.REQUEST,
                 ACTION_TYPES.RESOURCE.CREATE,
                 RESOURCE_TYPES.MEDIA,
-                {
-                    remotePostMediaRequest
-                },
+                remotePostMediaRequest,
                 {sender: process.env.PUBLIC_KEY}
             );
             try {
