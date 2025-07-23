@@ -194,6 +194,8 @@ export const uploadRemotePostMedia = async (req, res) => {
                 remotePostMediaRequest,
                 {sender: process.env.PUBLIC_KEY}
             );
+
+            console.log("Sending uploadRemotePostMediaRequest: ", uploadRemotePostMediaRequest);
             try {
                 const response = await sendMessageWithResponse(peerId, uploadRemotePostMediaRequest);
                 res.status(200).json({ message: 'Remote post media uploaded successfully.', response });

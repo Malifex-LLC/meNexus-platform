@@ -55,7 +55,7 @@ export const createMessage = (messageType, actionType = {}, resourceType = {}, p
  */
 export const encodeMessage = (message) => {
     //console.log('encodeMessage called for:', message);
-    return JSON.stringify(message);
+    return JSON.stringify(message) + '\n';
 }
 
 /**
