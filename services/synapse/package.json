@@ -54,6 +54,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "form-data": "^4.0.4",
     "helia": "^5.1.1",
     "it-pipe": "^3.0.1",
     "libp2p": "^2.5.0",

@@ -6,6 +6,7 @@ import useCreatePost from '../../../api/hooks/useCreatePost.js';
 import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
 import useUploadPostMedia from "../../../api/hooks/useUploadPostMedia.js";
 import { IoMdAttach } from "react-icons/io";
+import useUploadRemotePostMedia from "../../../api/hooks/useUploadRemotePostMedia.js";
 
 
 const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, refreshPosts }) => {
@@ -20,7 +21,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
     const { createPost, loading, error } = useCreatePost(refreshPosts);
     const { createRemotePost } = useCreateRemotePost(refreshPosts);
     const { uploadPostMedia, loading: uploadPostMediaLoading, error: uploadPostMediaError } = useUploadPostMedia();
-
+    const { uploadRemotePostMedia } = useUploadRemotePostMedia();
     const handleSubmit = async () => {
         console.log('handleSubmit called.');
         console.log('isLocalSynapse', isLocalSynapse);
@@ -53,6 +54,10 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             setText(""); // Reset the text field after submission
             refreshPosts();
             setPostId(response.postId)
+            if (selectedFile) {
+                console.log("Uploading remote post media for: ", selectedFile.name, ", ", response.data.postId, ", ", publicKey);
+                await handleUploadRemotePostMedia(selectedFile, response.data.postId, publicKey, synapsePublicKey)
+            }
         }
     };
 
@@ -88,6 +93,31 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
 
         try {
             const response = await uploadPostMedia(selectedFile, postId, publicKey);
+
+            if(response.status === 200) {
+                console.log('Post media uploaded successfully!');
+                setIsUploadSuccess(true);
+                setPreviewUrl(null)
+                setSelectedFile(null);
+            }
+        } catch (error) {
+            console.error('Error uploading post media:', error.message);
+            console.log('Failed to upload post media.');
+            setIsUploadError(true);
+        }
+    };
+
+    const handleUploadRemotePostMedia = async (selectedFile, postId, publicKey, synapsePublicKey) => {
+        setIsUploadError(false);
+        setIsUploadSuccess(false);
+
+        if (!selectedFile) {
+            console.log('Please select a file to upload.');
+            return;
+        }
+
+        try {
+            const response = await uploadRemotePostMedia(selectedFile, postId, publicKey, synapsePublicKey);
 
             if(response.status === 200) {
                 console.log('Post media uploaded successfully!');
