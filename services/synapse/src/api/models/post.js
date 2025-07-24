@@ -88,6 +88,7 @@ export const getPost = (postId) => {
                         ...post,
                         handle: user?.handle || 'Unknown',
                         displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
                         synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
@@ -120,6 +121,7 @@ export const getAllPosts = async (req, res) => {
                         ...post,
                         handle: user?.handle || 'Unknown',
                         displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
                         synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
@@ -153,6 +155,7 @@ export const getBoardPosts = async (board) => {
                         ...post,
                         handle: user?.handle || 'Unknown',
                         displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
                         synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
@@ -208,6 +211,7 @@ export const getPosts = async (publicKey) => {
                                 ...post,
                                 handle: postUser?.handle || 'Unknown',
                                 displayName: postUser?.displayName || 'Unknown',
+                                synapsePublicKey: synapseConfig.identity.publicKey,
                                 synapseUrl: synapseConfig.identity.synapseUrl
                             };
                         })
@@ -248,6 +252,7 @@ export const getUserPosts = (publicKey) => {
                         ...post,
                         handle: user?.handle || 'Unknown',
                         displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
                         synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
