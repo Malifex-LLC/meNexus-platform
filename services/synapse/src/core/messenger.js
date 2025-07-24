@@ -13,6 +13,8 @@ import { handleSnpMessage } from '#handlers/handleSnpMessage.js';
 import { peerIdFromString } from '@libp2p/peer-id'
 import { pipe } from 'it-pipe';
 import { Uint8ArrayList } from 'uint8arraylist';
+import { toString as uint8ToString } from 'uint8arrays/to-string';
+import split from 'it-split'; // splits by newlines by default
 
 
 
@@ -82,26 +84,18 @@ export const initializeMessenger = async () => {
         const peerId = connection.remotePeer.toString();
         peerStateManager.mergeMultiaddrs(peerId, [connection.remoteAddr]);
 
-        const decoder = new TextDecoder();
-        let buffer = '';
-
         try {
-            for await (const chunk of stream.source) {
-                const uint8 = chunk instanceof Uint8ArrayList ? chunk.subarray() : chunk;
-                buffer += decoder.decode(uint8, { stream: true });
+            for await (const rawChunk of split(stream.source)) {
+                const rawMessage = uint8ToString(rawChunk).trim();
 
-                let boundary;
-                while ((boundary = buffer.indexOf('\n')) >= 0) {
-                    const rawMessage = buffer.slice(0, boundary).trim();
-                    buffer = buffer.slice(boundary + 1);
+                if (!rawMessage) continue;
 
-                    try {
-                        const message = decodeMessage(rawMessage);
-                        validateMessage(message);
-                        await handleSnpMessage(libp2p, message);
-                    } catch (err) {
-                        console.error('Failed to process incoming message:', err.message);
-                    }
+                try {
+                    const message = decodeMessage(rawMessage);
+                    validateMessage(message);
+                    await handleSnpMessage(libp2p, message);
+                } catch (err) {
+                    console.error('Failed to process incoming message:', err.message);
                 }
             }
         } catch (err) {

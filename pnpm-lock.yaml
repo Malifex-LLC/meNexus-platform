@@ -185,6 +185,9 @@ importers:
       it-pipe:
         specifier: ^3.0.1
         version: 3.0.1
+      it-split:
+        specifier: ^3.0.10
+        version: 3.0.10
       libp2p:
         specifier: ^2.5.0
         version: 2.8.12
@@ -2595,6 +2598,9 @@ packages:
 
   it-sort@3.0.9:
     resolution: {integrity: sha512-jsM6alGaPiQbcAJdzMsuMh00uJcI+kD9TBoScB8TR75zUFOmHvhSsPi+Dmh2zfVkcoca+14EbfeIZZXTUGH63w==}
+
+  it-split@3.0.10:
+    resolution: {integrity: sha512-8sAlk/UbEOJIO9iC95LrirRZUfJBlH96RSLqme2HuC6d+LQ5OTy+imtBZ91i7qv4IJ6ngKg5+PL9P6qTDOscBQ==}
 
   it-stream-types@2.0.2:
     resolution: {integrity: sha512-Rz/DEZ6Byn/r9+/SBCuJhpPATDF9D+dz5pbgSUyBsCDtza6wtNATrz/jz1gDyNanC3XdLboriHnOC925bZRBww==}
@@ -7378,6 +7384,10 @@ snapshots:
   it-sort@3.0.9:
     dependencies:
       it-all: 3.0.9
+
+  it-split@3.0.10:
+    dependencies:
+      uint8arraylist: 2.4.8
 
   it-stream-types@2.0.2: {}
 
