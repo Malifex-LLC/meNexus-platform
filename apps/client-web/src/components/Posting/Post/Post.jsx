@@ -19,6 +19,7 @@ import { refreshComments } from "../../../utils/apiUtils.js"
 const Post = ({
                   isLocalSynapse,
                   synapsePublicKey,
+                  synapseUrl,
                   postId,
                   publicKey,
                   sessionPublicKey,
@@ -204,11 +205,13 @@ const Post = ({
                     <div className="flex justify-center items-center mt-4">
                         <img
                             className="rounded-lg max-w-full h-auto object-contain"
-                            src={`${import.meta.env.VITE_API_BASE_URL}${mediaUrl}`}
+                            src={`${isLocalSynapse ? import.meta.env.VITE_API_BASE_URL : synapseUrl}${mediaUrl}`}
                             alt={`${postId}'s media`}
                         />
                     </div>
                 ) : null}
+
+
 
 
                 {/* Post Actions */}

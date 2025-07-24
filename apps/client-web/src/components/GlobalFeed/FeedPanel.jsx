@@ -181,6 +181,7 @@ const FeedPanel = () => {
                                     key={index}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
+                                    synapseUrl={post.synapseUrl}
                                     session_user_id={user.publicKey}
                                     date={post.created_at}
                                     content={post.content}
