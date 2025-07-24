@@ -8,6 +8,7 @@ import { sendRequest } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
+import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
     switch (message.messageType) {
@@ -229,6 +230,48 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
 
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.MEDIA) {
+                        console.log(`Received Create MEDIA request from ${message.meta.sender}.`);
+                        const { postId, publicKey, filename, mimetype, file } = message.payload;
+
+                        const fileBuffer = Buffer.from(file, 'base64'); // decode from base64
+                        const formData = new FormData();
+
+                        // Append fields
+                        formData.append('postId', postId);
+                        formData.append('publicKey', publicKey);
+                        formData.append('post_media', fileBuffer, {
+                            filename: filename,
+                            contentType: mimetype,
+                        });
+
+                        const response = await sendRequest({
+                            method: 'POST',
+                            url: ENDPOINTS.UPLOAD_POST_MEDIA,
+                            data: formData,
+                            headers: formData.getHeaders?.(),
+                        })
+                        console.log("UPLOAD_POST_MEDIA response: ", response);
+                        const upload = response.data;
+
+                        const uploadPostMediaResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.CREATE,
+                            RESOURCE_TYPES.POST,
+                            { upload },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, uploadPostMediaResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
                     }
                     if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
                         console.log(`Received Create COMMENTS request from ${message.meta.sender}.`);

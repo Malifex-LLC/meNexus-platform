@@ -36,6 +36,7 @@ export const ENDPOINTS = {
     GET_BOARD_POSTS: `${API_BASE_URL}/api/post/getBoardPosts`,
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
+    UPLOAD_POST_MEDIA: `${API_BASE_URL}/api/post/uploadPostMedia`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
     UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,
@@ -68,6 +69,7 @@ export const ENDPOINTS = {
     FETCH_REMOTE_BOARD_POSTS: `${API_BASE_URL}/remote/getRemoteBoardPosts`,
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
     CREATE_REMOTE_POST: `${API_BASE_URL}/remote/createRemotePost`,
+    UPLOAD_REMOTE_POST_MEDIA: `${API_BASE_URL}/remote/uploadRemotePostMedia`,
     FETCH_REMOTE_POST_COMMENTS: `${API_BASE_URL}/remote/fetchRemotePostComments`,
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,

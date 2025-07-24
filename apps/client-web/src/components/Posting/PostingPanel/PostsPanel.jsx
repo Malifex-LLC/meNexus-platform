@@ -69,11 +69,13 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
                                     key={index}
                                     isLocalSynapse={isLocalSynapse}
                                     synapsePublicKey={synapsePublicKey}
+                                    synapseUrl={post.synapseUrl}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
                                     sessionPublicKey={publicKey}
                                     date={post.created_at}
                                     content={post.content}
+                                    mediaUrl={post.media_url}
                                     comments={0}
                                     likes={0}
                                     onDelete={() => handleDelete(post.post_id)}

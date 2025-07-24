@@ -23,6 +23,7 @@ const FeedPanel = () => {
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
+    const [localSynapse, setLocalSynapse] = useState({})
     const [sessionUser, setSessionUser ] = useState({})
     const [user, setUser] = useState({})
     const [posts, setPosts] = useState([]); // State for synapse posts
@@ -87,6 +88,7 @@ const FeedPanel = () => {
             if (!user || !user.synapses) return;
 
             const localSynapseData = await getSynapseMetadata();
+            setLocalSynapse(localSynapseData)
             const allPostPromises = user.synapses.map(async (synapse) => {
                 if (synapse === localSynapseData.identity.publicKey) {
                     return await getAllPosts(); // returns array
@@ -172,18 +174,22 @@ const FeedPanel = () => {
                 {posts.length > 0 ? (
                     posts
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                        .map((post, index) => (
+                        .map((post, index) =>  (
+
                             <div
                                 key={index}
                                 className={'shadow-2xl'}
                             >
                                 <Post
                                     key={index}
+                                    isLocalSynapse={post.synapsePublicKey === localSynapse.identity.publicKey}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
+                                    synapseUrl={post.synapseUrl}
                                     session_user_id={user.publicKey}
                                     date={post.created_at}
                                     content={post.content}
+                                    mediaUrl={post.media_url}
                                     comments={0}
                                     likes={0}
                                     onDelete={() => handleDelete(post.post_id)}

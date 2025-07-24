@@ -161,6 +161,9 @@ importers:
       blockstore-level:
         specifier: ^2.0.1
         version: 2.0.3
+      busboy:
+        specifier: ^1.6.0
+        version: 1.6.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -173,12 +176,18 @@ importers:
       express-session:
         specifier: ^1.18.1
         version: 1.18.1
+      form-data:
+        specifier: ^4.0.4
+        version: 4.0.4
       helia:
         specifier: ^5.1.1
         version: 5.4.2(react-native@0.80.0(@babel/core@7.27.4)(@types/react@18.3.23)(react@19.1.0))
       it-pipe:
         specifier: ^3.0.1
         version: 3.0.1
+      it-split:
+        specifier: ^3.0.10
+        version: 3.0.10
       libp2p:
         specifier: ^2.5.0
         version: 2.8.12
@@ -191,6 +200,9 @@ importers:
       mysql2:
         specifier: ^3.12.0
         version: 3.14.1
+      uint8arraylist:
+        specifier: ^2.4.8
+        version: 2.4.8
       uint8arrays:
         specifier: ^5.1.0
         version: 5.1.0
@@ -2089,8 +2101,8 @@ packages:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
     engines: {node: '>= 0.4'}
 
-  form-data@4.0.3:
-    resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
+  form-data@4.0.4:
+    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
 
   forwarded@0.2.0:
@@ -2586,6 +2598,9 @@ packages:
 
   it-sort@3.0.9:
     resolution: {integrity: sha512-jsM6alGaPiQbcAJdzMsuMh00uJcI+kD9TBoScB8TR75zUFOmHvhSsPi+Dmh2zfVkcoca+14EbfeIZZXTUGH63w==}
+
+  it-split@3.0.10:
+    resolution: {integrity: sha512-8sAlk/UbEOJIO9iC95LrirRZUfJBlH96RSLqme2HuC6d+LQ5OTy+imtBZ91i7qv4IJ6ngKg5+PL9P6qTDOscBQ==}
 
   it-stream-types@2.0.2:
     resolution: {integrity: sha512-Rz/DEZ6Byn/r9+/SBCuJhpPATDF9D+dz5pbgSUyBsCDtza6wtNATrz/jz1gDyNanC3XdLboriHnOC925bZRBww==}
@@ -5964,7 +5979,7 @@ snapshots:
   axios@1.10.0(debug@4.4.1):
     dependencies:
       follow-redirects: 1.15.9(debug@4.4.1)
-      form-data: 4.0.3
+      form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -6814,7 +6829,7 @@ snapshots:
     dependencies:
       is-callable: 1.2.7
 
-  form-data@4.0.3:
+  form-data@4.0.4:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
@@ -7369,6 +7384,10 @@ snapshots:
   it-sort@3.0.9:
     dependencies:
       it-all: 3.0.9
+
+  it-split@3.0.10:
+    dependencies:
+      uint8arraylist: 2.4.8
 
   it-stream-types@2.0.2: {}
 

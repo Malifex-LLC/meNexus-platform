@@ -4,6 +4,11 @@
 // Import the Post model
 import Post from '../models/post.js';
 
+import Busboy from 'busboy';
+import fs from 'fs';
+import path from 'path';
+
+
 // Post creation logic
 export const createPost = async (req, res) => {
     const { publicKey, activeBoard, content } = req.body;
@@ -134,6 +139,83 @@ export const getUserPosts = async (req, res) => {
     }
 }
 
+export const uploadPostMedia = async (req, res) => {
+    try {
+        const busboy = Busboy({ headers: req.headers });
+
+        let publicKey = '';
+        let postId = '';
+        let fileInfo = null;
+        let chunks = [];
+
+        busboy.on('field', (fieldname, val) => {
+            if (fieldname === 'postId') postId = val.toString();
+            if (fieldname === 'publicKey') publicKey = val.toString();
+        });
+
+        busboy.on('file', (fieldname, file, info) => {
+            if (fieldname !== 'post_media') {
+                file.resume(); // skip irrelevant fields
+                return;
+            }
+
+            fileInfo = info;
+
+            file.on('data', (data) => {
+                chunks.push(data);
+            });
+
+            file.on('limit', () => {
+                console.warn('File size exceeded limit');
+            });
+
+            file.on('error', (err) => {
+                console.error('Stream error:', err);
+            });
+        });
+
+        busboy.on('finish', async () => {
+            try {
+                if (!publicKey || !postId || !fileInfo || chunks.length === 0) {
+                    return res.status(400).json({ error: 'Missing fields or file data' });
+                }
+
+                const { filename, mimeType } = fileInfo;
+                const savedFileName = filename;
+                const savedMimeType = mimeType;
+
+                const uploadDir = path.join(process.cwd(), 'uploads', publicKey, 'posts', postId);
+                fs.mkdirSync(uploadDir, { recursive: true });
+
+                const savedFilePath = path.join(uploadDir, savedFileName);
+                await fs.promises.writeFile(savedFilePath, Buffer.concat(chunks));
+
+                const mediaUrl = `/uploads/${publicKey}/posts/${postId}/${savedFileName}`;
+
+                await Post.uploadPostMedia({
+                    postId,
+                    publicKey,
+                    mediaUrl,
+                    filename: savedFileName,
+                    mimetype: savedMimeType
+                });
+
+                return res.status(200).json({ message: 'Media uploaded successfully.' });
+            } catch (err) {
+                console.error('Final upload handler error:', err);
+                return res.status(500).json({ error: 'Failed to save media.' });
+            }
+        });
+
+        req.pipe(busboy);
+    } catch (err) {
+        console.error('Upload controller crash:', err);
+        return res.status(500).json({ error: 'Unexpected server error.' });
+    }
+};
+
+
+
 export default {
     createPost,
     updatePost,
@@ -143,4 +225,5 @@ export default {
     getBoardPosts,
     getPosts,
     getUserPosts,
+    uploadPostMedia
 }

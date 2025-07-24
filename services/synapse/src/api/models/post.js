@@ -3,6 +3,15 @@
 
 import meNexus from "../config/mysql.js";
 import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
+import path from 'path';
+import { fileURLToPath } from 'url';
+import {loadConfig} from "#utils/configUtils.js";
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 export const createPost = (publicKey, activeBoard, content) => {
     return new Promise((resolve, reject) => {
@@ -74,10 +83,13 @@ export const getPost = (postId) => {
             try {
                 const enrichedPost = await Promise.all(result.map(async (post) => {
                     const user = await getUserByPublicKeyFromDB(post.public_key);
+                    const synapseConfig = await loadConfig(CONFIG_FILE)
                     return {
                         ...post,
                         handle: user?.handle || 'Unknown',
-                        displayName: user?.displayName || 'Unknown'
+                        displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
+                        synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
                 resolve(enrichedPost[0]);
@@ -104,10 +116,13 @@ export const getAllPosts = async (req, res) => {
             try {
                 const enrichedPosts = await Promise.all(results.map(async (post) => {
                     const user = await getUserByPublicKeyFromDB(post.public_key);
+                    const synapseConfig = await loadConfig(CONFIG_FILE)
                     return {
                         ...post,
                         handle: user?.handle || 'Unknown',
-                        displayName: user?.displayName || 'Unknown'
+                        displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
+                        synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
                 resolve(enrichedPosts);
@@ -135,10 +150,13 @@ export const getBoardPosts = async (board) => {
             try {
                 const enrichedPosts = await Promise.all(results.map(async (post) => {
                     const user = await getUserByPublicKeyFromDB(post.public_key);
+                    const synapseConfig = await loadConfig(CONFIG_FILE)
                     return {
                         ...post,
                         handle: user?.handle || 'Unknown',
-                        displayName: user?.displayName || 'Unknown'
+                        displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
+                        synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
                 resolve(enrichedPosts);
@@ -188,10 +206,13 @@ export const getPosts = async (publicKey) => {
                     const enrichedPosts = await Promise.all(
                         results.map(async (post) => {
                             const postUser = await getUserByPublicKeyFromDB(post.public_key);
+                            const synapseConfig = await loadConfig(CONFIG_FILE)
                             return {
                                 ...post,
                                 handle: postUser?.handle || 'Unknown',
-                                displayName: postUser?.displayName || 'Unknown'
+                                displayName: postUser?.displayName || 'Unknown',
+                                synapsePublicKey: synapseConfig.identity.publicKey,
+                                synapseUrl: synapseConfig.identity.synapseUrl
                             };
                         })
                     );
@@ -226,10 +247,13 @@ export const getUserPosts = (publicKey) => {
             try {
                 const enrichedPosts = await Promise.all(results.map(async (post) => {
                     const user = await getUserByPublicKeyFromDB(post.public_key);
+                    const synapseConfig = await loadConfig(CONFIG_FILE)
                     return {
                         ...post,
                         handle: user?.handle || 'Unknown',
-                        displayName: user?.displayName || 'Unknown'
+                        displayName: user?.displayName || 'Unknown',
+                        synapsePublicKey: synapseConfig.identity.publicKey,
+                        synapseUrl: synapseConfig.identity.synapseUrl
                     };
                 }));
                 resolve(enrichedPosts);
@@ -241,6 +265,26 @@ export const getUserPosts = (publicKey) => {
     })
 }
 
+export const uploadPostMedia = async ({ postId, publicKey, mediaUrl, filename, mimetype }) => {
+
+    return new Promise((resolve, reject) => {
+        const sql = `
+            UPDATE Posts
+            SET media_url = ?
+            WHERE post_id = ?
+        `;
+
+        meNexus.query(sql, [mediaUrl, postId], (err, result) => {
+            if (err) {
+                console.error(err)
+                return reject(new Error('Database error'));
+            }
+            resolve(result);
+        });
+    });
+};
+
+
 export default {
     createPost,
     updatePost,
@@ -250,4 +294,5 @@ export default {
     getBoardPosts,
     getPosts,
     getUserPosts,
+    uploadPostMedia
 }

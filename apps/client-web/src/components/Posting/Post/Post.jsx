@@ -19,11 +19,13 @@ import { refreshComments } from "../../../utils/apiUtils.js"
 const Post = ({
                   isLocalSynapse,
                   synapsePublicKey,
+                  synapseUrl,
                   postId,
                   publicKey,
                   sessionPublicKey,
                   date,
                   content,
+                  mediaUrl,
                   likes,
                   onEdit,
                   onDelete,
@@ -144,6 +146,17 @@ const Post = ({
         setShowComments((prev) => !prev); // Toggle visibility
     };
 
+    const getMediaTypeFromUrl = (url) =>  {
+        const extension = url.split('.').pop().toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+
+        if (imageExtensions.includes(extension)) return 'image';
+        if (videoExtensions.includes(extension)) return 'video';
+        return 'unknown';
+    }
+
+
     if (!user) {
         return
     }
@@ -172,7 +185,7 @@ const Post = ({
             </div>
 
             {/* Right Column: Content */}
-            <div className="flex flex-col flex-1 pl-6">
+            <div className="flex flex-col w-full flex-1 pl-6">
                 {/* Identity */}
                 <div>
                     <Link
@@ -197,6 +210,27 @@ const Post = ({
                         <p className="text-md lg:text-3xl whitespace-pre-wrap">{content}</p>
                     )}
                 </div>
+
+                {/* Post Media */}
+                {mediaUrl && getMediaTypeFromUrl(mediaUrl) === 'image' ? (
+                    <div className="flex justify-center items-center mt-4">
+                        <img
+                            className="rounded-lg max-w-full h-auto object-contain"
+                            src={`${isLocalSynapse ? import.meta.env.VITE_API_BASE_URL : synapseUrl}${mediaUrl}`}
+                            alt={`${postId}'s media`}
+                        />
+                    </div>
+                ) : mediaUrl && getMediaTypeFromUrl(mediaUrl) === 'video' ? (
+                    <div className="flex justify-center items-center mt-4">
+                        <video
+                            className="rounded-lg max-w-full h-auto object-contain"
+                            src={`${isLocalSynapse ? import.meta.env.VITE_API_BASE_URL : synapseUrl}${mediaUrl}`}
+                            alt={`${postId}'s media`}
+                            controls={true}
+                        />
+                    </div>
+                ) : null
+                }
 
                 {/* Post Actions */}
                 {isOwner && (
