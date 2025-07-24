@@ -146,6 +146,17 @@ const Post = ({
         setShowComments((prev) => !prev); // Toggle visibility
     };
 
+    const getMediaTypeFromUrl = (url) =>  {
+        const extension = url.split('.').pop().toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+
+        if (imageExtensions.includes(extension)) return 'image';
+        if (videoExtensions.includes(extension)) return 'video';
+        return 'unknown';
+    }
+
+
     if (!user) {
         return
     }
@@ -201,7 +212,7 @@ const Post = ({
                 </div>
 
                 {/* Post Media */}
-                {mediaUrl ? (
+                {mediaUrl && getMediaTypeFromUrl(mediaUrl) === 'image' ? (
                     <div className="flex justify-center items-center mt-4">
                         <img
                             className="rounded-lg max-w-full h-auto object-contain"
@@ -209,10 +220,17 @@ const Post = ({
                             alt={`${postId}'s media`}
                         />
                     </div>
-                ) : null}
-
-
-
+                ) : mediaUrl && getMediaTypeFromUrl(mediaUrl) === 'video' ? (
+                    <div className="flex justify-center items-center mt-4">
+                        <video
+                            className="rounded-lg max-w-full h-auto object-contain"
+                            src={`${isLocalSynapse ? import.meta.env.VITE_API_BASE_URL : synapseUrl}${mediaUrl}`}
+                            alt={`${postId}'s media`}
+                            controls={true}
+                        />
+                    </div>
+                ) : null
+                }
 
                 {/* Post Actions */}
                 {isOwner && (

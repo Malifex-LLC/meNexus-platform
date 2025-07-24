@@ -165,7 +165,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
                 <input
                     id="postMedia"
                     type="file"
-                    accept="image/*"
+                    accept="image/*, video/*"
                     onChange={handleFileChange}
                     className="hidden"
                 />
