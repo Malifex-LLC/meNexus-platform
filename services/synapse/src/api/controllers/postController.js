@@ -145,68 +145,50 @@ export const uploadPostMedia = async (req, res) => {
 
         let publicKey = '';
         let postId = '';
-
-        let savedFilePath = '';
-        let savedFileName = '';
-        let savedMimeType = '';
-        let fileBuffer = [];
         let fileInfo = null;
-
-        let fileWritePromise = null;
+        let chunks = [];
 
         busboy.on('field', (fieldname, val) => {
-            const value = typeof val === 'string' ? val : val.toString();
-            if (fieldname === 'postId') postId = value;
-            if (fieldname === 'publicKey') publicKey = value;
+            if (fieldname === 'postId') postId = val.toString();
+            if (fieldname === 'publicKey') publicKey = val.toString();
         });
 
         busboy.on('file', (fieldname, file, info) => {
             if (fieldname !== 'post_media') {
-                file.resume();
+                file.resume(); // skip irrelevant fields
                 return;
             }
 
             fileInfo = info;
+
             file.on('data', (data) => {
-                fileBuffer.push(data);
+                chunks.push(data);
             });
 
-            file.on('end', async () => {
-                if (!publicKey || !postId) {
-                    console.error('File ended before fields were set');
-                    return res.status(400).json({ error: 'Fields not set before file received' });
-                }
+            file.on('limit', () => {
+                console.warn('File size exceeded limit');
+            });
 
-                const { filename, mimeType } = fileInfo;
-                savedFileName = filename;
-                savedMimeType = mimeType;
-
-                const uploadDir = path.join(process.cwd(), 'uploads', publicKey, 'posts', postId);
-                fs.mkdirSync(uploadDir, { recursive: true });
-
-                const filepath = path.join(uploadDir, filename);
-                savedFilePath = filepath;
-
-                const writeStream = fs.createWriteStream(filepath);
-                fileWritePromise = new Promise((resolve, reject) => {
-                    writeStream.on('finish', resolve);
-                    writeStream.on('error', reject);
-                });
-
-                for (const chunk of fileBuffer) {
-                    writeStream.write(chunk);
-                }
-                writeStream.end();
+            file.on('error', (err) => {
+                console.error('Stream error:', err);
             });
         });
 
         busboy.on('finish', async () => {
-            if (!publicKey || !postId || !savedFilePath) {
-                return res.status(400).json({ error: 'Missing required fields or file not uploaded.' });
-            }
-
             try {
-                if (fileWritePromise) await fileWritePromise;
+                if (!publicKey || !postId || !fileInfo || chunks.length === 0) {
+                    return res.status(400).json({ error: 'Missing fields or file data' });
+                }
+
+                const { filename, mimeType } = fileInfo;
+                const savedFileName = filename;
+                const savedMimeType = mimeType;
+
+                const uploadDir = path.join(process.cwd(), 'uploads', publicKey, 'posts', postId);
+                fs.mkdirSync(uploadDir, { recursive: true });
+
+                const savedFilePath = path.join(uploadDir, savedFileName);
+                await fs.promises.writeFile(savedFilePath, Buffer.concat(chunks));
 
                 const mediaUrl = `/uploads/${publicKey}/posts/${postId}/${savedFileName}`;
 
@@ -220,17 +202,18 @@ export const uploadPostMedia = async (req, res) => {
 
                 return res.status(200).json({ message: 'Media uploaded successfully.' });
             } catch (err) {
-                console.error('Post model error:', err);
-                return res.status(500).json({ error: 'Database error during media upload.' });
+                console.error('Final upload handler error:', err);
+                return res.status(500).json({ error: 'Failed to save media.' });
             }
         });
 
         req.pipe(busboy);
     } catch (err) {
-        console.error('Upload controller error:', err);
-        res.status(500).json({ error: 'Unexpected server error.' });
+        console.error('Upload controller crash:', err);
+        return res.status(500).json({ error: 'Unexpected server error.' });
     }
 };
+
 
 
 export default {
