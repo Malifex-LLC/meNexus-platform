@@ -36,12 +36,12 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             const response = await createPost(post);
             console.log("createPost response: ", response);
             setText(""); // Reset the text field after submission
-            refreshPosts();
             setPostId(response.data.postId)
             if (selectedFile) {
                 console.log("Uploading post media for: ", selectedFile.name, ", ", response.data.postId, ", ", publicKey);
                 await handleUploadPostMedia(selectedFile, response.data.postId, publicKey)
             }
+            refreshPosts();
         } else {
             const post = {
                 publicKey: publicKey,
@@ -53,12 +53,12 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             const response = await createRemotePost(post);
             console.log("create Remote post response: ", response);
             setText(""); // Reset the text field after submission
-            refreshPosts();
             setPostId(response.data.response.payload.post.postId)
             if (selectedFile) {
                 console.log("Uploading remote post media for: ", selectedFile.name, ", ", response.data.response.payload.post.postId, ", ", publicKey);
                 await handleUploadRemotePostMedia(selectedFile, response.data.response.payload.post.postId, publicKey, synapsePublicKey)
             }
+            refreshPosts();
         }
     };
 
