@@ -15,6 +15,11 @@ export async function sendRequest({method, url, data ={}, params ={}, withCreden
 }
 
 export async function fetchLinkPreview(url) {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        const videoId = extractYouTubeVideoId(url);
+        return await fetchYouTubePreview(videoId, process.env.YOUTUBE_API_KEY);
+    }
+
     const { data } = await axios.get(url, {
         timeout: 5000,
         headers: {
@@ -37,3 +42,34 @@ export async function fetchLinkPreview(url) {
         url: getMeta('og:url') || url,
     };
 }
+
+export function extractYouTubeVideoId(url) {
+    const regex = /(?:v=|youtu\.be\/)([0-9A-Za-z_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+
+export async function fetchYouTubePreview(videoId, apiKey) {
+    console.log(`fetchYoutubePreview called for ${videoId}`);
+    const res = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+        params: {
+            part: 'snippet',
+            id: videoId,
+            key: apiKey,
+        },
+    });
+
+    const video = res.data.items[0];
+    if (!video) return null;
+
+    const { title, description, thumbnails, channelTitle } = video.snippet;
+
+    return {
+        title,
+        description,
+        image: thumbnails.high?.url || thumbnails.default?.url,
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+        channel: channelTitle,
+    };
+}
+
