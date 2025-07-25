@@ -16,6 +16,7 @@ router.get('/getBoardPosts', postController.getBoardPosts);
 router.get('/getPosts', postController.getPosts);
 router.get('/getUserPosts', postController.getUserPosts);
 router.post('/uploadPostMedia', postController.uploadPostMedia);
+router.post('/unfurlUrl', postController.unfurlUrl);
 
 // Export the router so it can be used in server.js
 export default router;

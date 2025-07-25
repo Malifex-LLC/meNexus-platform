@@ -37,6 +37,7 @@ export const ENDPOINTS = {
     GET_POSTS: `${API_BASE_URL}/api/post/getPosts`,
     GET_USER_POSTS: `${API_BASE_URL}/api/post/getUserPosts`,
     UPLOAD_POST_MEDIA: `${API_BASE_URL}/api/post/uploadPostMedia`,
+    UNFURL_URL: `${API_BASE_URL}/api/post/unfurlUrl`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
     UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,

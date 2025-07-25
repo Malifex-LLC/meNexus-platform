@@ -15,6 +15,7 @@ import useGetUser from "../../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
 import useFetchRemoteComments from "../../../api/hooks/useFetchRemoteComments.js";
 import { refreshComments } from "../../../utils/apiUtils.js"
+import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
 
 const Post = ({
                   isLocalSynapse,
@@ -39,11 +40,14 @@ const Post = ({
     const [isFollowing, setIsFollowing] = useState(false);
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
+    const [preview, setPreview] = useState(null);
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { getComments } = useGetComments();
     const { fetchRemoteComments } = useFetchRemoteComments();
     const { createNotification } = useCreateNotification();
     const { getUser, loading: userLoading, error: userError } = useGetUser();
+    const { unfurlUrl } = useUnfurlUrl();
+
     const resource_type = "POST";
 
     const handleRefreshComments = async () => {
@@ -142,6 +146,15 @@ const Post = ({
         fetchComments(); // Only fetchComments if they are displayed
     },[postId])
 
+    useEffect(() => {
+        const urls = extractUrls(content);
+        if (urls.length > 0) {
+            unfurlUrl(urls[0]).then(data => {
+                if (data) setPreview(data);
+            });
+        }
+    }, [content])
+
     const toggleComments = () => {
         setShowComments((prev) => !prev); // Toggle visibility
     };
@@ -155,6 +168,14 @@ const Post = ({
         if (videoExtensions.includes(extension)) return 'video';
         return 'unknown';
     }
+
+    const urlRegex = /https?:\/\/[^\s]+/g;
+
+    const extractUrls = (text) => {
+        const matches = text.match(urlRegex);
+        return matches || [];
+    };
+
 
 
     if (!user) {
@@ -231,6 +252,16 @@ const Post = ({
                     </div>
                 ) : null
                 }
+
+                {/* Link Previews */}
+                {preview && (
+                    <div className="p-4 mt-4 w-full border border-border rounded-xl shadow-xl ">
+                        <a href={preview.url} target="_blank" className="text-lg font-bold text-brand"><img src={preview.image} alt="" className="rounded-xl mb-2" /></a>
+                        <a href={preview.url} target="_blank" className="text-lg font-bold text-brand">{preview.title}</a>
+                        <p className="text-sm text-foreground">{preview.description}</p>
+                    </div>
+
+                )}
 
                 {/* Post Actions */}
                 {isOwner && (
