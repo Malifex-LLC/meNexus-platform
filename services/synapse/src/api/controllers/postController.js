@@ -8,6 +8,8 @@ import Busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
 
+import { fetchLinkPreview } from "#utils/apiUtils.js";
+
 
 // Post creation logic
 export const createPost = async (req, res) => {
@@ -214,6 +216,23 @@ export const uploadPostMedia = async (req, res) => {
     }
 };
 
+export const unfurlUrl = async (req, res) => {
+    const { url } = req.body;
+    console.log("unfurlUrl called for url: ", url);
+
+    if (!url) {
+        return res.status(400).json({ error: 'Missing URL' });
+    }
+
+    try {
+        const preview = await fetchLinkPreview(url);
+        res.json(preview);
+    } catch (err) {
+        console.error('Failed to fetch preview:', err.message);
+        res.status(500).json({ error: 'Unable to fetch link preview' });
+    }
+}
+
 
 
 export default {
@@ -225,5 +244,6 @@ export default {
     getBoardPosts,
     getPosts,
     getUserPosts,
-    uploadPostMedia
+    uploadPostMedia,
+    unfurlUrl
 }

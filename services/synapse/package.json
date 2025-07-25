@@ -50,6 +50,7 @@
     "base64": "link:multiformats/bases/base64",
     "blockstore-level": "^2.0.1",
     "busboy": "^1.6.0",
+    "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
