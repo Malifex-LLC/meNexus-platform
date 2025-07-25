@@ -37,7 +37,7 @@ const SynapseLayout =({ children }) => {
     const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
     const navigate = useNavigate(); // React Router navigate
     const [boards, setBoards] = useState(null);
-    const [activeBoard, setActiveBoard] = useState("Main Chat");
+    const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
@@ -86,6 +86,7 @@ const SynapseLayout =({ children }) => {
                     setIsLocalSynapse(true);
                     const synapseBoards = await getSynapsePostBoards();
                     setBoards(synapseBoards)
+                    setActiveBoard(synapseBoards[0])
                 } else {
                     try {
                         const synapseMetadataResponse = await fetchRemoteSynapseMetadata(synapsePublicKey);
@@ -93,6 +94,7 @@ const SynapseLayout =({ children }) => {
                         setIsLocalSynapse(false);
                         const synapseBoards = await fetchRemoteSynapsePostBoards(synapsePublicKey);
                         setBoards(synapseBoards);
+                        setActiveBoard(synapseBoards[0])
                     } catch (error) {
                         console.error("Error fetching remote Synapse data: ", error);
                     }
