@@ -15,7 +15,15 @@ export async function sendRequest({method, url, data ={}, params ={}, withCreden
 }
 
 export async function fetchLinkPreview(url) {
-    const { data } = await axios.get(url, { timeout: 5000 });
+    const { data } = await axios.get(url, {
+        timeout: 5000,
+        headers: {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+        },
+    });
+
     const $ = cheerio.load(data);
 
     const getMeta = (name) =>
