@@ -32,7 +32,19 @@ export const getAllDiscoveredPeers = async (req, res) => {
     res.status(200).json(peersJSON);
 }
 
+export const getSynapsePostBoards = async (req, res) => {
+    try {
+        const config = await loadConfig(CONFIG_FILE);
+        const boards = config.boards;
+        res.status(200).json(boards);
+    } catch (err) {
+        console.error('Error fetching Post Boards:', err);
+        res.status(500).json({error: 'Failed to fetch Post Boards'});
+    }
+}
+
 export default {
     getSynapseMetadata,
-    getAllDiscoveredPeers
+    getAllDiscoveredPeers,
+    getSynapsePostBoards
 }
