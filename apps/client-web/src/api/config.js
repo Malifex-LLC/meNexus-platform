@@ -59,6 +59,7 @@ export const ENDPOINTS = {
     SEARCH: `${API_BASE_URL}/api/search/search`,
 
     GET_SYNAPSE_METADATA: `${API_BASE_URL}/api/synapse/getSynapseMetadata`,
+    GET_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/api/synapse/getSynapsePostBoards`,
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
     
 
@@ -66,6 +67,7 @@ export const ENDPOINTS = {
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/fetchRemoteUsers`,
+    FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
     FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/fetchRemotePosts`,
     FETCH_REMOTE_BOARD_POSTS: `${API_BASE_URL}/remote/fetchRemoteBoardPosts`,
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/fetchRemoteUserPosts`,

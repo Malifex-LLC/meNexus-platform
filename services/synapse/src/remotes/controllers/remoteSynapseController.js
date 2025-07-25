@@ -49,6 +49,34 @@ export const fetchRemoteSynapseMetadata = async (req, res) => {
     }
 }
 
+export const fetchRemoteSynapsePostBoards = async (req, res) => {
+    const synapsePublicKey = req.query.synapsePublicKey;
+    if (!synapsePublicKey) {
+        return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
+    console.log('fetchRemoteSynapsePostBoards for synapsePublicKey: ', synapsePublicKey)
+
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
+    }
+    const { peerId } = peer;
+    const synapsePostBoardsRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.DATA.QUERY,
+        RESOURCE_TYPES.SYNAPSE_POST_BOARDS,
+        {},
+        {sender: process.env.PUBLIC_KEY}
+    );
+    try {
+        const response = await sendMessageWithResponse(peerId, synapsePostBoardsRequest);
+        res.status(200).json(response.payload);
+    } catch (err) {
+        console.error('Error fetching Synapse post boards:', err);
+        res.status(500).json({error: 'Failed to fetch post boards from the synapse.'});
+    }
+}
+
 export const joinSynapse = async (req, res) => {
     const {publicKey, synapsePublicKey} = req.query;
     if (!publicKey || !synapsePublicKey) {
@@ -87,6 +115,7 @@ export const leaveSynapse = async (req, res) => {
 
 export default {
     fetchRemoteSynapseMetadata,
+    fetchRemoteSynapsePostBoards,
     joinSynapse,
     leaveSynapse,
 }

@@ -22,6 +22,8 @@ import { CgFeed } from "react-icons/cg";
 import { FaUsersViewfinder } from "react-icons/fa6";
 import useGetBoardPosts from "../../api/hooks/useGetBoardPosts.js";
 import useFetchRemoteBoardPosts from "../../api/hooks/useFetchRemoteBoardPosts.js";
+import useGetSynapsePostBoards from "../../api/hooks/useGetSynapsePostBoards.js";
+import useFetchRemoteSynapsePostBoards from "../../api/hooks/useFetchRemoteSynapsePostBoards.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -34,13 +36,15 @@ const SynapseLayout =({ children }) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
     const navigate = useNavigate(); // React Router navigate
-    const boards = ["Main Chat", "Bug Hunt", "Feature Request", "Gaming", "Music Share"];
-    const [activeBoard, setActiveBoard] = useState("Main Chat");
+    const [boards, setBoards] = useState(null);
+    const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
 
     const { getSynapseMetadata } = useGetSynapseMetadata();
+    const { getSynapsePostBoards } = useGetSynapsePostBoards();
+    const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { getBoardPosts } = useGetBoardPosts();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
 
@@ -80,11 +84,17 @@ const SynapseLayout =({ children }) => {
                 if (localSynapseData.identity.publicKey === synapsePublicKey) {
                     setSynapseMetadata(localSynapseData);
                     setIsLocalSynapse(true);
+                    const synapseBoards = await getSynapsePostBoards();
+                    setBoards(synapseBoards)
+                    setActiveBoard(synapseBoards[0])
                 } else {
                     try {
                         const synapseMetadataResponse = await fetchRemoteSynapseMetadata(synapsePublicKey);
                         setSynapseMetadata(synapseMetadataResponse);
                         setIsLocalSynapse(false);
+                        const synapseBoards = await fetchRemoteSynapsePostBoards(synapsePublicKey);
+                        setBoards(synapseBoards);
+                        setActiveBoard(synapseBoards[0])
                     } catch (error) {
                         console.error("Error fetching remote Synapse data: ", error);
                     }
@@ -125,6 +135,10 @@ const SynapseLayout =({ children }) => {
 
     if (!user || !user.publicKey) {
         return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
+    }
+
+    if (!boards) {
+        return <div className={'bg-background text-foreground'}>Loading Synapse boards...</div>
     }
 
 
