@@ -147,13 +147,15 @@ const Post = ({
     },[postId])
 
     useEffect(() => {
+        setPreview(null);
+
         const urls = extractUrls(content);
         if (urls.length > 0) {
             unfurlUrl(urls[0]).then(data => {
                 if (data) setPreview(data);
             });
         }
-    }, [content])
+    }, [postId, content])
 
     const toggleComments = () => {
         setShowComments((prev) => !prev); // Toggle visibility
