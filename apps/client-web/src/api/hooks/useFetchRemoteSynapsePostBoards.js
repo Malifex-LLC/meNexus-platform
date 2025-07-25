@@ -14,11 +14,12 @@ const useFetchRemoteSynapsePostBoards = () => {
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.FETCH_REMOTE_SYNAPSE_POST_BOARDS,
-            data: {synapsePublicKey},
+            params: {synapsePublicKey},
             withCredentials: true,
         });
+        console.log("fetchRemoteSynapsePostBoards response ", response);
 
-        return response.data;
+        return response.data.postBoards;
     };
 
     return {

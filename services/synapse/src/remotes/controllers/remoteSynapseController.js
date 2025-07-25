@@ -50,7 +50,7 @@ export const fetchRemoteSynapseMetadata = async (req, res) => {
 }
 
 export const fetchRemoteSynapsePostBoards = async (req, res) => {
-    const synapsePublicKey = req.query.publicKey;
+    const synapsePublicKey = req.query.synapsePublicKey;
     if (!synapsePublicKey) {
         return res.status(401).json({error: 'No Synapse publicKey provided.'});
     }

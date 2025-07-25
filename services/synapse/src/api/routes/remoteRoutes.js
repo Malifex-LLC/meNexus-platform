@@ -13,10 +13,11 @@ import remoteCommentController from "#remotes/controllers/remoteCommentControlle
 router.get('/fetchRemoteSynapseMetadata', remoteSynapseController.fetchRemoteSynapseMetadata);
 router.post('/joinSynapse', remoteSynapseController.joinSynapse);
 router.post('/leaveSynapse', remoteSynapseController.leaveSynapse);
+router.get('/fetchRemoteSynapsePostBoards', remoteSynapseController.fetchRemoteSynapsePostBoards);
+
 
 router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 
-router.get('getchRemoteSynapsePostBoards', remoteSynapseController.fetchRemoteSynapsePostBoards)
 router.get('/fetchRemotePosts', remotePostController.fetchRemotePosts);
 router.get('/fetchRemoteBoardPosts', remotePostController.fetchRemoteBoardPosts);
 router.get('/fetchRemoteUserPosts', remotePostController.fetchRemoteUserPosts);

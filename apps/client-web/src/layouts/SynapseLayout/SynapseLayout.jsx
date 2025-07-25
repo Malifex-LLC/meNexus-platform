@@ -36,7 +36,7 @@ const SynapseLayout =({ children }) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
     const navigate = useNavigate(); // React Router navigate
-    const [boards, setBoards] = useState([]);
+    const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState("Main Chat");
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
@@ -133,6 +133,10 @@ const SynapseLayout =({ children }) => {
 
     if (!user || !user.publicKey) {
         return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
+    }
+
+    if (!boards) {
+        return <div className={'bg-background text-foreground'}>Loading Synapse boards...</div>
     }
 
 
