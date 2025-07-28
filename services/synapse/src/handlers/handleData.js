@@ -382,7 +382,7 @@ export const handleData = async (libp2p, message) => {
                         const response = await sendRequest({
                             method: 'PUT',
                             url: url,
-                            data: { updatedContent: content },
+                            data: { content },
                         });
                         console.log('updateComment response ', response);
                         const updatedComment = response.data;
