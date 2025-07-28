@@ -345,13 +345,14 @@ export const handleData = async (libp2p, message) => {
                         const url = replaceParams(ENDPOINTS.UPDATE_POST, {postId})
                         console.log('updatePost url: ', url)
 
-                        const updatedPost = await sendRequest({
+                        const response = await sendRequest({
                             method: 'PUT',
                             url: url,
                             data: { content },
                         });
 
-                        console.log('updatedPost response: ', updatedPost);
+                        console.log('updatedPost response: ', response);
+                        const updatedPost = response.data;
 
                         const updatedPostResponse = createMessage(
                             MESSAGE_TYPES.DATA.RESPONSE,

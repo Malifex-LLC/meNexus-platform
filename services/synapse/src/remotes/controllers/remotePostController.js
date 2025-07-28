@@ -237,10 +237,10 @@ export const updateRemotePost = async (req, res) => {
     )
     try {
         const response = await sendMessageWithResponse(peerId, createPostRequest);
-        res.status(200).json({ message: 'Post created successfully.', response });
+        res.status(200).json({ message: 'Post updated successfully.', response });
     } catch (error) {
-        console.error('Error in createPost:', error);
-        res.status(500).json({error: 'Failed to create post.'});
+        console.error('Error in updateRemotePost:', error);
+        res.status(500).json({error: 'Failed to update post.'});
     }
 
 }

@@ -13,6 +13,7 @@ const useEditPost = (refreshPosts) => {
 
     const handleEdit = (postId, posts) => {
         const postToEdit = posts.find((post) => post.post_id === postId);
+
         if (postToEdit) {
             setEditingPostId(postId); // Save the post ID to state
             setEditedPostContent(postToEdit.content); // Set the content for editing

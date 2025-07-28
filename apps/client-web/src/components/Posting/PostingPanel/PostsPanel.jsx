@@ -7,11 +7,8 @@ import Post from "../Post/Post.jsx";
 import useEditPost from "../../../api/hooks/useEditPost.js";
 import useFetchRemotePosts from "../../../api/hooks/useFetchRemotePosts.js";
 import useDeletePost from "../../../api/hooks/useDeletePost.js";
-import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
-import useCreatePost from "../../../api/hooks/useCreatePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
 import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
-import {useState} from "react";
 import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
 
 const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, activeBoard, setActiveBoard, posts, setPosts}) => {
@@ -20,11 +17,22 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
 
     // Hooks for editing and deleting posts
 
-    const localEdit = useEditPost(() => refreshPosts(getAllPosts(), setPosts()));
-    const remoteEdit = useEditRemotePost(
-        () => refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts()),
-        synapsePublicKey
-    );
+    // Hooks for editing and deleting posts
+    const localRefreshPosts = async () => {
+        const allPosts = await getAllPosts();
+        const filteredPosts = allPosts.filter(post => post.board === activeBoard);
+        setPosts(filteredPosts);
+    };
+
+    const remoteRefreshPosts = async () => {
+        const allPosts = await fetchRemotePosts(synapsePublicKey);
+        const filteredPosts = allPosts.filter(post => post.board === activeBoard);
+        setPosts(filteredPosts);
+    };
+
+
+    const localEdit = useEditPost(localRefreshPosts);
+    const remoteEdit = useEditRemotePost(remoteRefreshPosts, synapsePublicKey);
 
     const {
         editingPostId,
@@ -36,10 +44,14 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
 
 
 
+
     const { handleDelete } = useDeletePost(() =>
         () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :
             refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts())));
 
+    if(!posts) {
+        return <div>Loading posts...</div>
+    }
 
     return (
         <div className="flex flex-row h-full rounded-xl">
