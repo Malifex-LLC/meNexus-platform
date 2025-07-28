@@ -59,11 +59,10 @@ export const updateRemotePostComment = async (req, res) => {
     const updatePostCommentRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.RESOURCE.UPDATE,
-        RESOURCE_TYPES.COMMENTS,
+        RESOURCE_TYPES.POST_COMMENT,
         {
-            commentId,
+            comment_id: commentId,
             content,
-            synapsePublicKey
         },
         {
             sender: process.env.PUBLIC_KEY

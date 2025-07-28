@@ -62,7 +62,7 @@ const Post = ({
     };
 
     const localEdit = useEditComment(handleRefreshComments);
-    const remoteEdit = useEditRemoteComment(handleRefreshComments);
+    const remoteEdit = useEditRemoteComment(handleRefreshComments, synapsePublicKey);
 
     const {
         handleCommentEdit,
