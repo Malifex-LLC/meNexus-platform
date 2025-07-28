@@ -45,7 +45,7 @@ export const deleteComment = (commentId) => {
     return new Promise((resolve, reject) => {
         const deleteSql = `
             DELETE FROM PostComments 
-            WHERE commentId = ?
+            WHERE comment_id = ?
         `;
 
         meNexus.query(deleteSql, [commentId], (error, result) => {
