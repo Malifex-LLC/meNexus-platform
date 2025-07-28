@@ -8,10 +8,10 @@ import { replaceParams } from "../../utils/apiUtils.js";
 const useDeleteComment = (refreshComments) => {
     const {sendRequest, loading, error} = useAxios();
 
-    const handleDeleteComment = async (comment_id) => {
-        console.log("handleDeleteComment called for comment_id: ", comment_id);
+    const handleDeleteComment = async (commentId) => {
+        console.log("handleDeleteComment called for comment_id: ", commentId);
         try {
-            const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {comment_id});
+            const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {commentId});
             await sendRequest( {
                 method: "DELETE",
                 url: url,
