@@ -79,6 +79,10 @@ export const updateRemotePostComment = async (req, res) => {
     }
 }
 
+export const deleteRemotePostComment = async (req, res) => {
+
+}
+
 export const fetchRemotePostComments = async (req, res) => {
     const {resourceType, resourceId, synapsePublicKey} = req.query;
     if (!resourceType || !resourceId || !synapsePublicKey) {
@@ -109,5 +113,7 @@ export const fetchRemotePostComments = async (req, res) => {
 
 export default {
     createRemotePostComment,
+    updateRemotePostComment,
+    deleteRemotePostComment,
     fetchRemotePostComments
 }
