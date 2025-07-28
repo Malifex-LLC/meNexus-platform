@@ -78,6 +78,8 @@ export const ENDPOINTS = {
     DELETE_REMOTE_POST: `${API_BASE_URL}/remote/deleteRemotePost`,
     FETCH_REMOTE_POST_COMMENTS: `${API_BASE_URL}/remote/fetchRemotePostComments`,
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
+    UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
+    DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
     LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
 };
