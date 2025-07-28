@@ -14,6 +14,13 @@ export async function sendRequest({method, url, data ={}, params ={}, withCreden
     });
 }
 
+export function replaceParams(url, params) {
+    Object.keys(params).forEach((key) => {
+        url = url.replace(`:${key}`, params[key]);
+    });
+    return url;
+};
+
 export async function fetchLinkPreview(url) {
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
         const videoId = extractYouTubeVideoId(url);

@@ -4,7 +4,7 @@
 import { createMessage } from '#protocols/snp/messageUtils.js';
 import { sendMessage } from '#core/messenger.js'
 import { MESSAGE_TYPES, ACTION_TYPES, RESOURCE_TYPES } from "#protocols/snp/index.js";
-import { sendRequest } from "#utils/apiUtils.js";
+import { sendRequest, replaceParams } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
@@ -342,7 +342,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST) {
                         console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
                         const { postId, content } = message.payload;
-                        const url = `${ENDPOINTS.UPDATE_POST}/${postId}`
+                        const url = replaceParams(ENDPOINTS.UPDATE_POST, {postId})
                         console.log('updatePost url: ', url)
 
                         const updatedPost = await sendRequest({
