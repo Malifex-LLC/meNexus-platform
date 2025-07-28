@@ -10,6 +10,7 @@ import useDeletePost from "../../../api/hooks/useDeletePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
 import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
 import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
+import useDeleteRemotePost from "../../../api/hooks/useDeleteRemotePost.js";
 
 const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, activeBoard, setActiveBoard, posts, setPosts}) => {
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
@@ -42,12 +43,12 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
         handleSave,
     } = isLocalSynapse ? localEdit : remoteEdit;
 
+    const localDelete = useDeletePost(localRefreshPosts);
+    const remoteDelete = useDeleteRemotePost(remoteRefreshPosts, synapsePublicKey);
 
-
-
-    const { handleDelete } = useDeletePost(() =>
-        () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :
-            refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts())));
+    const {
+        handleDelete
+    } = isLocalSynapse ? localDelete : remoteDelete;
 
     if(!posts) {
         return <div>Loading posts...</div>

@@ -25,6 +25,7 @@ router.get('/fetchRemotePostComments', remoteCommentController.fetchRemotePostCo
 router.post('/createRemotePost', remotePostController.createRemotePost);
 router.post('/uploadRemotePostMedia', remotePostController.uploadRemotePostMedia);
 router.put('/updateRemotePost', remotePostController.updateRemotePost);
+router.delete('/deleteRemotePost', remotePostController.deleteRemotePost);
 router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
 
 

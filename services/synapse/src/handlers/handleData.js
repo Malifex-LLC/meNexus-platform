@@ -373,6 +373,39 @@ export const handleData = async (libp2p, message) => {
                         }
                     }
 
+                case ACTION_TYPES.RESOURCE.DELETE:
+                    console.log(`Received DELETE request from ${message.meta.sender}.`);
+                    if (message.resourceType === RESOURCE_TYPES.POST) {
+                        console.log(`Received DELETE POST request from ${message.meta.sender}.`);
+                        const { postId } = message.payload;
+                        const url = replaceParams(ENDPOINTS.DELETE_POST, {postId});
+                        console.log('deletePost url ', url)
+                        const response = await sendRequest({
+                            method: 'DELETE',
+                            url: url
+                        });
+                        console.log('deletePost response: ', response);
+                        const deletedPost = response.data;
+
+                        const deletedPostResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.POST,
+                            { deletedPost },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, deletedPostResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+
                 case ACTION_TYPES.DATA.AGGREGATE:
                     console.log(`Received DATA_RESPONSE from ${message.meta.sender}.`);
                     resolvePendingRequest(message.meta.requestId, message);
