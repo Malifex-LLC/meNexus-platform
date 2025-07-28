@@ -40,8 +40,8 @@ export const ENDPOINTS = {
     UNFURL_URL: `${API_BASE_URL}/api/post/unfurlUrl`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
-    UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,
-    DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:comment_id`,
+    UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:commentId`,
+    DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:commentId`,
     GET_COMMENTS: `${API_BASE_URL}/api/comment/getComments`,
 
     CREATE_CONVERSATION: `${API_BASE_URL}/api/conversation/createConversation`,

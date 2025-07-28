@@ -10,8 +10,8 @@ const useEditRemoteComment = (refreshComments, synapsePublicKey) => {
     const [editedCommentContent, setEditedCommentContent] = useState("");
     const { sendRequest, loading, error } = useAxios();
 
-    const handleCommentEdit = (comment_id, comments) => {
-        const commentToEdit = comments.find((comment) => comment.comment_id === comment_id);
+    const handleCommentEdit = (commentId, comments) => {
+        const commentToEdit = comments.find((comment) => comment.comment_id === commentId);
         console.log("commentToEdit", commentToEdit);
         if (commentToEdit) {
             setEditingCommentId(commentToEdit.comment_id);
