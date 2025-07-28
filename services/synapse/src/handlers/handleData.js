@@ -375,8 +375,8 @@ export const handleData = async (libp2p, message) => {
 
                     if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
                         console.log(`Received UPDATE COMMENT request from ${message.meta.sender}.`);
-                        const { comment_id, content } = message.payload;
-                        const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {comment_id});
+                        const { commentId, content } = message.payload;
+                        const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {commentId});
                         console.log('updateComment url ', url)
 
                         const response = await sendRequest({

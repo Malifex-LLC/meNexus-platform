@@ -61,7 +61,7 @@ export const updateRemotePostComment = async (req, res) => {
         ACTION_TYPES.RESOURCE.UPDATE,
         RESOURCE_TYPES.POST_COMMENT,
         {
-            comment_id: commentId,
+            commentId,
             content,
         },
         {
