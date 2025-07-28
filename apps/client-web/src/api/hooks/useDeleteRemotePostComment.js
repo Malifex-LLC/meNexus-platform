@@ -4,11 +4,11 @@
 import useAxios from "./useAxios.js";
 import { ENDPOINTS } from '../config.js'
 
-const useDeleteComment = (refreshComments, synapsePublicKey) => {
+const useDeleteRemotePostComment = (refreshComments, synapsePublicKey) => {
     const {sendRequest, loading, error} = useAxios();
 
     const handleDeleteComment = async (commentId) => {
-        console.log("handleDeleteComment called for comment_id: ", commentId);
+        console.log("handleDeleteComment called for commentId: ", commentId);
         try {
             await sendRequest( {
                 method: "DELETE",
@@ -30,4 +30,4 @@ const useDeleteComment = (refreshComments, synapsePublicKey) => {
     };
 };
 
-export default useDeleteComment;
+export default useDeleteRemotePostComment;

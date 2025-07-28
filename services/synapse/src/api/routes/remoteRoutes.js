@@ -28,7 +28,7 @@ router.put('/updateRemotePost', remotePostController.updateRemotePost);
 router.delete('/deleteRemotePost', remotePostController.deleteRemotePost);
 router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
 router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
-router.delete('deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
+router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
 
 
 
