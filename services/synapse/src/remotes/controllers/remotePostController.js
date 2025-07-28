@@ -212,6 +212,39 @@ export const uploadRemotePostMedia = async (req, res) => {
     }
 };
 
+export const updateRemotePost = async (req, res) => {
+    const {postId, content, synapsePublicKey} = req.body;
+
+    if (!postId || !content || !synapsePublicKey) {
+        return res.status(400).json({error: 'postId or content not found.'});
+    }
+    console.log('updateRemotePost called for synapsePublicKey: ', synapsePublicKey)
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
+    }
+    const { peerId } = peer;
+
+    const createPostRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.RESOURCE.UPDATE,
+        RESOURCE_TYPES.POST,
+        {
+            postId,
+            content
+        },
+        {sender: process.env.PUBLIC_KEY}
+    )
+    try {
+        const response = await sendMessageWithResponse(peerId, createPostRequest);
+        res.status(200).json({ message: 'Post created successfully.', response });
+    } catch (error) {
+        console.error('Error in createPost:', error);
+        res.status(500).json({error: 'Failed to create post.'});
+    }
+
+}
+
 
 
 
@@ -220,5 +253,6 @@ export default {
     fetchRemoteBoardPosts,
     fetchRemoteUserPosts,
     createRemotePost,
-    uploadRemotePostMedia
+    uploadRemotePostMedia,
+    updateRemotePost
 }

@@ -337,6 +337,38 @@ export const handleData = async (libp2p, message) => {
                     }
                     break;
 
+                case ACTION_TYPES.RESOURCE.UPDATE:
+                    console.log(`Received RESOURCE_UPDATE request from ${message.meta.sender}.`);
+                    if (message.resourceType === RESOURCE_TYPES.POST) {
+                        console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
+                        const { postId, content } = message.payload;
+                        const url = `${ENDPOINTS.UPDATE_POST}/${postId}`
+
+                        const updatedPost = await sendRequest({
+                            method: 'PUT',
+                            url: url,
+                            data: { content },
+                        });
+
+                        const updatedPostResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.UPDATE,
+                            RESOURCE_TYPES.POST,
+                            { updatedPost },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, updatedPostResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+
                 case ACTION_TYPES.DATA.AGGREGATE:
                     console.log(`Received DATA_RESPONSE from ${message.meta.sender}.`);
                     resolvePendingRequest(message.meta.requestId, message);
