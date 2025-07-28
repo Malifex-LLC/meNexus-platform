@@ -372,6 +372,7 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
                     }
+                    break;
 
                 case ACTION_TYPES.RESOURCE.DELETE:
                     console.log(`Received DELETE request from ${message.meta.sender}.`);
@@ -405,6 +406,7 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
                     }
+                    break;
 
                 case ACTION_TYPES.DATA.AGGREGATE:
                     console.log(`Received DATA_RESPONSE from ${message.meta.sender}.`);

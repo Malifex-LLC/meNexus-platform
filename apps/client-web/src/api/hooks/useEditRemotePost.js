@@ -19,6 +19,7 @@ const useEditRemotePost = (refreshPosts, synapsePublicKey) => {
     };
 
     const handleSave = async () => {
+        console.log('editRemotePost handleSave called');
         try {
             await sendRequest({
                 method: "PUT",
