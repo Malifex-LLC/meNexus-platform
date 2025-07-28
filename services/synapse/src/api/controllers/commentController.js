@@ -33,9 +33,9 @@ export const updateComment = async (req, res) => {
 }
 
 export const deleteComment = async (req, res) => {
-    const comment_id = req.params.comment_id;
+    const commentId = req.params.commentId;
 
-    const result = await Comment.deleteComment(comment_id);
+    const result = await Comment.deleteComment(commentId);
 
     if (result.affectedRows === 0) {
         return res.status(404).json({error: 'Comment not found'});
