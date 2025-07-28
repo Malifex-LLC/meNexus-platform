@@ -79,7 +79,37 @@ export const updateRemotePostComment = async (req, res) => {
 }
 
 export const deleteRemotePostComment = async (req, res) => {
+    const { commentId, synapsePublicKey } = req.body;
+    if (!commentId || !synapsePublicKey) {
+        return res.status(400).json({error: 'commentId or synapsePublicKey not found.'});
+    }
+    console.log('deleteRemotePostComment called for synapsePublicKey: ', synapsePublicKey);
 
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
+    }
+    const { peerId } = peer;
+
+    const deletePostCommentRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.RESOURCE.DELETE,
+        RESOURCE_TYPES.POST_COMMENT,
+        {
+            commentId,
+        },
+        {
+            sender: process.env.PUBLIC_KEY
+        }
+    )
+    try {
+        const response = await sendMessageWithResponse(peerId, deletePostCommentRequest);
+
+        res.status(200).json(response.payload.updatedComment);
+    } catch (error) {
+        console.error('Error updating remote post comment', error);
+        res.status(500).json({error: 'Failed to update remote post comment'});
+    }
 }
 
 export const fetchRemotePostComments = async (req, res) => {

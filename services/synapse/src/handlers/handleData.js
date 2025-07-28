@@ -440,6 +440,36 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
                     }
+                    if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
+                        console.log(`Received DELETE POST COMMENT request from ${message.meta.sender}.`);
+                        const { commentId } = message.payload;
+                        const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {commentId});
+                        console.log('deleteComment url ', url)
+                        const response = await sendRequest({
+                            method: 'DELETE',
+                            url: url
+                        });
+                        console.log('deleteComment response ', response);
+                        const deletedComment = response.data;
+
+                        const deletedCommentResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.POST_COMMENT,
+                            { deletedComment },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, deletedCommentResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
                     break;
 
                 case ACTION_TYPES.DATA.AGGREGATE:
