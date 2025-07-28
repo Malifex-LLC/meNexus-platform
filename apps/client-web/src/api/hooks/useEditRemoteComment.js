@@ -4,7 +4,6 @@
 import { useState } from "react";
 import useAxios from "./useAxios.js";
 import { ENDPOINTS } from "../config.js";
-import { replaceParams } from "../../utils/apiUtils.js";
 
 const useEditRemoteComment = (refreshComments, synapsePublicKey) => {
     const [editingCommentId, setEditingCommentId] = useState(null);
@@ -22,7 +21,6 @@ const useEditRemoteComment = (refreshComments, synapsePublicKey) => {
 
     const handleCommentSave = async () => {
         try {
-            console.log("handleCommentSave url: ", url);
             await sendRequest( {
                 method: "PUT",
                 url: ENDPOINTS.UPDATE_REMOTE_POST_COMMENT,

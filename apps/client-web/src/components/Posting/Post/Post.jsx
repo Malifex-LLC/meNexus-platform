@@ -16,6 +16,7 @@ import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
 import useFetchRemoteComments from "../../../api/hooks/useFetchRemoteComments.js";
 import { refreshComments } from "../../../utils/apiUtils.js"
 import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
+import useEditRemoteComment from "../../../api/hooks/useEditRemoteComment.js";
 
 const Post = ({
                   isLocalSynapse,
@@ -60,15 +61,20 @@ const Post = ({
         }
     };
 
+    const localEdit = useEditComment(handleRefreshComments);
+    const remoteEdit = useEditRemoteComment(handleRefreshComments);
+
     const {
         handleCommentEdit,
         handleCommentSave,
         editingCommentId,
         editedCommentContent,
         setEditedCommentContent,
-    } = useEditComment(handleRefreshComments);
+    } = isLocalSynapse ? localEdit : remoteEdit;
 
-    const { handleDeleteComment } = useDeleteComment(handleRefreshComments);
+    const {
+        handleDeleteComment
+    } = useDeleteComment(handleRefreshComments);
 
     const handleFollow = async () => {
         console.log("handleFollow for followed_id: ", publicKey);

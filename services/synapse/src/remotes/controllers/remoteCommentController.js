@@ -72,7 +72,7 @@ export const updateRemotePostComment = async (req, res) => {
     try {
         const response = await sendMessageWithResponse(peerId, updatePostCommentRequest);
 
-        res.status(200).json(response.payload.comment);
+        res.status(200).json(response.payload.updatedComment);
     } catch (error) {
         console.error('Error updating remote post comment', error);
         res.status(500).json({error: 'Failed to update remote post comment'});
