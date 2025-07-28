@@ -12,21 +12,29 @@ import useCreatePost from "../../../api/hooks/useCreatePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
 import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
 import {useState} from "react";
+import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
 
 const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, activeBoard, setActiveBoard, posts, setPosts}) => {
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
 
     // Hooks for editing and deleting posts
+
+    const localEdit = useEditPost(() => refreshPosts(getAllPosts(), setPosts()));
+    const remoteEdit = useEditRemotePost(
+        () => refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts()),
+        synapsePublicKey
+    );
+
     const {
         editingPostId,
         editedPostContent,
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(() =>
-        () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :
-            refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts())));
+    } = isLocalSynapse ? localEdit : remoteEdit;
+
+
 
     const { handleDelete } = useDeletePost(() =>
         () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :

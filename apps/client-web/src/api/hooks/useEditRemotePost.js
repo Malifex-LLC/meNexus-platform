@@ -10,7 +10,7 @@ const useEditRemotePost = (refreshPosts, synapsePublicKey) => {
     const [editedPostContent, setEditedPostContent] = useState("");
     const { sendRequest, loading, error } = useAxios();
 
-    const handleRemoteEdit = (postId, posts) => {
+    const handleEdit = (postId, posts) => {
         const postToEdit = posts.find((post) => post.post_id === postId);
         if (postToEdit) {
             setEditingPostId(postId); // Save the post ID to state
@@ -18,7 +18,7 @@ const useEditRemotePost = (refreshPosts, synapsePublicKey) => {
         }
     };
 
-    const handleRemoteSave = async () => {
+    const handleSave = async () => {
         try {
             await sendRequest({
                 method: "PUT",
@@ -35,8 +35,8 @@ const useEditRemotePost = (refreshPosts, synapsePublicKey) => {
     };
 
     return {
-        handleRemoteEdit,
-        handleRemoteSave,
+        handleEdit,
+        handleSave,
         editingPostId,
         editedPostContent,
         setEditedPostContent,

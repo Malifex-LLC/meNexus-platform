@@ -343,12 +343,15 @@ export const handleData = async (libp2p, message) => {
                         console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
                         const { postId, content } = message.payload;
                         const url = `${ENDPOINTS.UPDATE_POST}/${postId}`
+                        console.log('updatePost url: ', url)
 
                         const updatedPost = await sendRequest({
                             method: 'PUT',
                             url: url,
                             data: { content },
                         });
+
+                        console.log('updatedPost response: ', updatedPost);
 
                         const updatedPostResponse = createMessage(
                             MESSAGE_TYPES.DATA.RESPONSE,
