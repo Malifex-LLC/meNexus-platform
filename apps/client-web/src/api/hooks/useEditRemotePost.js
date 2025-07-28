@@ -4,16 +4,14 @@
 import { useState } from "react";
 import useAxios from "./useAxios.js";
 import { ENDPOINTS } from "../config.js";
-import { replaceParams } from "../../utils/apiUtils.js";
 
-const useEditPost = (refreshPosts) => {
+const useEditRemotePost = (refreshPosts, synapsePublicKey) => {
     const [editingPostId, setEditingPostId] = useState(null);
     const [editedPostContent, setEditedPostContent] = useState("");
     const { sendRequest, loading, error } = useAxios();
 
     const handleEdit = (postId, posts) => {
         const postToEdit = posts.find((post) => post.post_id === postId);
-
         if (postToEdit) {
             setEditingPostId(postId); // Save the post ID to state
             setEditedPostContent(postToEdit.content); // Set the content for editing
@@ -21,12 +19,12 @@ const useEditPost = (refreshPosts) => {
     };
 
     const handleSave = async () => {
+        console.log('editRemotePost handleSave called');
         try {
-            const url = replaceParams(ENDPOINTS.UPDATE_POST, { postId: editingPostId });
             await sendRequest({
                 method: "PUT",
-                url: url,
-                data: { content: editedPostContent }, // Use the updated content
+                url: ENDPOINTS.UPDATE_REMOTE_POST,
+                data: { postId:editingPostId, content: editedPostContent, synapsePublicKey }, // Use the updated content
             });
 
             setEditingPostId(null);
@@ -48,4 +46,4 @@ const useEditPost = (refreshPosts) => {
     };
 };
 
-export default useEditPost;
+export default useEditRemotePost;

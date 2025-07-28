@@ -40,8 +40,8 @@ export const ENDPOINTS = {
     UNFURL_URL: `${API_BASE_URL}/api/post/unfurlUrl`,
 
     CREATE_COMMENT: `${API_BASE_URL}/api/comment/createComment`,
-    UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:comment_id`,
-    DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:comment_id`,
+    UPDATE_COMMENT: `${API_BASE_URL}/api/comment/updateComment/:commentId`,
+    DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:commentId`,
     GET_COMMENTS: `${API_BASE_URL}/api/comment/getComments`,
 
     CREATE_CONVERSATION: `${API_BASE_URL}/api/conversation/createConversation`,
@@ -74,8 +74,12 @@ export const ENDPOINTS = {
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
     CREATE_REMOTE_POST: `${API_BASE_URL}/remote/createRemotePost`,
     UPLOAD_REMOTE_POST_MEDIA: `${API_BASE_URL}/remote/uploadRemotePostMedia`,
+    UPDATE_REMOTE_POST: `${API_BASE_URL}/remote/updateRemotePost`,
+    DELETE_REMOTE_POST: `${API_BASE_URL}/remote/deleteRemotePost`,
     FETCH_REMOTE_POST_COMMENTS: `${API_BASE_URL}/remote/fetchRemotePostComments`,
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
+    UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
+    DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
     LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
 };

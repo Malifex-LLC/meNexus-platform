@@ -4,7 +4,7 @@
 import { createMessage } from '#protocols/snp/messageUtils.js';
 import { sendMessage } from '#core/messenger.js'
 import { MESSAGE_TYPES, ACTION_TYPES, RESOURCE_TYPES } from "#protocols/snp/index.js";
-import { sendRequest } from "#utils/apiUtils.js";
+import { sendRequest, replaceParams } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
@@ -331,6 +331,141 @@ export const handleData = async (libp2p, message) => {
                         const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
                         if (peerId) {
                             await sendMessage(peerId, createCommentResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+                    break;
+
+                case ACTION_TYPES.RESOURCE.UPDATE:
+                    console.log(`Received RESOURCE_UPDATE request from ${message.meta.sender}.`);
+                    if (message.resourceType === RESOURCE_TYPES.POST) {
+                        console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
+                        const { postId, content } = message.payload;
+                        const url = replaceParams(ENDPOINTS.UPDATE_POST, {postId})
+                        console.log('updatePost url: ', url)
+
+                        const response = await sendRequest({
+                            method: 'PUT',
+                            url: url,
+                            data: { content },
+                        });
+
+                        console.log('updatedPost response: ', response);
+                        const updatedPost = response.data;
+
+                        const updatedPostResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.UPDATE,
+                            RESOURCE_TYPES.POST,
+                            { updatedPost },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, updatedPostResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+
+                    if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
+                        console.log(`Received UPDATE COMMENT request from ${message.meta.sender}.`);
+                        const { commentId, content } = message.payload;
+                        const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {commentId});
+                        console.log('updateComment url ', url)
+
+                        const response = await sendRequest({
+                            method: 'PUT',
+                            url: url,
+                            data: { content },
+                        });
+                        console.log('updateComment response ', response);
+                        const updatedComment = response.data;
+
+                        const updatedCommentResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.UPDATE,
+                            RESOURCE_TYPES.POST_COMMENT,
+                            { updatedComment },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, updatedCommentResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+
+                    }
+                    break;
+
+                case ACTION_TYPES.RESOURCE.DELETE:
+                    console.log(`Received DELETE request from ${message.meta.sender}.`);
+                    if (message.resourceType === RESOURCE_TYPES.POST) {
+                        console.log(`Received DELETE POST request from ${message.meta.sender}.`);
+                        const { postId } = message.payload;
+                        const url = replaceParams(ENDPOINTS.DELETE_POST, {postId});
+                        console.log('deletePost url ', url)
+                        const response = await sendRequest({
+                            method: 'DELETE',
+                            url: url
+                        });
+                        console.log('deletePost response: ', response);
+                        const deletedPost = response.data;
+
+                        const deletedPostResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.POST,
+                            { deletedPost },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, deletedPostResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
+                        console.log(`Received DELETE POST COMMENT request from ${message.meta.sender}.`);
+                        const { commentId } = message.payload;
+                        const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {commentId});
+                        console.log('deleteComment url ', url)
+                        const response = await sendRequest({
+                            method: 'DELETE',
+                            url: url
+                        });
+                        console.log('deleteComment response ', response);
+                        const deletedComment = response.data;
+
+                        const deletedCommentResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.POST_COMMENT,
+                            { deletedComment },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, deletedCommentResponse);
                         } else {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }

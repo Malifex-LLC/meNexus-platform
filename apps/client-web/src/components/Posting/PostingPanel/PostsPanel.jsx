@@ -7,31 +7,52 @@ import Post from "../Post/Post.jsx";
 import useEditPost from "../../../api/hooks/useEditPost.js";
 import useFetchRemotePosts from "../../../api/hooks/useFetchRemotePosts.js";
 import useDeletePost from "../../../api/hooks/useDeletePost.js";
-import useCreateRemotePost from "../../../api/hooks/useCreateRemotePost.js";
-import useCreatePost from "../../../api/hooks/useCreatePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
 import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
-import {useState} from "react";
+import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
+import useDeleteRemotePost from "../../../api/hooks/useDeleteRemotePost.js";
 
 const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, activeBoard, setActiveBoard, posts, setPosts}) => {
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
 
     // Hooks for editing and deleting posts
+
+    // Hooks for editing and deleting posts
+    const localRefreshPosts = async () => {
+        const allPosts = await getAllPosts();
+        const filteredPosts = allPosts.filter(post => post.board === activeBoard);
+        setPosts(filteredPosts);
+    };
+
+    const remoteRefreshPosts = async () => {
+        const allPosts = await fetchRemotePosts(synapsePublicKey);
+        const filteredPosts = allPosts.filter(post => post.board === activeBoard);
+        setPosts(filteredPosts);
+    };
+
+
+    const localEdit = useEditPost(localRefreshPosts);
+    const remoteEdit = useEditRemotePost(remoteRefreshPosts, synapsePublicKey);
+
     const {
         editingPostId,
         editedPostContent,
         setEditedPostContent,
         handleEdit,
         handleSave,
-    } = useEditPost(() =>
-        () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :
-            refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts())));
+    } = isLocalSynapse ? localEdit : remoteEdit;
 
-    const { handleDelete } = useDeletePost(() =>
-        () => (isLocalSynapse ? refreshPosts(getAllPosts(), setPosts()) :
-            refreshPosts(fetchRemotePosts(synapsePublicKey), setPosts())));
+    const localDelete = useDeletePost(localRefreshPosts);
+    const remoteDelete = useDeleteRemotePost(remoteRefreshPosts, synapsePublicKey);
 
+    const {
+        handleDelete
+    } = isLocalSynapse ? localDelete : remoteDelete;
+
+    if(!posts) {
+        return <div>Loading posts...</div>
+    }
 
     return (
         <div className="flex flex-row h-full rounded-xl">

@@ -24,7 +24,11 @@ router.get('/fetchRemoteUserPosts', remotePostController.fetchRemoteUserPosts);
 router.get('/fetchRemotePostComments', remoteCommentController.fetchRemotePostComments);
 router.post('/createRemotePost', remotePostController.createRemotePost);
 router.post('/uploadRemotePostMedia', remotePostController.uploadRemotePostMedia);
+router.put('/updateRemotePost', remotePostController.updateRemotePost);
+router.delete('/deleteRemotePost', remotePostController.deleteRemotePost);
 router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
+router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
+router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
 
 
 

@@ -4,9 +4,8 @@
 import { useState } from "react";
 import useAxios from "./useAxios.js";
 import { ENDPOINTS } from "../config.js";
-import { replaceParams } from "../../utils/apiUtils.js";
 
-const useEditComment = (refreshComments) => {
+const useEditRemoteComment = (refreshComments, synapsePublicKey) => {
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedCommentContent, setEditedCommentContent] = useState("");
     const { sendRequest, loading, error } = useAxios();
@@ -22,12 +21,10 @@ const useEditComment = (refreshComments) => {
 
     const handleCommentSave = async () => {
         try {
-            const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {commentId: editingCommentId});
-            console.log("handleCommentSave url: ", url);
             await sendRequest( {
                 method: "PUT",
-                url: url,
-                data: {content: editedCommentContent},
+                url: ENDPOINTS.UPDATE_REMOTE_POST_COMMENT,
+                data: {commentId: editingCommentId, content: editedCommentContent, synapsePublicKey},
             });
 
             setEditingCommentId(null);
@@ -49,4 +46,4 @@ const useEditComment = (refreshComments) => {
     }
 }
 
-export default useEditComment;
+export default useEditRemoteComment;

@@ -22,7 +22,7 @@ export const createComment = (resourceType, resourceId, content, publicKey) => {
     });
 };
 
-export const updateComment = (comment_id, updated_content) => {
+export const updateComment = (commentId, updated_content) => {
     return new Promise((resolve, reject) => {
         const sql = `
             UPDATE PostComments 
@@ -30,7 +30,7 @@ export const updateComment = (comment_id, updated_content) => {
             WHERE comment_id = ?
         `;
 
-        meNexus.query(sql, [updated_content, comment_id], (error, result) => {
+        meNexus.query(sql, [updated_content, commentId], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
@@ -41,14 +41,14 @@ export const updateComment = (comment_id, updated_content) => {
     });
 };
 
-export const deleteComment = (comment_id) => {
+export const deleteComment = (commentId) => {
     return new Promise((resolve, reject) => {
         const deleteSql = `
             DELETE FROM PostComments 
             WHERE comment_id = ?
         `;
 
-        meNexus.query(deleteSql, [comment_id], (error, result) => {
+        meNexus.query(deleteSql, [commentId], (error, result) => {
             if (error) {
                 console.error(error);
                 return reject(error);
