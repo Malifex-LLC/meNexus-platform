@@ -1,6 +1,9 @@
-/* Blush Cloud */
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Copyright © 2025 Malifex LLC and contributors */
 
-@theme {
+/* Blush Cloud Theme */
+
+:root {
     /* Foundations */
     --color-background:         #f9fafc;   /* Panel Background */
     --color-surface:            #f6d9d5;   /* Panel/Card Surface */
@@ -32,16 +35,15 @@
     --color-delete-hover:       #c56d6c;
 }
 
-/* Options for the actual window background. Solid, gradient, animated. */
-
-
 /* Solid Background */
 body {
-    background: #f9fafc;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
 }
 
-/* Gradient Background */
-/*body {
+/* Optional Gradient Backgrounds (commented out by default) */
+/*
+body {
     background: linear-gradient(
         to bottom,
         var(--color-background),
@@ -49,10 +51,11 @@ body {
         var(--color-background)
     );
     backdrop-filter: blur(1rem);
-}*/
+}
+*/
 
-/* Animated Background */
-/*body {
+/*
+body {
     background: linear-gradient(
         270deg,
         var(--color-background),
@@ -69,11 +72,10 @@ body {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
-}*/
+}
+*/
 
 /* Scrollbar Styling */
-
-/* For WebKit (Chrome, Safari) */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -81,6 +83,6 @@ body {
     background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #f7d0cb;
+    background-color: var(--color-brand);
     border-radius: 6px;
 }

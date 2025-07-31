@@ -1,6 +1,6 @@
 /* Salmon Fresh */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #F9FAFC;   /* Background */
     --color-surface:            #FFFFFF;   /* Panel/Card Surface */

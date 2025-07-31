@@ -1,6 +1,6 @@
 /* Sanskrit */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #22180F;   /* Panel Background */
     --color-surface:            #332416;   /* Panel/Card Surface */

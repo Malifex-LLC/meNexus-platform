@@ -5,7 +5,7 @@
  *─────────────────────────────────────────────────────────────────────────────*/
 
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #0A0A0A;   /* Panel Background */
     --color-surface:            #131313;   /* Panel/Card Surface */

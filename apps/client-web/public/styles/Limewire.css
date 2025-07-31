@@ -4,7 +4,7 @@
  * evoking mid-2000s file sharing chaos in premium UI form.       *
  *────────────────────────────────────────────────────────────────*/
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #1A1A1A;   /* Panel Background */
     --color-surface:            #262626;   /* Panel/Card Surface */

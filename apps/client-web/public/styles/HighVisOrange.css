@@ -1,6 +1,6 @@
 /* Hi-Vis Orange */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #0B0B0B;   /* Panel Background */
     --color-surface:            #1A1A1A;   /* Panel/Card Surface */

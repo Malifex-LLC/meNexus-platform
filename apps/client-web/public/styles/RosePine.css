@@ -1,6 +1,6 @@
 /* Rosé Pine */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #191724;   /* Panel Background */
     --color-surface:            #1f1d2e;   /* Panel/Card Surface */

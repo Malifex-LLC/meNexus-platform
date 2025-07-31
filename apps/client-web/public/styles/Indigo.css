@@ -1,6 +1,6 @@
 /* Indigo */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #0E0D19;   /* Panel Background */
     --color-surface:            #1B1A2A;   /* Panel/Card Surface */

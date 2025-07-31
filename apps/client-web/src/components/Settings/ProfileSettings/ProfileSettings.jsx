@@ -270,7 +270,7 @@ const ProfileSettings = () => {
                         />
                     )}
                     <button
-                        className={`w-md bg-brand hover:bg-primary active:bg-surface`}
+                        className={`w-md bg-brand hover:bg-primary active:bg-surface cursor-pointer`}
                         type="button"
                         onClick={handleProfilePictureUpload}
                     >

@@ -5,7 +5,7 @@
 @import 'tailwindcss';
 
 
-@import './styles/SalmonRoasted.css';
+@import '../public/styles/SalmonRoasted.css';
 
 #root {
   margin: 0;

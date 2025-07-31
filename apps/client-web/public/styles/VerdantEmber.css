@@ -1,6 +1,6 @@
 /* VerdantEmber */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #212121;   /* Panel Background */
     --color-surface:            #2A2A2A;   /* Panel/Card Surface */

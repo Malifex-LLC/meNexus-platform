@@ -1,6 +1,6 @@
 /* Enki */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #000000;   /* Panel Background */
     --color-surface:            #060606;   /* Panel/Card Surface */
