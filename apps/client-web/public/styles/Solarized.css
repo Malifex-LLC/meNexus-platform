@@ -1,6 +1,6 @@
 /* Solarized */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #002B36;   /* Panel Background */
     --color-surface:            #073642;   /* Panel/Card Surface */
@@ -36,7 +36,8 @@
 
 /* Solid Background */
 body {
-    background: #002B36;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
 }
 
 /* Gradient Background */

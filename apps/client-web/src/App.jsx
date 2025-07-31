@@ -16,7 +16,17 @@ import PostPage from "./pages/Post/PostPage.jsx";
 import DashboardPage from "./pages/Dashboard/DashboardPage.jsx";
 import ExplorePage from "./pages/Explore/ExplorePage.jsx";
 
+import {useEffect, useState} from 'react';
+import useThemeLoader from './api/hooks/useThemeLoader.js';
+
 function App() {
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'SalmonRoasted');
+
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+    useThemeLoader(theme);
+
     return (
         <div className="App">
             <BrowserRouter>

@@ -1,6 +1,6 @@
 /* Game Boy */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #8DA57B;   /* Panel Background */
     --color-surface:            #C4BEBB;   /* Panel/Card Surface */

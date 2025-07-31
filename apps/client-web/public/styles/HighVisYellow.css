@@ -1,6 +1,6 @@
 /* Hi-Vis Yellow */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #0E0E0E;   /* Panel Background */
     --color-surface:            #1A1A1A;   /* Panel/Card Surface */

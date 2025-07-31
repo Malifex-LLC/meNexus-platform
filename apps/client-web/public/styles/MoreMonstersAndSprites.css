@@ -4,7 +4,7 @@
  * original sound—more refined, but still feral.                               *
  *─────────────────────────────────────────────────────────────────────────────*/
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #050505;   /* Panel Background */
     --color-surface:            #121212;   /* Panel/Card Surface */

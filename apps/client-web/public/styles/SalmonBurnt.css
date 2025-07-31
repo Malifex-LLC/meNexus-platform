@@ -1,6 +1,6 @@
 /* Salmon Burnt */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #000000;   /* Panel Background */
     --color-surface:            #141414;   /* Panel/Card Surface */
@@ -36,7 +36,8 @@
 
 /* Solid Background */
 body {
-    background: #000000;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
 }
 
 /* Gradient Background */

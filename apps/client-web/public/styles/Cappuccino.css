@@ -1,6 +1,6 @@
 /* Cappuccino */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #4b3832;   /* Panel Background */
     --color-surface:            #3c2f2f;   /* Panel/Card Surface */

@@ -1,6 +1,6 @@
 /* Turbo Unicorn Confetti */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #FF66FF;   /* Panel Background */
     --color-surface:            #00FFEE;   /* Panel/Card Surface */

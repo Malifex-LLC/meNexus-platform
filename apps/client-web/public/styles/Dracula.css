@@ -1,6 +1,6 @@
 /* Dracula */
 
-@theme {
+:root {
     /* Foundations */
     --color-background:         #282A36;   /* Panel Background */
     --color-surface:            #343746;   /* Panel/Card Surface */
