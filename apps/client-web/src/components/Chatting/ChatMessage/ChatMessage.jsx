@@ -3,8 +3,30 @@
 
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../utils/dateUtils.js";
+import {useEffect, useState} from "react";
+import useGetUser from "../../../api/hooks/useGetUser.js";
 
 const ChatMessage = ({ message, isOwner }) => {
+    const [user, setUser] = useState(null);
+    const { getUser, loading: userLoading, error: userError } = useGetUser();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUser(message.public_key);
+                console.log('Fetched userData:', userData);
+                setUser(userData);
+            } catch (error) {
+                console.error("Error fetching userData: ", error);
+            }
+        }
+        fetchUserData();
+    }, [message])
+
+    if (!user) {
+        return
+    }
+
     return (
         <div
             className={`
@@ -14,7 +36,7 @@ const ChatMessage = ({ message, isOwner }) => {
         >
             {/* avatar */}
             <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${message.profilePicture}`}
+                src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                 alt={`${message.displayName}'s avatar`}
                 className="w-8 h-8 rounded-md object-cover shrink-0"
             />
@@ -46,7 +68,7 @@ const ChatMessage = ({ message, isOwner }) => {
                         isOwner ? "text-right" : ""
                     }`}
                 >
-          {formatDate(message.createdAt)}
+          {formatDate(message.created_at)}
         </span>
             </div>
         </div>

@@ -42,6 +42,9 @@ export const ENDPOINTS = {
     DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:commentId`,
     GET_COMMENTS: `${API_BASE_URL}/api/comment/getComments`,
 
+    CREATE_CHAT_MESSAGE: `${API_BASE_URL}/api/chat/createChatMessage`,
+    GET_CHANNEL_CHAT_MESSAGES: `${API_BASE_URL}/api/chat/getChannelChatMessages`,
+
     CREATE_CONVERSATION: `${API_BASE_URL}/api/conversation/createConversation`,
     UPDATE_CONVERSATION_PARTICIPANTS: `${API_BASE_URL}/api/conversation/updateConversationParticipants`,
     GET_CONVERSATIONS: `${API_BASE_URL}/api/conversation/getConversations`,

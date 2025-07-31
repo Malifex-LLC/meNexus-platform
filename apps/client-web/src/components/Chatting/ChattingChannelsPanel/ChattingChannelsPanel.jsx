@@ -4,9 +4,7 @@
 import Channel from '../ChattingChannel/Channel.jsx';
 import {useState} from "react";
 
-const ChattingChannelsPanel = () => {
-    const channels = ["Global", "meNexus Dev Chat", "Gaming", "Debate", "FTPm"];
-    const [activeChannel, setActiveChannel] = useState("Global");
+const ChattingChannelsPanel = ({channels, activeChannel, setActiveChannel}) => {
 
     return (
         <div className={''}>

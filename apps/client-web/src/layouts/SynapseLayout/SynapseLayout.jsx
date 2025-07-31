@@ -24,6 +24,7 @@ import useGetBoardPosts from "../../api/hooks/useGetBoardPosts.js";
 import useFetchRemoteBoardPosts from "../../api/hooks/useFetchRemoteBoardPosts.js";
 import useGetSynapsePostBoards from "../../api/hooks/useGetSynapsePostBoards.js";
 import useFetchRemoteSynapsePostBoards from "../../api/hooks/useFetchRemoteSynapsePostBoards.js";
+import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -39,13 +40,19 @@ const SynapseLayout =({ children }) => {
     const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
+    const channels = ["Global", "meNexus Dev Chat", "Gaming", "Debate", "FTPm"];
+    const [activeChannel, setActiveChannel] = useState("Global");
+    const [chatMessages, setChatMessages] = useState([]);
+
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
 
+
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { getSynapsePostBoards } = useGetSynapsePostBoards();
-    const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { getBoardPosts } = useGetBoardPosts();
+    const { getChannelChatMessages } = useGetChannelChatMessages();
+    const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
 
     useEffect(() => {
@@ -132,6 +139,29 @@ const SynapseLayout =({ children }) => {
         fetchSynapsePosts();
     },[synapsePublicKey, isLocalSynapse, synapseMetadata, activeBoard]);
 
+    useEffect(() => {
+        const fetchSynapseChatMessages = async () => {
+            if (!synapsePublicKey) {
+                return
+            }
+            if (isLocalSynapse) {
+                try {
+                    const channelChats = await getChannelChatMessages(activeChannel);
+                    setChatMessages(channelChats);
+                } catch (error) {
+                    console.error("Error fetching Synapse chat messages: ", error);
+                }
+            } else {
+                try {
+                    console.log('Fetching remote synapse chat messages...')
+                } catch (error) {
+                    console.error("Error fetching remote Synapse chat messages :", error);
+                }
+            }
+        }
+        fetchSynapseChatMessages();
+    }, [synapsePublicKey, isLocalSynapse, synapseMetadata, activeChannel])
+
 
     if (!user || !user.publicKey) {
         return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
@@ -207,7 +237,16 @@ const SynapseLayout =({ children }) => {
                                 </div>
                             ) : activeMiddlebarTab === "chat" ? (
                                 <div className={'flex w-full h-full shadow-2xl rounded-xl'}>
-                                    <ChatPanel synapsePublicKey={synapsePublicKey} />
+                                    <ChatPanel
+                                        isLocalSynapse={isLocalSynapse}
+                                        publicKey={sessionUser.publicKey}
+                                        synapsePublicKey={synapsePublicKey}
+                                        channels={channels}
+                                        activeChannel={activeChannel}
+                                        setActiveChannel={setActiveChannel}
+                                        chatMessages={chatMessages}
+                                        setChatMessages={setChatMessages}
+                                    />
                                 </div>
 
                             ) : (

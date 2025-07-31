@@ -19,6 +19,7 @@ import userRoutes         from './routes/userRoutes.js';
 import followerRoutes     from './routes/followerRoutes.js';
 import postRoutes         from './routes/postRoutes.js';
 import commentRoutes      from './routes/commentRoutes.js';
+import chatRoutes         from "#api/routes/chatRoutes.js";
 import conversationRoutes from './routes/conversationRoutes.js';
 import messageRoutes      from './routes/messageRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
@@ -56,6 +57,7 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     app.use('/api/follow',       followerRoutes);
     app.use('/api/post',         postRoutes);
     app.use('/api/comment',      commentRoutes);
+    app.use('/api/chat',         chatRoutes);
     app.use('/api/conversation', conversationRoutes);
     app.use('/api/message',      messageRoutes);
     app.use('/api/notification', notificationRoutes);
