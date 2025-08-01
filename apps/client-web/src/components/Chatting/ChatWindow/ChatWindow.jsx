@@ -17,7 +17,7 @@ const ChatWindow = ({ publicKey, chatMessages }) => {
                 // Final defer with small delay to ensure rendering is complete
                 timeout = setTimeout(() => {
                     bottomRef.current?.scrollIntoView({ behavior: "auto" }); // use "auto" instead of "smooth"
-                }, 50);
+                }, 100);
             });
         });
 
