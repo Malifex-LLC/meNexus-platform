@@ -10,19 +10,24 @@ const ChatWindow = ({ publicKey, chatMessages }) => {
 
     useEffect(() => {
         let frame1, frame2;
+        let timeout;
 
-        // Wait 2 frames to ensure layout is flushed
         frame1 = requestAnimationFrame(() => {
             frame2 = requestAnimationFrame(() => {
-                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+                // Final defer with small delay to ensure rendering is complete
+                timeout = setTimeout(() => {
+                    bottomRef.current?.scrollIntoView({ behavior: "auto" }); // use "auto" instead of "smooth"
+                }, 30); // ~1 frame at 60fps
             });
         });
 
         return () => {
             cancelAnimationFrame(frame1);
             cancelAnimationFrame(frame2);
+            clearTimeout(timeout);
         };
     }, [chatMessages]);
+
 
 
 
