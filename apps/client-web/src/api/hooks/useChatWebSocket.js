@@ -4,7 +4,7 @@ const useChatSocket = ({ publicKey, activeChannel, onMessage }) => {
     const socketRef = useRef(null);
 
     useEffect(() => {
-        const socket = new WebSocket(`ws://localhost:3001?publicKey=${publicKey}`);
+        const socket = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}?publicKey=${publicKey}`);
         socketRef.current = socket;
 
         socket.onopen = () => {

@@ -6,6 +6,8 @@ import { getUserByPublicKeyFromDB } from "#src/orbitdb/globalUsers.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {loadConfig} from "#utils/configUtils.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +24,7 @@ export const createWebSocketServer = (server) => {
     // TODO Not sure if WebSocket needs CORS
     // Configure WebSocket Server for CORS
     wss.on('headers', (headers, req) => {
-        headers.push('Access-Control-Allow-Origin: http://localhost:5173');
+        headers.push(`Access-Control-Allow-Origin: ${process.env.CORS_ORIGIN}`);
         headers.push('Access-Control-Allow-Credentials: true');
     });
 
