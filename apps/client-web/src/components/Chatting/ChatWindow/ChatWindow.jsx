@@ -1,4 +1,5 @@
-// ChatWindow.jsx
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
 
 import { useEffect, useRef } from "react";
 import ChatMessage from "../ChatMessage/ChatMessage.jsx";
@@ -10,11 +11,9 @@ const ChatWindow = ({ publicKey, chatMessages }) => {
     useEffect(() => {
         const timeout = setTimeout(() => {
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 1000); // allow DOM/layout to fully settle
-
+        }, 10);
         return () => clearTimeout(timeout);
     }, [chatMessages]);
-
 
     return (
         <div

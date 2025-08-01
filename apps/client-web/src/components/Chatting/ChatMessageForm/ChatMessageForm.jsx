@@ -36,6 +36,12 @@ const ChatMessageForm = ({publicKey, activeChannel, sendMessage}) => {
                     className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault(); // Prevent newline
+                            handleSubmit();
+                        }
+                    }}
                 />
             </div>
             <button className="message-form__button text-2xl text-foreground " onClick={handleSubmit} disabled={loading}>
