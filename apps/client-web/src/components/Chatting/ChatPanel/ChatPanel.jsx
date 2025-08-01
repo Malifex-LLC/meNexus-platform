@@ -13,7 +13,6 @@ const ChatPanel = ({isLocalSynapse, publicKey, synapsePublicKey, channels, activ
         activeChannel,
         onMessage: (message) => {
             console.log('WebSocket message received:', message);
-            setActiveChannel(message.activeChannel);
             setChatMessages(prev => [message, ...prev]);
         }
     });

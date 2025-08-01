@@ -81,7 +81,7 @@ export const createWebSocketServer = (server) => {
                             client.send(JSON.stringify({
                                 type: 'newChatMessage',
                                 message: enriched,
-                                activeChannel,
+                                activeChannel: activeChannel,
                             }));
                         }
                     }
