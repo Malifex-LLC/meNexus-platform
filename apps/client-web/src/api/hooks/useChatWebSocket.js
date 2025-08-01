@@ -25,7 +25,7 @@ const useChatSocket = ({ publicKey, activeChannel, onMessage }) => {
         return () => {
             socket.close();
         };
-    }, [publicKey]);
+    }, [publicKey, activeChannel]);
 
     const sendMessage = (msg) => {
         if (socketRef.current?.readyState === WebSocket.OPEN) {
