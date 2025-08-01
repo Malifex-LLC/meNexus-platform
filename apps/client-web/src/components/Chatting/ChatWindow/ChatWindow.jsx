@@ -9,11 +9,22 @@ const ChatWindow = ({ publicKey, chatMessages }) => {
     const bottomRef = useRef(null);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 10);
-        return () => clearTimeout(timeout);
+        let frame1, frame2;
+
+        // Wait 2 frames to ensure layout is flushed
+        frame1 = requestAnimationFrame(() => {
+            frame2 = requestAnimationFrame(() => {
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            });
+        });
+
+        return () => {
+            cancelAnimationFrame(frame1);
+            cancelAnimationFrame(frame2);
+        };
     }, [chatMessages]);
+
+
 
     return (
         <div
