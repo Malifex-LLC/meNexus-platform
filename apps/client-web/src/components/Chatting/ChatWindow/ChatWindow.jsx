@@ -9,29 +9,24 @@ const ChatWindow = ({ publicKey, chatMessages }) => {
     const bottomRef = useRef(null);
 
     useEffect(() => {
-        let frame1, frame2, timeout1, timeout2;
+        let frame1, frame2;
+        let timeout;
 
         frame1 = requestAnimationFrame(() => {
             frame2 = requestAnimationFrame(() => {
-                timeout1 = setTimeout(() => {
-                    bottomRef.current?.scrollIntoView({ behavior: "auto" });
-
-                    // Scroll again in case layout shifted
-                    timeout2 = setTimeout(() => {
-                        bottomRef.current?.scrollIntoView({ behavior: "auto" });
-                    }, 100); // delay just enough for any remaining layout work
-                }, 30);
+                // Final defer with small delay to ensure rendering is complete
+                timeout = setTimeout(() => {
+                    bottomRef.current?.scrollIntoView({ behavior: "auto" }); // use "auto" instead of "smooth"
+                }, 50);
             });
         });
 
         return () => {
             cancelAnimationFrame(frame1);
             cancelAnimationFrame(frame2);
-            clearTimeout(timeout1);
-            clearTimeout(timeout2);
+            clearTimeout(timeout);
         };
     }, [chatMessages]);
-
 
 
 
