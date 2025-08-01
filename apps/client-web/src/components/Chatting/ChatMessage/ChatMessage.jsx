@@ -30,7 +30,7 @@ const ChatMessage = ({ message, isOwner }) => {
     return (
         <div
             className={`
-        flex items-end gap-2 shadow-2xl
+        flex items-end gap-2 shadow-2xl 
         ${isOwner ? "flex-row-reverse" : "flex-row"}
       `}
         >
@@ -46,8 +46,8 @@ const ChatMessage = ({ message, isOwner }) => {
                 className={`
           relative max-w-md px-3 py-2 rounded-lg  leading-snug
           ${isOwner
-                    ? "bg-brand text-foreground-message after:border-l-brand"
-                    : "bg-surface text-foreground after:border-r-surface"}
+                    ? "bg-brand text-foreground-message-owner after:border-l-brand"
+                    : "bg-surface text-foreground-message after:border-r-surface"}
           after:content-[''] after:absolute after:-bottom-1
           ${isOwner
                     ? "after:-right-1 after:border-l-8 after:border-t-8 after:border-l-transparent after:border-t-transparent"
@@ -61,7 +61,10 @@ const ChatMessage = ({ message, isOwner }) => {
                     {message.displayName}
                 </Link>
 
-                <p className="text-xl whitespace-pre-wrap break-words">{message.content}</p>
+                <p className={`text-xl whitespace-pre-wrap break-words`}
+                >
+                    {message.content}
+                </p>
 
                 <span
                     className={`block mt-1 text-[10px] opacity-60 ${

@@ -12,6 +12,7 @@
     /* Typography */
     --color-foreground:         #F8F8F8;   /* Primary Text */
     --color-foreground-message: #F8F8F8;   /* Text for Chat/Direct Messages */
+    --color-foreground-message-owner: #0B0B0B;   /* Text for Chat/Direct Messages */
     --color-neutral:            #B5B5B5;   /* Secondary Labels */
 
     /* Brand & Accents */
