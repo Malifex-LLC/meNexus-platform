@@ -10,5 +10,6 @@ import synapseController from "#api/controllers/synapseController.js";
 router.get('/getSynapseMetadata', synapseController.getSynapseMetadata);
 router.get('/getAllDiscoveredPeers', synapseController.getAllDiscoveredPeers);
 router.get('/getSynapsePostBoards', synapseController.getSynapsePostBoards);
+router.get('/getSynapseChatChannels', synapseController.getSynapseChatChannels);
 
 export default router;

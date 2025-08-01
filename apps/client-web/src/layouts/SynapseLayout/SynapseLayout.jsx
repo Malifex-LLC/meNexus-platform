@@ -25,6 +25,7 @@ import useFetchRemoteBoardPosts from "../../api/hooks/useFetchRemoteBoardPosts.j
 import useGetSynapsePostBoards from "../../api/hooks/useGetSynapsePostBoards.js";
 import useFetchRemoteSynapsePostBoards from "../../api/hooks/useFetchRemoteSynapsePostBoards.js";
 import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages.js";
+import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -40,8 +41,8 @@ const SynapseLayout =({ children }) => {
     const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
-    const channels = ["Global", "meNexus Dev Chat", "Gaming", "Debate", "FTPm"];
-    const [activeChannel, setActiveChannel] = useState("Global");
+    const [channels, setChannels] = useState([]);
+    const [activeChannel, setActiveChannel] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
 
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
@@ -51,6 +52,7 @@ const SynapseLayout =({ children }) => {
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { getSynapsePostBoards } = useGetSynapsePostBoards();
     const { getBoardPosts } = useGetBoardPosts();
+    const { getSynapseChatChannels } = useGetSynapseChatChannels();
     const { getChannelChatMessages } = useGetChannelChatMessages();
     const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
@@ -94,6 +96,9 @@ const SynapseLayout =({ children }) => {
                     const synapseBoards = await getSynapsePostBoards();
                     setBoards(synapseBoards)
                     setActiveBoard(synapseBoards[0])
+                    const synapseChannels = await getSynapseChatChannels();
+                    setChannels(synapseChannels);
+                    setActiveChannel(synapseChannels[0])
                 } else {
                     try {
                         const synapseMetadataResponse = await fetchRemoteSynapseMetadata(synapsePublicKey);

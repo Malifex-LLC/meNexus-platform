@@ -43,8 +43,20 @@ export const getSynapsePostBoards = async (req, res) => {
     }
 }
 
+export const getSynapseChatChannels = async (req, res) => {
+    try {
+        const config = await loadConfig(CONFIG_FILE);
+        const boards = config.channels;
+        res.status(200).json(boards);
+    } catch (err) {
+        console.error('Error fetching chat channels:', err);
+        res.status(500).json({error: 'Failed to fetch chat channels'});
+    }
+}
+
 export default {
     getSynapseMetadata,
     getAllDiscoveredPeers,
-    getSynapsePostBoards
+    getSynapsePostBoards,
+    getSynapseChatChannels
 }
