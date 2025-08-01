@@ -44,7 +44,7 @@ const ChatMessage = ({ message, isOwner }) => {
             {/* bubble */}
             <div
                 className={`
-          relative max-w-xs px-3 py-2 rounded-lg text-sm leading-snug
+          relative max-w-md px-3 py-2 rounded-lg  leading-snug
           ${isOwner
                     ? "bg-brand text-foreground-message after:border-l-brand"
                     : "bg-surface text-foreground after:border-r-surface"}
@@ -56,12 +56,12 @@ const ChatMessage = ({ message, isOwner }) => {
             >
                 <Link
                     to={`/profile/${message.handle}`}
-                    className="font-semibold hover:underline"
+                    className="text-md font-semibold hover:underline"
                 >
                     {message.displayName}
                 </Link>
 
-                <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                <p className="text-xl whitespace-pre-wrap break-words">{message.content}</p>
 
                 <span
                     className={`block mt-1 text-[10px] opacity-60 ${
