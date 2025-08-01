@@ -36,7 +36,7 @@ export const getChannelChatMessages = async (channel) => {
             SELECT *
             FROM ChatMessages
             WHERE ChatMessages.channel = ?
-            ORDER BY ChatMessages.created_at DESC
+            ORDER BY ChatMessages.created_at 
         `;
         meNexus.query(query, channel, async (err, results) => {
             if (err) {
