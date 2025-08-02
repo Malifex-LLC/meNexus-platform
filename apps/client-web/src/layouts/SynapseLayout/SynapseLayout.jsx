@@ -26,6 +26,7 @@ import useGetSynapsePostBoards from "../../api/hooks/useGetSynapsePostBoards.js"
 import useFetchRemoteSynapsePostBoards from "../../api/hooks/useFetchRemoteSynapsePostBoards.js";
 import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages.js";
 import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
+import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -56,6 +57,7 @@ const SynapseLayout =({ children }) => {
     const { getChannelChatMessages } = useGetChannelChatMessages();
     const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
+    const { fetchRemoteSynapseChatChannels } = useFetchRemoteSynapseChatChannels();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -107,6 +109,9 @@ const SynapseLayout =({ children }) => {
                         const synapseBoards = await fetchRemoteSynapsePostBoards(synapsePublicKey);
                         setBoards(synapseBoards);
                         setActiveBoard(synapseBoards[0])
+                        const synapseChannels = await fetchRemoteSynapseChatChannels(synapsePublicKey);
+                        setChannels(synapseChannels);
+                        setActiveChannel(synapseChannels[0])
                     } catch (error) {
                         console.error("Error fetching remote Synapse data: ", error);
                     }

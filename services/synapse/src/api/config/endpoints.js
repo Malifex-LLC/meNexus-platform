@@ -73,6 +73,7 @@ export const ENDPOINTS = {
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
     FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
+    FETCH_REMOTE_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/remote/fetchRemoteSynapseChatChannels`,
     FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
     FETCH_REMOTE_BOARD_POSTS: `${API_BASE_URL}/remote/getRemoteBoardPosts`,
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,

@@ -5,7 +5,7 @@ import scrollbar from 'tailwind-scrollbar';
 
 export default {
     content: [
-        "./src/**/*.{js,jsx,ts,tsx}", // or wherever your files live
+        "./src/**/*.{js,jsx,ts,tsx}",
     ],
     safelist: [
         'text-foreground-alt',

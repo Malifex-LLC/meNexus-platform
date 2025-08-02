@@ -89,7 +89,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                             </p>
                             {isSynapseMember ? (
                                 <button
-                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:cursor-pointer`}
+                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:text-foreground-alt hover:cursor-pointer`}
                                     onClick={async () => {
                                         await leaveSynapse(publicKey, synapsePublicKey);
                                         setIsSynapseMember(false);
