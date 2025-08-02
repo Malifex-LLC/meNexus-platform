@@ -7,6 +7,7 @@ import remoteSynapseController from '#remotes/controllers/remoteSynapseControlle
 import remoteUserController from "#remotes/controllers/remoteUserController.js";
 import remotePostController from "#remotes/controllers/remotePostController.js"
 import remoteCommentController from "#remotes/controllers/remoteCommentController.js";
+import remoteChatController from "#remotes/controllers/remoteChatController.js";
 
 // Define synapseRoutes and link them to corresponding controller functions
 
