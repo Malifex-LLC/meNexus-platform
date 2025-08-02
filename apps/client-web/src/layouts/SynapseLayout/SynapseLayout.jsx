@@ -27,6 +27,7 @@ import useFetchRemoteSynapsePostBoards from "../../api/hooks/useFetchRemoteSynap
 import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages.js";
 import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
 import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
+import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelChats.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -58,6 +59,7 @@ const SynapseLayout =({ children }) => {
     const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
     const { fetchRemoteSynapseChatChannels } = useFetchRemoteSynapseChatChannels();
+    const { fetchRemoteChannelChats } = useFetchRemoteChannelChats();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -163,7 +165,8 @@ const SynapseLayout =({ children }) => {
                 }
             } else {
                 try {
-                    console.log('Fetching remote synapse chat messages...')
+                    const channelChats = await fetchRemoteChannelChats(synapsePublicKey, activeChannel);
+                    setChatMessages(channelChats);
                 } catch (error) {
                     console.error("Error fetching remote Synapse chat messages :", error);
                 }

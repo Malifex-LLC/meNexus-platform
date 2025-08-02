@@ -16,13 +16,13 @@ const useFetchRemoteChannelChats = () => {
             params: {synapsePublicKey, board},
             withCredentials: true,
         });
-
-        return response.data;
+        console.log('fetchRemoteChannelChats response ', response);
+        return response.data.chats;
     };
 
     return {
         fetchRemoteChannelChats,
-        posts: data,
+        data,
         loading,
         error};
 };
