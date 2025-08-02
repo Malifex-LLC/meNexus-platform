@@ -202,7 +202,7 @@ export const handleData = async (libp2p, message) => {
                         const chatsResponse = createMessage(
                             MESSAGE_TYPES.DATA.RESPONSE,
                             ACTION_TYPES.DATA.AGGREGATE,
-                            RESOURCE_TYPES.BOARD_POSTS,
+                            RESOURCE_TYPES.CHANNEL_CHATS,
                             { chats },
                             {
                                 sender: libp2p.peerId.toString(),

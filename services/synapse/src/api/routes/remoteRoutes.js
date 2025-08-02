@@ -31,7 +31,7 @@ router.post('/createRemotePostComment', remoteCommentController.createRemotePost
 router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
 router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
 
-router.get('/fetchRemoteChannelPosts', remoteChatController.fetchRemoteChannelChats);
+router.get('/fetchRemoteChannelChats', remoteChatController.fetchRemoteChannelChats);
 
 
 
