@@ -14,7 +14,7 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
             </div>
 
             {boards.map((board) => (
-                <button                       /* button = semantic + focus support  */
+                <button
                     key={board}
                     onClick={() => setActiveBoard(board)}
                     className={`

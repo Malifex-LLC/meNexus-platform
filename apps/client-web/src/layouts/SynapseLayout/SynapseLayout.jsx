@@ -42,7 +42,7 @@ const SynapseLayout =({ children }) => {
     const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
-    const [channels, setChannels] = useState([]);
+    const [channels, setChannels] = useState(null);
     const [activeChannel, setActiveChannel] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
 
@@ -179,6 +179,10 @@ const SynapseLayout =({ children }) => {
 
     if (!boards) {
         return <div className={'bg-background text-foreground'}>Loading Synapse boards...</div>
+    }
+
+    if (!channels) {
+        return <div className={'bg-background text-foreground'}>Loading Synapse channels...</div>
     }
 
 

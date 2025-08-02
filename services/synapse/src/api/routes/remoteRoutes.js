@@ -30,6 +30,8 @@ router.post('/createRemotePostComment', remoteCommentController.createRemotePost
 router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
 router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
 
+router.get('/fetchRemoteChannelPosts', remoteChatController.fetchRemoteChannelChats);
+
 
 
 // Export the router so it can be used in server.js

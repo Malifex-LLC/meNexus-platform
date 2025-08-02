@@ -17,8 +17,8 @@ const useFetchRemoteSynapseChatChannels = () => {
             params: { synapsePublicKey },
             withCredentials: true,
         });
-
-        return response.data;
+        console.log("fetchRemoteSynapseChatChannels response", response);
+        return response.data.chatChannels;
     };
 
     return {

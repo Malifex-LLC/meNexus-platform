@@ -85,6 +85,7 @@ export const ENDPOINTS = {
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
     UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
     DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
+    FETCH_REMOTE_CHANNEL_CHATS: `${API_BASE_URL}/remote/fetchRemoteChannelChats`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
     LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
 };
