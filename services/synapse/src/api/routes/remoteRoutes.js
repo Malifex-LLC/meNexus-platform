@@ -14,7 +14,7 @@ router.get('/fetchRemoteSynapseMetadata', remoteSynapseController.fetchRemoteSyn
 router.post('/joinSynapse', remoteSynapseController.joinSynapse);
 router.post('/leaveSynapse', remoteSynapseController.leaveSynapse);
 router.get('/fetchRemoteSynapsePostBoards', remoteSynapseController.fetchRemoteSynapsePostBoards);
-
+router.get('/fetchRemoteSynapseChatChannels', remoteSynapseController.fetchRemoteSynapseChatChannels);
 
 router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 

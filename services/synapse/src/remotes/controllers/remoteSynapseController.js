@@ -144,6 +144,7 @@ export const leaveSynapse = async (req, res) => {
 export default {
     fetchRemoteSynapseMetadata,
     fetchRemoteSynapsePostBoards,
+    fetchRemoteSynapseChatChannels,
     joinSynapse,
     leaveSynapse,
 }
