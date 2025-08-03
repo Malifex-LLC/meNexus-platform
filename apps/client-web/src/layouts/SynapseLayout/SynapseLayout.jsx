@@ -255,6 +255,7 @@ const SynapseLayout =({ children }) => {
                             ) : activeMiddlebarTab === "chat" ? (
                                 <div className={'flex w-full h-full shadow-2xl rounded-xl'}>
                                     <ChatPanel
+                                        key={synapseMetadata?.identity?.publicKey}
                                         synapseMetadata={synapseMetadata}
                                         publicKey={sessionUser.publicKey}
                                         channels={channels}
