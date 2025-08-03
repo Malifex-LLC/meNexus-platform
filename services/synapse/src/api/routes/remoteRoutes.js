@@ -7,6 +7,7 @@ import remoteSynapseController from '#remotes/controllers/remoteSynapseControlle
 import remoteUserController from "#remotes/controllers/remoteUserController.js";
 import remotePostController from "#remotes/controllers/remotePostController.js"
 import remoteCommentController from "#remotes/controllers/remoteCommentController.js";
+import remoteChatController from "#remotes/controllers/remoteChatController.js";
 
 // Define synapseRoutes and link them to corresponding controller functions
 
@@ -14,7 +15,7 @@ router.get('/fetchRemoteSynapseMetadata', remoteSynapseController.fetchRemoteSyn
 router.post('/joinSynapse', remoteSynapseController.joinSynapse);
 router.post('/leaveSynapse', remoteSynapseController.leaveSynapse);
 router.get('/fetchRemoteSynapsePostBoards', remoteSynapseController.fetchRemoteSynapsePostBoards);
-
+router.get('/fetchRemoteSynapseChatChannels', remoteSynapseController.fetchRemoteSynapseChatChannels);
 
 router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 
@@ -29,6 +30,8 @@ router.delete('/deleteRemotePost', remotePostController.deleteRemotePost);
 router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
 router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
 router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
+
+router.get('/fetchRemoteChannelChats', remoteChatController.fetchRemoteChannelChats);
 
 
 

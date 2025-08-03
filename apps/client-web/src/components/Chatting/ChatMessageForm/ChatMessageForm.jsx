@@ -1,27 +1,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import {useState} from "react";
-import useCreateMessage from "../../../api/hooks/useCreateMessage.js";
-import {IoSend} from "react-icons/io5";
+import { useEffect, useState, useRef } from "react";
+import { IoSend } from "react-icons/io5";
+import useCreateChatMessage from "../../../api/hooks/useCreateChatMessage.js";
+import useChatWebSocket  from '../../../api/hooks/useChatWebSocket.js';
 
-const ChatMessageForm = () => {
+const ChatMessageForm = ({publicKey, activeChannel, sendMessage}) => {
     const [text, setText] = useState(`New Message`);
     const [formClicked, setFormClicked] = useState(false);
-    const [expanded, setExpanded] = useState(false);
+    const { createChatMessage, loading, error } = useCreateChatMessage();
 
-    const { createMessage, loading, error } = useCreateMessage(() => refreshMessages());
-
-    const handleSubmit = async () => {
-        if (!text.trim()) return; // Avoid sending empty messages
-        const message = {
-            participant_id: participant_id,
-            content: text,
-        };
-        console.log("Submitting message:", message);
-        await createMessage(conversation_id, message);
-        setText(""); // Reset the text field after submission
-        await refreshMessages(getMessages, conversation_id, setMessages); // Refresh messages
+    const handleSubmit = () => {
+        if (!text.trim()) return;
+        sendMessage({
+            type: 'chatMessage',
+            publicKey: publicKey,
+            activeChannel: activeChannel,
+            content: text
+        });
+        setText('');
     };
 
     const handleFormClick = () => {
@@ -38,6 +36,12 @@ const ChatMessageForm = () => {
                     className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault(); // Prevent newline
+                            handleSubmit();
+                        }
+                    }}
                 />
             </div>
             <button className="message-form__button text-2xl text-foreground " onClick={handleSubmit} disabled={loading}>

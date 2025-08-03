@@ -75,7 +75,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
 
     return (
 
-        <div className=" py-2 px-4 rounded-xl bg-background text-foreground ">
+        <div className=" py-2 px-4 rounded-xl bg-background">
             <div>
                 {currentSynapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">
@@ -89,7 +89,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                             </p>
                             {isSynapseMember ? (
                                 <button
-                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:cursor-pointer`}
+                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:text-foreground-alt hover:cursor-pointer`}
                                     onClick={async () => {
                                         await leaveSynapse(publicKey, synapsePublicKey);
                                         setIsSynapseMember(false);
@@ -99,7 +99,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 </button>
                             ) : (
                                 <button
-                                    className={`px-1 mt-1 text-foreground bg-brand rounded-xl hover:bg-primary hover:cursor-pointer`}
+                                    className={`px-1 mt-1 text-foreground-alt bg-brand rounded-xl hover:bg-primary hover:cursor-pointer`}
                                     onClick={async () => {
                                         await joinSynapse(publicKey, synapsePublicKey);
                                         setIsSynapseMember(true);

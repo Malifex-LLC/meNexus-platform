@@ -5,7 +5,12 @@ import scrollbar from 'tailwind-scrollbar';
 
 export default {
     content: [
-        "./src/**/*.{js,jsx,ts,tsx}", // or wherever your files live
+        "./src/**/*.{js,jsx,ts,tsx}",
+    ],
+    safelist: [
+        'text-foreground-alt',
+        'text-foreground-message',
+        'text-foreground-message-owner'
     ],
     plugins: [
         scrollbar(),
@@ -18,6 +23,10 @@ export default {
                 border: 'rgb(var(--color-border) / <alpha-value>)',
                 'header-bg': 'rgb(var(--color-header-bg) / <alpha-value>)',
                 foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
+                'foreground-alt': 'rgb(var(--color-foreground-alt) / <alpha-value>)',
+                'foreground-message': 'rgb(var(--color-foreground-message) / <alpha-value>)',
+                'foreground-message-owner': 'rgb(var(--color-foreground-message-owner) / <alpha-value>)',
+                owner: 'rgb(var(--color-owner) / <alpha-value>)',
                 neutral: 'rgb(var(--color-neutral) / <alpha-value>)',
                 brand: 'rgb(var(--color-brand) / <alpha-value>)',
                 primary: 'rgb(var(--color-primary) / <alpha-value>)',

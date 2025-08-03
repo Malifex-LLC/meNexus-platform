@@ -71,6 +71,34 @@ export const handleData = async (libp2p, message) => {
                         }
 
                     }
+                    if (message.resourceType === RESOURCE_TYPES.SYNAPSE_CHAT_CHANNELS) {
+                        console.log(`Received SYNAPSE_CHAT_CHANNELS request from ${message.meta.sender}.`);
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_SYNAPSE_CHAT_CHANNELS,
+                            withCredentials: true,
+                        });
+                        console.log("GET_SYNAPSE_CHAT_CHANNELS response ", response);
+                        const chatChannels = response.data;
+
+                        const chatChannelsResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.SYNAPSE_CHAT_CHANNELS,
+                            { chatChannels },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, chatChannelsResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+
+                    }
                     if (message.resourceType === RESOURCE_TYPES.ALL_USERS) {
                         console.log(`Received ALL_USERS request from ${message.meta.sender}.`);
                         const response = await sendRequest({
@@ -154,6 +182,36 @@ export const handleData = async (libp2p, message) => {
                         const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
                         if (peerId) {
                             await sendMessage(peerId, postsResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.CHANNEL_CHATS) {
+                        console.log(`Received CHANNEL_CHATS request from ${message.meta.sender}.`);
+                        const { channel } = message.payload;
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_CHANNEL_CHAT_MESSAGES,
+                            params: { channel },
+                            withCredentials: true,
+                        });
+
+                        console.log("GET_CHANNEL_CHATS response ", response);
+                        const chats = response.data;
+
+                        const chatsResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.CHANNEL_CHATS,
+                            { chats },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, chatsResponse);
                         } else {
                             console.warn('Cannot map publicKey to peerId - response not sent.');
                         }

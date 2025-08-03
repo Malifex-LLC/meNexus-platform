@@ -44,6 +44,9 @@ export const ENDPOINTS = {
     DELETE_COMMENT: `${API_BASE_URL}/api/comment/deleteComment/:commentId`,
     GET_COMMENTS: `${API_BASE_URL}/api/comment/getComments`,
 
+    CREATE_CHAT_MESSAGE: `${API_BASE_URL}/api/chat/createChatMessage`,
+    GET_CHANNEL_CHAT_MESSAGES: `${API_BASE_URL}/api/chat/getChannelChatMessages`,
+
     CREATE_CONVERSATION: `${API_BASE_URL}/api/conversation/createConversation`,
     UPDATE_CONVERSATION_PARTICIPANTS: `${API_BASE_URL}/api/conversation/updateConversationParticipants`,
     GET_CONVERSATIONS: `${API_BASE_URL}/api/conversation/getConversations`,
@@ -62,6 +65,7 @@ export const ENDPOINTS = {
 
     GET_SYNAPSE_METADATA: `${API_BASE_URL}/api/synapse/getSynapseMetadata`,
     GET_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/api/synapse/getSynapsePostBoards`,
+    GET_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/api/synapse/getSynapseChatChannels`,
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
 
 
@@ -69,6 +73,7 @@ export const ENDPOINTS = {
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
     FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
+    FETCH_REMOTE_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/remote/fetchRemoteSynapseChatChannels`,
     FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
     FETCH_REMOTE_BOARD_POSTS: `${API_BASE_URL}/remote/getRemoteBoardPosts`,
     FETCH_REMOTE_USER_POSTS: `${API_BASE_URL}/remote/getRemoteUserPosts`,
@@ -80,6 +85,7 @@ export const ENDPOINTS = {
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
     UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
     DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
+    FETCH_REMOTE_CHANNEL_CHATS: `${API_BASE_URL}/remote/fetchRemoteChannelChats`,
     JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
     LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
 };

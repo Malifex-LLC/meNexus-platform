@@ -4,20 +4,46 @@
 import ChatMessageForm from "../ChatMessageForm/ChatMessageForm.jsx";
 import ChattingChannelsPanel from "../ChattingChannelsPanel/ChattingChannelsPanel.jsx";
 import ChatWindow from "../ChatWindow/ChatWindow.jsx";
+import useChatWebSocket from "../../../api/hooks/useChatWebSocket.js";
 
-const ChatPanel = () => {
+const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActiveChannel, chatMessages, setChatMessages}) => {
+
+    const { sendMessage } = useChatWebSocket({
+        wsUrl: synapseMetadata.identity.webSocketUrl,
+        publicKey,
+        activeChannel,
+        onMessage: (message) => {
+            console.log('WebSocket message received:', message);
+            setChatMessages(prev => [...prev, message]);
+        }
+    });
+
     return (
         <div className="flex flex-col w-full h-full text-foreground  ">
             <div className="flex flex-row flex-1 min-h-0 p-4 gap-4 ">
                 <div className="w-1/5 h-full overflow-y-auto p-4 border border-border shadow-2xl rounded-xl bg-background">
-                    <ChattingChannelsPanel />
+                    <ChattingChannelsPanel
+                        channels={channels}
+                        activeChannel={activeChannel}
+                        setActiveChannel={setActiveChannel}
+                    />
                 </div>
                 <div className={'relative flex flex-col w-full'}>
                     <div className="flex-1 h-full overflow-y-auto border border-border shadow-lg rounded-xl">
-                        <ChatWindow />
+                        <ChatWindow
+                            publicKey={publicKey}
+                            activeChannel={activeChannel}
+                            setActiveChannel={setActiveChannel}
+                            chatMessages={chatMessages}
+                            setChatMessages={setChatMessages}
+                        />
                     </div>
                     <div className="p-4 mt-2 border border-border bg-background shadow-2xl rounded-xl">
-                        <ChatMessageForm />
+                        <ChatMessageForm
+                            publicKey={publicKey}
+                            activeChannel={activeChannel}
+                            sendMessage={sendMessage}
+                        />
                     </div>
                 </div>
             </div>
