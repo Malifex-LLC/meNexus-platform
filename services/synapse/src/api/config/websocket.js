@@ -70,7 +70,7 @@ export const createWebSocketServer = (server) => {
                     console.log('Current connected clients:', clients.size);
                     for (const [id, client] of clients.entries()) {
                         console.log(`Client ${id} state:`, client.readyState);
-                        if (client.readyState === WebSocket.open && client.activeChannel === activeChannel) {
+                        if (client.readyState === WebSocket.open) {
                             console.log("Broadcasting message to channel:", activeChannel);
                             client.send(JSON.stringify({
                                 type: 'newChatMessage',
