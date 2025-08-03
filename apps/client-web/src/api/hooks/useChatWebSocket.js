@@ -39,7 +39,7 @@ const useChatSocket = ({ wsUrl, publicKey, activeChannel, onMessage }) => {
         return () => {
             socket.close();
         };
-    }, [publicKey]); // Only re-run if publicKey changes
+    }, [publicKey, wsUrl]); // Only re-run if publicKey changes
 
     // Re-send activeChannel when it changes
     useEffect(() => {
