@@ -6,9 +6,10 @@ import ChattingChannelsPanel from "../ChattingChannelsPanel/ChattingChannelsPane
 import ChatWindow from "../ChatWindow/ChatWindow.jsx";
 import useChatWebSocket from "../../../api/hooks/useChatWebSocket.js";
 
-const ChatPanel = ({isLocalSynapse, publicKey, synapsePublicKey, channels, activeChannel, setActiveChannel, chatMessages, setChatMessages}) => {
+const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActiveChannel, chatMessages, setChatMessages}) => {
 
     const { sendMessage } = useChatWebSocket({
+        wsUrl: synapseMetadata.identity.webSocketUrl,
         publicKey,
         activeChannel,
         onMessage: (message) => {

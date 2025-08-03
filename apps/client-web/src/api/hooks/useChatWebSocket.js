@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const useChatSocket = ({ publicKey, activeChannel, onMessage }) => {
+const useChatSocket = ({ wsUrl, publicKey, activeChannel, onMessage }) => {
     const socketRef = useRef(null);
     const activeChannelRef = useRef(activeChannel);
 
@@ -9,7 +9,7 @@ const useChatSocket = ({ publicKey, activeChannel, onMessage }) => {
     }, [activeChannel]);
 
     useEffect(() => {
-        const socket = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}?publicKey=${publicKey}`);
+        const socket = new WebSocket(`${wsUrl}?publicKey=${publicKey}`);
         socketRef.current = socket;
 
         socket.onopen = () => {

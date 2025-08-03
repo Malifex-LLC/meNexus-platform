@@ -15,18 +15,12 @@ const __dirname = path.dirname(__filename);
 
 const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 import { WebSocketServer } from "ws";
+
 // Store connected clients
 export const clients = new Map();
 
 export const createWebSocketServer = (server) => {
     const wss = new WebSocketServer({ noServer: true });
-
-    // TODO Not sure if WebSocket needs CORS
-    // Configure WebSocket Server for CORS
-    wss.on('headers', (headers, req) => {
-        headers.push(`Access-Control-Allow-Origin: ${process.env.CORS_ORIGIN}`);
-        headers.push('Access-Control-Allow-Credentials: true');
-    });
 
     wss.on('connection', (ws, request) => {
         const publicKey = ws.publicKey
@@ -76,7 +70,7 @@ export const createWebSocketServer = (server) => {
                     console.log('Current connected clients:', clients.size);
                     for (const [id, client] of clients.entries()) {
                         console.log(`Client ${id} state:`, client.readyState);
-                        if (client.readyState === 1) {
+                        if (client.readyState === WebSocket.open && client.activeChannel === activeChannel) {
                             console.log("Broadcasting message to channel:", activeChannel);
                             client.send(JSON.stringify({
                                 type: 'newChatMessage',
@@ -86,7 +80,10 @@ export const createWebSocketServer = (server) => {
                         }
                     }
                 }
-
+                if (parsed.type === 'setChannel') {
+                    ws.activeChannel = parsed.activeChannel;
+                    console.log(`User ${parsed.publicKey} subscribed to channel ${ws.activeChannel}`);
+                }
             } catch (err) {
                 console.error("Error processing WebSocket message:", err);
             }
