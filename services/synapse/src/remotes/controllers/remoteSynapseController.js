@@ -134,6 +134,7 @@ export const joinRemoteSynapse = async (req, res) => {
 
 export const leaveRemoteSynapse = async (req, res) => {
     const {publicKey, synapsePublicKey} = req.query;
+    console.log('leaveRemoteSynapse request publicKey: ', publicKey, ' synapsePublicKey: ', synapsePublicKey);
     if (!publicKey || !synapsePublicKey) {
         return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});
     }
