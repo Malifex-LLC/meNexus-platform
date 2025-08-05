@@ -45,7 +45,7 @@ export const getSynapseMembers = async (req, res) => {
 }
 
 export const joinSynapse = async (req, res) => {
-    const { publicKey } = req.body;
+    const { publicKey } = req.query;
     if (!publicKey) {
         return res.status(401).json({error: 'No user publicKey provided.'});
     }
@@ -68,7 +68,7 @@ export const joinSynapse = async (req, res) => {
 }
 
 export const leaveSynapse = async (req, res) => {
-    const { publicKey } = req.body;
+    const { publicKey } = req.query;
     if (!publicKey) {
         return res.status(401).json({error: 'No user publicKey provided.'});
     }

@@ -74,6 +74,7 @@ export const ENDPOINTS = {
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
+    FETCH_REMOTE_SYNAPSE_MEMBERS: `${API_BASE_URL}/remote/fetchRemoteSynapseMembers`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
     FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
     FETCH_REMOTE_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/remote/fetchRemoteSynapseChatChannels`,

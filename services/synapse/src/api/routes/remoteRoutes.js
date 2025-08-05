@@ -12,6 +12,7 @@ import remoteChatController from "#remotes/controllers/remoteChatController.js";
 // Define synapseRoutes and link them to corresponding controller functions
 
 router.get('/fetchRemoteSynapseMetadata', remoteSynapseController.fetchRemoteSynapseMetadata);
+router.get('/fetchRemoteSynapseMembers', remoteSynapseController.fetchRemoteSynapseMembers);
 router.post('/joinRemoteSynapse', remoteSynapseController.joinRemoteSynapse);
 router.post('/leaveRemoteSynapse', remoteSynapseController.leaveRemoteSynapse);
 router.get('/fetchRemoteSynapsePostBoards', remoteSynapseController.fetchRemoteSynapsePostBoards);

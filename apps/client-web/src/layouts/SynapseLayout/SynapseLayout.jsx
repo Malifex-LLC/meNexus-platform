@@ -28,6 +28,8 @@ import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels
 import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
 import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelChats.js";
 import SynapseMembersPanel from "../../components/SynapseUsersPanel/SynapseMembersPanel.jsx";
+import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
+import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
 
 const SynapseLayout =({ children }) => {
 
@@ -38,8 +40,8 @@ const SynapseLayout =({ children }) => {
     const [user, setUser] = useState({})
     const { getUser } = useGetUser();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
     const navigate = useNavigate(); // React Router navigate
+    const [members, setMembers] = useState(null);
     const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState(null);
     const [posts, setPosts] = useState([]); // State for synapse posts
@@ -52,10 +54,13 @@ const SynapseLayout =({ children }) => {
 
 
     const { getSynapseMetadata } = useGetSynapseMetadata();
+    const { getSynapseMembers } = useGetSynapseMembers();
     const { getSynapsePostBoards } = useGetSynapsePostBoards();
     const { getBoardPosts } = useGetBoardPosts();
     const { getSynapseChatChannels } = useGetSynapseChatChannels();
     const { getChannelChatMessages } = useGetChannelChatMessages();
+    const { fetchRemoteSynapseMetadata, loading, error } = useFetchRemoteSynapseMetadata();
+    const { fetchRemoteSynapseMembers } = useFetchRemoteSynapseMembers();
     const { fetchRemoteSynapsePostBoards } = useFetchRemoteSynapsePostBoards();
     const { fetchRemoteBoardPosts, loading: remoteBoardPostsLoading, error: remoteBoardPostsError } = useFetchRemoteBoardPosts();
     const { fetchRemoteSynapseChatChannels } = useFetchRemoteSynapseChatChannels();
@@ -97,6 +102,8 @@ const SynapseLayout =({ children }) => {
                 if (localSynapseData.identity.publicKey === synapsePublicKey) {
                     setSynapseMetadata(localSynapseData);
                     setIsLocalSynapse(true);
+                    const synapseMembers = await getSynapseMembers();
+                    setMembers(synapseMembers);
                     const synapseBoards = await getSynapsePostBoards();
                     setBoards(synapseBoards)
                     setActiveBoard(synapseBoards[0])
@@ -108,6 +115,8 @@ const SynapseLayout =({ children }) => {
                         const synapseMetadataResponse = await fetchRemoteSynapseMetadata(synapsePublicKey);
                         setSynapseMetadata(synapseMetadataResponse);
                         setIsLocalSynapse(false);
+                        const synapseMembers = await fetchRemoteSynapseMembers(synapsePublicKey);
+                        setMembers(synapseMembers);
                         const synapseBoards = await fetchRemoteSynapsePostBoards(synapsePublicKey);
                         setBoards(synapseBoards);
                         setActiveBoard(synapseBoards[0])
@@ -298,7 +307,7 @@ const SynapseLayout =({ children }) => {
                     <div className=" overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
                         {activeSidebarTab === "activity" ? (
                             <>
-                                <SynapseMembersPanel />
+                                <SynapseMembersPanel members={members} />
                             </>
                         ) : (
                             <ActivityFeed />
