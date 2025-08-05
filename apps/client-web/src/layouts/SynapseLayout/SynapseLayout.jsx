@@ -9,7 +9,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import {useSwipeable} from "react-swipeable";
 import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
-import SynapseUsersPanel from "../../components/SynapseUsersPanel/SynapseUsersPanel.jsx";
 import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import ChatPanel from "../../components/Chatting/ChatPanel/ChatPanel.jsx";
 import PostsPanel from "../../components/Posting/PostingPanel/PostsPanel.jsx";
@@ -28,6 +27,7 @@ import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages
 import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
 import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
 import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelChats.js";
+import SynapseMembersPanel from "../../components/SynapseUsersPanel/SynapseMembersPanel.jsx";
 
 const SynapseLayout =({ children }) => {
 
@@ -298,7 +298,7 @@ const SynapseLayout =({ children }) => {
                     <div className=" overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
                         {activeSidebarTab === "activity" ? (
                             <>
-                                <SynapseUsersPanel />
+                                <SynapseMembersPanel />
                             </>
                         ) : (
                             <ActivityFeed />

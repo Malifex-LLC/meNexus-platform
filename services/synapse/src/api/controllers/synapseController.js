@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+import Synapse from "#api/models/synapse.js"
 import * as peerStateManager from '#core/peerStateManager.js';
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getGlobalUsersDB } from "#src/orbitdb/globalUsers.js";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +34,62 @@ export const getAllDiscoveredPeers = async (req, res) => {
     res.status(200).json(peersJSON);
 }
 
+export const getSynapseMembers = async (req, res) => {
+    try {
+        const members = await Synapse.getSynapseMembers();
+        res.status(200).json(members);
+    } catch (err) {
+        console.error('Error getting Members data:', err);
+        res.status(500).json({error: 'Failed to fetch Members from the Synapse'})
+    }
+}
+
+export const joinSynapse = async (req, res) => {
+    const { publicKey } = req.query;
+    if (!publicKey) {
+        return res.status(401).json({error: 'No user publicKey provided.'});
+    }
+    const metadata = await loadConfig(CONFIG_FILE);
+    if (!metadata) {
+        return res.status(401).json({error: 'No Synapse metadata loaded.'});
+    }
+    const db = await getGlobalUsersDB();
+    const [updatedUser] = await db.query(doc => doc._id === publicKey);
+    if(updatedUser) {
+        try {
+            updatedUser.synapses.push(metadata.identity.publicKey);
+            await db.put(updatedUser);
+            await Synapse.addSynapseMember(publicKey)
+            res.status(200).json(updatedUser);
+        } catch (err) {
+            console.error('Error joining Synapse: ', err);
+        }
+    }
+}
+
+export const leaveSynapse = async (req, res) => {
+    const { publicKey } = req.query;
+    if (!publicKey) {
+        return res.status(401).json({error: 'No user publicKey provided.'});
+    }
+    const metadata = await loadConfig(CONFIG_FILE);
+    if (!metadata) {
+        return res.status(401).json({error: 'No Synapse metadata loaded.'});
+    }
+    const db = await getGlobalUsersDB();
+    const [updatedUser] = await db.query(doc => doc._id === publicKey);
+    if(updatedUser) {
+        try {
+            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== metadata.identity.publicKey);
+            await db.put(updatedUser);
+            await Synapse.removeSynapseMember(publicKey);
+            res.status(200).json(updatedUser);
+        } catch (err) {
+            console.error('Error leaving Synapse: ', err);
+        }
+    }
+}
+
 export const getSynapsePostBoards = async (req, res) => {
     try {
         const config = await loadConfig(CONFIG_FILE);
@@ -57,6 +115,9 @@ export const getSynapseChatChannels = async (req, res) => {
 export default {
     getSynapseMetadata,
     getAllDiscoveredPeers,
+    getSynapseMembers,
+    joinSynapse,
+    leaveSynapse,
     getSynapsePostBoards,
     getSynapseChatChannels
 }

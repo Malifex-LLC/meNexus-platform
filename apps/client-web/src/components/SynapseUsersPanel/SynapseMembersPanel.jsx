@@ -3,7 +3,7 @@
 
 import ProfileCard from "../ProfileCard/ProfileCard.jsx";
 
-const SynapseUsersPanel = () => {
+const SynapseMembersPanel = () => {
     // TODO Implement fetching logic for Synapse Users
     return (
         <div className={'flex flex-col p-4 w-full h-screen text-foreground'}>
@@ -23,4 +23,4 @@ const SynapseUsersPanel = () => {
     );
 }
 
-export default SynapseUsersPanel;
+export default SynapseMembersPanel;

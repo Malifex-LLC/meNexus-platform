@@ -4,15 +4,16 @@
 import useAxios from './useAxios.js';
 import { ENDPOINTS } from "../config.js";
 
-const useLeaveSynapse = () => {
-    console.log("useLeaveSynapse called");
+const useLeaveRemoteSynapse = () => {
+    console.log("useLeaveRemoteSynapse called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const leaveSynapse = async (publicKey) => {
+    const leaveRemoteSynapse = async (publicKey, synapsePublicKey) => {
+        console.log("leaveRemoteSynapse called for Synapse: ", synapsePublicKey);
         const response = await sendRequest({
             method: 'POST',
-            url: ENDPOINTS.LEAVE_SYNAPSE,
-            params: { publicKey },
+            url: ENDPOINTS.LEAVE_REMOTE_SYNAPSE,
+            params: {publicKey, synapsePublicKey},
             withCredentials: true
         });
 
@@ -20,10 +21,10 @@ const useLeaveSynapse = () => {
     };
 
     return {
-        leaveSynapse,
+        leaveRemoteSynapse,
         data,
         loading,
         error};
 };
 
-export default useLeaveSynapse;
+export default useLeaveRemoteSynapse;
