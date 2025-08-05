@@ -34,7 +34,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
     useEffect(() => {
         const fetchCurrentSynapseMetadata = async () => {
             const localSynapseMetadata = await getSynapseMetadata();
-            if (synapsePublicKey === localSynapseMetadata.publicKey) {
+            if (synapsePublicKey === localSynapseMetadata.identity.publicKey) {
                 setCurrentSynapseMetadata(localSynapseMetadata);
                 setIsLocalSynapse(true)
             } else {
@@ -81,6 +81,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
     }
 
     const handleJoin = async () => {
+        console.log("isLocalSynapse:", isLocalSynapse);
         if (isLocalSynapse) {
             await joinSynapse(publicKey);
         } else {
@@ -89,6 +90,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
     }
 
     const handleLeave = async () => {
+        console.log("isLocalSynapse:", isLocalSynapse);
         if (isLocalSynapse) {
             await leaveSynapse(publicKey);
         } else {
