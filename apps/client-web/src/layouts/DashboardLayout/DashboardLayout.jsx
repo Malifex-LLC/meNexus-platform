@@ -3,7 +3,6 @@
 
 import React, {useEffect, useState} from "react";
 import Header from "../../components/Header/Header.jsx";
-import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
 import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import { useSwipeable } from 'react-swipeable';
 import JoinedSynapsesPanel from "../../components/JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
@@ -12,7 +11,7 @@ import useGetUser from "../../api/hooks/useGetUser.js";
 import { useNavigate } from "react-router-dom"
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import FeedPanel from "../../components/GlobalFeed/FeedPanel.jsx";
-import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
+import GlobalActivityPanel from "../../components/GlobalActivityPanel/GlobalActivityPanel.jsx";
 
 const DashboardLayout = ({ children }) => {
     const navigate = useNavigate(); // React Router navigate
@@ -121,7 +120,7 @@ const DashboardLayout = ({ children }) => {
                         {/*<ActivityFeed />*/}
                         <div className={'text-3xl text-foreground text-center border-b border-border p-4'}>Activity</div>
 
-                        <UserActivityPanel />
+                        <GlobalActivityPanel />
                     </div>
                 </div>
             </div>

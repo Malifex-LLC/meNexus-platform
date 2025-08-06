@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import Header from "../../components/Header/Header.jsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import {useNavigate, useParams} from "react-router-dom";
@@ -30,6 +30,8 @@ import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelCha
 import SynapseMembersPanel from "../../components/SynapseUsersPanel/SynapseMembersPanel.jsx";
 import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
 import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
+import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
+import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
 
 const SynapseLayout =({ children }) => {
 
@@ -310,7 +312,9 @@ const SynapseLayout =({ children }) => {
                                 <SynapseMembersPanel members={members} />
                             </>
                         ) : (
-                            <ActivityFeed />
+                            <SynapseActivityPanel
+                                isLocalSynapse={isLocalSynapse}
+                            />
                         )}
                     </div>
                 </div>

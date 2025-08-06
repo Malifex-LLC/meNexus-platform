@@ -68,8 +68,8 @@ export const ENDPOINTS = {
     GET_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/api/synapse/getSynapsePostBoards`,
     GET_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/api/synapse/getSynapseChatChannels`,
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
-    
 
+    GET_ALL_ACTIVITIES: `${API_BASE_URL}/api/activity/getAllActivities`,
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,

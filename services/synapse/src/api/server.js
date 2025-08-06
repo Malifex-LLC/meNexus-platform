@@ -14,6 +14,7 @@ import { initializeOrbitDB, closeOrbitDB } from '#config/orbitdb-service.js';
 import { getGlobalUsersDB } from '#src/orbitdb/globalUsers.js'
 
 // Route modules
+import activityRoutes     from "#api/routes/activityRoutes.js";
 import authRoutes         from './routes/authRoutes.js';
 import userRoutes         from './routes/userRoutes.js';
 import followerRoutes     from './routes/followerRoutes.js';
@@ -26,9 +27,11 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import searchRoutes       from './routes/searchRoutes.js';
 import settingsRoutes     from './routes/settingsRoutes.js';
 import synapseRoutes      from './routes/synapseRoutes.js';
-import remoteRoutes      from './routes/remoteRoutes.js';
+import remoteRoutes       from './routes/remoteRoutes.js';
+
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 /* ────────────────────────────────────────────────
    1.  The starter function
    ──────────────────────────────────────────────── */
@@ -52,6 +55,7 @@ export async function startApi ({ port = process.env.EXPRESS_PORT } = {}) {
     app.use('/uploads', express.static(uploadsPath));
 
     /* ---- REST routes ----------------------------------------------------- */
+    app.use('/api/activity',     activityRoutes);
     app.use('/api/auth',         authRoutes);
     app.use('/api/user',         userRoutes);
     app.use('/api/follow',       followerRoutes);
