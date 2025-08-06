@@ -32,7 +32,7 @@ const  SynapseActivityPanel = ({isLocalSynapse}) => {
 
         }
         getActivites();
-    }, [synapsePublicKey])
+    }, [isLocalSynapse, synapsePublicKey])
 
 
     /* group by day */
