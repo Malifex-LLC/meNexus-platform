@@ -17,7 +17,7 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
 
 const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => {
     const { synapsePublicKey } = useParams();
-    const [activities, setActivities] = useState([]);
+    const [activities, setActivities] = useState(null);
     const { getAllActivities } = useGetAllActivities();
     const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
 
@@ -47,12 +47,15 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
 
     /* group by day */
     const groups = useMemo(() => {
-        return activities.reduce((acc, a) => {
+        const sorted = [...activities].sort((a, b) => new Date(b.published) - new Date(a.published));
+
+        return sorted.reduce((acc, a) => {
             const key = yyyymmdd(a.published);
             (acc[key] ||= []).push(a);
             return acc;
         }, {});
     }, [activities]);
+
 
 
     if (!activities) {
