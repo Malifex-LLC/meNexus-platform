@@ -1,15 +1,38 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-const IdentityQuickActionsPanel = () => {
+import useFollowActions from "../../api/hooks/useFollowActions.js";
+
+const IdentityQuickActionsPanel = ({ publicKey, isFollowing, setIsFollowing }) => {
+    const { followUser, unfollowUser } = useFollowActions();
+
+    const handleFollow = async () => {
+        await followUser(publicKey);
+        setIsFollowing(true);
+    }
+
+    const handleUnfollow = async () => {
+        await unfollowUser(publicKey);
+        setIsFollowing(false);
+    }
+
     return (
         <div className={'flex gap-8   text-foreground'}>
-            <button
-                className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-primary hover:tranlsate-y-[-2px]`}
-                onClick={() => {}}
-            >
-                Follow
-            </button>
+            {isFollowing ? (
+                <button
+                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-surface hover:bg-primary hover:tranlsate-y-[-2px]`}
+                    onClick={ handleUnfollow }
+                >
+                    Unfollow
+                </button>
+            ): (
+                <button
+                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-brand hover:bg-primary hover:tranlsate-y-[-2px]`}
+                    onClick={ handleFollow }
+                >
+                    Follow
+                </button>
+            )}
             <button
                 className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-primary hover:tranlsate-y-[-2px]`}
                 onClick={() => {}}

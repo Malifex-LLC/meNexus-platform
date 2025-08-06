@@ -185,8 +185,8 @@ const FeedPanel = () => {
                                     isLocalSynapse={post.synapsePublicKey === localSynapse.identity.publicKey}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
+                                    sessionPublicKey={user.publicKey}
                                     synapseUrl={post.synapseUrl}
-                                    session_user_id={user.publicKey}
                                     date={post.created_at}
                                     content={post.content}
                                     mediaUrl={post.media_url}
