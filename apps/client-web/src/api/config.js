@@ -62,6 +62,9 @@ export const ENDPOINTS = {
     SEARCH: `${API_BASE_URL}/api/search/search`,
 
     GET_SYNAPSE_METADATA: `${API_BASE_URL}/api/synapse/getSynapseMetadata`,
+    GET_SYNAPSE_MEMBERS: `${API_BASE_URL}/api/synapse/getSynapseMembers`,
+    JOIN_SYNAPSE: `${API_BASE_URL}/api/synapse/joinSynapse`,
+    LEAVE_SYNAPSE: `${API_BASE_URL}/api/synapse/leaveSynapse`,
     GET_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/api/synapse/getSynapsePostBoards`,
     GET_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/api/synapse/getSynapseChatChannels`,
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
@@ -70,6 +73,7 @@ export const ENDPOINTS = {
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
+    FETCH_REMOTE_SYNAPSE_MEMBERS: `${API_BASE_URL}/remote/fetchRemoteSynapseMembers`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/fetchRemoteUsers`,
     FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
     FETCH_REMOTE_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/remote/fetchRemoteSynapseChatChannels`,
@@ -85,6 +89,6 @@ export const ENDPOINTS = {
     UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
     DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
     FETCH_REMOTE_CHANNEL_CHATS: `${API_BASE_URL}/remote/fetchRemoteChannelChats`,
-    JOIN_SYNAPSE: `${API_BASE_URL}/remote/joinSynapse`,
-    LEAVE_SYNAPSE: `${API_BASE_URL}/remote/leaveSynapse`,
+    JOIN_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/joinRemoteSynapse`,
+    LEAVE_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/leaveRemoteSynapse`,
 };

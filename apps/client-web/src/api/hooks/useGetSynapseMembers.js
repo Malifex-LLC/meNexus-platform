@@ -4,26 +4,27 @@
 import useAxios from './useAxios.js';
 import { ENDPOINTS } from "../config.js";
 
-const useLeaveSynapse = () => {
-    console.log("useLeaveSynapse called");
+
+const useGetSynapseMembers = () => {
+    console.log("useGetSynapseMembers called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const leaveSynapse = async (publicKey) => {
-        const response = await sendRequest({
-            method: 'POST',
-            url: ENDPOINTS.LEAVE_SYNAPSE,
-            params: { publicKey },
-            withCredentials: true
-        });
+    const getSynapseMembers = async () => {
 
+        const response = await sendRequest({
+            method: 'GET',
+            url: ENDPOINTS.GET_SYNAPSE_MEMBERS,
+            withCredentials: true,
+        });
+        console.log('getSynapseMembers response', response);
         return response.data;
     };
 
     return {
-        leaveSynapse,
+        getSynapseMembers,
         data,
         loading,
         error};
 };
 
-export default useLeaveSynapse;
+export default useGetSynapseMembers;

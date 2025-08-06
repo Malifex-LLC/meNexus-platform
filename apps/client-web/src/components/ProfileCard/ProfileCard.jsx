@@ -116,7 +116,7 @@ const ProfileCard = ({publicKey}) => {
                 </div>
                 <div className={`flex flex-col`}>
                     <Link
-                        className="profile-card__display-name text-sm cursor-pointer hover:underline"
+                        className="profile-card__display-name text-sm text-foreground cursor-pointer hover:underline"
                         to={`/profile/${user.handle}`}
                     >
                         {user.displayName}

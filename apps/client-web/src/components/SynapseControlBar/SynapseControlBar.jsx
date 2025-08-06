@@ -10,12 +10,15 @@ import JoinedSynapsesTray from "../JoinedSynapsesTray/JoinedSynapsesTray.jsx";
 import synapse from "../../pages/Synapse/Synapse.jsx";
 import useJoinSynapse from "../../api/hooks/useJoinSynapse.js";
 import useLeaveSynapse from "../../api/hooks/useLeaveSynapse.js";
+import useJoinRemoteSynapse from "../../api/hooks/useJoinRemoteSynapse.js";
+import useLeaveRemoteSynapse from "../../api/hooks/useLeaveRemoteSynapse.js";
 
 
 const SynapseControlBar = ({synapses = [], publicKey}) => {
     const location = useLocation();
     const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
     const {synapsePublicKey} = useParams();
+    const [isLocalSynapse, setIsLocalSynapse] = useState(null);
     const [synapseMetadataList, setSynapseMetadataList] = useState([]);
     const [synapseMetadata, setSynapseMetadata] = useState(null);
     const [showJoinedSynapsesTray, setShowJoinedSynapsesTray] = useState(false);
@@ -25,19 +28,23 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { joinSynapse } = useJoinSynapse();
     const { leaveSynapse } = useLeaveSynapse();
+    const { joinRemoteSynapse } = useJoinRemoteSynapse();
+    const { leaveRemoteSynapse } = useLeaveRemoteSynapse();
 
     useEffect(() => {
         const fetchCurrentSynapseMetadata = async () => {
             const localSynapseMetadata = await getSynapseMetadata();
-            if (synapsePublicKey === localSynapseMetadata.publicKey) {
+            if (synapsePublicKey === localSynapseMetadata.identity.publicKey) {
                 setCurrentSynapseMetadata(localSynapseMetadata);
+                setIsLocalSynapse(true)
+            } else {
+                const response = await fetchRemoteSynapseMetadata(synapsePublicKey);
+                setCurrentSynapseMetadata(response);
+                setIsLocalSynapse(false)
             }
-            const response = await fetchRemoteSynapseMetadata(synapsePublicKey);
-            setCurrentSynapseMetadata(response);
 
             const isMember = synapses.includes(synapsePublicKey);
             setIsSynapseMember(isMember);
-
         }
         fetchCurrentSynapseMetadata();
     }, [synapsePublicKey, synapses])
@@ -73,6 +80,24 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
         setShowJoinedSynapsesTray((prevState) => !prevState);
     }
 
+    const handleJoin = async () => {
+        console.log("isLocalSynapse:", isLocalSynapse);
+        if (isLocalSynapse) {
+            await joinSynapse(publicKey);
+        } else {
+            await joinRemoteSynapse(publicKey, synapsePublicKey);
+        }
+    }
+
+    const handleLeave = async () => {
+        console.log("isLocalSynapse:", isLocalSynapse);
+        if (isLocalSynapse) {
+            await leaveSynapse(publicKey);
+        } else {
+            await leaveRemoteSynapse(publicKey, synapsePublicKey);
+        }
+    }
+
     return (
 
         <div className=" py-2 px-4 rounded-xl bg-background">
@@ -91,7 +116,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 <button
                                     className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:text-foreground-alt hover:cursor-pointer`}
                                     onClick={async () => {
-                                        await leaveSynapse(publicKey, synapsePublicKey);
+                                        await handleLeave();
                                         setIsSynapseMember(false);
                                     }}
                                 >
@@ -101,7 +126,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 <button
                                     className={`px-1 mt-1 text-foreground-alt bg-brand rounded-xl hover:bg-primary hover:cursor-pointer`}
                                     onClick={async () => {
-                                        await joinSynapse(publicKey, synapsePublicKey);
+                                        await handleJoin();
                                         setIsSynapseMember(true);
                                     }}
                                 >

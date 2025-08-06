@@ -8,12 +8,11 @@ const useJoinSynapse = () => {
     console.log("useJoinSynapse called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const joinSynapse = async (publicKey, synapsePublicKey) => {
-        console.log("joinSynapse called for Synapse: ", synapsePublicKey);
+    const joinSynapse = async (publicKey) => {
         const response = await sendRequest({
             method: 'POST',
             url: ENDPOINTS.JOIN_SYNAPSE,
-            params: {publicKey, synapsePublicKey},
+            params: { publicKey },
             withCredentials: true
         });
 

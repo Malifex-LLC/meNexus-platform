@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 // TODO Need to fix so that the privateKey is not included in the Synapse Metadata returned
-import {getGlobalUsersDB} from "#src/orbitdb/globalUsers.js";
+import { getGlobalUsersDB } from "#src/orbitdb/globalUsers.js";
 import { MESSAGE_TYPES, ACTION_TYPES, RESOURCE_TYPES } from "#protocols/snp/index.js";
 import { createMessage } from '#protocols/snp/messageUtils.js'
 import { sendMessageWithResponse } from "#core/messenger.js";
@@ -46,6 +46,34 @@ export const fetchRemoteSynapseMetadata = async (req, res) => {
     } catch (err) {
         console.error('Error fetching Synapse metadata:', err);
         res.status(500).json({error: 'Failed to fetch metadata from the synapse.'});
+    }
+}
+
+export const fetchRemoteSynapseMembers = async (req, res) => {
+    const synapsePublicKey = req.query.synapsePublicKey;
+    if (!synapsePublicKey) {
+        return res.status(401).json({error: 'No Synapse publicKey provided.'});
+    }
+    console.log('fetchRemoteSynapseMembers for synapsePublicKey: ', synapsePublicKey)
+
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
+    }
+    const { peerId } = peer;
+    const synapseMembersRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.DATA.QUERY,
+        RESOURCE_TYPES.SYNAPSE_MEMBERS,
+        {},
+        {sender: process.env.PUBLIC_KEY}
+    );
+    try {
+        const response = await sendMessageWithResponse(peerId, synapseMembersRequest);
+        res.status(200).json(response.payload);
+    } catch (err) {
+        console.error('Error fetching Synapse members:', err);
+        res.status(500).json({error: 'Failed to fetch members from the synapse.'});
     }
 }
 
@@ -105,46 +133,66 @@ export const fetchRemoteSynapseChatChannels = async (req, res) => {
     }
 }
 
-export const joinSynapse = async (req, res) => {
+export const joinRemoteSynapse = async (req, res) => {
     const {publicKey, synapsePublicKey} = req.query;
     if (!publicKey || !synapsePublicKey) {
         return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});
     }
-    const db = await getGlobalUsersDB();
-    const [updatedUser] = await db.query(doc => doc._id === publicKey);
-    if(updatedUser) {
-        try {
-            updatedUser.synapses.push(synapsePublicKey);
-            await db.put(updatedUser);
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            console.error('Error joining Synapse: ', err);
-        }
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
     }
+    const { peerId } = peer;
+    const joinRemoteSynapseRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.RESOURCE.UPDATE,
+        RESOURCE_TYPES.SYNAPSE_MEMBERS,
+        { publicKey },
+        {sender: process.env.PUBLIC_KEY}
+    );
+    try {
+        const response = await sendMessageWithResponse(peerId, joinRemoteSynapseRequest);
+        res.status(200).json(response.payload);
+    } catch (err) {
+        console.error('Error joining remote Synapse :', err);
+        res.status(500).json({error: 'Failed to join remote Synapse.'});
+    }
+
 }
 
-export const leaveSynapse = async (req, res) => {
+export const leaveRemoteSynapse = async (req, res) => {
     const {publicKey, synapsePublicKey} = req.query;
+    console.log('leaveRemoteSynapse request publicKey: ', publicKey, ' synapsePublicKey: ', synapsePublicKey);
     if (!publicKey || !synapsePublicKey) {
         return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});
     }
-    const db = await getGlobalUsersDB();
-    const [updatedUser] = await db.query(doc => doc._id === publicKey);
-    if(updatedUser) {
-        try {
-            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== synapsePublicKey);
-            await db.put(updatedUser);
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            console.error('Error leaving Synapse: ', err);
-        }
+    const peer = peerStateManager.getPeerByPublicKey(synapsePublicKey);
+    if (!peer || !peer.peerId) {
+        return res.status(401).json({ error: 'No peerId returned from peerStateManager.' });
     }
+    const { peerId } = peer;
+    const leaveRemoteSynapseRequest = createMessage(
+        MESSAGE_TYPES.DATA.REQUEST,
+        ACTION_TYPES.RESOURCE.DELETE,
+        RESOURCE_TYPES.SYNAPSE_MEMBERS,
+        { publicKey },
+        {sender: process.env.PUBLIC_KEY}
+    );
+    try {
+        const response = await sendMessageWithResponse(peerId, leaveRemoteSynapseRequest);
+        res.status(200).json(response.payload);
+    } catch (err) {
+        console.error('Error leaving remote Synapse :', err);
+        res.status(500).json({error: 'Failed to leave remote Synapse.'});
+    }
+
 }
 
 export default {
     fetchRemoteSynapseMetadata,
+    fetchRemoteSynapseMembers,
     fetchRemoteSynapsePostBoards,
     fetchRemoteSynapseChatChannels,
-    joinSynapse,
-    leaveSynapse,
+    joinRemoteSynapse,
+    leaveRemoteSynapse,
 }

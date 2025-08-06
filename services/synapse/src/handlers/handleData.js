@@ -43,6 +43,34 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peerId - response not sent.');
                         }
                     }
+                    if (message.resourceType === RESOURCE_TYPES.SYNAPSE_MEMBERS) {
+                        console.log(`Received SYNAPSE_MEMBERS request from ${message.meta.sender}.`);
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_SYNAPSE_MEMBERS,
+                            withCredentials: true,
+                        });
+                        console.log('GET_SYNAPSE_MEMBERS response: ', response);
+                        const members = response.data;
+
+                        const membersResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.SYNAPSE_MEMBERS,
+                            { members },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, membersResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+
+                    }
                     if (message.resourceType === RESOURCE_TYPES.SYNAPSE_POST_BOARDS) {
                         console.log(`Received SYNAPSE_POST_BOARDS request from ${message.meta.sender}.`);
                         const response = await sendRequest({
@@ -464,6 +492,38 @@ export const handleData = async (libp2p, message) => {
                         }
 
                     }
+
+                    if (message.resourceType === RESOURCE_TYPES.SYNAPSE_MEMBERS) {
+                        console.log(`Received UPDATE SYNAPSE_MEMBERS request from ${message.meta.sender}.`);
+                        const { publicKey } = message.payload;
+
+                        const response = await sendRequest({
+                            method: 'POST',
+                            url: ENDPOINTS.JOIN_SYNAPSE,
+                            params: { publicKey },
+                        });
+                        console.log('joinSynapse response ', response);
+                        const joined = response.data;
+
+                        const updatedSynapseMembers = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.UPDATE,
+                            RESOURCE_TYPES.SYNAPSE_MEMBERS,
+                            { joined },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, updatedSynapseMembers);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+
+                    }
                     break;
 
                 case ACTION_TYPES.RESOURCE.DELETE:
@@ -524,6 +584,35 @@ export const handleData = async (libp2p, message) => {
                         const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
                         if (peerId) {
                             await sendMessage(peerId, deletedCommentResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.SYNAPSE_MEMBERS) {
+                        console.log(`Received DELETE SYNAPSE_MEMBER request from ${message.meta.sender}.`);
+                        const { publicKey } = message.payload;
+                        const response = await sendRequest({
+                            method: 'POST',
+                            url: ENDPOINTS.LEAVE_SYNAPSE,
+                            params: { publicKey },
+                        });
+                        console.log('leaveSynapse response ', response);
+                        const leaveSynapse = response.data;
+
+                        const leaveSynapseResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.POST_COMMENT,
+                            { leaveSynapse },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, leaveSynapseResponse);
                         } else {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
