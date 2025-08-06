@@ -20,7 +20,7 @@ router.get('/fetchRemoteSynapseChatChannels', remoteSynapseController.fetchRemot
 
 router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 
-router.get('/fetchRemoteSynapseAllActivities', )
+router.get('/fetchRemoteSynapseAllActivities', remoteSynapseController.fetchRemoteSynapseAllActivities)
 router.get('/fetchRemotePosts', remotePostController.fetchRemotePosts);
 router.get('/fetchRemoteBoardPosts', remotePostController.fetchRemoteBoardPosts);
 router.get('/fetchRemoteUserPosts', remotePostController.fetchRemoteUserPosts);
