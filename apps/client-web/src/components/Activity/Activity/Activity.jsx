@@ -209,7 +209,7 @@ const Activity = ({ activity, mode }) => {
 
     const date = new Date(activity.published);
 
-    if (!description) {
+    if (!description || !user) {
         return <div>Loading...</div>;
     }
 

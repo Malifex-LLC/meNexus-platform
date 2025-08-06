@@ -18,6 +18,7 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
 const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => {
     const { synapsePublicKey } = useParams();
     const [activities, setActivities] = useState(null);
+    const [bufferedActivities, setBufferedActivities] = useState([]);
     const { getAllActivities } = useGetAllActivities();
     const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
 
@@ -25,13 +26,19 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
         wsUrl: synapseMetadata.identity.webSocketUrl,
         publicKey,
         onActivity: (newActivity) => {
-            setActivities(prev => [newActivity, ...prev]);
+            const parsedDate = new Date(newActivity.published.replace(' ', 'T') + 'Z');
+            const safeActivity = {
+                ...newActivity,
+                published: parsedDate.toISOString(), // ensures consistency
+            };
+
+            setBufferedActivities(prev => [safeActivity, ...prev]);
         }
     });
 
 
     useEffect(() => {
-        const getActivites = async () => {
+        const getActivities = async () => {
             if (isLocalSynapse) {
                 const activitiesData = await getAllActivities();
                 setActivities(activitiesData)
@@ -41,12 +48,26 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
             }
 
         }
-        getActivites();
+        getActivities();
     }, [isLocalSynapse, synapsePublicKey])
+
+    const reloadActivities = async () => {
+            if (isLocalSynapse) {
+                const activitiesData = await getAllActivities();
+                setActivities(activitiesData)
+                setBufferedActivities([])
+            } else {
+                const activitiesData = await fetchRemoteSynapseAllActivities(synapsePublicKey);
+                setActivities(activitiesData)
+                setBufferedActivities([])
+            }
+    }
 
 
     /* group by day */
     const groups = useMemo(() => {
+        if (!activities) return {};
+
         const sorted = [...activities].sort((a, b) => new Date(b.published) - new Date(a.published));
 
         return sorted.reduce((acc, a) => {
@@ -78,8 +99,19 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
 
                         {/* items for that day */}
                         <ul className={'px-8 py-2'}>
-                            {items.map((activity, i) => (
-                                <li key={i} className="relative pl-8 py-16 ">
+                            {bufferedActivities.length > 0 && (
+                                <div className="text-center py-2">
+                                    <button
+                                        onClick={reloadActivities}
+                                        className="px-4 py-2 bg-brand text-foreground rounded-xl shadow hover:brightness-110"
+                                    >
+                                        Load {bufferedActivities.length} new {bufferedActivities.length === 1 ? 'activity' : 'activities'}
+                                    </button>
+                                </div>
+                            )}
+
+                            {items.map((activity) => (
+                                <li key={activity.id} className="relative pl-8 py-16 ">
                                     {/* dot */}
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
                                     <Activity activity={activity} mode={'SYNAPSE'} />
