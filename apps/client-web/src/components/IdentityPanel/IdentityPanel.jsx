@@ -6,13 +6,33 @@ import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
 import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
 import IdentityQuickActionsPanel from "./IdentityQuickActionsPanel.jsx";
 import StatusPanel from "./StatusPanel.jsx";
+import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
+import {useParams} from "react-router-dom";
+import useFollowActions from "../../api/hooks/useFollowActions.js";
 
 const IdentityPanel = ({user, isProfileOwner}) => {
+
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [followerCount, setFollowerCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
+
+    const { getUserByHandle } = useGetUserByHandle();
+    const { followCheck } = useFollowActions();
     const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
     const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
 
-    const [followerCount, setFollowerCount] = useState(0);
-    const [followingCount, setFollowingCount] = useState(0);
+
+    useEffect(() => {
+        const fetchFollowStatus = async () => {
+            try {
+                const following = await followCheck(user.publicKey);
+                setIsFollowing(following);
+            } catch (error) {
+                console.error("Error fetching follow status:", error);
+            }
+        }
+        fetchFollowStatus();
+    }, [])
 
     useEffect(() => {
         const fetchFollowerCount = async () => {
@@ -75,7 +95,11 @@ const IdentityPanel = ({user, isProfileOwner}) => {
                 {/* Quick Actions */}
                 {!isProfileOwner  ? (
                     <div className={'flex p-4 justify-evenly rounded-xl shadow-lg w-full'}>
-                        <IdentityQuickActionsPanel/>
+                        <IdentityQuickActionsPanel
+                            publicKey={user.publicKey}
+                            isFollowing={isFollowing}
+                            setIsFollowing={setIsFollowing}
+                        />
                     </div>
                 ) : null}
 
