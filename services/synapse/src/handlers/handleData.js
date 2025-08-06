@@ -500,7 +500,7 @@ export const handleData = async (libp2p, message) => {
                         const response = await sendRequest({
                             method: 'POST',
                             url: ENDPOINTS.JOIN_SYNAPSE,
-                            data: { publicKey },
+                            params: { publicKey },
                         });
                         console.log('joinSynapse response ', response);
                         const joined = response.data;
@@ -594,7 +594,7 @@ export const handleData = async (libp2p, message) => {
                         const response = await sendRequest({
                             method: 'POST',
                             url: ENDPOINTS.LEAVE_SYNAPSE,
-                            data: { publicKey },
+                            params: { publicKey },
                         });
                         console.log('leaveSynapse response ', response);
                         const leaveSynapse = response.data;

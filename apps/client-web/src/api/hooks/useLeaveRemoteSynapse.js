@@ -13,7 +13,7 @@ const useLeaveRemoteSynapse = () => {
         const response = await sendRequest({
             method: 'POST',
             url: ENDPOINTS.LEAVE_REMOTE_SYNAPSE,
-            params: {publicKey, synapsePublicKey},
+            params: { publicKey, synapsePublicKey },
             withCredentials: true
         });
 

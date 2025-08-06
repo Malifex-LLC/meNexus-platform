@@ -9,15 +9,16 @@ const useFetchRemoteSynapseMembers = () => {
     console.log("useFetchRemoteSynapseMembers called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const fetchRemoteSynapseMembers = async () => {
+    const fetchRemoteSynapseMembers = async (synapsePublicKey) => {
 
         const response = await sendRequest({
             method: 'GET',
             url: ENDPOINTS.FETCH_REMOTE_SYNAPSE_MEMBERS,
+            params: { synapsePublicKey },
             withCredentials: true,
         });
-
-        return response.data;
+        console.log('fetchRemoteSynapseMembers response: ', response);
+        return response.data.members;
     };
 
     return {
