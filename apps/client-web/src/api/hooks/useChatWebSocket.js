@@ -13,7 +13,7 @@ const useChatSocket = ({ wsUrl, publicKey, activeChannel, onMessage }) => {
         socketRef.current = socket;
 
         socket.onopen = () => {
-            console.log('WebSocket connected');
+            console.log('Chat WebSocket connected');
 
             // Optional: send setChannel to server if you want server-side filtering
             socket.send(JSON.stringify({

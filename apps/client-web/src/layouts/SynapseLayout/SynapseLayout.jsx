@@ -314,6 +314,8 @@ const SynapseLayout =({ children }) => {
                         ) : (
                             <SynapseActivityPanel
                                 isLocalSynapse={isLocalSynapse}
+                                synapseMetadata={synapseMetadata}
+                                publicKey={user.publicKey}
                             />
                         )}
                     </div>

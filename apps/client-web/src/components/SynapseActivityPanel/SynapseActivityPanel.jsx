@@ -3,6 +3,7 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 import Activity from '../Activity/Activity/Activity.jsx';
+import useActivityWebSocket from "../../api/hooks/useActivityWebSocket.js";
 import useGetAllActivities from '../../api/hooks/useGetAllActivities.js'
 import useFetchRemoteSynapseAllActivities from "../../api/hooks/useFetchRemoteSynapseAllActivities.js";
 import {useParams} from "react-router-dom";
@@ -14,11 +15,20 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
         day:   '2-digit'
     });
 
-const  SynapseActivityPanel = ({isLocalSynapse}) => {
+const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => {
     const { synapsePublicKey } = useParams();
     const [activities, setActivities] = useState([]);
     const { getAllActivities } = useGetAllActivities();
     const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
+
+    useActivityWebSocket({
+        wsUrl: synapseMetadata.identity.webSocketUrl,
+        publicKey,
+        onActivity: (newActivity) => {
+            setActivities(prev => [newActivity, ...prev]);
+        }
+    });
+
 
     useEffect(() => {
         const getActivites = async () => {

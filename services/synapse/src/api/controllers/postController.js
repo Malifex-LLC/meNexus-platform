@@ -4,6 +4,7 @@
 // Import the Post model
 import Post from '../models/post.js';
 import activityController from './activityController.js';
+import broadcastController from './broadcastController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
 
 
@@ -34,7 +35,9 @@ export const createPost = async (req, res) => {
     try {
         const postId = await Post.createPost(publicKey, activeBoard, content);
         const synapseConfig = await loadConfig(CONFIG_FILE)
-        await activityController.createPostActivity(publicKey, postId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
+        const activity = await activityController.createPostActivity(publicKey, postId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
+        console.log('activityController.createPostActivity() response: ', activity);
+        broadcastController.broadcastActivity(activity);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);

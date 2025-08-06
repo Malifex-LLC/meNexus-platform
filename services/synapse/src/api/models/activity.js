@@ -43,7 +43,20 @@ export const createActivity = async ({
                     console.error('Error inserting activity:', err);
                     return reject(err);
                 }
-                resolve(result);
+                resolve(resolve({
+                    id,
+                    type,
+                    actorPublicKey,
+                    objectType,
+                    objectId,
+                    targetType,
+                    targetId,
+                    contextType,
+                    contextId,
+                    meta,
+                    published
+                })
+            );
             }
         );
     });
