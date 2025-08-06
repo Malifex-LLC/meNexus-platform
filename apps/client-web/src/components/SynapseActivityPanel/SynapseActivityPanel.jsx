@@ -4,6 +4,8 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import Activity from '../Activity/Activity/Activity.jsx';
 import useGetAllActivities from '../../api/hooks/useGetAllActivities.js'
+import useFetchRemoteSynapseAllActivities from "../../api/hooks/useFetchRemoteSynapseAllActivities.js";
+import {useParams} from "react-router-dom";
 
 const yyyymmdd = ts => ts.slice(0, 10);                      // "2025-06-23"
 const dayLabel = ts =>                                       // "Jun 23", "Apr 07"
@@ -13,16 +15,24 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
     });
 
 const  SynapseActivityPanel = ({isLocalSynapse}) => {
+    const { synapsePublicKey } = useParams();
     const [activities, setActivities] = useState([]);
     const { getAllActivities } = useGetAllActivities();
+    const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
 
     useEffect(() => {
         const getActivites = async () => {
-            const activitiesData = await getAllActivities();
-            setActivities(activitiesData)
+            if (isLocalSynapse) {
+                const activitiesData = await getAllActivities();
+                setActivities(activitiesData)
+            } else {
+                const activitiesData = await fetchRemoteSynapseAllActivities(synapsePublicKey);
+                setActivities(activitiesData)
+            }
+
         }
         getActivites();
-    }, [])
+    }, [synapsePublicKey])
 
 
     /* group by day */
