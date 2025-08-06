@@ -306,7 +306,7 @@ const SynapseLayout =({ children }) => {
                     </div>
 
                     {/* Content */}
-                    <div className=" overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
+                    <div className="h-full overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
                         {activeSidebarTab === "activity" ? (
                             <>
                                 <SynapseMembersPanel members={members} />

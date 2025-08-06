@@ -49,7 +49,7 @@ const  SynapseActivityPanel = ({isLocalSynapse}) => {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
+        <div className="flex  overflow-y-auto bg-background rounded-xl m-4 text-foreground">
 
             {/* master timeline line */}
             <ul className="p-4">
