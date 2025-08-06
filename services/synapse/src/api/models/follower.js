@@ -34,8 +34,8 @@ export const unfollowUser = async (publicKey, followedPublicKey) => {
             followedUser.followers = followedUser.followers.filter(f => f !== publicKey);
             await db.put(followedUser); // This saves the change
         }
-        if (followingUser.followers.includes(followedPublicKey)) {
-            followingUser.followers = followingUser.followers.filter(f => f !== followedPublicKey);
+        if (followingUser.following.includes(followedPublicKey)) {
+            followingUser.following = followingUser.following.filter(f => f !== followedPublicKey);
             await db.put(followingUser); // This saves the change
         }
     } catch (err) {
