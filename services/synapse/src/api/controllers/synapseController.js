@@ -9,6 +9,7 @@ import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getGlobalUsersDB } from "#src/orbitdb/globalUsers.js";
+import broadcastController from "#api/controllers/broadcastController.js";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -61,8 +62,9 @@ export const joinSynapse = async (req, res) => {
         try {
             updatedUser.synapses.push(metadata.identity.publicKey);
             await db.put(updatedUser);
-            await Synapse.addSynapseMember(publicKey)
-            await activityController.createJoinSynapseActivity(publicKey, metadata.identity.publicKey)
+            await Synapse.addSynapseMember(publicKey);
+            const activity = await activityController.createJoinSynapseActivity(publicKey, metadata.identity.publicKey);
+            broadcastController.broadcastActivity(activity);
             res.status(200).json(updatedUser);
         } catch (err) {
             console.error('Error joining Synapse: ', err);
@@ -86,7 +88,8 @@ export const leaveSynapse = async (req, res) => {
             updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== metadata.identity.publicKey);
             await db.put(updatedUser);
             await Synapse.removeSynapseMember(publicKey);
-            await activityController.createLeaveSynapseActivity(publicKey, metadata.identity.publicKey)
+            const activity = await activityController.createLeaveSynapseActivity(publicKey, metadata.identity.publicKey);
+            broadcastController.broadcastActivity(activity);
             res.status(200).json(updatedUser);
         } catch (err) {
             console.error('Error leaving Synapse: ', err);

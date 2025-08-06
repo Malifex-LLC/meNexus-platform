@@ -9,6 +9,7 @@ import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activit
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {loadConfig} from "#utils/configUtils.js";
+import broadcastController from "#api/controllers/broadcastController.js";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +31,8 @@ export const createComment = async (req, res) => {
     }
 
     const synapseConfig = await loadConfig(CONFIG_FILE)
-    await activityController.createCommentActivity(publicKey, OBJECT_TYPES.POST, resourceId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
+    const activity = await activityController.createCommentActivity(publicKey, OBJECT_TYPES.POST, resourceId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
+    broadcastController.broadcastActivity(activity);
     return res.status(200).json(result);
 }
 

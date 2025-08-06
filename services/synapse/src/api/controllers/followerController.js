@@ -5,6 +5,7 @@
 import Follower from '../models/follower.js'
 import activityController from './activityController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js';
+import broadcastController from "#api/controllers/broadcastController.js";
 
 export const followUser = async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -23,7 +24,8 @@ export const followUser = async (req, res) => {
     if (result === false) {
         return res.status(404).json({ error: 'Failed to follow user: ', followedPublicKey });
     }
-    await activityController.createFollowActivity(publicKey, followedPublicKey);
+    const activity = await activityController.createFollowActivity(publicKey, followedPublicKey);
+    broadcastController.broadcastActivity(activity);
     return res.status(200).json({result});
 }
 
@@ -43,7 +45,8 @@ export const unfollowUser = async (req, res) => {
 
     const result = await Follower.unfollowUser(publicKey, followedPublicKey);
 
-    await activityController.createUnfollowActivity(publicKey, followedPublicKey);
+    const activity = await activityController.createUnfollowActivity(publicKey, followedPublicKey);
+    broadcastController.broadcastActivity(activity);
     return res.status(200).json({result});
 }
 
