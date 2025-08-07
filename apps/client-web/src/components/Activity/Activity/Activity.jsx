@@ -22,7 +22,7 @@ const makeDescription = ({
     switch (activity.type) {
         case 'POSTED':
             return (
-                <>
+                <div>
                     {mode === 'SYNAPSE' && (
                         <>
                             <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> created a new
@@ -37,12 +37,12 @@ const makeDescription = ({
                             <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
-                </>
+                </div>
             );
 
         case 'COMMENTED':
             return (
-                <>
+                <div>
                     {mode === 'SYNAPSE' && (
                         <>
                             <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> commented on a
@@ -57,26 +57,26 @@ const makeDescription = ({
                             <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
-                </>
+                </div>
             );
 
         case 'FOLLOWED':
             return (
-                <>
+                <div>
                     <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> followed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
-                </>
+                </div>
             );
 
         case 'UNFOLLOWED':
             return (
-                <>
+                <div>
                     <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> unfollowed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
-                </>
+                </div>
             );
 
         case 'JOINED':
             return (
-                <>
+                <div>
                     {mode === 'SYNAPSE' && (
                         <>
                             <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> joined!
@@ -88,12 +88,12 @@ const makeDescription = ({
                             <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
-                </>
+                </div>
             );
 
         case 'LEFT':
             return (
-                <>
+                <div>
                     {mode === 'SYNAPSE' && (
                         <>
                             <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> left!
@@ -105,14 +105,14 @@ const makeDescription = ({
                             <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
-                </>
+                </div>
             );
 
         default:
             return (
-                <>
+                <div>
                     {actor.handle} did something
-                </>
+                </div>
             );
     }
 }
@@ -215,7 +215,7 @@ const Activity = ({ activity, mode }) => {
 
 
     return (
-        <div className="flex flex-col flex-1 p-4 py-5 rounded-xl text-xl md:text-xs xl:text-md 2xl:text-xl
+        <div className="flex flex-col w-full p-4 py-5 rounded-xl text-lg
                     bg-surface/40 text-foreground shadow-2xl"
         >
             {description}

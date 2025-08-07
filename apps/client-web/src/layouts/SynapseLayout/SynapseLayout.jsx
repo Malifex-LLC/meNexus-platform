@@ -27,7 +27,7 @@ import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages
 import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
 import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
 import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelChats.js";
-import SynapseMembersPanel from "../../components/SynapseUsersPanel/SynapseMembersPanel.jsx";
+import SynapseMembersPanel from "../../components/SynapseMembersPanel/SynapseMembersPanel.jsx";
 import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
 import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
 import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
@@ -287,26 +287,26 @@ const SynapseLayout =({ children }) => {
                 </div>
 
                 {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col m-4 rounded-xl lg:col-span-3 overflow-hidden bg-background">
+                <div className="hidden lg:flex flex-col w-full p-4 m-4 rounded-xl lg:col-span-3 overflow-hidden bg-background">
                     {/* Tab Switcher */}
                     <div className="flex justify-around border border-border bg-background
                     p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl">
                         <button
                             onClick={() => setActiveSidebarTab("activity")}
-                            className={`${activeSidebarTab === "activity" ? "text-brand font-bold" : "hover:text-brand"}`}
+                            className={`${activeSidebarTab === "activity" ? "text-brand font-bold" : "hover:text-brand hover:cursor-pointer"}`}
                         >
                             Members
                         </button>
                         <button
                             onClick={() => setActiveSidebarTab("chat")}
-                            className={`${activeSidebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand"}`}
+                            className={`${activeSidebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand hover:cursor-pointer"}`}
                         >
                             Activity
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="h-full overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
+                    <div className="h-full  overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
                         {activeSidebarTab === "activity" ? (
                             <>
                                 <SynapseMembersPanel members={members} />
