@@ -1,0 +1,89 @@
+/* GruvboxDark */
+
+:root {
+    /* Foundations */
+    --color-background:         #1D2021;   /* Panel Background */
+    --color-surface:            #504945;   /* Panel/Card Surface */
+    --color-border:             #665C54;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #1D2021;   /* Header Background Color */
+
+    /* Typography */
+    --color-foreground:         #E4CF9D;   /* Primary Text */
+    --color-foreground-message: #E4CF9D;   /* Text for Chat/Direct Messages */
+    --color-foreground-message-owner: #E4CF9D;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #A9B7C6;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #E94632;   /* Headlines and Highlights */
+    --color-primary:            #952D20;   /* Buttons / CTAs */
+    --color-accent:             #B7BA26;   /* Notifications / Alerts */
+    --color-secondary:          #A9B7C6;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #3F3F3F;
+    --color-edit-hover:         #2F2F2F;
+    --color-is-editing:         #FF6B6B;
+
+    --color-save:               #28A745;
+    --color-save-hover:         #28A745;
+
+    --color-delete:             #DC3545;
+    --color-delete-hover:       #AB4555;
+}
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background: #1D2021;
+}
+
+/* Gradient Background */
+/*
+body {
+    background: linear-gradient(
+        to bottom,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-background)
+    );
+    backdrop-filter: blur(1rem);
+}
+*/
+
+/* Optional Animated Background */
+/*
+body {
+    background: linear-gradient(
+        270deg,
+        var(--color-background),
+        var(--color-primary),
+        var(--color-accent),
+        var(--color-secondary),
+        var(--color-background)
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 14s ease infinite;
+    backdrop-filter: blur(16px);
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+*/
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #E94632;
+    border-radius: 6px;
+}

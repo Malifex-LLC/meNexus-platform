@@ -36,6 +36,7 @@ const DisplaySettings = () => {
                         <option value="Dracula">Dracula</option>
                         <option value="Enki">Enki</option>
                         <option value="GameBoy">GameBoy</option>
+                        <option value="GruvboxDark">Gruvbox Dark</option>
                         <option value="HighVisOrange">High Vis - Orange</option>
                         <option value="HighVisYellow">High Vis - Yellow</option>
                         <option value="Indigo">Indigo</option>
