@@ -10,6 +10,10 @@ const SynapseMembersPanel = ({ members }) => {
         return <div>Loading Synapse members...</div>
     }
 
+    if (members.length === 0) {
+        return <div className={'text-foreground text-center text-xl p-4'}>No Synapse members...</div>
+    }
+
     return (
         <div>
             {members.map(member => {

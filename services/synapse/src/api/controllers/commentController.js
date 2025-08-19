@@ -3,6 +3,19 @@
 
 // Import the Comment model
 import Comment from '../models/comment.js';
+import activityController from './activityController.js';
+import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+import {loadConfig} from "#utils/configUtils.js";
+import broadcastController from "#api/controllers/broadcastController.js";
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 export const createComment = async (req, res) => {
     const { resourceType, resourceId, content, publicKey} = req.body;
@@ -16,6 +29,10 @@ export const createComment = async (req, res) => {
     if (result.affectedRows === 0) {
         return res.status(500).json({error: 'Failed to create a comment'});
     }
+
+    const synapseConfig = await loadConfig(CONFIG_FILE)
+    const activity = await activityController.createCommentActivity(publicKey, OBJECT_TYPES.POST, resourceId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
+    broadcastController.broadcastActivity(activity);
     return res.status(200).json(result);
 }
 

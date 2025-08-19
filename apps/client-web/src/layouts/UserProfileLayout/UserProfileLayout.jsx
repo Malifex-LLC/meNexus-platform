@@ -45,7 +45,7 @@ const UserProfileLayout = ({ children }) => {
             }
         }
         fetchSessionUser();
-    }, [])
+    }, [handle])
 
     useEffect(() => {
         const fetchUser = async () => {

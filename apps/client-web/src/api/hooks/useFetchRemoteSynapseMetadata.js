@@ -15,6 +15,7 @@ const useFetchRemoteSynapseMetadata = () => {
             params: {publicKey},
             withCredentials: true,
         });
+        console.log('fetchRemoteSynapseMetadata response: ', response);
         return response.data;
     };
 

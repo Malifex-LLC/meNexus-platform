@@ -12,7 +12,7 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
         day:   '2-digit'
     });
 
-export default function UserActivityPanel( ) {
+const  GlobalActivityPanel = () => {
     const [activities, setActivities] = useState([]);
     const { getAllActivities } = useGetAllActivities();
 
@@ -39,7 +39,7 @@ export default function UserActivityPanel( ) {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
+        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
 
             {/* master timeline line */}
             <ul className="p-4">
@@ -59,7 +59,7 @@ export default function UserActivityPanel( ) {
                                 <li key={i} className="relative pl-8 py-16 ">
                                     {/* dot */}
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
-                                    <Activity activity={activity} mode={'GLOBAL'}/>
+                                    <Activity activity={activity} mode={'GLOBAL'} />
                                 </li>
                             ))}
                         </ul>
@@ -69,3 +69,5 @@ export default function UserActivityPanel( ) {
         </div>
     );
 }
+
+export default GlobalActivityPanel

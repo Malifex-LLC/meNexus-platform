@@ -4,26 +4,27 @@
 import useAxios from './useAxios.js';
 import { ENDPOINTS } from "../config.js";
 
-const useGetSynapseMetadata = () => {
-    console.log("useGetSynapseMetadata called");
+
+const useGetAllActivities = () => {
+    console.log("useGetAllActivities called");
     const { data, loading, error, sendRequest } = useAxios();
 
-    const getSynapseMetadata = async () => {
+    const getAllActivities = async () => {
+
         const response = await sendRequest({
             method: 'GET',
-            url: ENDPOINTS.GET_SYNAPSE_METADATA,
+            url: ENDPOINTS.GET_ALL_ACTIVITIES,
             withCredentials: true,
         });
-        console.log('getSynapseMetadata response: ', response);
+        console.log('getAllActivities response: ', response.data);
         return response.data;
     };
 
     return {
-        getSynapseMetadata,
+        getAllActivities,
         data,
         loading,
-        error,
-    };
+        error};
 };
 
-export default useGetSynapseMetadata;
+export default useGetAllActivities;
