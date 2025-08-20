@@ -52,7 +52,7 @@ const makeDescription = ({
                     {mode === 'GLOBAL' && (
                         <>
                             <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> commented on a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-neutral cursor-pointer'}> post</span></Link>
+                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer'}> post</span></Link>
                             <> in </>
                             <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
                         </>
