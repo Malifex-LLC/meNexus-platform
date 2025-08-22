@@ -23,8 +23,7 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
     const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
     const publicKey = user.publicKey;
 
-
-
+    // TODO This method only receives new activities for the local Synapse in realtime, need to implement a pub/sub for all Synapses
     useActivityWebSocket({
         wsUrl: localSynapseMetadata.identity.webSocketUrl,
         publicKey,
