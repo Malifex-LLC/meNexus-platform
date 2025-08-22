@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom"
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import FeedPanel from "../../components/GlobalFeed/FeedPanel.jsx";
 import GlobalActivityPanel from "../../components/GlobalActivityPanel/GlobalActivityPanel.jsx";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 
 const DashboardLayout = ({ children }) => {
     const navigate = useNavigate(); // React Router navigate
@@ -24,8 +25,10 @@ const DashboardLayout = ({ children }) => {
 
     const [sessionUser, setSessionUser ] = useState(null)
     const [user, setUser] = useState(null)
+    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const { getUser } = useGetUser();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getSynapseMetadata } = useGetSynapseMetadata();
 
 
     useEffect(() => {
@@ -53,6 +56,18 @@ const DashboardLayout = ({ children }) => {
         }
         fetchUser();
     }, [sessionUser])
+
+    useEffect(() => {
+        const getMetadata = async () => {
+            try {
+                const metadata = await getSynapseMetadata();
+                setLocalSynapseMetadata(metadata);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getMetadata()
+    }, [])
 
 
     if (!user || !user.publicKey) {
@@ -120,7 +135,7 @@ const DashboardLayout = ({ children }) => {
                         {/*<ActivityFeed />*/}
                         <div className={'text-3xl text-foreground text-center border-b border-border p-4'}>Activity</div>
 
-                        <GlobalActivityPanel />
+                        <GlobalActivityPanel user={user} localSynapseMetadata={localSynapseMetadata} />
                     </div>
                 </div>
             </div>
