@@ -141,6 +141,12 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             className="post-form__entry-field p-4 w-full bg-background text-foreground rounded-md"
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent newline
+                    handleSubmit();
+                }
+            }}
         />
             </div>
 
@@ -149,6 +155,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
                 <button
                     className="post-form__button px-4 py-2 bg-brand text-white rounded-lg"
                     onClick={handleSubmit}
+
                     disabled={loading}
                 >
                     {loading ? "Posting..." : "Post"}

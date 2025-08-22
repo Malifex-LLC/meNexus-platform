@@ -84,6 +84,12 @@ const LoginForm = () => {
                         className={`w-full p-4 rounded-md border border-border mt-2`}
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault(); // Prevent newline
+                                handleSubmit(e);
+                            }
+                        }}
                         placeholder="Paste your private key here"
                     />
                 </label>
