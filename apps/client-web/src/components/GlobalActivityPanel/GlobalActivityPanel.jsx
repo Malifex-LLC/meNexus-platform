@@ -53,7 +53,10 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
             });
 
             const results = await Promise.all(allPostPromises);
-            const combinedActivities = results.flat(); // flatten array of arrays
+            const combinedActivities = results
+                .flat() // flatten array of arrays
+                .sort((a, b) => new Date(b.published) - new Date(a.published));
+
             setActivities(combinedActivities);
             console.log('Aggregated activities:', combinedActivities);
         };
