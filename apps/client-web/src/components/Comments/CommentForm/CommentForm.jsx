@@ -79,6 +79,12 @@ const CommentForm = ({
                     className="comment-form__entry-field p-4 mt-8  w-full rounded-2xl  bg-background"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault(); // Prevent newline
+                            handleSubmit();
+                        }
+                    }}
                 />
             </div>
             <button className="comment-form__button p-1 px-2 my-4 text-xs md:text-sm rounded-md bg-primary"
