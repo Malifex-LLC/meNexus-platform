@@ -18,7 +18,7 @@ const useFetchRemoteSynapseUserActivities = () => {
             withCredentials: true,
         });
         console.log('fetchRemoteSynapseUserActivities response: ', response.data);
-        return response.data;
+        return response.data.activities;
     };
 
     return {
