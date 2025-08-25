@@ -14,6 +14,8 @@ import UserOverviewPanel from "../../components/UserOverviewPanel/UserOverviewPa
 import UserShowcasePanel from "../../components/UserShowcasePanel/UserShowcasePanel.jsx";
 import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
 import UserJoinedSynapsesPanel from "../../components/UserJoinedSynapsesPanel/UserJoinedSynapsesPanel.jsx";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
+
 
 const UserProfileLayout = ({ children }) => {
     const navigate = useNavigate(); // React Router navigate
@@ -22,10 +24,12 @@ const UserProfileLayout = ({ children }) => {
     const [sessionUser, setSessionUser ] = useState(null)
     const [user, setUser] = useState(null)
     const [currentHandle, setCurrentHandle ] = useState(null)
-    const { getUserByHandle } = useGetUserByHandle();
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const [activeTab, setActiveTab] = useState("overview");
     const [isProfileOwner, setIsProfileOwner] = useState(false)
+    const { getUserByHandle } = useGetUserByHandle();
+    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getSynapseMetadata } = useGetSynapseMetadata();
 
     useEffect(() => {
         const fetchSessionUser = async () => {
@@ -58,6 +62,18 @@ const UserProfileLayout = ({ children }) => {
         }
         fetchUser();
     }, [sessionUser])
+
+    useEffect(() => {
+        const getMetadata = async () => {
+            try {
+                const metadata = await getSynapseMetadata();
+                setLocalSynapseMetadata(metadata);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getMetadata()
+    }, [])
 
     if (!user || !user.publicKey) {
         return <div className={'h-screen bg-background'}></div>;
@@ -120,7 +136,7 @@ const UserProfileLayout = ({ children }) => {
                             ) : activeTab === "showcase" ? (
                                 <UserShowcasePanel/>
                             ) : activeTab === "activity" ? (
-                                <UserActivityPanel/>
+                                <UserActivityPanel user={user} localSynapseMetadata={localSynapseMetadata}/>
                             ) : activeTab === "synapses" ? (
                                 <UserJoinedSynapsesPanel user={user} />
                             ) : (
