@@ -134,6 +134,20 @@ export const getAllActivities = async (req, res) => {
     }
 }
 
+export const getUserActivities = async (req, res) => {
+    const { publicKey } = req.query
+    if (!publicKey) {
+        res.status(400).json({error: 'No publicKey provided'});
+    }
+    try {
+        const activities = await Activity.getUserActivities(publicKey);
+        res.status(200).json(activities);
+    } catch (err) {
+        console.error('Error getting all activities: ', err);
+        res.status(500).json({error: 'Error getting all activities'});
+    }
+}
+
 export default {
     createPostActivity,
     createCommentActivity,
@@ -142,4 +156,5 @@ export default {
     createJoinSynapseActivity,
     createLeaveSynapseActivity,
     getAllActivities,
+    getUserActivities
 }

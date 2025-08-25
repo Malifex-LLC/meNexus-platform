@@ -99,6 +99,36 @@ export const handleData = async (libp2p, message) => {
                         }
 
                     }
+                    if (message.resourceType === RESOURCE_TYPES.SYNAPSE_USER_ACTIVITIES) {
+                        console.log(`Received SYNAPSE_USER_ACTIVITIES request from ${message.meta.sender}.`);
+                        const { publicKey } = message.payload;
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_USER_ACTIVITIES,
+                            params: { publicKey },
+                            withCredentials: true,
+                        });
+                        console.log('GET_USER_ACTIVITIES response: ', response);
+                        const activities = response.data;
+
+                        const activitiesResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.SYNAPSE_USER_ACTIVITIES,
+                            { activities },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, activitiesResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+
+                    }
                     if (message.resourceType === RESOURCE_TYPES.SYNAPSE_POST_BOARDS) {
                         console.log(`Received SYNAPSE_POST_BOARDS request from ${message.meta.sender}.`);
                         const response = await sendRequest({

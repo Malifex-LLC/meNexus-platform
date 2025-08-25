@@ -96,8 +96,27 @@ export const getAllActivities = async () => {
     })
 }
 
+export const getUserActivities = async (publicKey) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT * 
+            FROM Activities
+            WHERE Activities.actor_public_key = ?
+            ORDER BY published DESC
+        `;
+        meNexus.query(sql, [publicKey], async (err, results) => {
+            if (err) {
+                console.error(err);
+                return reject(err);
+            }
+            resolve(results);
+        })
+    })
+}
+
 export default {
     createActivity,
     createPostActivity,
     getAllActivities,
+    getUserActivities
 }
