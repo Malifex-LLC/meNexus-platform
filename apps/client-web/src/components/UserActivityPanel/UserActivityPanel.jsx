@@ -6,6 +6,8 @@ import Activity from '../Activity/Activity/Activity.jsx';
 import useGetAllActivities from '../../api/hooks/useGetAllActivities.js'
 import useFetchRemoteSynapseAllActivities from "../../api/hooks/useFetchRemoteSynapseAllActivities.js";
 import useActivityWebSocket from "../../api/hooks/useActivityWebSocket.js";
+import useGetUserActivities from "../../api/hooks/useGetUserActivities.js";
+import useFetchRemoteSynapseUserActivities from "../../api/hooks/useFetchRemoteSynapseUserActivities.js";
 
 const yyyymmdd = ts => ts.slice(0, 10);                      // "2025-06-23"
 const dayLabel = ts =>                                       // "Jun 23", "Apr 07"
@@ -18,8 +20,8 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
     const [localSynapse, setLocalSynapse] = useState({})
     const [activities, setActivities] = useState([]);
     const [bufferedActivities, setBufferedActivities] = useState([]);
-    const { getAllActivities } = useGetAllActivities();
-    const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
+    const { getUserActivities } = useGetUserActivities();
+    const { fetchRemoteSynapseUserActivities } = useFetchRemoteSynapseUserActivities();
     const publicKey = user.publicKey;
 
     useEffect(() => {
@@ -29,9 +31,9 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
 
             const allPostPromises = user.synapses.map(async (synapse) => {
                 if (synapse === localSynapseMetadata.identity.publicKey) {
-                    return await getAllActivities(); // returns array
+                    return await getUserActivities(user.publicKey); // returns array
                 } else {
-                    return await fetchRemoteSynapseAllActivities(synapse); // returns array
+                    return await fetchRemoteSynapseUserActivities(synapse, publicKey); // returns array
                 }
             });
 

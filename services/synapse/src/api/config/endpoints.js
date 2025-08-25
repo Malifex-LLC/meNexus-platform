@@ -72,12 +72,14 @@ export const ENDPOINTS = {
     GET_ALL_DISCOVERED_PEERS: `${API_BASE_URL}/api/synapse/getAllDiscoveredPeers`,
 
     GET_ALL_ACTIVITIES: `${API_BASE_URL}/api/activity/getAllActivities`,
+    GET_USER_ACTIVITIES: `${API_BASE_URL}/api/activity/getUserActivities`,
 
     /* ---- REMOTE ROUTES ----------------------------------------------------- */
     FETCH_REMOTE_SYNAPSE_METADATA: `${API_BASE_URL}/remote/fetchRemoteSynapseMetadata`,
     FETCH_REMOTE_SYNAPSE_MEMBERS: `${API_BASE_URL}/remote/fetchRemoteSynapseMembers`,
     FETCH_REMOTE_USERS: `${API_BASE_URL}/remote/getRemoteUsers`,
     FETCH_REMOTE_SYNAPSE_ALL_ACTIVITIES: `${API_BASE_URL}/remote/fetchRemoteSynapseAllActivities`,
+    FETCH_REMOTE_SYNAPSE_USER_ACTIVITIES: `${API_BASE_URL}/remote/fetchRemoteSynapseUserActivities`,
     FETCH_REMOTE_SYNAPSE_POST_BOARDS: `${API_BASE_URL}/remote/fetchRemoteSynapsePostBoards`,
     FETCH_REMOTE_SYNAPSE_CHAT_CHANNELS: `${API_BASE_URL}/remote/fetchRemoteSynapseChatChannels`,
     FETCH_REMOTE_POSTS: `${API_BASE_URL}/remote/getRemotePosts`,
