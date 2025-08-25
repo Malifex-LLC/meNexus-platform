@@ -122,7 +122,7 @@ export const fetchRemoteSynapseUserActivities = async (req, res) => {
         MESSAGE_TYPES.DATA.REQUEST,
         ACTION_TYPES.DATA.QUERY,
         RESOURCE_TYPES.SYNAPSE_USER_ACTIVITIES,
-        {},
+        {publicKey},
         {sender: process.env.PUBLIC_KEY}
     );
     try {
