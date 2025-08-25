@@ -4,6 +4,8 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import Activity from '../Activity/Activity/Activity.jsx';
 import useGetAllActivities from '../../api/hooks/useGetAllActivities.js'
+import useFetchRemoteSynapseAllActivities from "../../api/hooks/useFetchRemoteSynapseAllActivities.js";
+import useActivityWebSocket from "../../api/hooks/useActivityWebSocket.js";
 
 const yyyymmdd = ts => ts.slice(0, 10);                      // "2025-06-23"
 const dayLabel = ts =>                                       // "Jun 23", "Apr 07"
@@ -12,17 +14,38 @@ const dayLabel = ts =>                                       // "Jun 23", "Apr 0
         day:   '2-digit'
     });
 
-export default function UserActivityPanel( ) {
+export default function UserActivityPanel({user, localSynapseMetadata}) {
+    const [localSynapse, setLocalSynapse] = useState({})
     const [activities, setActivities] = useState([]);
+    const [bufferedActivities, setBufferedActivities] = useState([]);
     const { getAllActivities } = useGetAllActivities();
+    const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
+    const publicKey = user.publicKey;
 
     useEffect(() => {
-        const getActivites = async () => {
-            const activitiesData = await getAllActivities();
-            setActivities(activitiesData)
-        }
-        getActivites();
-    }, [])
+        const aggregateActivity = async () => {
+            console.log('Aggregate Activity called');
+            if (!user || !user.synapses) return;
+
+            const allPostPromises = user.synapses.map(async (synapse) => {
+                if (synapse === localSynapseMetadata.identity.publicKey) {
+                    return await getAllActivities(); // returns array
+                } else {
+                    return await fetchRemoteSynapseAllActivities(synapse); // returns array
+                }
+            });
+
+            const results = await Promise.all(allPostPromises);
+            const combinedActivities = results
+                .flat() // flatten array of arrays
+                .sort((a, b) => new Date(b.published) - new Date(a.published));
+
+            setActivities(combinedActivities);
+            console.log('Aggregated activities:', combinedActivities);
+        };
+
+        aggregateActivity();
+    }, [user]);
 
 
     /* group by day */
@@ -39,7 +62,7 @@ export default function UserActivityPanel( ) {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
+        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
 
             {/* master timeline line */}
             <ul className="p-4">
@@ -59,7 +82,7 @@ export default function UserActivityPanel( ) {
                                 <li key={i} className="relative pl-8 py-16 ">
                                     {/* dot */}
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
-                                    <Activity activity={activity} mode={'GLOBAL'}/>
+                                    <Activity activity={activity} mode={'GLOBAL'} />
                                 </li>
                             ))}
                         </ul>
