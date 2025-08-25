@@ -13,7 +13,7 @@ const useFetchRemoteSynapseUserActivities = () => {
 
         const response = await sendRequest({
             method: 'GET',
-            url: ENDPOINTS.GET_USER_ACTIVITIES,
+            url: ENDPOINTS.FETCH_REMOTE_SYNAPSE_USER_ACTIVITIES,
             params: { publicKey },
             withCredentials: true,
         });
