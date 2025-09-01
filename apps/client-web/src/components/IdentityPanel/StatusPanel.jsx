@@ -3,7 +3,7 @@
 
 const StatusPanel = () => {
     return (
-        <div className={'bg-surface p-2 text-foreground rounded-xl'}>
+        <div className={'bg-surface p-2 text-foreground rounded-xl shadow-lg'}>
             Online - Vibe Coding...
         </div>
     );

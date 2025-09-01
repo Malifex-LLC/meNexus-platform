@@ -6,8 +6,10 @@ import { FaFireFlameCurved } from "react-icons/fa6";
 
 
 const mockReputation = {
-    level: "Core Maintainer",
-    score: 812,
+    level: "Trusted",
+    score: 1337,
+    creator: '63 %',
+    curator: '37 %',
     endorsements: 23,
     contributions: 42,
     verifiedCredentials: 3,
@@ -16,11 +18,11 @@ const mockReputation = {
 const UserReputationPanel = () => {
     return (
         <div className="bg-surface rounded-xl shadow-lg p-6 w-full text-foreground border border-border">
-            <h2 className="text-2xl font-semibold text-primary mb-4">Reputation</h2>
+            <h2 className="text-2xl font-semibold text-brand mb-4">Reputation</h2>
 
             {/* Reputation Level */}
             <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-medium">Reputation Level:</span>
+                <span className="text-lg text-foreground font-medium">Reputation Level:</span>
                 <span className="text-brand font-bold text-md flex items-center gap-2">
                     <FaFireFlameCurved className={'text-accent'}/>
                     {mockReputation.level}
@@ -31,6 +33,14 @@ const UserReputationPanel = () => {
             <div className="flex items-center justify-between mb-3">
                 <span className="text-neutral">Reputation Score:</span>
                 <span className="font-semibold">{mockReputation.score}</span>
+            </div>
+            <div className="flex items-center justify-between mb-3">
+                <span className="text-neutral">Creator:</span>
+                <span className="font-semibold">{mockReputation.creator}</span>
+            </div>
+            <div className="flex items-center justify-between mb-3">
+                <span className="text-neutral">Curator:</span>
+                <span className="font-semibold">{mockReputation.curator}</span>
             </div>
 
             {/* Endorsements */}
