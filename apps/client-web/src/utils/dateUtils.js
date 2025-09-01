@@ -14,3 +14,12 @@ export const formatDate = (isoDateString) => {
     });
 };
 
+export const formatDateNoTime = (isoDateString) => {
+    const date = new Date(isoDateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long', // e.g., "December"
+        day: 'numeric', // e.g., "9"
+    });
+};
+

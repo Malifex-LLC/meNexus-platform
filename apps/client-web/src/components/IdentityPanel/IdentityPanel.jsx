@@ -60,11 +60,11 @@ const IdentityPanel = ({user, isProfileOwner}) => {
 
 
     return (
-        <div className={`relative flex flex-col p-4 h-full w-full bg-background rounded-xl border border-border shadow-2xl`}>
+        <div className={`relative flex flex-col p-4 h-full w-full bg-background rounded-xl border border-border shadow-lg`}>
             {/* Top Profile Section */}
             <div className={'p-4'}>
                 <div className={` p-4 flex flex-col text-foreground rounded-xl shadow-lg `}>
-                    <div className={'p-4 bg-surface rounded-xl shadow-2xl'}>
+                    <div className={'p-4 bg-surface rounded-xl shadow-lg'}>
                         <p className={`md:text-2xl xl:text-7xl`}>{user.displayName}</p>
                         <p className={`md:text-lg xl:text-5xl text-brand`}>@{user.handle}</p>
                     </div>
