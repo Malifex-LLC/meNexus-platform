@@ -5,6 +5,8 @@ services:
     image: mysql:8.0
     container_name: menexus-db
     restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
     environment:
       MYSQL_DATABASE: menexus_schema
       MYSQL_USER: user
@@ -15,9 +17,9 @@ services:
         target: DB_ROOT_PW
       - source: DB_USER_PW
         target: DB_USER_PW
-    command: >
-      mysqld --character-set-server=utf8mb4
-             --collation-server=utf8mb4_unicode_ci
+#    command: >
+#      mysqld --character-set-server=utf8mb4
+#             --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"                     # optional to expose to host tools
     volumes:

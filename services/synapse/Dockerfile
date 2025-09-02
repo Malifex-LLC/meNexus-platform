@@ -3,7 +3,7 @@
 ############################
 # Build deps with pnpm workspaces
 ############################
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /repo
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
@@ -21,7 +21,7 @@ COPY . .
 ############################
 # Runtime image
 ############################
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
