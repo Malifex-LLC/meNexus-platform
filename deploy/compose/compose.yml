@@ -1,0 +1,120 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: menexus-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: menexus_schema
+      MYSQL_USER: user
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/DB_ROOT_PW
+      MYSQL_PASSWORD_FILE: /run/secrets/DB_USER_PW
+    secrets:
+      - source: DB_ROOT_PW
+        target: DB_ROOT_PW
+      - source: DB_USER_PW
+        target: DB_USER_PW
+    command: >
+      mysqld --character-set-server=utf8mb4
+             --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"                     # optional to expose to host tools
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ../../services/synapse/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  synapse:
+    build:
+      context: ../..                    # repo root
+      dockerfile: services/synapse/Dockerfile
+    image: ghcr.io/malifex/synapse:dev
+    container_name: synapse
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - "3001:3001"                     # API
+      - "4001:4001"                     # libp2p TCP
+      - "4002:4002"                     # orbitdb TCP
+
+    environment:
+      # --- MySQL DB config  ---
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_USER: user
+      DB_PASSWORD_FILE: /run/secrets/DB_USER_PW
+      DB_DATABASE: menexus_schema
+
+      # --- orbitDB config  ---
+      GLOBAL_USERS_DB_ADDR: /orbitdb/zdpuAuqAzFotj3AvtYtob9xoLMRWqhozNC7FLHooFreM49pJS
+
+      # --- Config & uploads paths in the container ---
+      CONFIG_FILE: "/app/services/synapse/src/config/synapse-config.json"
+      SYNAPSE_PRIVATE_KEY_FILE: /data/secrets/account_private_key
+      UPLOADS_DIR: "/synapse/uploads"
+
+      # --- First-run config generation & networking ---
+      GENERATE_CONFIG: "true"
+      PUBLIC_URL: "http://localhost:8080"
+      EXTERNAL_IP: "70.57.81.12"
+      EXPRESS_PORT: "3001"
+      LIBP2P_TCP: "4001"
+      LIBP2P_BOOTSTRAP: "/ip4/13.223.39.175/tcp/4001/p2p/12D3KooWN7V1PpogA2PS6yY3D5tHDQHkJUBQuQnQcDXJ6ZAjJpvX"
+      ORBITDB_TCP: "4002"
+      ORBITDB_BOOTSTRAP: "/ip4/13.223.39.175/tcp/4002/p2p/12D3KooWPzebGKJnwvBEoNg4ZXxoSg5AiSBu4YfDuapCjxFrmC8s"
+
+      SYNAPSE_NAME: "New Synapse"
+      SYNAPSE_DESC: "New Synapse Running in Docker Container"
+      SYNAPSE_BOARDS:
+      SYNAPSE_CHANNELS:
+
+    secrets:
+      - source: DB_USER_PW
+        target: DB_USER_PW
+      - source: YOUTUBE_API_KEY
+        target: YOUTUBE_API_KEY
+
+    volumes:
+      - synapse-config:/app/services/synapse/src/config
+      - synapse-uploads:/synapse/uploads
+      - synapse-secrets:/data/secrets
+
+  web:
+    build:
+      context: ../..                         # repo root
+      dockerfile: apps/client-web/Dockerfile
+      args:
+        VITE_API_BASE_URL: ""
+        VITE_WS_BASE_URL: /ws
+    image: ghcr.io/malifex/synapse-web:dev
+    container_name: synapse-web
+    restart: unless-stopped
+    depends_on:
+      synapse:
+        condition: service_started
+    ports:
+      - "8080:80"                            # visit http://localhost:8080
+
+secrets:
+  DB_ROOT_PW:
+    file: ./secrets/db_root_pw.txt
+  DB_USER_PW:
+    file: ./secrets/db_user_pw.txt
+  YOUTUBE_API_KEY:
+    file: ./secrets/youtube_api_key.txt
+
+volumes:
+  dbdata:
+  synapse-config:
+  synapse-uploads:
+  synapse-secrets:
+

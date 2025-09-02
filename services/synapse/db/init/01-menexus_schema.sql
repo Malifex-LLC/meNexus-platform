@@ -21,6 +21,52 @@ USE `menexus_schema`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `Activities`
+--
+
+DROP TABLE IF EXISTS `Activities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Activities` (
+                              `id` char(36) NOT NULL,
+                              `type` varchar(50) NOT NULL,
+                              `actor_public_key` varchar(66) NOT NULL,
+                              `object_type` varchar(50) NOT NULL,
+                              `object_id` varchar(66) NOT NULL,
+                              `target_type` varchar(50) DEFAULT NULL,
+                              `target_id` varchar(255) DEFAULT NULL,
+                              `context_type` varchar(50) DEFAULT NULL,
+                              `context_id` varchar(255) DEFAULT NULL,
+                              `meta` json DEFAULT NULL,
+                              `published` datetime DEFAULT CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`id`),
+                              KEY `idx_actor_public_key` (`actor_public_key`),
+                              KEY `idx_context_id` (`context_id`),
+                              KEY `idx_object_id` (`object_id`),
+                              KEY `idx_published` (`published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `ChatMessages`
+--
+
+DROP TABLE IF EXISTS `ChatMessages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ChatMessages` (
+                                `chat_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+                                `public_key` varchar(66) NOT NULL,
+                                `channel` varchar(255) NOT NULL,
+                                `content` text NOT NULL,
+                                `media_url` text,
+                                `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                PRIMARY KEY (`chat_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `ConversationParticipants`
 --
 
@@ -48,6 +94,20 @@ CREATE TABLE `Conversations` (
                                  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                  PRIMARY KEY (`conversation_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Members`
+--
+
+DROP TABLE IF EXISTS `Members`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Members` (
+                           `public_key` varchar(66) NOT NULL,
+                           `joined_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                           PRIMARY KEY (`public_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +151,7 @@ CREATE TABLE `Notifications` (
                                  `is_read` tinyint NOT NULL DEFAULT '0',
                                  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  PRIMARY KEY (`notification_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=399 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=408 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +172,7 @@ CREATE TABLE `PostComments` (
                                 PRIMARY KEY (`comment_id`),
                                 KEY `fk_post_id_idx` (`resource_id`),
                                 CONSTRAINT `fk_post_id` FOREIGN KEY (`resource_id`) REFERENCES `Posts` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=209 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,12 +185,13 @@ DROP TABLE IF EXISTS `Posts`;
 CREATE TABLE `Posts` (
                          `post_id` bigint unsigned NOT NULL AUTO_INCREMENT,
                          `public_key` varchar(66) NOT NULL,
+                         `board` varchar(255) NOT NULL,
                          `content` text,
                          `media_url` varchar(255) DEFAULT NULL,
                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`post_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=218 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,27 +208,6 @@ CREATE TABLE `Reactions` (
                              `resource_type` varchar(50) NOT NULL,
                              `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                              PRIMARY KEY (`reaction_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Themes`
---
-
-DROP TABLE IF EXISTS `Themes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Themes` (
-                          `theme_id` bigint NOT NULL AUTO_INCREMENT,
-                          `name` varchar(100) NOT NULL,
-                          `description` text,
-                          `css` text,
-                          `animations` json DEFAULT NULL,
-                          `created_by` bigint unsigned NOT NULL,
-                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          PRIMARY KEY (`theme_id`),
-                          UNIQUE KEY `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -200,4 +240,4 @@ CREATE TABLE `UserSettings` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-25 23:54:47
+-- Dump completed on 2025-09-01 15:59:37
