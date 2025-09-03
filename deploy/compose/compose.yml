@@ -62,7 +62,7 @@ services:
       # --- Config & uploads paths in the container ---
       CONFIG_FILE: "/app/services/synapse/src/config/synapse-config.json"
       SYNAPSE_PRIVATE_KEY_FILE: /data/secrets/account_private_key
-      UPLOADS_DIR: "/synapse/uploads"
+      UPLOADS_DIR: "/app/services/synapse/uploads"
 
       # --- First-run config generation & networking ---
       GENERATE_CONFIG: "true"
@@ -87,7 +87,7 @@ services:
 
     volumes:
       - synapse-config:/app/services/synapse/src/config
-      - synapse-uploads:/synapse/uploads
+      - synapse-uploads:/app/services/synapse/uploads
       - synapse-secrets:/data/secrets
 
   web:
