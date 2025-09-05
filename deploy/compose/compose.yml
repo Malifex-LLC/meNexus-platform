@@ -63,6 +63,9 @@ services:
     entrypoint: [ "/bin/sh","-c" ]
     command: |
       set -eu
+      ROOT_PW="$(cat /work/secrets/db_root_pw.txt)"
+      APP_PW="$(cat /work/secrets/db_user_pw.txt)"
+      ADMIN_PW="$(cat /work/secrets/db_admin_pw.txt)"
       # wait for DB just in case
       until mysql -h db -uroot -p"$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do
         echo "[db-init] waiting for db..."
