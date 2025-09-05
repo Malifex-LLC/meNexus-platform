@@ -5,19 +5,20 @@ services:
     image: alpine:3.20
     container_name: menexus-bootstrap
     restart: "no"
-    # Bind-mount the same secrets dir your `secrets:` entries reference
     volumes:
       - ./secrets:/work/secrets
-    entrypoint: [ "/bin/sh","-c" ]
-    command: >
-      set -eu;
-      umask 077;
-      mkdir -p /work/secrets;
-      [ -s /work/secrets/db_root_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_root_pw.txt;
-      [ -s /work/secrets/db_user_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_user_pw.txt;
-      [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt;
-      [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt;
-      echo "[bootstrap] Secrets ready in ./secrets."
+    entrypoint: [ "/bin/sh" ]
+    command:
+      - -euxc
+      - |
+        umask 077
+        mkdir -p /work/secrets
+        [ -s /work/secrets/db_root_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_root_pw.txt
+        [ -s /work/secrets/db_user_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_user_pw.txt
+        [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt
+        [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt
+        echo "[bootstrap] Secrets ready in ./secrets."
+  
 
   db:
     depends_on:
