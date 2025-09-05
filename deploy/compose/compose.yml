@@ -1,4 +1,5 @@
-version: "3.9"
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright © 2025 Malifex LLC and contributors
 
 services:
   bootstrap:
@@ -31,15 +32,10 @@ services:
     environment:
       MYSQL_DATABASE: menexus_schema
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/DB_ROOT_PW
+      MYSQL_ROOT_HOST: "%"
     secrets:
       - source: DB_ROOT_PW
         target: DB_ROOT_PW
-      - source: DB_USER_PW
-        target: DB_USER_PW
-        mode: 0444
-      - source: DB_ADMIN_PW
-        target: DB_ADMIN_PW
-        mode: 0444
 #    command: >
 #      mysqld --character-set-server=utf8mb4
 #             --collation-server=utf8mb4_unicode_ci
@@ -54,6 +50,48 @@ services:
       timeout: 3s
       retries: 20
 
+  db-init:
+    image: mysql:8.0
+    user: "0:0"
+    depends_on:
+      db:
+        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
+    volumes:
+      - ./secrets:/work/secrets:ro
+    entrypoint: [ "/bin/sh","-c" ]
+    command: |
+      set -eu
+      ROOT_PW="$(cat /work/secrets/db_root_pw.txt)"
+      APP_PW="$(cat /work/secrets/db_user_pw.txt)"
+      ADMIN_PW="$(cat /work/secrets/db_admin_pw.txt)"
+      # wait for DB just in case
+      until mysql -h db -uroot -p"$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do
+        echo "[db-init] waiting for db..."
+        sleep 1
+      done
+      mysql -h db -uroot -p"$ROOT_PW" <<SQL
+      CREATE DATABASE IF NOT EXISTS \`menexus_schema\`
+        CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+      
+      CREATE USER IF NOT EXISTS 'menexus_user'@'%' IDENTIFIED BY '$APP_PW';
+      CREATE USER IF NOT EXISTS 'menexus_admin'@'%' IDENTIFIED BY '$ADMIN_PW';
+      
+      ALTER USER 'menexus_user'@'%' IDENTIFIED BY '$APP_PW';
+      ALTER USER 'menexus_admin'@'%' IDENTIFIED BY '$ADMIN_PW';
+      
+      GRANT SELECT, INSERT, UPDATE, DELETE
+        ON \`menexus_schema\`.* TO 'menexus_user'@'%';
+      
+      GRANT CREATE, ALTER, DROP, INDEX, CREATE VIEW, SHOW VIEW, EVENT, TRIGGER,
+             SELECT, INSERT, UPDATE, DELETE
+        ON \`menexus_schema\`.* TO 'menexus_admin'@'%';
+      
+      FLUSH PRIVILEGES;
+      SQL
+    restart: "no"
+
   synapse:
     build:
       context: ../..                    # repo root
@@ -67,6 +105,8 @@ services:
         condition: service_completed_successfully
       db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
 
     ports:
       - "4001:4001"                     # libp2p TCP
