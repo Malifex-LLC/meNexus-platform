@@ -62,13 +62,13 @@ services:
       - ./secrets:/work/secrets:ro
     entrypoint: [ "/bin/sh","-euxc" ]
     command: >
-      ROOT_PW="$(cat /work/secrets/db_root_pw.txt)";
-      APP_PW="$(cat /work/secrets/db_user_pw.txt)";
-      ADMIN_PW="$(cat /work/secrets/db_admin_pw.txt)";
-      until mysqladmin ping -h db --silent; do sleep 1; done;
-      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done;
-      APP_ESC=$$(printf "%s" "$$APP_PW" | sed "s/'/''/g");
-      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g");
+      ROOT_PW="$(cat /work/secrets/db_root_pw.txt)"; \
+      APP_PW="$(cat /work/secrets/db_user_pw.txt)"; \
+      ADMIN_PW="$(cat /work/secrets/db_admin_pw.txt)"; \
+      until mysqladmin ping -h db --silent; do sleep 1; done; \
+      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done; \
+      APP_ESC=$$(printf "%s" "$$APP_PW" | sed "s/'/''/g"); \
+      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g"); \
       mysql -h db -uroot -p"$$ROOT_PW" -e "
         CREATE DATABASE IF NOT EXISTS \`menexus_schema\`
           CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
