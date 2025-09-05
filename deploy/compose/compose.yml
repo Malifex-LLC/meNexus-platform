@@ -1,7 +1,28 @@
 version: "3.9"
 
 services:
+  bootstrap:
+    image: alpine:3.20
+    container_name: menexus-bootstrap
+    restart: "no"
+    # Bind-mount the same secrets dir your `secrets:` entries reference
+    volumes:
+      - ./secrets:/work/secrets
+    entrypoint: [ "/bin/sh","-c" ]
+    command: >
+      set -eu;
+      umask 077;
+      mkdir -p /work/secrets;
+      [ -s /work/secrets/db_root_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_root_pw.txt;
+      [ -s /work/secrets/db_user_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_user_pw.txt;
+      [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt;
+      [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt;
+      echo "[bootstrap] Secrets ready in ./secrets."
+
   db:
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
     image: mysql:8.0
     container_name: menexus-db
     restart: unless-stopped
@@ -9,19 +30,19 @@ services:
       - seccomp:unconfined
     environment:
       MYSQL_DATABASE: menexus_schema
-      MYSQL_USER: user
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/DB_ROOT_PW
-      MYSQL_PASSWORD_FILE: /run/secrets/DB_USER_PW
     secrets:
       - source: DB_ROOT_PW
         target: DB_ROOT_PW
       - source: DB_USER_PW
         target: DB_USER_PW
+      - source: DB_ADMIN_PW
+        target: DB_ADMIN_PW
 #    command: >
 #      mysqld --character-set-server=utf8mb4
 #             --collation-server=utf8mb4_unicode_ci
     ports:
-      - "3306:3306"                     # optional to expose to host tools
+      - "127.0.0.1:3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
       - ../../services/synapse/db/init:/docker-entrypoint-initdb.d:ro
@@ -35,24 +56,27 @@ services:
     build:
       context: ../..                    # repo root
       dockerfile: services/synapse/Dockerfile
-    image: ghcr.io/malifex/synapse:dev
+    image: ${SYNAPSE_IMAGE:-ghcr.io/malifex/synapse:dev}
     container_name: synapse
     restart: unless-stopped
 
     depends_on:
+      bootstrap:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
 
     ports:
-      - "3001:3001"                     # API
       - "4001:4001"                     # libp2p TCP
       - "4002:4002"                     # orbitdb TCP
+    expose:
+      - "3001"
 
     environment:
       # --- MySQL DB config  ---
       DB_HOST: db
       DB_PORT: "3306"
-      DB_USER: user
+      DB_USER: menexus_user
       DB_PASSWORD_FILE: /run/secrets/DB_USER_PW
       DB_DATABASE: menexus_schema
 
@@ -66,18 +90,18 @@ services:
 
       # --- First-run config generation & networking ---
       GENERATE_CONFIG: "true"
-      PUBLIC_URL: "http://localhost:8080"
-      EXTERNAL_IP: "70.57.81.12"
+      PUBLIC_URL: "${PUBLIC_URL:-http://localhost}"    # ← from .env
+      EXTERNAL_IP: "${EXTERNAL_IP:-}"
       EXPRESS_PORT: "3001"
-      LIBP2P_TCP: "4001"
-      LIBP2P_BOOTSTRAP: "/ip4/13.223.39.175/tcp/4001/p2p/12D3KooWN7V1PpogA2PS6yY3D5tHDQHkJUBQuQnQcDXJ6ZAjJpvX"
-      ORBITDB_TCP: "4002"
-      ORBITDB_BOOTSTRAP: "/ip4/13.223.39.175/tcp/4002/p2p/12D3KooWPzebGKJnwvBEoNg4ZXxoSg5AiSBu4YfDuapCjxFrmC8s"
+      LIBP2P_TCP: "${LIBP2P_TCP:-4001}"
+      LIBP2P_BOOTSTRAP: "${LIBP2P_BOOTSTRAP:-}"
+      ORBITDB_TCP: "${ORBITDB_TCP:-4002}"
+      ORBITDB_BOOTSTRAP: "${ORBITDB_BOOTSTRAP:-}"
 
-      SYNAPSE_NAME: "New Synapse"
-      SYNAPSE_DESC: "New Synapse Running in Docker Container"
-      SYNAPSE_BOARDS:
-      SYNAPSE_CHANNELS:
+      SYNAPSE_NAME: "${SYNAPSE_NAME:-New Synapse}"
+      SYNAPSE_DESC: "${SYNAPSE_DESC:-New Synapse Running in Docker Container}"
+      SYNAPSE_BOARDS: "${SYNAPSE_BOARDS:-}"
+      SYNAPSE_CHANNELS: "${SYNAPSE_CHANNELS:-}"
 
     secrets:
       - source: DB_USER_PW
@@ -97,20 +121,41 @@ services:
       args:
         VITE_API_BASE_URL: ""
         VITE_WS_BASE_URL: /ws
-    image: ghcr.io/malifex/synapse-web:dev
+    image: ${WEB_IMAGE:-ghcr.io/malifex/synapse-web:dev}
     container_name: synapse-web
     restart: unless-stopped
     depends_on:
       synapse:
         condition: service_started
+    expose:
+      - "80"
+
+  proxy:
+    build:
+      context: ../../services/proxy
+      dockerfile: Dockerfile
+    container_name: synapse-proxy
+    restart: unless-stopped
+    depends_on:
+      - web
+      - synapse
+    environment:
+      PUBLIC_URL: "${PUBLIC_URL:-http://localhost}"
+      EMAIL: "${EMAIL:-admin@example.com}"
     ports:
-      - "8080:80"                            # visit http://localhost:8080
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - acme-webroot:/var/www/certbot
 
 secrets:
   DB_ROOT_PW:
     file: ./secrets/db_root_pw.txt
   DB_USER_PW:
     file: ./secrets/db_user_pw.txt
+  DB_ADMIN_PW:
+    file: ./secrets/db_admin_pw.txt
   YOUTUBE_API_KEY:
     file: ./secrets/youtube_api_key.txt
 
@@ -119,4 +164,6 @@ volumes:
   synapse-config:
   synapse-uploads:
   synapse-secrets:
+  letsencrypt:
+  acme-webroot:
 
