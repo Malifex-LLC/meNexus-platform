@@ -127,7 +127,7 @@ services:
 
       # --- Config & uploads paths in the container ---
       CONFIG_FILE: "/app/services/synapse/src/config/synapse-config.json"
-      SYNAPSE_PRIVATE_KEY_FILE: /data/secrets/account_private_key
+      SYNAPSE_PRIVATE_KEY_FILE: /data/secrets/synapse_private_key
       UPLOADS_DIR: "/app/services/synapse/uploads"
 
       # --- First-run config generation & networking ---
