@@ -62,37 +62,29 @@ services:
       - ./secrets:/work/secrets:ro
     entrypoint: [ "/bin/sh","-c" ]
     command: |
-      set -euxo pipefail
-      ROOT_PW="$$(cat /work/secrets/db_root_pw.txt)"
-      APP_PW="$$(cat /work/secrets/db_user_pw.txt)"
-      ADMIN_PW="$$(cat /work/secrets/db_admin_pw.txt)"
-
-      # Wait for MySQL to be reachable
-      until mysqladmin ping -h db --silent; do sleep 1; done
-      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done
-
-      # Escape single quotes for SQL literals
-      APP_ESC=$$(printf "%s" "$$APP_PW"   | sed "s/'/''/g")
-      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g")
-
-      mysql -h db -uroot -p"$$ROOT_PW" <<'SQL'
-      CREATE DATABASE IF NOT EXISTS `menexus_schema`
-        CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-      SQL
-
-      mysql -h db -uroot -p"$$ROOT_PW" -e "
-        CREATE USER IF NOT EXISTS 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC';
-        CREATE USER IF NOT EXISTS 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC';
-        ALTER USER 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC';
-        ALTER USER 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC';
-        GRANT SELECT, INSERT, UPDATE, DELETE
-          ON \`menexus_schema\`.* TO 'menexus_user'@'%';
-        GRANT CREATE, ALTER, DROP, INDEX, CREATE VIEW, SHOW VIEW, EVENT, TRIGGER,
-               SELECT, INSERT, UPDATE, DELETE
-          ON \`menexus_schema\`.* TO 'menexus_admin'@'%';
-        FLUSH PRIVILEGES;
+      ROOT_PW="$$(cat /work/secrets/db_root_pw.txt)"; \
+      APP_PW="$$(cat /work/secrets/db_user_pw.txt)"; \
+      ADMIN_PW="$$(cat /work/secrets/db_admin_pw.txt)"; \
+      until mysqladmin ping -h db --silent; do sleep 1; done; \
+      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done; \
+      APP_ESC=$$(printf "%s" "$$APP_PW"   | sed "s/'/''/g"); \
+      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g"); \
+      mysql -h db -uroot -p"$$ROOT_PW" -e " \
+        CREATE DATABASE IF NOT EXISTS \`menexus_schema\` \
+          CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
+        CREATE USER IF NOT EXISTS 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC'; \
+        CREATE USER IF NOT EXISTS 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC'; \
+        ALTER USER 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC'; \
+        ALTER USER 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC'; \
+        GRANT SELECT, INSERT, UPDATE, DELETE \
+          ON \`menexus_schema\`.* TO 'menexus_user'@'%'; \
+        GRANT CREATE, ALTER, DROP, INDEX, CREATE VIEW, SHOW VIEW, EVENT, TRIGGER, \
+               SELECT, INSERT, UPDATE, DELETE \
+          ON \`menexus_schema\`.* TO 'menexus_admin'@'%'; \
+        FLUSH PRIVILEGES; \
       "
     restart: "no"
+
 
 
 
