@@ -36,8 +36,10 @@ services:
         target: DB_ROOT_PW
       - source: DB_USER_PW
         target: DB_USER_PW
+        mode: 0444
       - source: DB_ADMIN_PW
         target: DB_ADMIN_PW
+        mode: 0444
 #    command: >
 #      mysqld --character-set-server=utf8mb4
 #             --collation-server=utf8mb4_unicode_ci
