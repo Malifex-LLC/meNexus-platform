@@ -62,35 +62,41 @@ services:
       - ./secrets:/work/secrets:ro
     entrypoint: [ "/bin/sh","-c" ]
     command: |
-      set -eu
+      set -euo pipefail
+      # read secrets (files exist; perms are 600 root:root)
       ROOT_PW="$(cat /work/secrets/db_root_pw.txt)"
       APP_PW="$(cat /work/secrets/db_user_pw.txt)"
       ADMIN_PW="$(cat /work/secrets/db_admin_pw.txt)"
-      # wait for DB just in case
-      until mysql -h db -uroot -p"$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do
-        echo "[db-init] waiting for db..."
-        sleep 1
-      done
-      mysql -h db -uroot -p"$ROOT_PW" <<SQL
+
+      # wait for TCP and auth
+      until mysqladmin ping -h db --silent; do sleep 1; done
+      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done
+
+      # escape single quotes for SQL safety
+      APP_ESC=$$(printf "%s" "$$APP_PW" | sed "s/'/''/g")
+      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g")
+
+      mysql -h db -uroot -p"$$ROOT_PW" <<SQL
       CREATE DATABASE IF NOT EXISTS \`menexus_schema\`
         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-      
-      CREATE USER IF NOT EXISTS 'menexus_user'@'%' IDENTIFIED BY '$APP_PW';
-      CREATE USER IF NOT EXISTS 'menexus_admin'@'%' IDENTIFIED BY '$ADMIN_PW';
-      
-      ALTER USER 'menexus_user'@'%' IDENTIFIED BY '$APP_PW';
-      ALTER USER 'menexus_admin'@'%' IDENTIFIED BY '$ADMIN_PW';
-      
+
+      CREATE USER IF NOT EXISTS "menexus_user"@"%" IDENTIFIED BY '$$APP_ESC';
+      CREATE USER IF NOT EXISTS "menexus_admin"@"%" IDENTIFIED BY '$$ADM_ESC';
+
+      ALTER USER "menexus_user"@"%" IDENTIFIED BY '$$APP_ESC';
+      ALTER USER "menexus_admin"@"%" IDENTIFIED BY '$$ADM_ESC';
+
       GRANT SELECT, INSERT, UPDATE, DELETE
-        ON \`menexus_schema\`.* TO 'menexus_user'@'%';
-      
+        ON \`menexus_schema\`.* TO "menexus_user"@"%";
+
       GRANT CREATE, ALTER, DROP, INDEX, CREATE VIEW, SHOW VIEW, EVENT, TRIGGER,
              SELECT, INSERT, UPDATE, DELETE
-        ON \`menexus_schema\`.* TO 'menexus_admin'@'%';
-      
+        ON \`menexus_schema\`.* TO "menexus_admin"@"%";
+
       FLUSH PRIVILEGES;
       SQL
     restart: "no"
+
 
   synapse:
     build:
