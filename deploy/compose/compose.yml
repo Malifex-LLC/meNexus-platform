@@ -19,7 +19,6 @@ services:
         [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt
         [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt
         echo "[bootstrap] Secrets ready in ./secrets."
-
   db:
     depends_on:
       bootstrap:
@@ -31,11 +30,14 @@ services:
       - seccomp:unconfined
     environment:
       MYSQL_DATABASE: menexus_schema
+      MYSQL_USER: menexus_user
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/DB_ROOT_PW
-      MYSQL_ROOT_HOST: "%"
+      MYSQL_PASSWORD_FILE: /run/secrets/DB_USER_PW
     secrets:
       - source: DB_ROOT_PW
         target: DB_ROOT_PW
+      - source: DB_USER_PW
+        target: DB_USER_PW
 #    command: >
 #      mysqld --character-set-server=utf8mb4
 #             --collation-server=utf8mb4_unicode_ci
@@ -49,45 +51,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
-  db-init:
-    image: mysql:8.0
-    user: "0:0"
-    depends_on:
-      db:
-        condition: service_healthy
-      bootstrap:
-        condition: service_completed_successfully
-    volumes:
-      - ./secrets:/work/secrets:ro
-    entrypoint: [ "/bin/sh","-c" ]
-    command: |
-      ROOT_PW="$$(cat /work/secrets/db_root_pw.txt)"; \
-      APP_PW="$$(cat /work/secrets/db_user_pw.txt)"; \
-      ADMIN_PW="$$(cat /work/secrets/db_admin_pw.txt)"; \
-      until mysqladmin ping -h db --silent; do sleep 1; done; \
-      until mysql -h db -uroot -p"$$ROOT_PW" -e 'SELECT 1' >/dev/null 2>&1; do sleep 1; done; \
-      APP_ESC=$$(printf "%s" "$$APP_PW"   | sed "s/'/''/g"); \
-      ADM_ESC=$$(printf "%s" "$$ADMIN_PW" | sed "s/'/''/g"); \
-      mysql -h db -uroot -p"$$ROOT_PW" -e " \
-        CREATE DATABASE IF NOT EXISTS \`menexus_schema\` \
-          CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
-        CREATE USER IF NOT EXISTS 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC'; \
-        CREATE USER IF NOT EXISTS 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC'; \
-        ALTER USER 'menexus_user'@'%' IDENTIFIED BY '$$APP_ESC'; \
-        ALTER USER 'menexus_admin'@'%' IDENTIFIED BY '$$ADM_ESC'; \
-        GRANT SELECT, INSERT, UPDATE, DELETE \
-          ON \`menexus_schema\`.* TO 'menexus_user'@'%'; \
-        GRANT CREATE, ALTER, DROP, INDEX, CREATE VIEW, SHOW VIEW, EVENT, TRIGGER, \
-               SELECT, INSERT, UPDATE, DELETE \
-          ON \`menexus_schema\`.* TO 'menexus_admin'@'%'; \
-        FLUSH PRIVILEGES; \
-      "
-    restart: "no"
-
-
-
-
 
   synapse:
     build:
@@ -193,8 +156,6 @@ secrets:
     file: ./secrets/db_root_pw.txt
   DB_USER_PW:
     file: ./secrets/db_user_pw.txt
-  DB_ADMIN_PW:
-    file: ./secrets/db_admin_pw.txt
   YOUTUBE_API_KEY:
     file: ./secrets/youtube_api_key.txt
 
