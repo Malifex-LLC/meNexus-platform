@@ -4,7 +4,6 @@
 services:
   bootstrap:
     image: alpine:3.20
-    container_name: menexus-bootstrap
     restart: "no"
     volumes:
       - ./secrets:/work/secrets
@@ -19,12 +18,12 @@ services:
         [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt
         [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt
         echo "[bootstrap] Secrets ready in ./secrets."
+
   db:
     depends_on:
       bootstrap:
         condition: service_completed_successfully
     image: mysql:8.0
-    container_name: menexus-db
     restart: unless-stopped
     security_opt:
       - seccomp:unconfined
@@ -53,25 +52,18 @@ services:
       retries: 20
 
   synapse:
-    build:
-      context: ../..                    # repo root
-      dockerfile: services/synapse/Dockerfile
-    image: ${SYNAPSE_IMAGE:-ghcr.io/malifex/synapse:dev}
-    container_name: synapse
+    image: ${REGISTRY}/${NAMESPACE}/menexus-synapse:${VERSION}
     restart: unless-stopped
-
     depends_on:
       bootstrap:
         condition: service_completed_successfully
       db:
         condition: service_healthy
-
     ports:
       - "4001:4001"                     # libp2p TCP
       - "4002:4002"                     # orbitdb TCP
     expose:
       - "3001"
-
     environment:
       # --- MySQL DB config  ---
       DB_HOST: db
@@ -98,31 +90,23 @@ services:
       ORBITDB_TCP: "${ORBITDB_TCP:-4002}"
       ORBITDB_BOOTSTRAP: "${ORBITDB_BOOTSTRAP:-}"
 
+      # --- Synapse metadata ---
       SYNAPSE_NAME: "${SYNAPSE_NAME:-New Synapse}"
       SYNAPSE_DESC: "${SYNAPSE_DESC:-New Synapse Running in Docker Container}"
       SYNAPSE_BOARDS: "${SYNAPSE_BOARDS:-}"
       SYNAPSE_CHANNELS: "${SYNAPSE_CHANNELS:-}"
-
     secrets:
       - source: DB_USER_PW
         target: DB_USER_PW
       - source: YOUTUBE_API_KEY
         target: YOUTUBE_API_KEY
-
     volumes:
       - synapse-config:/app/services/synapse/src/config
       - synapse-uploads:/app/services/synapse/uploads
       - synapse-secrets:/data/secrets
 
-  web:
-    build:
-      context: ../..                         # repo root
-      dockerfile: apps/client-web/Dockerfile
-      args:
-        VITE_API_BASE_URL: ""
-        VITE_WS_BASE_URL: /ws
-    image: ${WEB_IMAGE:-ghcr.io/malifex/synapse-web:dev}
-    container_name: synapse-web
+  client:
+    image: ${REGISTRY}/${NAMESPACE}/menexus-client:${VERSION}
     restart: unless-stopped
     depends_on:
       synapse:
@@ -131,14 +115,13 @@ services:
       - "80"
 
   proxy:
-    build:
-      context: ../../services/proxy
-      dockerfile: Dockerfile
-    container_name: synapse-proxy
+    image: ${REGISTRY}/${NAMESPACE}/menexus-proxy:${VERSION}
     restart: unless-stopped
     depends_on:
-      - web
-      - synapse
+      client:
+        condition: service_started
+      synapse:
+        condition: service_started
     environment:
       PUBLIC_URL: "${PUBLIC_URL:-http://localhost}"
       EMAIL: "${EMAIL:-admin@example.com}"
