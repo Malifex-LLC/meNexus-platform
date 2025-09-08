@@ -77,7 +77,7 @@ jobs:
             VERSION=${{ steps.ver.outputs.version }}
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ steps.meta.outputs.date }}
-            VITE_API_BASE_URL=""
+            VITE_API_BASE_URL=
             VITE_WS_BASE_URL=/ws
           tags: |
             ghcr.io/${{ steps.meta.outputs.owner_lc }}/menexus-client:${{ steps.ver.outputs.version }}
