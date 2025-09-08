@@ -24,3 +24,5 @@ node_modules
 .env
 .env.production
 .env.*.local
+deploy/compose/.env
+deploy/compose/secrets/*

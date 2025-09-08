@@ -203,7 +203,7 @@ export const uploadPostMedia = async (req, res) => {
                 const savedFileName = filename;
                 const savedMimeType = mimeType;
 
-                const uploadDir = path.join(process.cwd(), 'uploads', publicKey, 'posts', postId);
+                const uploadDir = path.join(process.env.UPLOADS_DIR, publicKey, 'posts', postId);
                 fs.mkdirSync(uploadDir, { recursive: true });
 
                 const savedFilePath = path.join(uploadDir, savedFileName);
