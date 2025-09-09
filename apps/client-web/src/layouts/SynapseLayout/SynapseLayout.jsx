@@ -251,7 +251,7 @@ const SynapseLayout =({ children }) => {
                         {/* Content */}
                         <div className={'flex flex-1 min-h-0 overflow-y-auto '}>
                             {activeMiddlebarTab === "feed" ? (
-                                <div className={'mx-4 my-2  rounded-xl shadow-2xl'}>
+                                <div className={'mx-4 my-2 w-full rounded-xl shadow-2xl'}>
                                     <PostsPanel
                                         isLocalSynapse={isLocalSynapse}
                                         publicKey={sessionUser.publicKey}
