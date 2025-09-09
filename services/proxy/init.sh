@@ -11,16 +11,16 @@ DOMAIN="$(echo "$PUB_URL" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:[0-9]+$##')"
 is_localhost() { [[ -z "$DOMAIN" || "$DOMAIN" == "localhost" || "$DOMAIN" == "127.0.0.1" || "$DOMAIN" == "::1" ]]; }
 is_ip()        { [[ "$DOMAIN" =~ ^[0-9.]+$ || "$DOMAIN" =~ : ]]; }  # IPv4 or IPv6
 
-wait_for_web() {
-  # Wait until the web container responds (API can come up later)
+wait_for_client() {
+  # Wait until the client container responds (API can come up later)
   for i in {1..60}; do
-    if curl -fsS http://web:80/ >/dev/null 2>&1; then
+    if curl -fsS http://client:80/ >/dev/null 2>&1; then
       return 0
     fi
-    echo "[proxy] waiting for web container..."
+    echo "[proxy] waiting for client container..."
     sleep 1
   done
-  echo "[proxy] warning: web not responding yet; continuing"
+  echo "[proxy] warning: client not responding yet; continuing"
 }
 
 start_nginx_http() {
@@ -70,7 +70,7 @@ main() {
       echo "[proxy][WARN] Browsers will treat this as insecure; WebCrypto will be unavailable and login will fail."
     fi
     echo "[proxy] PUBLIC_URL='${PUB_URL}' -> HTTP-only (local/IP/plain-http)"
-    wait_for_web
+    wait_for_client
     start_nginx_http
   else
     echo "[proxy] PUBLIC_URL='${PUB_URL}' -> ACME domain mode"

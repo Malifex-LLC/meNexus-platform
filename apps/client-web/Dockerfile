@@ -31,6 +31,22 @@ RUN pnpm --filter ./apps/client-web build
 # Runtime: Nginx serving static SPA + proxy to Synapse
 ############################
 FROM nginx:alpine
+
+# ---- OCI labels ----
+ARG VERSION
+ARG VCS_REF
+ARG BUILD_DATE
+
+LABEL org.opencontainers.image.title="meNexus Client" \
+      org.opencontainers.image.description="Web based client for meNexus" \
+      org.opencontainers.image.url="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.source="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.documentation="https://github.com/malifex-llc/menexus-platform#readme" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.created="${BUILD_DATE}"
+
 # Copy the built SPA
 COPY --from=build /repo/apps/client-web/dist /usr/share/nginx/html
 # Nginx config (history fallback + /api + /remote + /uploads + /ws proxy)

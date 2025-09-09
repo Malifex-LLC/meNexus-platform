@@ -25,6 +25,21 @@ FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
+# ---- OCI labels ----
+ARG VERSION
+ARG VCS_REF
+ARG BUILD_DATE
+
+LABEL org.opencontainers.image.title="meNexus Synapse" \
+      org.opencontainers.image.description="Decentralized social node (Synapse) for meNexus" \
+      org.opencontainers.image.url="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.source="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.documentation="https://github.com/malifex-llc/menexus-platform#readme" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.created="${BUILD_DATE}"
+
 # Bring runtime node_modules (workspace + service)
 COPY --from=deps /repo/node_modules /app/node_modules
 COPY --from=deps /repo/services/synapse/node_modules /app/services/synapse/node_modules
