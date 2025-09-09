@@ -97,6 +97,24 @@ export const leaveSynapse = async (req, res) => {
     }
 }
 
+export const forceLeaveSynapse = async (req, res) => {
+    const { publicKey, synapsePublicKey } = req.query;
+    if (!publicKey || !synapsePublicKey) {
+        return res.status(401).json({error: 'No user publicKey or synapsePublicKey provided.'});
+    }
+    const db = await getGlobalUsersDB();
+    const [updatedUser] = await db.query(doc => doc._id === publicKey);
+    if(updatedUser) {
+        try {
+            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== synapsePublicKey);
+            await db.put(updatedUser);
+            res.status(200).json(updatedUser);
+        } catch (err) {
+            console.error('Error leaving Synapse: ', err);
+        }
+    }
+}
+
 export const getSynapsePostBoards = async (req, res) => {
     try {
         const config = await loadConfig(CONFIG_FILE);
@@ -125,6 +143,7 @@ export default {
     getSynapseMembers,
     joinSynapse,
     leaveSynapse,
+    forceLeaveSynapse,
     getSynapsePostBoards,
     getSynapseChatChannels
 }

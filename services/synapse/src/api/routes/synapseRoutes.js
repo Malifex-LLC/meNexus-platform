@@ -3,7 +3,7 @@
 
 import express from 'express';
 const router = express.Router();
-import synapseController from "#api/controllers/synapseController.js";
+import synapseController, {forceLeaveSynapse} from "#api/controllers/synapseController.js";
 
 // Define userRoutes and link them to corresponding controller functions
 
@@ -12,6 +12,7 @@ router.get('/getAllDiscoveredPeers', synapseController.getAllDiscoveredPeers);
 router.get('/getSynapseMembers', synapseController.getSynapseMembers);
 router.post('/joinSynapse', synapseController.joinSynapse);
 router.post('/leaveSynapse', synapseController.leaveSynapse);
+router.post('/forceLeaveSynapse', synapseController.forceLeaveSynapse);
 router.get('/getSynapsePostBoards', synapseController.getSynapsePostBoards);
 router.get('/getSynapseChatChannels', synapseController.getSynapseChatChannels);
 
