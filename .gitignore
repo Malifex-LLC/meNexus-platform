@@ -26,3 +26,4 @@ node_modules
 .env.*.local
 deploy/compose/.env
 deploy/compose/secrets/*
+services/synapse/secrets/*

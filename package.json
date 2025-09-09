@@ -34,6 +34,7 @@
     "dev:client": "pnpm --filter @menexus/client-web run dev",
     "dev:admin": "pnpm --filter @menexus/admin-web  run dev",
     "dev:synapse": "pnpm --filter @menexus/synapse    run dev",
+    "init:synapse-config:local": "node services/synapse/src/utils/initSynapseConfig.local.js",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
     "test": "pnpm -r run test"
