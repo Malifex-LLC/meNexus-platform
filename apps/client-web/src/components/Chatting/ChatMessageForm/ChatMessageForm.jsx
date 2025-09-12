@@ -30,7 +30,7 @@ const ChatMessageForm = ({publicKey, activeChannel, sendMessage}) => {
     };
 
     return (
-        <div className="message-form flex gap-4 bg-surface p-8 position-fixed-bottom ">
+        <div className="message-form flex gap-4 bg-surface p-8 position-fixed-bottom rounded-xl">
             <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
                     className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"

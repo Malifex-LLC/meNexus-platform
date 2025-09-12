@@ -72,11 +72,11 @@ const CommentForm = ({
     };
 
     return (
-        <div className="comment-form items-center text-center w-full lg:px-32 ">
-            <div className={` `}
+        <div className="flex flex-col items-center text-center w-full lg:px-32 ">
+            <div className={`flex w-full`}
                 onClick={handleFormClick}>
                 <textarea
-                    className="comment-form__entry-field p-4 mt-8  w-full rounded-2xl  bg-background"
+                    className="flex w-full p-4 mt-8  w-full rounded-2xl  bg-background"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {

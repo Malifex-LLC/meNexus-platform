@@ -78,9 +78,13 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
-
+        <div className="flex flex-col min-h-0 h-full overflow-y-auto bg-background/70   text-foreground border border-border rounded-xl">
             {/* master timeline line */}
+            <div className="flex justify-around p-4 gap-4 bg-background border-b border-border text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-bold `}>
+                    Activity
+                </button>
+            </div>
             <ul className="p-4">
                 {Object.entries(groups).map(([day, items]) => (
                     <li key={day} className="">

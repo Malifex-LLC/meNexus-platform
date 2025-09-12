@@ -19,17 +19,10 @@ const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActi
     });
 
     return (
-        <div className="flex flex-col w-full h-full text-foreground  ">
-            <div className="flex flex-row flex-1 min-h-0 p-4 gap-4 ">
-                <div className="w-1/5 h-full overflow-y-auto p-4 border border-border shadow-2xl rounded-xl bg-background">
-                    <ChattingChannelsPanel
-                        channels={channels}
-                        activeChannel={activeChannel}
-                        setActiveChannel={setActiveChannel}
-                    />
-                </div>
+        <div className="flex flex-col w-full h-full text-foreground border border-border rounded-xl ">
+            <div className="flex flex-row flex-1 min-h-0  ">
                 <div className={'relative flex flex-col w-full'}>
-                    <div className="flex-1 h-full overflow-y-auto border border-border shadow-lg rounded-xl">
+                    <div className="flex-1 h-full overflow-y-auto ">
                         <ChatWindow
                             publicKey={publicKey}
                             activeChannel={activeChannel}
@@ -38,7 +31,7 @@ const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActi
                             setChatMessages={setChatMessages}
                         />
                     </div>
-                    <div className="p-4 mt-2 border border-border bg-background shadow-2xl rounded-xl">
+                    <div className="p-4 mt-2 bg-background">
                         <ChatMessageForm
                             publicKey={publicKey}
                             activeChannel={activeChannel}

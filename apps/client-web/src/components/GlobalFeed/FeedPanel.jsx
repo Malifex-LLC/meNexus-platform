@@ -116,9 +116,9 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col p-4 text-3xl bg-background text-foreground text-center ">
-            <div className="flex flex-col gap-2 p-2 border-b border-border bg-surface text-lg shadow-lg rounded-xl">
-                <div className={'text-3xl'}>
+        <div className="flex flex-col flex-1 overflow-y-auto h-full text-foreground bg-background/70 rounded-xl  px-8 space-y-8 border border-border">
+            <div className="flex flex-col gap-2 p-2 mt-4 border-b border-border bg-surface text-lg shadow-lg rounded-xl">
+                <div className={'text-3xl text-brand text-center'}>
                     Global Feed
                 </div>
                 <div className={'flex flex-row justify-start gap-8'}>
@@ -169,7 +169,7 @@ const FeedPanel = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col text-left space-y-8 mt-8">
+            <div className="flex flex-col text-left space-y-8 ">
                 {/* TODO Post object is not passed all required fields. */}
                 {posts.length > 0 ? (
                     posts

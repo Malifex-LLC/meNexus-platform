@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import SynapseCard from "../SynapseCard/SynapseCard.jsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import {Link} from "react-router-dom";
@@ -49,7 +49,7 @@ const JoinedSynapsesPanel = ({synapses}) => {
 
     if (synapseMetadataList.length === 0) {
         return (
-            <div className={' bg-background text-foreground p-4 w-full'}>
+            <div className={'bg-surface text-foreground p-4 w-full'}>
                 <div className={'text-3xl text-center'}>
                     Joined Synapses
                 </div>
@@ -63,11 +63,13 @@ const JoinedSynapsesPanel = ({synapses}) => {
     }
 
     return (
-        <div className={' bg-background text-foreground p-4 shadow-lg'}>
-            <div className={'text-3xl text-center'}>
-                Joined Synapses
+        <div className={'flex flex-col  w-full h-full  text-foreground'}>
+            <div className="flex justify-around p-4 gap-4 bg-background border-b border-border text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-bold `}>
+                    Joined Synapses
+                </button>
             </div>
-            <div>
+            <div className={`overflow-y-auto`}>
                 {synapseMetadataList.map((metadata, index) => (
                     <Link to={`/synapse/${metadata.identity.publicKey}`} key={index}>
                         <SynapseCard

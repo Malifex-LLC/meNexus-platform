@@ -15,7 +15,7 @@ const SynapseMembersPanel = ({ members }) => {
     }
 
     return (
-        <div>
+        <div className={`p-4`}>
             {members.map(member => {
                 return (
                     <ProfileCard

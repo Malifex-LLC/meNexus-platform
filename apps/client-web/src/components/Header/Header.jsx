@@ -113,7 +113,7 @@ const Header = ({user}) => {
                         </div>
                     </div>
                     {showNotificationsTray && (
-                        <div className="absolute right-0 mt-2 w-80 z-50 bg-header-bg/70 border border-border rounded-2xl shadow-lg">
+                        <div className="absolute right-0 mt-2 w-80 z-50 bg-header-bg/70 backdrop-blur-xs border border-border rounded-2xl shadow-lg">
                             <NotificationsTray
                                 user_id={user.publicKey}
                                 notifications={notifications}

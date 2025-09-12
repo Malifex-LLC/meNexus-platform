@@ -83,7 +83,7 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex flex-1  overflow-y-auto bg-background rounded-xl  text-foreground">
+        <div className="flex flex-1  overflow-y-auto rounded-xl  text-foreground">
 
             {/* master timeline line */}
             <ul className="flex flex-col w-full p-4">
