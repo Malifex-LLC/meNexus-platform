@@ -13,35 +13,33 @@ const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
     const navigate = useNavigate();
 
     return (
-        <div className={`p-4 m-8 flex flex-col items-center text-2xl rounded-2xl bg-surface `}>
-            <h1 className={`p-4 `}>Settings Menu</h1>
-            <div className={`flex h-1 w-full bg-border mb-4`}/>
-            <ul className="settings-menu__list ">
+        <div className={`flex flex-col m-8 items-center text-2xl rounded-xl bg-surface`}>
+            <ul className="p-4">
                 <li onClick={() => onSelectMenu('Profile')}
-                    className={`settings - menu__item flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-r-2xl
-                ${selectedMenu === 'Profile' ? 'bg-brand' : ''}`}>
+                    className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
+                ${selectedMenu === 'Profile' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}>
                     <CgProfile />
                     Profile
                 </li>
                 <li
                     onClick={() => onSelectMenu('Account')}
-                    className={`settings - menu__item flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-r-2xl
-                ${selectedMenu === 'Account' ? 'bg-brand' : ''}`}
+                    className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
+                ${selectedMenu === 'Account' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}
                 >
                     <FaKey />
                     Account
                 </li>
                 <li
                     onClick={() => onSelectMenu('Display')}
-                    className={`settings - menu__item flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-r-2xl
-                ${selectedMenu === 'Display' ? 'bg-brand' : ''}`}>
+                    className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
+                ${selectedMenu === 'Display' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}>
                     <FaDisplay />
                     Display
                 </li>
                 <li
                     onClick={() => navigate('/login')}
-                    className={`settings - menu__item flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-r-2xl
-                ${selectedMenu === 'Logout' ? 'bg-brand' : ''}`}>
+                    className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
+                ${selectedMenu === 'Logout' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}>
                     <TbLogout2 />
                     Logout
                 </li>

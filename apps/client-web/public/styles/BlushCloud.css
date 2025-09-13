@@ -5,7 +5,7 @@
 
 :root {
     /* Foundations */
-    --color-background:         #f9fafc;   /* Panel Background */
+    --color-background:         #fef2f3;   /* Panel Background */
     --color-surface:            #f6d9d5;   /* Panel/Card Surface */
     --color-border:             #e3e4e6;   /* Pane Splitters */
 
@@ -13,12 +13,12 @@
     --color-header-bg:          #ffffff;   /* Header Background Color */
 
     /* Typography */
-    --color-foreground:         #313131;   /* Primary Text */
+    --color-foreground:         #653438;   /* Primary Text */
     --color-foreground-message: #313131;   /* Text for Chat/Direct Messages */
     --color-neutral:            #a1a1a1;   /* Secondary Labels */
 
     /* Brand & Accents */
-    --color-brand:              #f7d0cb;   /* Headlines and Highlights */
+    --color-brand:              #FE828C;   /* Headlines and Highlights */
     --color-primary:            #e3e4e6;   /* Buttons / CTAs */
     --color-accent:             #f7d0cb;   /* Notifications / Alerts */
     --color-secondary:          #f6d9d5;   /* Secondary */

@@ -74,14 +74,14 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="login__main-content flex flex-col items-center justify-center p-8  rounded-2xl bg-surface text-foreground ">
+        <div className="login__main-content flex flex-col items-center justify-center p-8  rounded-xl bg-background/70 text-foreground ">
             <form className='login__form w-full flex flex-col'
                   onSubmit={handleSubmit}
             >
                 <label>
                     Private Key:
                     <textarea
-                        className={`w-full p-4 rounded-md border border-border mt-2`}
+                        className={`w-full p-4 rounded-md border border-border mt-2 bg-surface`}
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}
                         onKeyDown={(e) => {
@@ -96,7 +96,7 @@ const LoginForm = () => {
                 <br />
                 {error && <p>{error}</p>}
                 <button
-                    className={`w-full p-2 rounded-md bg-brand cursor-pointer hover:bg-primary`}
+                    className={`w-full p-2 rounded-md bg-brand cursor-pointer hover:bg-brand/70`}
                     type="submit"
                 >
                     Login

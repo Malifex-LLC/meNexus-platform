@@ -19,7 +19,7 @@ const ChattingChannelsPanel = ({channels, activeChannel, setActiveChannel}) => {
                     className={`
             rounded-xl p-2 mt-4 w-full text-left text-xl text-foreground border border-border rounded-xl shadow-lg 
             hover:bg-brand/10 hover:translate-y-[-2px]
-            ${activeChannel === channel ? "bg-surface text-background  " : "bg-background"}
+            ${activeChannel === channel ? "bg-brand/60 text-background  " : "bg-surface"}
           `}
                 >
                     <Channel channel={channel} />

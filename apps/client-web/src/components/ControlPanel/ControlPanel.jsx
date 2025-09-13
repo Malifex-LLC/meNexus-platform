@@ -46,8 +46,8 @@ const ControlPanel = ({user}) => {
 
 
     return (
-        <div className={`flex flex-col overflow-y-auto p-4 h-full gap-4 items-center shadow-2xl bg-background/70 border border-border rounded-xl`}>
-            <div className="flex flex-col  p-4 w-full h-full items-center overflow-hidden rounded-2xl border border-border shadow-lg bg-background/70">
+        <div className={`flex flex-col overflow-y-auto p-4 h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border rounded-xl`}>
+            <div className="flex flex-col  p-4 w-full h-full items-center overflow-hidden rounded-2xl border border-border shadow-lg bg-surface/70">
                 {/* Header stripe with gradient */}
                 <div className="flex flex-col  mt-4 border border-border rounded-xl w-full h-32 bg-gradient-to-r from-surface via-brand to-surface blur-xl">
                 </div>

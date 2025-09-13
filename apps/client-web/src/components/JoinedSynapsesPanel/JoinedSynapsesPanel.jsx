@@ -64,7 +64,7 @@ const JoinedSynapsesPanel = ({synapses}) => {
 
     return (
         <div className={'flex flex-col  w-full h-full  text-foreground'}>
-            <div className="flex justify-around p-4 gap-4 bg-background border-b border-border text-2xl text-foreground shadows-2xl ">
+            <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border text-2xl text-foreground shadows-2xl ">
                 <button className={`text-brand font-bold `}>
                     Joined Synapses
                 </button>

@@ -30,10 +30,10 @@ const ChatMessageForm = ({publicKey, activeChannel, sendMessage}) => {
     };
 
     return (
-        <div className="message-form flex gap-4 bg-surface p-8 position-fixed-bottom rounded-xl">
+        <div className="flex gap-4 bg-background p-8 position-fixed-bottom rounded-xl">
             <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
-                    className="message-form__entry-field w-full h-full bg-background text-foreground rounded-2xl px-4 py-2"
+                    className="message-form__entry-field w-full h-full bg-surface text-foreground rounded-2xl px-4 py-2"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {

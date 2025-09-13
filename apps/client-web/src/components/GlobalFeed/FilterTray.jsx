@@ -3,9 +3,9 @@
 
 const FilterTray = () => {
     return (
-        <div>
-            <option value="joined">Joined Synapses</option>
-            <option value="followed">Followed Users</option>
+        <div className={`flex flex-col p-2`}>
+            <option value="joined" className={`px-2 hover:bg-brand/50 hover:cursor-pointer rounded-xl`}>Joined Synapses</option>
+            <option value="followed" className={`px-2 hover:bg-brand/50 hover:cursor-pointer rounded-xl`}>Followed Users</option>
         </div>
     )
 }

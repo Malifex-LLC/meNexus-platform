@@ -60,7 +60,7 @@ const SettingsLayout = ({ children }) => {
     }
 
     return (
-        <div className='settings-layout h-screen  flex flex-col sm:items-center xl:items-start  bg-background '>
+        <div className='flex flex-col h-screen sm:items-center xl:items-start  bg-background '>
             <div className='sticky top-0 z-50 border-b border-border w-full'>
                 <Header
                     user={user}
@@ -89,8 +89,8 @@ const SettingsLayout = ({ children }) => {
             </div>
 
             {/* Content Area */}
-            <div className={`flex h-full pt-17 px-8 overflow-y-auto`}>
-                <div className="settings-layout__menu hidden lg:flex   text-foreground">
+            <div className={`flex h-full w-full pt-17 overflow-y-auto`}>
+                <div className="hidden lg:flex   text-foreground">
                     {/* Render Settings Menu */}
                     {children[0]}
                 </div>
@@ -99,7 +99,7 @@ const SettingsLayout = ({ children }) => {
                     <div className="lg:hidden w-full">
                         <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
                             <main className="settings-layout__main-content flex flex-1 ">
-                                <div className={`${activePanel === 0 ? 'flex w-full items-center' : 'hidden'} min-h-screen flex-col  pt-17 `}>
+                                <div className={`${activePanel === 0 ? 'flex w-full items-center' : 'hidden'} min-h-screen flex-col pt-17 `}>
                                     <ProfileSettings />
                                 </div>
                                 <div className={`${activePanel === 1 ? 'flex' : 'hidden'} min-h-screen pt-17 `}>

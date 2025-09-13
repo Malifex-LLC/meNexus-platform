@@ -11,7 +11,7 @@ import UserLinks from "./UserLinks.jsx";
 
 const UserOverviewPanel = ({ user }) => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 w-full text-foreground">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 w-full h-full text-foreground bg-surface/70 border border-border rounded-xl">
             {/* Left Column (2/3) */}
             <div className="flex flex-col gap-6 lg:col-span-2">
                 {/* About / Bio */}

@@ -52,9 +52,8 @@ const AccountSettings = () => {
     }
 
     return (
-        <div className="account-settings__container flex flex-col p-8  md:mx-16 text-foreground">
-            <div className="account-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 items-center rounded-2xl
-            bg-surface">
+        <div className="flex flex-col  w-full m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+            <div className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">
                 <FaKey />
                 Account Settings
             </div>

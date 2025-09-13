@@ -101,7 +101,7 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
                     <li key={day} className="flex flex-col w-full">
                         {/* day badge */}
                         <div className="">
-                            <span className="px-2 py-0.5 bg-surface font-medium text-3xl text-neutral shadow-2xl rounded-xl"
+                            <span className="px-2 py-0.5 bg-background font-medium text-3xl text-neutral shadow-2xl rounded-xl"
                             >
                                 {dayLabel(items[0].published)}
                             </span>

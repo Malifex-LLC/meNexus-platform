@@ -34,6 +34,9 @@ import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPa
 import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
 import PostBoardsPanel from "../../components/Posting/PostBoardsPanel/PostBoardsPanel.jsx";
 import ChattingChannelsPanel from "../../components/Chatting/ChattingChannelsPanel/ChattingChannelsPanel.jsx";
+import { TbActivityHeartbeat } from "react-icons/tb";
+import { FiActivity } from "react-icons/fi";
+
 
 const SynapseLayout =({ children }) => {
 
@@ -217,13 +220,13 @@ const SynapseLayout =({ children }) => {
             {/* Main Grid */}
             <div className="flex flex-col  p-4 gap-4 h-full min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden">
                 {/* Synapse Control Bar */}
-                <div className="flex flex-col shadow-2xl border border-border rounded-xl lg:col-span-3 bg-background/70">
+                <div className="flex flex-col shadow-2xl border border-border rounded-xl lg:col-span-3 bg-surface/70">
                     <SynapseControlBar
                         synapses={user.synapses}
                         publicKey={user.publicKey}
                     />
                     {/* Tab Switcher */}
-                    <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-background  p-2 text-4xl ' +
+                    <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-surface  p-2 text-4xl ' +
                         'text-foreground '}>
                         <button
                             className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
@@ -310,9 +313,9 @@ const SynapseLayout =({ children }) => {
                 </div>
 
                 {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col w-full rounded-xl lg:col-span-3 overflow-hidden bg-background/70  border border-border">
+                <div className="hidden lg:flex flex-col w-full rounded-xl lg:col-span-3 overflow-hidden bg-surface/70  border border-border">
                     {/* Tab Switcher */}
-                    <div className="flex justify-around p-4 gap-4 bg-background border-b border-border text-2xl text-foreground shadows-2xl ">
+                    <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border text-2xl text-foreground shadows-2xl ">
                         <button
                             onClick={() => setActiveSidebarTab("members")}
                             className={`${activeSidebarTab === "members" ? "text-brand font-bold " : "hover:text-brand/50 hover:cursor-pointer"}`}

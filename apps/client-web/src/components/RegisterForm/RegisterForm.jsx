@@ -44,18 +44,18 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="register__main-content flex flex-col items-center  justify-center p-8 rounded-xl ">
+        <div className=" flex flex-col items-center  justify-center p-8 rounded-xl bg-background/70">
             {keysGenerated && (
                 <label className="register__keys">
                     <p>public key: {cryptoKeys.publicKey}</p>
                     <p>private key: {cryptoKeys.privateKey}</p>
                 </label>
             )}
-            <form className='register__form' onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <label>
                     Handle:
                     <input
-                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2`}
+                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2 bg-surface/70`}
                         type="text"
                         value={handle}
                         onChange={(e) => setHandle(e.target.value)} />
@@ -64,7 +64,7 @@ const RegisterForm = () => {
                 <label>
                     Display Name:
                     <input
-                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2`}
+                        className={`w-full p-2 rounded-md border border-border mb-8 mt-2 bg-surface/70`}
                         type="text"
                         value={display_name}
                         onChange={(e) => setDisplay_name(e.target.value)} />
@@ -72,7 +72,7 @@ const RegisterForm = () => {
                 <br />
                 {error && <p>{error}</p>}
                 <button
-                    className={`w-full p-2 rounded-md bg-brand cursor-pointer hover:bg-primary`}
+                    className={`w-full p-2 rounded-md bg-brand cursor-pointer hover:bg-brand/70`}
                     type="submit"
                 >
                     Register

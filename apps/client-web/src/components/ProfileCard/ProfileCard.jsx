@@ -102,16 +102,16 @@ const ProfileCard = ({publicKey}) => {
     }
 
     return (
-        <div className="flex p-4 my-2 border border-border/30 rounded-xl bg-background shadow-lg
+        <div className="flex p-4 my-2 border border-border/30 rounded-xl bg-surface shadow-lg
         hover:bg-brand/10 hover:translate-y-[-2px]">
-            <div className="profile-card__identity flex flex-row gap-4">
-                <div className="profile-card__profile-picture w-8">
+            <div className="flex flex-row w-full gap-4">
+                <div className="flex w-8 text-xs">
                     <Link
                         className="profile-card__display-name cursor-pointer"
                         to={`/profile/${user.publicKey}`}
                     >
                         <img src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
-                             alt="Profile Picture"/>
+                             alt="Avatar"/>
                     </Link>
                 </div>
                 <div className={`flex flex-col`}>

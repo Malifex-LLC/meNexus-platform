@@ -2,8 +2,8 @@
 
 @theme {
     /* Foundations */
-    --color-background:         #1A1A1A;   /* Panel Background */
-    --color-surface:            #282828;   /* Panel/Card Surface */
+    --color-background:         #282828;   /* Panel Background */
+    --color-surface:            #1A1A1A;   /* Panel/Card Surface */
     --color-border:             #3A3A3A;   /* Pane Splitters */
 
     /* Header background */
@@ -84,6 +84,6 @@ body {
     background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #994040;
+    background-color: #FF6B6B;
     border-radius: 6px;
 }

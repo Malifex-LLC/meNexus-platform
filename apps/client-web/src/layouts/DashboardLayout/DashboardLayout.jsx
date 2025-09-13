@@ -77,7 +77,7 @@ const DashboardLayout = ({ children }) => {
     }
 
     return (
-        <div className='flex flex-col h-screen'>
+        <div className='flex flex-col h-screen w-full'>
             <div className='sticky top-0 z-50 h-17 shrink-0 border-b border-border'>
                 <Header
                     user={user}

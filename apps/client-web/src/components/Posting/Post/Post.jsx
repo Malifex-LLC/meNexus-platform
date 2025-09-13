@@ -203,7 +203,7 @@ const Post = ({
     }
 
     return (
-        <div className={`grid grid-cols-12 w-full p-4   rounded-xl bg-surface text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+        <div className={`grid grid-cols-12 w-full p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
             {/* Left Column: Profile */}
             <div className="flex flex-col col-span-2 items-center w-24 shrink-0">
                 {user.profilePicture ? (
@@ -216,12 +216,21 @@ const Post = ({
                     <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
                 )}
                 {!isOwner && (
-                    <button
-                        className="mt-4 text-xs px-1 rounded-md bg-brand text-black"
-                        onClick={isFollowing ? handleUnfollow : handleFollow}
-                    >
-                        {isFollowing ? "Unfollow" : "Follow"}
-                    </button>
+                    isFollowing ? (
+                            <button
+                                className="mt-4 text-xs px-2 py-1 rounded-md bg-surface/60 text-foreground hover:cursor-pointer hover:bg-brand/60"
+                                onClick={isFollowing ? handleUnfollow : handleFollow}
+                            >
+                                Unfollow
+                            </button>
+                        ) : (
+                            <button
+                                className="mt-4 text-xs px-2 py-1 rounded-md bg-brand hover:cursor-pointer hover:bg-brand/60"
+                                onClick={isFollowing ? handleUnfollow : handleFollow}
+                            >
+                                Follow
+                            </button>
+                        )
                 )}
             </div>
 
@@ -346,7 +355,7 @@ const Post = ({
                 {showActions && isOwner && (
                     <div
                         role="menu"
-                        className="absolute right-0 mt-2 w-44 origin-top-right p-4  rounded-xl border border-border bg-background/70 backdrop-blur-xs shadow-xl ring-1 ring-border p-2 z-50"
+                        className="absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-border bg-surface/70 backdrop-blur-xs shadow-xl ring-1 ring-border p-2 z-50"
                     >
                         <div className="grid gap-2">
                             {isEditing ? (

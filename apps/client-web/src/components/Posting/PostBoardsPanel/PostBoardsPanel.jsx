@@ -19,7 +19,7 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
                     onClick={() => setActiveBoard(board)}
                     className={` p-2 mt-4 w-full text-left text-xl text-foreground shadow-lg 
                                  border border-border rounded-xl hover:bg-brand/10 hover:translate-y-[-2px]
-            ${activeBoard === board ? "bg-surface text-background" : "bg-background"}
+            ${activeBoard === board ? "bg-brand/60 text-background" : "bg-surface"}
           `}
                 >
                     <PostBoard channel={board} />
