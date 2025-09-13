@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 const JoinedSynapsesTray = ({synapseMetadataList}) => {
     console.log('JoinedSynapsesTray synapseMetadataList: ', synapseMetadataList);
     return (
-        <div className={'joinedSynapsesTray border border-border rounded-xl'}>
+        <div className={'border border-border rounded-xl'}>
             {synapseMetadataList.length > 0 ? (
                 synapseMetadataList
                     .map((synapse, index) => (
@@ -24,7 +24,7 @@ const JoinedSynapsesTray = ({synapseMetadataList}) => {
                         </Link>
                     ))
             ) : (
-                <div>
+                <div className={`p-4`}>
                     No Joined Synapses found.
                 </div>
             )}
