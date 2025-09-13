@@ -83,7 +83,7 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex flex-1  overflow-y-auto bg-background rounded-xl  text-foreground">
+        <div className="flex flex-1  overflow-y-auto rounded-xl  text-foreground">
 
             {/* master timeline line */}
             <ul className="flex flex-col w-full p-4">
@@ -101,7 +101,7 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey}) => 
                     <li key={day} className="flex flex-col w-full">
                         {/* day badge */}
                         <div className="">
-                            <span className="px-2 py-0.5 bg-surface font-medium text-3xl text-neutral shadow-2xl rounded-xl"
+                            <span className="px-2 py-0.5 bg-background font-medium text-3xl text-neutral shadow-2xl rounded-xl"
                             >
                                 {dayLabel(items[0].published)}
                             </span>

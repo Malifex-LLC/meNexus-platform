@@ -64,7 +64,7 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
+        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-surface/70 border border-border rounded-xl text-foreground">
 
             {/* master timeline line */}
             <ul className="p-4">
@@ -72,7 +72,7 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
                     <li key={day} className="">
                         {/* day badge */}
                         <div className="">
-                            <span className="px-2 py-0.5 bg-surface font-medium text-3xl text-neutral shadow-2xl rounded-xl"
+                            <span className="px-2 py-0.5 bg-background font-medium text-3xl text-neutral shadow-2xl rounded-xl"
                             >
                                 {dayLabel(items[0].published)}
                             </span>

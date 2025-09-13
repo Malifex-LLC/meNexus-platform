@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import ProfileCard from "../ProfileCard/ProfileCard.jsx";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 
 const FollowedUsersPanel = ({following}) => {
@@ -23,11 +23,13 @@ const FollowedUsersPanel = ({following}) => {
     }, [])
 
     return (
-        <div className={'bg-background text-foreground p-4 m-4 text-center shadow-2xl'}>
-            <div className={'text-3xl '}>
-                Followed Users
+        <div className={'flex flex-col w-full h-full  text-foreground text-center shadow-2xl'}>
+            <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-bold `}>
+                    Followed Users
+                </button>
             </div>
-            <div className={'p-4 m-4 text-left'}>
+            <div className={'p-4 text-left overflow-y-auto'}>
                 {allUsers.map((user) => (
                     <ProfileCard
                         publicKey={user.publicKey}

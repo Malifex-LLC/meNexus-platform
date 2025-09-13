@@ -46,37 +46,46 @@ const ControlPanel = ({user}) => {
 
 
     return (
-        <div className={`relative flex flex-col p-4 items-center shadow-2xl`}>
-            <div className={`p-24 md:p-12 xl:p-24 w-full relative top-2 bg-gradient-to-b from-background via-primary to-surface backdrop-blur-md rounded-2xl`}/>
-            <div className=" relative z-1  flex flex-col px-4 pb-0 w-full -top-8  justify-center rounded-xl shadow-md
-            bg-surface text-foreground">
-                <div className={`flex  justify-center`}>
-                    <div className={`flex flex-col relative  items-center text-md`}>
-                        <p className={`px-4 lg:px-2  xl:px-4`}>{followerCount}</p>
-                        <p className={`px-4 lg:px-2  xl:px-4`}>Followers</p>
-                    </div>
-                    <img
-                        className={`relative -top-16 w-32 mb-0 pb-0`}
-                        src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
-                        alt={`${user.displayName}'s profile picture`}
-                    />
-                    <div className={`flex flex-col items-center text-md`}>
-                        <p className={`px-4 lg:px-2 xl:px-4 `}>{followingCount}</p>
-                        <p className={`px-4 lg:px-2 xl:px-4 `}>Following</p>
+        <div className={`flex flex-col overflow-y-auto p-4 h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border rounded-xl`}>
+            <div className="flex flex-col  p-4 w-full h-full items-center overflow-hidden rounded-2xl border border-border shadow-lg bg-surface/70">
+                {/* Header stripe with gradient */}
+                <div className="flex flex-col  mt-4 border border-border rounded-xl w-full h-32 bg-gradient-to-r from-surface via-brand to-surface blur-xl">
+                </div>
+                {/* Avatar with glow + gradient ring */}
+                <div className="flex flex-col -mt-32 p-4">
+                    <div className="z-1">
+                        <img
+                            className="w-32  object-cover ring-4 ring-surface"
+                            src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                            alt={`${user.displayName}'s profile picture`}
+                        />
                     </div>
                 </div>
-                <div className={`relative flex flex-col py-2 md:-top-8 -top-16 items-center text-foreground`}>
-                    <p className={`md:text-2xl xl:text-3xl`}>{user.displayName}</p>
-                    <p className={`md:text-lg xl:text-xl text-brand`}>@{user.handle}</p>
+
+                {/* Identity */}
+
+
+                {/* Stats row */}
+                <div className="flex justify-center mt-4 w-full text-center">
+                    <div className="p-2 mx-8">
+                        <p className="text-brand text-lg font-semibold">{followerCount}</p>
+                        <p className="text-foreground text-xs text-muted-foreground">Followers</p>
+                    </div>
+                    <div className=" flex flex-col -mt-4 items-center text-center px-4">
+                        <p className="text-foreground text-xl md:text-2xl xl:text-3xl font-semibold">{user.displayName}</p>
+                        <p className="text-brand text-sm md:text-lg xl:text-xl">@{user.handle}</p>
+                    </div>
+                    <div className="p-2 mx-8">
+                        <p className="text-brand text-lg font-semibold">{followingCount}</p>
+                        <p className="text-foreground text-xs text-muted-foreground">Following</p>
+                    </div>
                 </div>
             </div>
-            <div className={'flex flex-col w-full'}>
-                <div className={'border border-border rounded-xl mb-4'}>
-                    <JoinedSynapsesPanel synapses={user.synapses} />
-                </div>
-                <div className={'border border-border rounded-xl'}>
-                    <FollowedUsersPanel following={user.following} />
-                </div>
+            <div className={'flex flex-col w-full h-full overflow-y-auto border border-border rounded-xl'}>
+                <JoinedSynapsesPanel synapses={user.synapses} />
+            </div>
+            <div className={'flex flex-col w-full h-full overflow-y-auto border border-border rounded-xl'}>
+                <FollowedUsersPanel following={user.following} />
             </div>
         </div>
     );

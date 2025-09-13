@@ -3,10 +3,10 @@
 
 const SortTray = () => {
     return (
-        <div>
-            <option value="recent">Recent</option>
-            <option value="chronological">Chronological</option>
-            <option value="trending">Trending</option>
+        <div className={`flex flex-col p-2`}>
+            <option value="recent" className={`px-2 hover:bg-brand/50 hover:cursor-pointer rounded-xl`}>Recent</option>
+            <option value="chronological" className={`px-2 hover:bg-brand/50 hover:cursor-pointer rounded-xl`}>Chronological</option>
+            <option value="trending" className={`px-2 hover:bg-brand/50 hover:cursor-pointer rounded-xl`}>Trending</option>
         </div>
     )
 }

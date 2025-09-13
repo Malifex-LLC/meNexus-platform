@@ -100,35 +100,35 @@ const UserProfileLayout = ({ children }) => {
                         />
                     </div>
                     {/* Main Content Grid */}
-                    <div className='flex flex-col h-full min-h-0 col-span-8'>
+                    <div className='flex flex-col w-full min-h-0 col-span-8'>
                         {/* Tab Switcher */}
-                        <div className="flex flex-row bg-background  justify-around border border-border p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl col-span-8">
+                        <div className="flex flex-row bg-surface/70  justify-around border border-border p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl col-span-8">
                             <button
                                 onClick={() => setActiveTab("overview")}
-                                className={`${activeTab === "overview" ? "text-brand font-bold" : "hover:text-brand"}`}
+                                className={`${activeTab === "overview" ? "text-brand font-bold" : "hover:text-brand/60 hover:cursor-pointer"}`}
                             >
                                 Overview
                             </button>
                             <button
                                 onClick={() => setActiveTab("showcase")}
-                                className={`${activeTab === "showcase" ? "text-brand font-bold" : "hover:text-brand"}`}
+                                className={`${activeTab === "showcase" ? "text-brand font-bold" : "hover:text-brand/60 hover:cursor-pointer"}`}
                             >
                                 Showcase
                             </button>
                             <button
                                 onClick={() => setActiveTab("synapses")}
-                                className={`${activeTab === "synapses" ? "text-brand font-bold" : "hover:text-brand"}`}
+                                className={`${activeTab === "synapses" ? "text-brand font-bold" : "hover:text-brand/60 hover:cursor-pointer"}`}
                             >
                                 Synapses
                             </button>
                             <button
                                 onClick={() => setActiveTab("activity")}
-                                className={`${activeTab === "activity" ? "text-brand font-bold" : "hover:text-brand"}`}
+                                className={`${activeTab === "activity" ? "text-brand font-bold" : "hover:text-brand/60 hover:cursor-pointer"}`}
                             >
                                 Activity
                             </button>
                         </div>
-                        <div className={'flex flex-col h-full min-h-0 '}>
+                        <div className={'flex flex-col h-full min-h-0 m-4'}>
                             {activeTab === "overview" ? (
                                 <UserOverviewPanel
                                     user={user}
@@ -138,7 +138,7 @@ const UserProfileLayout = ({ children }) => {
                             ) : activeTab === "activity" ? (
                                 <UserActivityPanel user={user} localSynapseMetadata={localSynapseMetadata}/>
                             ) : activeTab === "synapses" ? (
-                                <UserJoinedSynapsesPanel user={user} />
+                                <UserJoinedSynapsesPanel synapses={user.synapses} />
                             ) : (
                                 <div>Selected Tab Not Valid</div>
                             )}

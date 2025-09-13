@@ -20,8 +20,7 @@ const mockShowcaseItems = [
 
 const UserShowcasePanel = () => {
     return (
-        <div className="p-6 w-full text-foreground">
-            <h2 className="text-3xl text-brand font-semibold mb-6">Showcase</h2>
+        <div className="p-4 w-full h-full text-foreground bg-surface/70 border border-border rounded-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {mockShowcaseItems.map((item, index) => (
                     <a

@@ -116,60 +116,60 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col p-4 text-3xl bg-background text-foreground text-center ">
-            <div className="flex flex-col gap-2 p-2 border-b border-border bg-surface text-lg shadow-lg rounded-xl">
-                <div className={'text-3xl'}>
+        <div className="flex flex-col flex-1  h-full text-foreground bg-surface/70 rounded-xl border border-border">
+            <div className="flex flex-col justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-bold `}>
                     Global Feed
-                </div>
-                <div className={'flex flex-row justify-start gap-8'}>
-                    <div className="flex flex-row relative  gap-2">
-                        <label className="">Source</label>
-                        <button
-                            className={'cursor-pointer'}
-                            onClick={() => toggleFilterTray()}>
-                            <FiFilter />
-                        </button>
-                    </div>
-
-                    <div className="flex flex-row items-center gap-2">
-                        <label className="">Sort By</label>
-                        <button
-                            className={'cursor-pointer'}
-                            onClick={() => toggleSortTray()}
-                        >
-                            <FaSortAmountUp />
-                        </button>
-                    </div>
-
-                    <div>
-                        {showSortTray && (
-                            <div className="absolute  z-50 bg-header-bg/70 rounded-2xl shadow-2xl w-2xl">
-                                <SortTray />
-                            </div>
-                        )}
-                    </div>
-                    <div>
-                        {showFilterTray && (
-                            <div className="absolute  z-50 bg-header-bg/70 rounded-2xl shadow-2xl w-2xl">
-                                <FilterTray />
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex flex-col">
-                    <label className=" mb-1 text-left ">Keyword</label>
+                </button>
+            </div>
+            <div className="flex flex-row gap-2 p-4  border-b border-border bg-background text-lg shadow-lg">
+                <div className="flex flex-col w-full">
                     <input
                         type="text"
                         placeholder="Search posts..."
                         value={feedFilters.keyword}
                         onChange={(e) => setFeedFilters({ ...feedFilters, keyword: e.target.value })}
-                        className="bg-background border border-border px-2 py-1 rounded text-foreground"
+                        className="bg-surface border border-border px-2 py-1 rounded text-foreground"
                     />
                 </div>
-            </div>
+                <div className={'flex flex-col w-full items-center justify-center'}>
+                    <div className={`flex flex-row w-full`}>
+                        <div className="flex flex-row w-full items-center justify-center gap-2">
+                            <label className="">Source</label>
+                            <button
+                                className={'cursor-pointer hover:text-brand/60'}
+                                onClick={() => toggleFilterTray()}>
+                                <FiFilter />
+                            </button>
+                            <div className={`absolute z-50 mt-33`}>
+                                {showFilterTray && (
+                                    <div className="px-4 bg-header-bg/70 rounded-xl shadow-2xl backdrop-blur-xs border border-border rounded-xl">
+                                        <FilterTray />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-row w-full items-center justify-center gap-2">
+                            <label className="">Sort By</label>
+                            <button
+                                className={'cursor-pointer hover:text-brand/60'}
+                                onClick={() => toggleSortTray()}
+                            >
+                                <FaSortAmountUp />
+                            </button>
+                            <div className={`absolute z-50 mt-40`}>
+                                {showSortTray && (
+                                    <div className="px-4 bg-surface/70 rounded-xl shadow-2xl backdrop-blur-xs border border-border rounded-xl">
+                                        <SortTray />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <div className="flex flex-col text-left space-y-8 mt-8">
+            </div>
+            <div className="flex flex-col overflow-y-auto text-left space-y-8 mt-4 p-4 ">
                 {/* TODO Post object is not passed all required fields. */}
                 {posts.length > 0 ? (
                     posts
@@ -204,10 +204,9 @@ const FeedPanel = () => {
                             </div>
                         ))
                 ) : (
-                    <div>No posts to show.</div>
+                    <div className={`flex flex-col p-4 text-2xl text-center`}>No posts to show.</div>
                 )}
             </div>
-
         </div>
     );
 }

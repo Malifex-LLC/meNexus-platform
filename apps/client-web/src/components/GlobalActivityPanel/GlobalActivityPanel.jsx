@@ -78,15 +78,19 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex-1 w-full min-h-0 overflow-y-auto bg-background rounded-xl m-4 text-foreground">
-
+        <div className="flex flex-col min-h-0 h-full  bg-surface/70   text-foreground border border-border rounded-xl">
             {/* master timeline line */}
-            <ul className="p-4">
+            <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-bold `}>
+                    Activity
+                </button>
+            </div>
+            <ul className="p-4 overflow-y-auto">
                 {Object.entries(groups).map(([day, items]) => (
                     <li key={day} className="">
                         {/* day badge */}
                         <div className="">
-                            <span className="px-2 py-0.5 bg-surface font-medium text-3xl text-neutral shadow-2xl rounded-xl"
+                            <span className="px-2 py-0.5 bg-background font-medium text-3xl text-neutral shadow-2xl rounded-xl"
                             >
                                 {dayLabel(items[0].published)}
                             </span>
@@ -95,7 +99,7 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
                         {/* items for that day */}
                         <ul className={'px-8 py-2'}>
                             {items.map((activity, i) => (
-                                <li key={i} className="relative pl-8 py-16 ">
+                                <li key={i} className="relative pl-8 py-8 ">
                                     {/* dot */}
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
                                     <Activity activity={activity} mode={'GLOBAL'} />

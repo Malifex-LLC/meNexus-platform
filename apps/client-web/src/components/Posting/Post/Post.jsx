@@ -18,6 +18,9 @@ import { refreshComments } from "../../../utils/apiUtils.js"
 import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
 import useEditRemoteComment from "../../../api/hooks/useEditRemoteComment.js";
 import useDeleteRemotePostComment from "../../../api/hooks/useDeleteRemotePostComment.js";
+import { HiDotsVertical } from "react-icons/hi";
+import { HiDotsHorizontal } from "react-icons/hi";
+
 
 const Post = ({
                   isLocalSynapse,
@@ -40,6 +43,7 @@ const Post = ({
     const isOwner = sessionPublicKey && publicKey === sessionPublicKey;
     const [user, setUser] = useState(null);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [showActions, setShowActions] = useState(false);
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [preview, setPreview] = useState(null);
@@ -167,6 +171,10 @@ const Post = ({
         }
     }, [postId, content])
 
+    const toggleActionsTray = () => {
+        setShowActions((prevState) => !prevState);
+    }
+
     const toggleComments = () => {
         setShowComments((prev) => !prev); // Toggle visibility
     };
@@ -195,12 +203,12 @@ const Post = ({
     }
 
     return (
-        <div className={`user-post flex w-full p-4   rounded-xl bg-surface text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+        <div className={`grid grid-cols-12 w-full p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
             {/* Left Column: Profile */}
-            <div className="flex flex-col items-center w-24 shrink-0">
+            <div className="flex flex-col col-span-2 items-center w-24 shrink-0">
                 {user.profilePicture ? (
                     <img
-                        className="w-16 h-16 rounded-lg object-cover"
+                        className="w-24 rounded-lg object-cover"
                         src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                         alt={`${user.displayName}'s profile picture`}
                     />
@@ -208,17 +216,26 @@ const Post = ({
                     <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
                 )}
                 {!isOwner && (
-                    <button
-                        className="mt-4 text-xs px-1 rounded-md bg-brand text-black"
-                        onClick={isFollowing ? handleUnfollow : handleFollow}
-                    >
-                        {isFollowing ? "Unfollow" : "Follow"}
-                    </button>
+                    isFollowing ? (
+                            <button
+                                className="mt-4 text-xs px-2 py-1 rounded-md bg-surface/60 text-foreground hover:cursor-pointer hover:bg-brand/60"
+                                onClick={isFollowing ? handleUnfollow : handleFollow}
+                            >
+                                Unfollow
+                            </button>
+                        ) : (
+                            <button
+                                className="mt-4 text-xs px-2 py-1 rounded-md bg-brand hover:cursor-pointer hover:bg-brand/60"
+                                onClick={isFollowing ? handleUnfollow : handleFollow}
+                            >
+                                Follow
+                            </button>
+                        )
                 )}
             </div>
 
-            {/* Right Column: Content */}
-            <div className="flex flex-col w-full flex-1 pl-6">
+            {/* Center Column: Content */}
+            <div className="flex flex-col col-span-9 w-full flex-1 pl-6">
                 {/* Identity */}
                 <div>
                     <Link
@@ -275,18 +292,6 @@ const Post = ({
 
                 )}
 
-                {/* Post Actions */}
-                {isOwner && (
-                    <div className="flex justify-end gap-2 mt-4">
-                        {isEditing ? (
-                            <button className="text-xs bg-save px-3 py-1 rounded" onClick={onSave}>Save</button>
-                        ) : (
-                            <button className="text-xs bg-edit hover:bg-edit-hover px-3 py-1 rounded" onClick={onEdit}>Edit</button>
-                        )}
-                        <button className="text-xs bg-delete hover:bg-delete-hover px-3 py-1 rounded" onClick={onDelete}>Delete</button>
-                    </div>
-                )}
-
                 {/* Stats */}
                 <div className="mt-4 text-sm text-neutral flex gap-4">
                     <p>{likes} likes</p>
@@ -297,7 +302,7 @@ const Post = ({
 
                 {/* Comments */}
                 {showComments && (
-                    <div className="mt-4 space-y-4">
+                    <div className="flex flex-col w-full mt-4 space-y-4">
                         {comments.length > 0 ? (
                             comments
                                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -331,6 +336,57 @@ const Post = ({
                             setComments={setComments}
                             refreshComments={handleRefreshComments}
                         />
+                    </div>
+                )}
+            </div>
+            {/* Right Column: Actions */}
+            <div className="relative inline-block text-left">
+                {/* Dots trigger */}
+                <button
+                    onClick={toggleActionsTray}
+                    className="inline-flex items-center justify-center p-2 rounded-lg hover:text-brand/50 hover:cursor-pointer text-3xl"
+                    aria-haspopup="menu"
+                    aria-expanded={showActions}
+                >
+                    <HiDotsHorizontal />
+                </button>
+
+                {/* Actions tray */}
+                {showActions && isOwner && (
+                    <div
+                        role="menu"
+                        className="absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-border bg-surface/70 backdrop-blur-xs shadow-xl ring-1 ring-border p-2 z-50"
+                    >
+                        <div className="grid gap-2">
+                            {isEditing ? (
+                                <button
+                                    onClick={onSave}
+                                    className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-save hover:bg-save/90 hover:cursor-pointer text-foreground"
+                                    role="menuitem"
+                                >
+                                    Save
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={onEdit}
+                                    className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-edit hover:bg-edit-hover hover:cursor-pointer text-foreground"
+                                    role="menuitem"
+                                >
+                                    Edit
+                                </button>
+                            )}
+
+                            <button
+                                onClick={() => {
+                                    onDelete();
+                                    toggleActionsTray();
+                                }}
+                                className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-delete hover:bg-delete-hover hover:cursor-pointer text-foreground "
+                                role="menuitem"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

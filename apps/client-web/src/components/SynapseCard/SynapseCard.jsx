@@ -6,9 +6,9 @@ const SynapseCard = ({
                          description,
                          publicKey}) => {
     return (
-        <div className='synapseCard p-4 m-4 max-w-3xl  bg-background rounded-xl
-        hover:bg-surface hover:translate-y-[-2px] shadow-lg'>
-            <div className="text-2xl text-brand">
+        <div className='synapseCard p-4 m-4 max-w-3xl  bg-surface border border-border/30 rounded-xl
+        hover:bg-brand/10 hover:translate-y-[-2px] shadow-lg'>
+            <div className="text-2xl text-brand hover:underline">
                 {name}
             </div>
             <div className="text-lg text-foreground">

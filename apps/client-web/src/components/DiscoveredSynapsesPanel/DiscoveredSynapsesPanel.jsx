@@ -39,9 +39,9 @@ const DiscoveredSynapsesPanel = ({discoveredPeers}) => {
         return (<div>Loading Discovered Synapses</div>)
     }
     return (
-        <div className={`flex flex-col flex-1 h-full p-4 border border-border rounded-xl shadow-xl`}>
-            <div className={`py-4 text-3xl text-foreground text-center border-b border-border`}>
-                Synapses
+        <div className={`flex flex-col flex-1 h-full bg-surface/70 border border-border rounded-xl shadow-xl`}>
+            <div className={`p-4 text-3xl bg-surface text-brand text-center border-b border-border rounded-t-xl`}>
+                Discovered Synapses
             </div>
             {synapseMetadata ? (
                 synapseMetadata.map((synapse, index) => {

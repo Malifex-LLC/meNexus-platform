@@ -2,8 +2,8 @@
 
 :root {
     /* Foundations */
-    --color-background:         #212121;   /* Panel Background */
-    --color-surface:            #2A2A2A;   /* Panel/Card Surface */
+    --color-background:         #2A2A2A;   /* Panel Background */
+    --color-surface:            #212121;   /* Panel/Card Surface */
     --color-border:             #3A3A3A;   /* Pane Splitters */
 
     /* Header background */
@@ -35,7 +35,7 @@
 
 /* Solid Background */
 body {
-    background: #212121;
+    background: #2A2A2A;
 }
 
 /* Gradient Background */

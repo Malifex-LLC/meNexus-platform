@@ -100,7 +100,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
 
     return (
 
-        <div className=" py-2 px-4 rounded-xl bg-background">
+        <div className="flex flex-col py-2 px-4 rounded-xl bg-surface">
             <div>
                 {currentSynapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">
@@ -109,12 +109,10 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                             <p className="text-lg text-foreground">
                                 {currentSynapseMetadata.metadata.description}
                             </p>
-                            <p className="text-xs ">
-                                publicKey: {currentSynapseMetadata.identity.publicKey}
-                            </p>
+
                             {isSynapseMember ? (
                                 <button
-                                    className={`px-1 mt-1 text-foreground bg-surface rounded-xl hover:bg-brand hover:text-foreground-alt hover:cursor-pointer`}
+                                    className={`px-1 mt-4 text-foreground bg-background rounded-xl hover:bg-brand/60 hover:text-foreground-alt hover:cursor-pointer`}
                                     onClick={async () => {
                                         await handleLeave();
                                         setIsSynapseMember(false);
@@ -124,7 +122,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 </button>
                             ) : (
                                 <button
-                                    className={`px-1 mt-1 text-foreground-alt bg-brand rounded-xl hover:bg-primary hover:cursor-pointer`}
+                                    className={`px-1 mt-4 text-foreground-alt bg-brand rounded-xl hover:bg-primary hover:cursor-pointer`}
                                     onClick={async () => {
                                         await handleJoin();
                                         setIsSynapseMember(true);
@@ -139,13 +137,13 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 className={'flex text-3xl'}
                                 onClick={toggleJoinedSynapsesTray}
                             >
-                                <div className={'flex h-full text-5xl cursor-pointer mt-10'}>
+                                <div className={'flex h-full text-5xl cursor-pointer mt-16 hover:text-brand/60'}>
                                     <IoMdArrowDropdown />
                                 </div>
                             </div>
                             <div>
                                 {showJoinedSynapsesTray && (
-                                    <div className="absolute  z-50 bg-header-bg/70 rounded-2xl shadow-2xl w-2xl">
+                                    <div className="absolute  z-50 bg-header-bg/70 backdrop-blur-xs rounded-2xl shadow-2xl w-2xl">
                                         <JoinedSynapsesTray
                                             synapseMetadataList={synapseMetadataList}
                                         />

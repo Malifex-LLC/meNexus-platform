@@ -8,8 +8,8 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
 
 
     return (
-        <div className={''}>
-            <div className="text-center rounded-xl border-b border-border">
+        <div className={'flex flex-col p-4 w-full'}>
+            <div className="text-foreground text-center text-xl border-b border-border">
                 Boards
             </div>
 
@@ -17,10 +17,9 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
                 <button
                     key={board}
                     onClick={() => setActiveBoard(board)}
-                    className={`
-            rounded-xl p-2 mt-4 w-full text-left text-xl shadow-lg
-            hover:bg-surface hover:translate-y-[-2px]
-            ${activeBoard === board ? "bg-primary text-background" : "bg-background"}
+                    className={` p-2 mt-4 w-full text-left text-xl text-foreground shadow-lg 
+                                 border border-border rounded-xl hover:bg-brand/10 hover:translate-y-[-2px]
+            ${activeBoard === board ? "bg-brand/60 text-background" : "bg-surface"}
           `}
                 >
                     <PostBoard channel={board} />

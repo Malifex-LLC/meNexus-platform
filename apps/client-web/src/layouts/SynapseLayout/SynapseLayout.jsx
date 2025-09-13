@@ -32,6 +32,11 @@ import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
 import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
 import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
 import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
+import PostBoardsPanel from "../../components/Posting/PostBoardsPanel/PostBoardsPanel.jsx";
+import ChattingChannelsPanel from "../../components/Chatting/ChattingChannelsPanel/ChattingChannelsPanel.jsx";
+import { TbActivityHeartbeat } from "react-icons/tb";
+import { FiActivity } from "react-icons/fi";
+
 
 const SynapseLayout =({ children }) => {
 
@@ -51,7 +56,7 @@ const SynapseLayout =({ children }) => {
     const [activeChannel, setActiveChannel] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
 
-    const [activeSidebarTab, setActiveSidebarTab] = useState("activity"); // or "chat"
+    const [activeSidebarTab, setActiveSidebarTab] = useState("activity");
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
 
 
@@ -201,7 +206,7 @@ const SynapseLayout =({ children }) => {
 
 
     return (
-        <div className="home-layout h-screen flex flex-col ">
+        <div className="flex flex-col h-screen">
             {/* Remove the bg-background above to see the magic below */}
             {/*<div className={`absolute top-0 left-o -z-1 pt-17 h-screen w-screen bg-gradient-to-b from-background via-primary to-background backdrop-blur-lg `}/>*/}
 
@@ -213,45 +218,66 @@ const SynapseLayout =({ children }) => {
             </div>
 
             {/* Main Grid */}
-            <div className="flex-1 min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden ">
-
-                {/* Main Content (Center Column) */}
-                <div className="flex flex-col flex-1 p-4 min-h-0 w-full lg:col-span-9 overflow-hidden">
-
-                    {/* Synapse Control Bar */}
-                    <div className=" mx-4 shadow-2xl border border-border rounded-xl">
-                        <SynapseControlBar
-                            synapses={user.synapses}
-                            publicKey={user.publicKey}
-                        />
+            <div className="flex flex-col  p-4 gap-4 h-full min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden">
+                {/* Synapse Control Bar */}
+                <div className="flex flex-col shadow-2xl border border-border rounded-xl lg:col-span-3 bg-surface/70">
+                    <SynapseControlBar
+                        synapses={user.synapses}
+                        publicKey={user.publicKey}
+                    />
+                    {/* Tab Switcher */}
+                    <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-surface  p-2 text-4xl ' +
+                        'text-foreground '}>
+                        <button
+                            className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
+                                ${activeMiddlebarTab === "feed" ? "text-brand font-bold" : "hover:text-brand/50"}`}
+                            onClick={() => setActiveMiddlebarTab("feed")}
+                        >
+                            <CgFeed />
+                        </button>
+                        <button
+                            className={`flex justify-center w-full h-full gap-2 hover:cursor-pointer
+                                ${activeMiddlebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand/50"}`}
+                            onClick={() => setActiveMiddlebarTab("chat")}
+                        >
+                            <FaUsersViewfinder />
+                        </button>
                     </div>
 
+                    <div>
+                        {activeMiddlebarTab === "feed" ? (
+                            <div className={'flex w-full rounded-xl shadow-2xl'}>
+                                <PostBoardsPanel
+                                    boards={boards}
+                                    activeBoard={activeBoard}
+                                    setActiveBoard={setActiveBoard}
+                                />
+                            </div>
+                        ) : activeMiddlebarTab === "chat" ? (
+                            <div className={'flex w-full rounded-xl shadow-2xl'}>
+                                <ChattingChannelsPanel
+                                    channels={channels}
+                                    activeChannel={activeChannel}
+                                    setActiveChannel={setActiveChannel}
+                                />
+                            </div>
+
+                        ) : (
+                            <div className="flex flex-col  w-full lg:col-span-6 ">
+                                unknown tab content
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Main Content (Center Column) */}
+                <div className="flex flex-col flex-1  min-h-0 w-full lg:col-span-6 overflow-hidden">
                     {/* Scrollable PostingPanel */}
-                    <div className={'hidden lg:flex flex-col flex-1 min-h-0  lg:col-span-9 '}>
-
-                        {/* Tab Switcher */}
-                        <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-background  p-2 text-4xl ' +
-                            'text-foreground '}>
-                            <button
-                                className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
-                                ${activeMiddlebarTab === "feed" ? "text-brand font-bold" : "hover:text-brand"}`}
-                                onClick={() => setActiveMiddlebarTab("feed")}
-                            >
-                                <CgFeed />
-                            </button>
-                            <button
-                                className={`flex justify-center w-full h-full gap-2 hover:cursor-pointer
-                                ${activeMiddlebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand"}`}
-                                onClick={() => setActiveMiddlebarTab("chat")}
-                            >
-                                <FaUsersViewfinder />
-                            </button>
-                        </div>
-
+                    <div className={'hidden lg:flex flex-col flex-1 min-h-0  lg:col-span-6 '}>
                         {/* Content */}
                         <div className={'flex flex-1 min-h-0 overflow-y-auto '}>
                             {activeMiddlebarTab === "feed" ? (
-                                <div className={'mx-4 my-2 w-full rounded-xl shadow-2xl'}>
+                                <div className={' w-full rounded-xl shadow-2xl'}>
                                     <PostsPanel
                                         isLocalSynapse={isLocalSynapse}
                                         publicKey={sessionUser.publicKey}
@@ -287,27 +313,26 @@ const SynapseLayout =({ children }) => {
                 </div>
 
                 {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col w-full p-4 m-4 rounded-xl lg:col-span-3 overflow-hidden bg-background">
+                <div className="hidden lg:flex flex-col w-full rounded-xl lg:col-span-3 overflow-hidden bg-surface/70  border border-border">
                     {/* Tab Switcher */}
-                    <div className="flex justify-around border border-border bg-background
-                    p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl">
+                    <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border text-2xl text-foreground shadows-2xl ">
                         <button
-                            onClick={() => setActiveSidebarTab("activity")}
-                            className={`${activeSidebarTab === "activity" ? "text-brand font-bold" : "hover:text-brand hover:cursor-pointer"}`}
+                            onClick={() => setActiveSidebarTab("members")}
+                            className={`${activeSidebarTab === "members" ? "text-brand font-bold " : "hover:text-brand/50 hover:cursor-pointer"}`}
                         >
                             Members
                         </button>
                         <button
-                            onClick={() => setActiveSidebarTab("chat")}
-                            className={`${activeSidebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand hover:cursor-pointer"}`}
+                            onClick={() => setActiveSidebarTab("activity")}
+                            className={`${activeSidebarTab === "activity" ? "text-brand font-bold " : "hover:text-brand/50 hover:cursor-pointer"}`}
                         >
                             Activity
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="h-full  overflow-y-auto p-4 m-4  bg-background border border-border rounded-xl shadow-2xl ">
-                        {activeSidebarTab === "activity" ? (
+                    <div className="h-full  overflow-y-auto    rounded-xl shadow-2xl ">
+                        {activeSidebarTab === "members" ? (
                             <>
                                 <SynapseMembersPanel members={members} />
                             </>
@@ -320,7 +345,6 @@ const SynapseLayout =({ children }) => {
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );

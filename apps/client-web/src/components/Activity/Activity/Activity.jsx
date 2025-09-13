@@ -25,16 +25,16 @@ const makeDescription = ({
                 <div>
                     {mode === 'SYNAPSE' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> created a new
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer'}> post</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> created a new
+                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer hover:underline'}> post</span></Link>
                         </>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> created a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer'}> post</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> created a
+                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer hover:underline'}> post</span></Link>
                             <> in </>
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
                 </div>
@@ -45,16 +45,16 @@ const makeDescription = ({
                 <div>
                     {mode === 'SYNAPSE' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> commented on a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer'}> post</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> commented on a
+                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer hover:underline'}> post</span></Link>
                         </>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> commented on a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer'}> post</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> commented on a
+                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer hover:underline'}> post</span></Link>
                             <> in </>
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
                 </div>
@@ -63,14 +63,14 @@ const makeDescription = ({
         case 'FOLLOWED':
             return (
                 <div>
-                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> followed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
+                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> followed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
                 </div>
             );
 
         case 'UNFOLLOWED':
             return (
                 <div>
-                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> unfollowed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
+                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> unfollowed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
                 </div>
             );
 
@@ -79,13 +79,13 @@ const makeDescription = ({
                 <div>
                     {mode === 'SYNAPSE' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> joined!
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> joined!
                         </>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> joined
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> joined
+                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
                 </div>
@@ -96,13 +96,13 @@ const makeDescription = ({
                 <div>
                     {mode === 'SYNAPSE' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> left!
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> left!
                         </>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer'}>@{actor.handle}</span></Link> left
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> left
+                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
                         </>
                     )}
                 </div>
@@ -216,7 +216,7 @@ const Activity = ({ activity, mode }) => {
 
     return (
         <div className="flex flex-col w-full p-4 py-5 rounded-xl text-lg
-                    bg-surface/40 text-foreground shadow-2xl"
+                    bg-background/70 text-foreground shadow-2xl"
         >
             {description}
             <span className="block text-xs opacity-60 mt-1">

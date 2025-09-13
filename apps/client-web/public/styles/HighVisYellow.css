@@ -2,8 +2,8 @@
 
 :root {
     /* Foundations */
-    --color-background:         #0E0E0E;   /* Panel Background */
-    --color-surface:            #1A1A1A;   /* Panel/Card Surface */
+    --color-background:         #1A1A1A;   /* Panel Background */
+    --color-surface:            #000000;   /* Panel/Card Surface */
     --color-border:             #2E2E2E;   /* Pane Splitters */
 
     /* Header background */

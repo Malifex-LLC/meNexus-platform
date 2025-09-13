@@ -154,9 +154,8 @@ const ProfileSettings = () => {
     }, [sessionUserHandle, navigate, isHandleSet, user]);
 
     return (
-        <div className="profile-settings__container flex-1  p-8 h-full  md:mx-16 text-foreground">
-            <h2 className="profile-settings__header flex text-4xl font-semibold p-8 mb-4 gap-8 rounded-2xl
-            bg-surface">Profile Settings</h2>
+        <div className="flex flex-col  w-full m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+            <h2 className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">Profile Settings</h2>
             <div className={`flex flex-col xl:flex-row gap-8 p-4 `}>
                 <div className={``}>
                     {/* Username */}

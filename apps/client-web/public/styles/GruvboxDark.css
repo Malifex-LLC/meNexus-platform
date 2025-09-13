@@ -2,8 +2,8 @@
 
 :root {
     /* Foundations */
-    --color-background:         #1D2021;   /* Panel Background */
-    --color-surface:            #504945;   /* Panel/Card Surface */
+    --color-background:         #504945;   /* Panel Background */
+    --color-surface:            #1D2021;   /* Panel/Card Surface */
     --color-border:             #665C54;   /* Pane Splitters */
 
     /* Header background */
@@ -37,44 +37,39 @@
 
 /* Solid Background */
 body {
-    background: #1D2021;
+    background: #3F3F3F;
 }
 
 /* Gradient Background */
-/*
-body {
-    background: linear-gradient(
-        to bottom,
-        var(--color-background),
-        var(--color-primary),
-        var(--color-background)
-    );
-    backdrop-filter: blur(1rem);
-}
-*/
+/*body {*/
+/*    background: linear-gradient(*/
+/*        to bottom,*/
+/*        var(--color-background),*/
+/*        var(--color-primary),*/
+/*        var(--color-background)*/
+/*    );*/
+/*    backdrop-filter: blur(1rem);*/
+/*}*/
 
 /* Optional Animated Background */
-/*
-body {
-    background: linear-gradient(
-        270deg,
-        var(--color-background),
-        var(--color-primary),
-        var(--color-accent),
-        var(--color-secondary),
-        var(--color-background)
-    );
-    background-size: 600% 600%;
-    animation: gradientShift 14s ease infinite;
-    backdrop-filter: blur(16px);
-}
 
-@keyframes gradientShift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-*/
+/*body {*/
+/*    background: linear-gradient(*/
+/*        90deg,*/
+/*        var(--color-background),*/
+/*        var(--color-brand),*/
+/*        var(--color-background)*/
+/*    );*/
+/*    background-size: 600% 600%;*/
+/*    animation: gradientShift 14s ease infinite;*/
+/*    backdrop-filter: blur(16px);*/
+/*}*/
+
+/*@keyframes gradientShift {*/
+/*    0%   { background-position: 0% 50%; }*/
+/*    50%  { background-position: 100% 50%; }*/
+/*    100% { background-position: 0% 50%; }*/
+/*}*/
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {

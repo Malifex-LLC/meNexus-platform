@@ -55,65 +55,55 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
     }
 
     return (
-        <div className="flex flex-row h-full rounded-xl">
-            <div className={'bg-background p-4 mr-2  rounded-xl  w-1/5 text-2xl text-foreground border border-border shadow-2xl'}
-            >
-                <PostBoardsPanel
-                    boards={boards}
+        <div className={'flex flex-col flex-1 overflow-y-auto h-full bg-surface/70 rounded-xl  px-8 space-y-8 border border-border'}>
+            <div className=" bg-background p-4 rounded-xl mt-4 mx-4  shadow-2xl">
+                <PostForm
+                    isLocalSynapse={isLocalSynapse}
+                    publicKey={publicKey}
+                    synapsePublicKey={synapsePublicKey}
                     activeBoard={activeBoard}
-                    setActiveBoard={setActiveBoard}
+                    refreshPosts={() => (
+                        isLocalSynapse
+                            ? refreshPosts(() => getAllPosts(), setPosts)
+                            : refreshPosts(() => fetchRemotePosts(synapsePublicKey), setPosts)
+                    )}
                 />
             </div>
-            <div className={'home__posts bg-background rounded-xl h-full flex-1 overflow-y-auto px-8 space-y-8 border border-border'}>
-                <div className="home__post-form bg-surface p-4 rounded-xl mt-4  shadow-2xl">
-                    <PostForm
-                        isLocalSynapse={isLocalSynapse}
-                        publicKey={publicKey}
-                        synapsePublicKey={synapsePublicKey}
-                        activeBoard={activeBoard}
-                        refreshPosts={() => (
-                            isLocalSynapse
-                                ? refreshPosts(() => getAllPosts(), setPosts)
-                                : refreshPosts(() => fetchRemotePosts(synapsePublicKey), setPosts)
-                        )}
-                    />
-                </div>
-                {posts.length > 0 ? (
-                    posts
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                        .map((post, index) => (
-                            <div
+            {posts.length > 0 ? (
+                posts
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .map((post, index) => (
+                        <div
+                            key={index}
+                            className={'mx-4 shadow-2xl'}
+                        >
+                            <Post
                                 key={index}
-                                className={'shadow-2xl mx-32'}
-                            >
-                                <Post
-                                    key={index}
-                                    isLocalSynapse={isLocalSynapse}
-                                    synapsePublicKey={synapsePublicKey}
-                                    synapseUrl={post.synapseUrl}
-                                    postId={post.post_id}
-                                    publicKey={post.public_key}
-                                    sessionPublicKey={publicKey}
-                                    date={post.created_at}
-                                    content={post.content}
-                                    mediaUrl={post.media_url}
-                                    comments={0}
-                                    likes={0}
-                                    onDelete={() => handleDelete(post.post_id)}
-                                    onEdit={() => handleEdit(post.post_id, posts)}
-                                    isEditing={editingPostId === post.post_id}
-                                    editedContent={editedPostContent}
-                                    onContentChange={(event) =>
-                                        setEditedPostContent(event.target.value)
-                                    }
-                                    onSave={handleSave}
-                                />
-                            </div>
-                        ))
-                ) : (
-                    <div>No posts to show.</div>
-                )}
-            </div>
+                                isLocalSynapse={isLocalSynapse}
+                                synapsePublicKey={synapsePublicKey}
+                                synapseUrl={post.synapseUrl}
+                                postId={post.post_id}
+                                publicKey={post.public_key}
+                                sessionPublicKey={publicKey}
+                                date={post.created_at}
+                                content={post.content}
+                                mediaUrl={post.media_url}
+                                comments={0}
+                                likes={0}
+                                onDelete={() => handleDelete(post.post_id)}
+                                onEdit={() => handleEdit(post.post_id, posts)}
+                                isEditing={editingPostId === post.post_id}
+                                editedContent={editedPostContent}
+                                onContentChange={(event) =>
+                                    setEditedPostContent(event.target.value)
+                                }
+                                onSave={handleSave}
+                            />
+                        </div>
+                    ))
+            ) : (
+                <div className={`flex flex-col p-4 text-2xl text-center text-foreground`}>No posts to show.</div>
+            )}
         </div>
     );
 }

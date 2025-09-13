@@ -2,12 +2,12 @@
 
 :root {
     /* Foundations */
-    --color-background:         #191724;   /* Panel Background */
-    --color-surface:            #1f1d2e;   /* Panel/Card Surface */
+    --color-background:         #1f1d2e;   /* Panel Background */
+    --color-surface:            #191724;   /* Panel/Card Surface */
     --color-border:             #26233a;   /* Pane Splitters */
 
     /* Header background */
-    --color-header-bg:          #1f1d2e;   /* Header Background Color */
+    --color-header-bg:          #191724;   /* Header Background Color */
 
     /* Typography */
     --color-foreground:         #e0def4;   /* Primary Text */
@@ -37,7 +37,7 @@
 
 /* Solid Background */
 body {
-    background: #191724;
+    background: #1f1d2e;
 }
 
 /* Gradient Background */
