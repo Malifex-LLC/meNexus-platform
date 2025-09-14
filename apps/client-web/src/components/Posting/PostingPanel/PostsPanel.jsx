@@ -55,7 +55,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
     }
 
     return (
-        <div className={'flex flex-col flex-1 overflow-y-auto h-full bg-surface/70 rounded-xl  px-8 space-y-8 border border-border'}>
+        <div className={'flex flex-col flex-1 overflow-y-auto h-full bg-surface/70 rounded-xl  md:px-8 space-y-8 border border-border'}>
             <div className=" bg-background p-4 rounded-xl mt-4 mx-4  shadow-2xl">
                 <PostForm
                     isLocalSynapse={isLocalSynapse}
@@ -104,6 +104,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
             ) : (
                 <div className={`flex flex-col p-4 text-2xl text-center text-foreground`}>No posts to show.</div>
             )}
+            <div className={`mb-8`}/>
         </div>
     );
 }

@@ -9,7 +9,7 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
 
     return (
         <div className={'flex flex-col p-4 w-full'}>
-            <div className="text-foreground text-center text-xl border-b border-border">
+            <div className="text-foreground text-center text-xl border-b border-border font-montserrat">
                 Boards
             </div>
 

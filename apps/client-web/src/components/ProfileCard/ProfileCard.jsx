@@ -116,13 +116,13 @@ const ProfileCard = ({publicKey}) => {
                 </div>
                 <div className={`flex flex-col`}>
                     <Link
-                        className="profile-card__display-name text-sm text-foreground cursor-pointer hover:underline"
+                        className="text-sm text-foreground font-montserrat cursor-pointer hover:underline"
                         to={`/profile/${user.handle}`}
                     >
                         {user.displayName}
                     </Link>
                     <Link
-                        className="profile-card__handle text-xs text-brand cursor-pointer"
+                        className="text-xs text-brand font-jetbrains cursor-pointer"
                         to={`/profile/${user.handle}`}
                     >
                         @{user.handle}

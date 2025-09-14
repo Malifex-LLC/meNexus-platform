@@ -13,6 +13,7 @@ import DisplaySettings from "../../components/Settings/DisplaySettings/DisplaySe
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import {useNavigate} from "react-router-dom";
+import {TbLogout2} from "react-icons/tb";
 
 const SettingsLayout = ({ children }) => {
     const [activePanel, setActivePanel] = useState(0); // 0: Profile, 1: Account, 2: Display
@@ -60,60 +61,64 @@ const SettingsLayout = ({ children }) => {
     }
 
     return (
-        <div className='flex flex-col h-screen sm:items-center xl:items-start  bg-background '>
+        <div className='flex flex-col h-[100dvh] sm:items-center xl:items-start  bg-background '>
             <div className='sticky top-0 z-50 border-b border-border w-full'>
                 <Header
                     user={user}
                 />
                 {/* Mobile Nav */}
-                <div className='flex  w-full lg:hidden pt-17 py-2 justify-evenly border-b bg-background border-border text-foreground'>
+                <div className='flex  w-full xl:hidden pt-17 py-2 justify-evenly border-b bg-background border-border text-foreground'>
                     <button
                         onClick={() => setActivePanel(0)}
-                        className={`${activePanel === 0 ? 'text-[#FF6B6B] font-semibold' : 'text-foreground'}`}
+                        className={`${activePanel === 0 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
                         Profile
                     </button>
                     <button
                         onClick={() => setActivePanel(1)}
-                        className={`${activePanel === 1 ? 'text-[#FF6B6B] font-semibold' : 'text-foreground'}`}
+                        className={`${activePanel === 1 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
                         Account
                     </button>
                     <button
                         onClick={() => setActivePanel(2)}
-                        className={`${activePanel === 2 ? 'text-[#FF6B6B] font-semibold' : 'text-foreground'}`}
+                        className={`${activePanel === 2 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
                         Display
+                    </button>
+                    <button
+                        className={`flex items-center text-xl text-foreground hover:text-brand/60 hover:cursor-pointer`}
+                        onClick={() => navigate('/login')}
+                    >
+                    <TbLogout2 />
                     </button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className={`flex h-full w-full pt-17 overflow-y-auto`}>
-                <div className="hidden lg:flex   text-foreground">
+            <div className={`flex h-full w-full xl:pt-17 overflow-y-auto`}>
+                <div className="hidden xl:flex   text-foreground">
                     {/* Render Settings Menu */}
                     {children[0]}
                 </div>
                 {/** MOBILE SWIPEABLE VIEWPORT */}
-                {window.innerWidth < 1050 && (
-                    <div className="lg:hidden w-full">
-                        <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
-                            <main className="settings-layout__main-content flex flex-1 ">
-                                <div className={`${activePanel === 0 ? 'flex w-full items-center' : 'hidden'} min-h-screen flex-col pt-17 `}>
-                                    <ProfileSettings />
-                                </div>
-                                <div className={`${activePanel === 1 ? 'flex' : 'hidden'} min-h-screen pt-17 `}>
-                                    <AccountSettings />
-                                </div>
-                                <div className={`${activePanel === 2 ? 'flex' : 'hidden'} min-h-screen flex-col pt-17 `}>
-                                    <DisplaySettings />
-                                </div>
-                            </main>
-                        </div>
+                <div className="xl:hidden w-full">
+                    <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
+                        <main className="settings-layout__main-content flex flex-1 w-full p-2">
+                            <div className={`${activePanel === 0 ? 'flex' : 'hidden'} w-full flex-col`}>
+                                <ProfileSettings />
+                            </div>
+                            <div className={`${activePanel === 1 ? 'flex' : 'hidden'} w-full`}>
+                                <AccountSettings />
+                            </div>
+                            <div className={`${activePanel === 2 ? 'flex' : 'hidden'} w-full flex-col`}>
+                                <DisplaySettings />
+                            </div>
+                        </main>
                     </div>
-                )}
+                </div>
 
-                <div className="hidden lg:flex flex-1 ">
+                <div className="hidden xl:flex flex-1 ">
                     {children[1]}
                 </div>
             </div>

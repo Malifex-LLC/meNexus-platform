@@ -52,50 +52,52 @@ const AccountSettings = () => {
     }
 
     return (
-        <div className="flex flex-col  w-full m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border rounded-xl">
             <div className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">
                 <FaKey />
                 Account Settings
             </div>
-            <form className="account-settings__form flex flex-col p-4 ">
-                <label className={`flex flex-col w-md mb-4`}>
-                    Email:
-                    <input
-                        className={`border border-border p-2`}
-                        type="email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        placeholder="Enter new email"
-                    />
-                </label>
-                <label className={`flex flex-col w-md mb-4`}>
-                    Password:
-                    <input
-                        className={`border border-border p-2`}
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Enter new password"
-                    />
-                </label>
-                <label className={`flex flex-col w-md mb-4`}>
-                    Confirm Password:
-                    <input
-                        className={`border border-border p-2`}
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm new password"
-                    />
-                </label>
-                <button
-                    className={` w-md bg-brand`}
-                    type="button"
-                    onClick={handleAccountUpdate}
-                >
-                    Save Changes
-                </button>
-            </form>
+            <div className={`xl:grid xl:grid-cols-4`}>
+                <form className="col-span-2 flex flex-col p-4 ">
+                    <label className={`flex flex-col w-full mb-4`}>
+                        Email:
+                        <input
+                            className={`border border-border p-2`}
+                            type="email"
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            placeholder="Enter new email"
+                        />
+                    </label>
+                    <label className={`flex flex-col w-full mb-4`}>
+                        Password:
+                        <input
+                            className={`border border-border p-2`}
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Enter new password"
+                        />
+                    </label>
+                    <label className={`flex flex-col w-full mb-4`}>
+                        Confirm Password:
+                        <input
+                            className={`border border-border p-2`}
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm new password"
+                        />
+                    </label>
+                    <button
+                        className={` w-full bg-brand rounded-xl`}
+                        type="button"
+                        onClick={handleAccountUpdate}
+                    >
+                        Save Changes
+                    </button>
+                </form>
+            </div>
             <p className="account-settings__passwords-dont-match">
                 {!isPasswordMatch && "Passwords Don't Match"}
             </p>

@@ -72,11 +72,11 @@ const CommentForm = ({
     };
 
     return (
-        <div className="flex flex-col items-center text-center w-full lg:px-32 ">
+        <div className="flex flex-col items-center text-center w-full  ">
             <div className={`flex w-full`}
                 onClick={handleFormClick}>
                 <textarea
-                    className="flex w-full p-4 mt-8  w-full rounded-2xl  bg-background"
+                    className="flex w-full p-4 mt-8 rounded-xl bg-surface"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {
@@ -87,7 +87,7 @@ const CommentForm = ({
                     }}
                 />
             </div>
-            <button className="comment-form__button p-1 px-2 my-4 text-xs md:text-sm rounded-md bg-primary"
+            <button className="p-1 px-2 my-4 text-xs md:text-sm rounded-md bg-primary"
                     onClick={handleSubmit} disabled={loading}>
                 {loading ? "Commenting..." : "Comment"}
             </button>

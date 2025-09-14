@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import useGetComments from "../../../api/hooks/useGetComments.js"
 import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
@@ -18,7 +18,6 @@ import { refreshComments } from "../../../utils/apiUtils.js"
 import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
 import useEditRemoteComment from "../../../api/hooks/useEditRemoteComment.js";
 import useDeleteRemotePostComment from "../../../api/hooks/useDeleteRemotePostComment.js";
-import { HiDotsVertical } from "react-icons/hi";
 import { HiDotsHorizontal } from "react-icons/hi";
 
 
@@ -203,15 +202,17 @@ const Post = ({
     }
 
     return (
-        <div className={`grid grid-cols-12 w-full p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+        <div className={`grid grid-cols-12 w-full p-2 md:p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
             {/* Left Column: Profile */}
-            <div className="flex flex-col col-span-2 items-center w-24 shrink-0">
+            <div className="flex flex-col col-span-2 items-center w-16 md:w-24 shrink-0">
                 {user.profilePicture ? (
-                    <img
-                        className="w-24 rounded-lg object-cover"
-                        src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
-                        alt={`${user.displayName}'s profile picture`}
-                    />
+                    <NavLink to={`/profile/${user.handle}`}>
+                        <img
+                            className="w-16 md:w-24 rounded-lg object-cover"
+                            src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                            alt={`${user.displayName}'s profile picture`}
+                        />
+                    </NavLink>
                 ) : (
                     <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
                 )}
@@ -237,27 +238,31 @@ const Post = ({
             {/* Center Column: Content */}
             <div className="flex flex-col col-span-9 w-full flex-1 pl-6">
                 {/* Identity */}
-                <div>
-                    <Link
-                        className="text-md md:text-md font-semibold hover:underline"
+                <div className={`flex flex-col`}>
+                    <NavLink
+                        className="text-sm md:text-xl font-montserrat font-semibold hover:underline hover:pointer-cursor"
                         to={`/profile/${user.handle}`}
                     >
                         {user.displayName}
-                    </Link>
-                    <div className="text-sm text-brand">@{user.handle}</div>
-                    <div className="text-xs text-neutral">{formatDate(date)}</div>
+                    </NavLink>
+                    <NavLink
+                        className={`text-xs md:text-lg text-brand font-jetbrains hover:underline hover:pointer-cursor`}
+                        to={`/profile/${user.handle}`}>
+                        @{user.handle}
+                    </NavLink>
+                    <div className="text-xs text-neutral font-montserrat">{formatDate(date)}</div>
                 </div>
 
                 {/* Post Content */}
-                <div className="mt-4">
+                <div className="mt-4 font-inter">
                     {isEditing ? (
                         <textarea
-                            className="w-full p-2 text-md lg:text-xl rounded-md bg-background"
+                            className="w-full p-2 text-sm md:text-md lg:text-xl rounded-md bg-surface"
                             value={editedContent}
                             onChange={onContentChange}
                         />
                     ) : (
-                        <p className="text-md lg:text-3xl whitespace-pre-wrap">{content}</p>
+                        <p className="text-sm md:text-md lg:text-3xl whitespace-pre-wrap">{content}</p>
                     )}
                 </div>
 
@@ -293,58 +298,21 @@ const Post = ({
                 )}
 
                 {/* Stats */}
-                <div className="mt-4 text-sm text-neutral flex gap-4">
+                <div className="mt-4 text-xs md:text-sm  text-neutral flex gap-4 font-montserrat">
                     <p>{likes} likes</p>
                     <p onClick={toggleComments} className="hover:underline cursor-pointer">
                         {showComments ? "Hide Comments" : `${comments.length} Comments`}
                     </p>
                 </div>
 
-                {/* Comments */}
-                {showComments && (
-                    <div className="flex flex-col w-full mt-4 space-y-4">
-                        {comments.length > 0 ? (
-                            comments
-                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                .map((comment, index) => (
-                                    <Comment
-                                        key={index}
-                                        publicKey={comment.comment_public_key}
-                                        sessionPublicKey={sessionPublicKey}
-                                        displayName={comment.displayName}
-                                        handle={comment.handle}
-                                        date={comment.comment_created_at}
-                                        content={comment.comment_content}
-                                        isEditing={editingCommentId === comment.comment_id}
-                                        onEdit={() => handleCommentEdit(comment.comment_id, comments)}
-                                        onDelete={() => handleDeleteComment(comment.comment_id)}
-                                        editedContent={editedCommentContent}
-                                        onContentChange={(e) => setEditedCommentContent(e.target.value)}
-                                        onSave={handleCommentSave}
-                                    />
-                                ))
-                        ) : (
-                            <div>No comments</div>
-                        )}
-                        <CommentForm
-                            isLocalSynapse={isLocalSynapse}
-                            publicKey={publicKey}
-                            synapsePublicKey={synapsePublicKey}
-                            sessionPublicKey={sessionPublicKey}
-                            resourceType="POST"
-                            resourceId={postId}
-                            setComments={setComments}
-                            refreshComments={handleRefreshComments}
-                        />
-                    </div>
-                )}
             </div>
+
             {/* Right Column: Actions */}
             <div className="relative inline-block text-left">
                 {/* Dots trigger */}
                 <button
                     onClick={toggleActionsTray}
-                    className="inline-flex items-center justify-center p-2 rounded-lg hover:text-brand/50 hover:cursor-pointer text-3xl"
+                    className="inline-flex items-center justify-center md:p-2 rounded-lg hover:text-brand/50 hover:cursor-pointer text-2xl md:text-3xl"
                     aria-haspopup="menu"
                     aria-expanded={showActions}
                 >
@@ -390,6 +358,47 @@ const Post = ({
                     </div>
                 )}
             </div>
+            {/* Comments */}
+            {showComments && (
+                <div className="flex flex-col col-start-3 col-span-10 w-full mt-4 md:p-4 space-y-4">
+                    {comments.length > 0 ? (
+                        comments
+                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                            .map((comment, index) => (
+                                <Comment
+                                    key={index}
+                                    publicKey={comment.comment_public_key}
+                                    sessionPublicKey={sessionPublicKey}
+                                    displayName={comment.displayName}
+                                    handle={comment.handle}
+                                    date={comment.comment_created_at}
+                                    content={comment.comment_content}
+                                    isEditing={editingCommentId === comment.comment_id}
+                                    onEdit={() => handleCommentEdit(comment.comment_id, comments)}
+                                    onDelete={() => handleDeleteComment(comment.comment_id)}
+                                    editedContent={editedCommentContent}
+                                    onContentChange={(e) => setEditedCommentContent(e.target.value)}
+                                    onSave={handleCommentSave}
+                                />
+                            ))
+                    ) : (
+                        <div>No comments</div>
+                    )}
+                    <div className={`flex w-full`}>
+                        <CommentForm
+                            isLocalSynapse={isLocalSynapse}
+                            publicKey={publicKey}
+                            synapsePublicKey={synapsePublicKey}
+                            sessionPublicKey={sessionPublicKey}
+                            resourceType="POST"
+                            resourceId={postId}
+                            setComments={setComments}
+                            refreshComments={handleRefreshComments}
+                        />
+                    </div>
+                </div>
+            )}
+
         </div>
 
 

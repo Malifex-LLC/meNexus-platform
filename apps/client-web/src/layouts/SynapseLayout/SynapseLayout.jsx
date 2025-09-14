@@ -6,17 +6,13 @@ import React, {useEffect, useState} from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import {useNavigate, useParams} from "react-router-dom";
-import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import {useSwipeable} from "react-swipeable";
-import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
 import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import ChatPanel from "../../components/Chatting/ChatPanel/ChatPanel.jsx";
 import PostsPanel from "../../components/Posting/PostingPanel/PostsPanel.jsx";
-import useFetchRemotePosts from "../../api/hooks/useFetchRemotePosts.js";
 import SynapseControlBar from "../../components/SynapseControlBar/SynapseControlBar.jsx";
-import JoinedSynapsesPanel from "../../components/JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
+import SynapseInfoTray from "../../components/SynapseInfoTray/SynapseInfoTray.jsx";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
-import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
 import { CgFeed } from "react-icons/cg";
 import { FaUsersViewfinder } from "react-icons/fa6";
 import useGetBoardPosts from "../../api/hooks/useGetBoardPosts.js";
@@ -30,12 +26,14 @@ import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelCha
 import SynapseMembersPanel from "../../components/SynapseMembersPanel/SynapseMembersPanel.jsx";
 import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
 import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
-import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
+import SynapseControlBarTray from "../../components/SynapseControlBar/SynapseControlBarTray.jsx";
 import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
 import PostBoardsPanel from "../../components/Posting/PostBoardsPanel/PostBoardsPanel.jsx";
 import ChattingChannelsPanel from "../../components/Chatting/ChattingChannelsPanel/ChattingChannelsPanel.jsx";
-import { TbActivityHeartbeat } from "react-icons/tb";
-import { FiActivity } from "react-icons/fi";
+import { LuPanelLeftClose } from "react-icons/lu";
+import { LuPanelRightClose } from "react-icons/lu";
+
+
 
 
 const SynapseLayout =({ children }) => {
@@ -58,6 +56,8 @@ const SynapseLayout =({ children }) => {
 
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity");
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
+    const [isSynapseInfoTrayOpen, setIsSynapseInfoTrayOpen] = useState(false);
+    const [isSynapseControlBarTrayOpen, setIsSynapseControlBarTrayOpen] = useState(false);
 
 
     const { getSynapseMetadata } = useGetSynapseMetadata();
@@ -165,7 +165,7 @@ const SynapseLayout =({ children }) => {
 
         };
         fetchSynapsePosts();
-    },[synapsePublicKey, isLocalSynapse, synapseMetadata, activeBoard]);
+    },[synapsePublicKey, isLocalSynapse, activeBoard]);
 
     useEffect(() => {
         const fetchSynapseChatMessages = async () => {
@@ -189,7 +189,37 @@ const SynapseLayout =({ children }) => {
             }
         }
         fetchSynapseChatMessages();
-    }, [synapsePublicKey, isLocalSynapse, synapseMetadata, activeChannel])
+    }, [synapsePublicKey, isLocalSynapse, activeChannel])
+
+    // Close drawers on ESC
+    useEffect(() => {
+        if (!(isSynapseControlBarTrayOpen || isSynapseInfoTrayOpen)) return;
+        const onKey = (e) => e.key === 'Escape' && (setIsSynapseControlBarTrayOpen(false), setIsSynapseInfoTrayOpen(false));
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isSynapseControlBarTrayOpen, isSynapseInfoTrayOpen]);
+
+    // Lock body scroll while any drawer is open
+    useEffect(() => {
+        document.body.style.overflow = (isSynapseControlBarTrayOpen || isSynapseInfoTrayOpen) ? 'hidden' : '';
+    }, [isSynapseControlBarTrayOpen, isSynapseInfoTrayOpen]);
+
+    // Set isXL based off window size for mounting components only once conditionally
+    function useIsXL() {
+        const [isXL, setIsXL] = React.useState(
+            typeof window !== 'undefined' && window.matchMedia('(min-width: 1280px)').matches
+        );
+        React.useEffect(() => {
+            if (typeof window === 'undefined') return;
+            const mql = window.matchMedia('(min-width: 1280px)');
+            const onChange = (e) => setIsXL(e.matches);
+            mql.addEventListener?.('change', onChange);
+            return () => mql.removeEventListener?.('change', onChange);
+        }, []);
+        return isXL;
+    }
+
+    const isXL = useIsXL();
 
 
     if (!user || !user.publicKey) {
@@ -204,152 +234,198 @@ const SynapseLayout =({ children }) => {
         return <div className={'bg-background text-foreground'}>Loading Synapse channels...</div>
     }
 
-
     return (
-        <div className="flex flex-col h-screen">
-            {/* Remove the bg-background above to see the magic below */}
-            {/*<div className={`absolute top-0 left-o -z-1 pt-17 h-screen w-screen bg-gradient-to-b from-background via-primary to-background backdrop-blur-lg `}/>*/}
-
+        <div className="flex flex-col h-[100dvh]">
             {/* Header */}
-            <div className="sticky top-0 h-17 z-50 border-b border-border">
-                <Header
-                    user={user}
-                />
-            </div>
+            <div className="sticky top-0 z-50 border-b border-border bg-background mt-15">
+                <div className="flex items-center justify-between">
+                    {/* Left hamburger (Browse) */}
+                    <button
+                        className="xl:hidden py-2 text-3xl text-foreground hover:text-brand/60 hover:cursor-pointer"
+                        aria-label="Open left menu"
+                        aria-expanded={isSynapseControlBarTrayOpen}
+                        aria-controls="synapse-drawer"
+                        onClick={() => setIsSynapseControlBarTrayOpen(true)}
+                    >
+                        <LuPanelRightClose />
+                    </button>
 
-            {/* Main Grid */}
-            <div className="flex flex-col  p-4 gap-4 h-full min-h-0 w-full lg:grid lg:grid-cols-12 overflow-hidden">
-                {/* Synapse Control Bar */}
-                <div className="flex flex-col shadow-2xl border border-border rounded-xl lg:col-span-3 bg-surface/70">
-                    <SynapseControlBar
-                        synapses={user.synapses}
-                        publicKey={user.publicKey}
-                    />
-                    {/* Tab Switcher */}
-                    <div className={'p-2 mx-4 my-2 border border-border rounded-xl flex justify-around  bg-surface  p-2 text-4xl ' +
-                        'text-foreground '}>
+                    {/* Center label */}
+                    {!isXL && (
+                        <div className="flex w-full justify-center text-2xl text-brand font-montserrat">
+                            {activeMiddlebarTab === 'feed' ? <div>{activeBoard}</div> : <div>{activeChannel}</div>}
+                        </div>
+                    )}
+
+                    {/* Right: Header + right hamburger (People) */}
+                    <div className="flex items-center gap-2">
+                        <Header user={user} />
                         <button
-                            className={`flex justify-center w-full h-full gap-2 border-r border-border hover:cursor-pointer
-                                ${activeMiddlebarTab === "feed" ? "text-brand font-bold" : "hover:text-brand/50"}`}
-                            onClick={() => setActiveMiddlebarTab("feed")}
+                            className="xl:hidden py-2 text-3xl text-foreground hover:text-brand/60 hover:cursor-pointer"
+                            aria-label="Open right menu"
+                            aria-expanded={isSynapseInfoTrayOpen}
+                            aria-controls="people-drawer"
+                            onClick={() => setIsSynapseInfoTrayOpen(true)}
                         >
-                            <CgFeed />
-                        </button>
-                        <button
-                            className={`flex justify-center w-full h-full gap-2 hover:cursor-pointer
-                                ${activeMiddlebarTab === "chat" ? "text-brand font-bold" : "hover:text-brand/50"}`}
-                            onClick={() => setActiveMiddlebarTab("chat")}
-                        >
-                            <FaUsersViewfinder />
+                            <LuPanelLeftClose />
                         </button>
                     </div>
+                </div>
+            </div>
 
-                    <div>
-                        {activeMiddlebarTab === "feed" ? (
-                            <div className={'flex w-full rounded-xl shadow-2xl'}>
-                                <PostBoardsPanel
+            {/* ===== Mobile Backdrop (shared) ===== */}
+            {(isSynapseControlBarTrayOpen || isSynapseInfoTrayOpen) && (
+                <button
+                    className="fixed inset-0 bg-surface/40 backdrop-blur-sm z-[55] xl:hidden"
+                    aria-label="Close menus"
+                    onClick={() => { setIsSynapseControlBarTrayOpen(false); setIsSynapseInfoTrayOpen(false); }}
+                />
+            )}
+
+            {/* ===== Left Drawer (Browse) ===== */}
+            {!isXL && (
+                <div
+                    id="synapse-control-bar-tray"
+                    role="dialog"
+                    aria-modal="true"
+                    className={`
+        fixed inset-y-0 left-0 w-80 max-w-full
+        transform transition-transform duration-300 ease-in-out
+        bg-surface/95 border-r border-border shadow-2xl
+        z-[60] xl:hidden
+        ${isSynapseControlBarTrayOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}
+                >
+                    <div className="flex items-center justify-between p-3 border-b border-border text-foreground">
+                        <h2 className="text-lg font-montserrat font-semibold">Browse</h2>
+                        <button
+                            className="p-2 text-2xl hover:text-brand/60 hover:cursor-pointer"
+                            aria-label="Close left menu"
+                            onClick={() => setIsSynapseControlBarTrayOpen(false)}
+                        >
+                            <LuPanelLeftClose />
+                        </button>
+                    </div>
+                    <div className="h-[calc(100%-3.25rem)] overflow-hidden">
+                        <SynapseControlBarTray
+                            user={user}
+                            activeMiddlebarTab={activeMiddlebarTab}
+                            setActiveMiddlebarTab={setActiveMiddlebarTab}
+                            boards={boards}
+                            activeBoard={activeBoard}
+                            setActiveBoard={setActiveBoard}
+                            channels={channels}
+                            activeChannel={activeChannel}
+                            setActiveChannel={setActiveChannel}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* ===== Right Drawer ===== */}
+            {!isXL && (
+                <div
+                    id="synapse-info-tray"
+                    role="dialog"
+                    aria-modal="true"
+                    className={`
+        fixed inset-y-0 right-0 w-80 max-w-[90vw]
+        transform transition-transform duration-300 ease-in-out
+        bg-surface/95 border-l border-border shadow-2xl
+        z-[60] xl:hidden
+        ${isSynapseInfoTrayOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}
+                >
+                    <div className="flex items-center justify-between p-3 border-b border-border text-foreground">
+                        <h2 className="text-lg font-montserrat font-semibold">Info</h2>
+                        <button
+                            className="p-2 text-2xl hover:text-brand/60 hover:cursor-pointer"
+                            aria-label="Close right menu"
+                            onClick={() => setIsSynapseInfoTrayOpen(false)}
+                        >
+                            <LuPanelRightClose />
+                        </button>
+                    </div>
+                    <div className="h-[calc(100%-3.25rem)] overflow-hidden">
+                        <SynapseInfoTray
+                            activeSidebarTab={activeSidebarTab}
+                            setActiveSidebarTab={setActiveSidebarTab}
+                            members={members}
+                            isLocalSynapse={isLocalSynapse}
+                            synapseMetadata={synapseMetadata}
+                            user={user}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* ===== Main Grid / Content ===== */}
+            <div className="flex flex-1 p-4 gap-4 min-h-0 w-full overflow-hidden xl:grid xl:grid-cols-12">
+                {/* Left Column (xl+): same as left drawer */}
+                {isXL && (
+                    <div className="hidden xl:flex xl:col-span-3 rounded-xl border border-border overflow-hidden shadow-2xl">
+                        <SynapseControlBarTray
+                            user={user}
+                            activeMiddlebarTab={activeMiddlebarTab}
+                            setActiveMiddlebarTab={setActiveMiddlebarTab}
+                            boards={boards}
+                            activeBoard={activeBoard}
+                            setActiveBoard={setActiveBoard}
+                            channels={channels}
+                            activeChannel={activeChannel}
+                            setActiveChannel={setActiveChannel}
+                        />
+                    </div>
+                )}
+
+                {/* Center Column */}
+                <div className="flex flex-col flex-1 min-h-0 w-full xl:col-span-6 overflow-hidden">
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                        {activeMiddlebarTab === 'feed' ? (
+                            <div className="w-full h-full rounded-xl shadow-2xl">
+                                <PostsPanel
+                                    isLocalSynapse={isLocalSynapse}
+                                    publicKey={sessionUser.publicKey}
+                                    synapsePublicKey={synapsePublicKey}
                                     boards={boards}
                                     activeBoard={activeBoard}
                                     setActiveBoard={setActiveBoard}
+                                    posts={posts}
+                                    setPosts={setPosts}
                                 />
                             </div>
-                        ) : activeMiddlebarTab === "chat" ? (
-                            <div className={'flex w-full rounded-xl shadow-2xl'}>
-                                <ChattingChannelsPanel
+                        ) : (
+                            <div className="flex w-full h-full shadow-2xl rounded-xl">
+                                <ChatPanel
+                                    synapseMetadata={synapseMetadata}
+                                    publicKey={sessionUser.publicKey}
                                     channels={channels}
                                     activeChannel={activeChannel}
                                     setActiveChannel={setActiveChannel}
+                                    chatMessages={chatMessages}
+                                    setChatMessages={setChatMessages}
                                 />
                             </div>
-
-                        ) : (
-                            <div className="flex flex-col  w-full lg:col-span-6 ">
-                                unknown tab content
-                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Main Content (Center Column) */}
-                <div className="flex flex-col flex-1  min-h-0 w-full lg:col-span-6 overflow-hidden">
-                    {/* Scrollable PostingPanel */}
-                    <div className={'hidden lg:flex flex-col flex-1 min-h-0  lg:col-span-6 '}>
-                        {/* Content */}
-                        <div className={'flex flex-1 min-h-0 overflow-y-auto '}>
-                            {activeMiddlebarTab === "feed" ? (
-                                <div className={' w-full rounded-xl shadow-2xl'}>
-                                    <PostsPanel
-                                        isLocalSynapse={isLocalSynapse}
-                                        publicKey={sessionUser.publicKey}
-                                        synapsePublicKey={synapsePublicKey}
-                                        boards={boards}
-                                        activeBoard={activeBoard}
-                                        setActiveBoard={setActiveBoard}
-                                        posts={posts}
-                                        setPosts={setPosts}
-                                    />
-                                </div>
-                            ) : activeMiddlebarTab === "chat" ? (
-                                <div className={'flex w-full h-full shadow-2xl rounded-xl'}>
-                                    <ChatPanel
-                                        key={synapseMetadata?.identity?.publicKey}
-                                        synapseMetadata={synapseMetadata}
-                                        publicKey={sessionUser.publicKey}
-                                        channels={channels}
-                                        activeChannel={activeChannel}
-                                        setActiveChannel={setActiveChannel}
-                                        chatMessages={chatMessages}
-                                        setChatMessages={setChatMessages}
-                                    />
-                                </div>
-
-                            ) : (
-                                <div className="flex flex-col  w-full lg:col-span-6 ">
-                                    unknown tab content
-                                </div>
-                            )}
-                        </div>
+                {/* Right Column (xl+): same as right drawer */}
+                {isXL && (
+                    <div className="hidden xl:flex flex-col w-full rounded-xl xl:col-span-3 overflow-hidden bg-surface/70 border border-border">
+                        <SynapseInfoTray
+                            activeSidebarTab={activeSidebarTab}
+                            setActiveSidebarTab={setActiveSidebarTab}
+                            members={members}
+                            isLocalSynapse={isLocalSynapse}
+                            synapseMetadata={synapseMetadata}
+                            user={user}
+                        />
                     </div>
-                </div>
-
-                {/* Right Column (Activity Feed + Users) */}
-                <div className="hidden lg:flex flex-col w-full rounded-xl lg:col-span-3 overflow-hidden bg-surface/70  border border-border">
-                    {/* Tab Switcher */}
-                    <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border text-2xl text-foreground shadows-2xl ">
-                        <button
-                            onClick={() => setActiveSidebarTab("members")}
-                            className={`${activeSidebarTab === "members" ? "text-brand font-bold " : "hover:text-brand/50 hover:cursor-pointer"}`}
-                        >
-                            Members
-                        </button>
-                        <button
-                            onClick={() => setActiveSidebarTab("activity")}
-                            className={`${activeSidebarTab === "activity" ? "text-brand font-bold " : "hover:text-brand/50 hover:cursor-pointer"}`}
-                        >
-                            Activity
-                        </button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="h-full  overflow-y-auto    rounded-xl shadow-2xl ">
-                        {activeSidebarTab === "members" ? (
-                            <>
-                                <SynapseMembersPanel members={members} />
-                            </>
-                        ) : (
-                            <SynapseActivityPanel
-                                isLocalSynapse={isLocalSynapse}
-                                synapseMetadata={synapseMetadata}
-                                publicKey={user.publicKey}
-                            />
-                        )}
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     );
-
-
 };
 
 export default SynapseLayout;

@@ -61,15 +61,15 @@ const ExploreLayout = ({children}) => {
         return <>Loading...</>;
     }
     return (
-        <div className={'flex h-screen pt-17 bg-background'}>
+        <div className={'flex h-[100dvh] pt-17 bg-background'}>
             <Header
                 user={user}
             />
-            <div className={`flex flex-col flex-1 h-full p-4 `}>
-                <div className={`text-foreground text-7xl font-weight-bold mb-12`}>
+            <div className={`flex flex-col flex-1 w-full h-full p-2 xl:p-4 `}>
+                <div className={`text-foreground text-5xl xl:text-7xl font-weight-bold mb-12`}>
                     Explore
                 </div>
-                <div className={`flex h-full max-w-2xl p-4`}>
+                <div className={`flex w-full h-full max-w-2xl `}>
                     <DiscoveredSynapsesPanel
                         discoveredPeers={discoveredPeers}
                     />

@@ -116,28 +116,28 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col flex-1  h-full text-foreground bg-surface/70 rounded-xl border border-border">
+        <div className="flex flex-col flex-1  w-full h-full text-foreground bg-surface/70 rounded-xl border border-border">
             <div className="flex flex-col justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
                 <button className={`text-brand font-bold `}>
                     Global Feed
                 </button>
             </div>
-            <div className="flex flex-row gap-2 p-4  border-b border-border bg-background text-lg shadow-lg">
+            <div className="flex flex-row gap-2 p-4  w-full border-b border-border bg-background text-lg shadow-lg">
                 <div className="flex flex-col w-full">
                     <input
                         type="text"
                         placeholder="Search posts..."
                         value={feedFilters.keyword}
                         onChange={(e) => setFeedFilters({ ...feedFilters, keyword: e.target.value })}
-                        className="bg-surface border border-border px-2 py-1 rounded text-foreground"
+                        className="bg-surface border border-border px-2 py-1 rounded text-foreground text-sm md:text-lg"
                     />
                 </div>
-                <div className={'flex flex-col w-full items-center justify-center'}>
+                <div className={'flex flex-col w-full items-center justify-center text-sm md:text-lg'}>
                     <div className={`flex flex-row w-full`}>
                         <div className="flex flex-row w-full items-center justify-center gap-2">
                             <label className="">Source</label>
                             <button
-                                className={'cursor-pointer hover:text-brand/60'}
+                                className={'flex w-full cursor-pointer hover:text-brand/60'}
                                 onClick={() => toggleFilterTray()}>
                                 <FiFilter />
                             </button>

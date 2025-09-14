@@ -76,33 +76,33 @@ const UserProfileLayout = ({ children }) => {
     }, [])
 
     if (!user || !user.publicKey) {
-        return <div className={'h-screen bg-background'}></div>;
+        return <div className={'h-[100dvh] bg-background'}></div>;
     }
 
     return (
-        <div className={''}>
+        <div className={'flex w-full items-center justify-center overflow-y-auto '}>
             {/* Remove the bg-background above to see the magic below */}
             {/*<div className={`absolute top-0 left-o -z-1 pt-17 h-screen w-screen bg-gradient-to-b from-background via-primary to-background backdrop-blur-lg `}/>*/}
 
-            <div className='h-screen flex flex-col'>
+            <div className='h-[100dvh] flex flex-col w-full'>
                 {/* Header */}
-                <div className={`sticky top-0 z-50 h-17 shrink-0 border-b border-border`}>
+                <div className={`sticky top-0 z-50 h-17 shrink-0`}>
                     <Header
                         user={user}
                     />
                 </div>
                 {/* IdentityPanel */}
-                <div className="flex-1 w-full flex flex-col lg:grid lg:grid-cols-12 overflow-hidden">
-                    <div className={'flex-col flex-1 min-h-0 overflow-y-auto p-4  w-full lg:col-span-4'}>
+                <div className="flex flex-col xl:flex-1 w-full xl:grid xl:grid-cols-12">
+                    <div className={'flex flex-col flex-1 min-h-0 p-2 xl:p-4  w-full xl:col-span-4'}>
                         <IdentityPanel
                             user={user}
                             isProfileOwner={isProfileOwner}
                         />
                     </div>
                     {/* Main Content Grid */}
-                    <div className='flex flex-col w-full min-h-0 col-span-8'>
+                    <div className='flex flex-col  w-full col-span-8'>
                         {/* Tab Switcher */}
-                        <div className="flex flex-row bg-surface/70  justify-around border border-border p-2 m-4 text-xl text-foreground shadows-2xl rounded-xl col-span-8">
+                        <div className="flex flex-row bg-surface/70  justify-around border border-border p-2 m-4 text-sm xl:text-xl text-foreground font-montserrat shadows-2xl rounded-xl col-span-8">
                             <button
                                 onClick={() => setActiveTab("overview")}
                                 className={`${activeTab === "overview" ? "text-brand font-bold" : "hover:text-brand/60 hover:cursor-pointer"}`}
@@ -128,7 +128,7 @@ const UserProfileLayout = ({ children }) => {
                                 Activity
                             </button>
                         </div>
-                        <div className={'flex flex-col h-full min-h-0 m-4'}>
+                        <div className={'flex flex-col h-full m-2 xl:m-4'}>
                             {activeTab === "overview" ? (
                                 <UserOverviewPanel
                                     user={user}
@@ -148,7 +148,6 @@ const UserProfileLayout = ({ children }) => {
                         {children}
                     </div>
                 </div>
-
             </div>
         </div>
 );

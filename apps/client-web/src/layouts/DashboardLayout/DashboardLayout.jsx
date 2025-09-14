@@ -1,25 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import Header from "../../components/Header/Header.jsx";
 import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
 import { useSwipeable } from 'react-swipeable';
-import JoinedSynapsesPanel from "../../components/JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
-import FollowedUsersPanel from "../../components/FollowedUsersPanel/FollowedUsersPanel.jsx";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import { useNavigate } from "react-router-dom"
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
 import FeedPanel from "../../components/GlobalFeed/FeedPanel.jsx";
 import GlobalActivityPanel from "../../components/GlobalActivityPanel/GlobalActivityPanel.jsx";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
-import SynapseMembersPanel from "../../components/SynapseMembersPanel/SynapseMembersPanel.jsx";
-import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
 
 const DashboardLayout = ({ children }) => {
     const navigate = useNavigate(); // React Router navigate
 
-    const [activePanel, setActivePanel] = useState(1); // 0: Social, 1: Main, 2: Activity
+    const [activePanel, setActivePanel] = useState(0); // 0: Control Panel, 1: Feed, 2: Activity
     const swipeHandlers = useSwipeable({
         onSwipedLeft: () => setActivePanel((prev) => Math.min(prev + 1, 2)),
         onSwipedRight: () => setActivePanel((prev) => Math.max(prev - 1, 0)),
@@ -77,67 +73,63 @@ const DashboardLayout = ({ children }) => {
     }
 
     return (
-        <div className='flex flex-col h-screen w-full'>
-            <div className='sticky top-0 z-50 h-17 shrink-0 border-b border-border'>
-                <Header
-                    user={user}
-                />
-                {/* Mobile Nav */}
-                <div className='flex  lg:hidden justify-around py-2 border-b border-border text-foreground'>
+        <div className="flex flex-col h-[100dvh] w-full">
+            {/* HEADER */}
+            <div className="sticky top-0 z-50 shrink-0 border-b border-border bg-background ">
+                <Header user={user} />
+
+                {/* Nav Tabs (Mobile) */}
+                <div className="flex xl:hidden justify-around py-2 border-t border-border text-foreground mt-15">
                     <button
                         onClick={() => setActivePanel(0)}
-                        className={`${activePanel === 0 ? 'text-[#FF6B6B] font-semibold' :
-                            'text-foreground cursor-pointer hover:text-brand'}`}
+                        className={`${activePanel === 0 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
                         Control Panel
                     </button>
                     <button
                         onClick={() => setActivePanel(1)}
-                        className={`${activePanel === 1 ? 'text-[#FF6B6B] font-semibold' :
-                            'text-foreground cursor-pointer hover:text-brand'}`}
+                        className={`${activePanel === 1 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
-                        Synapses
+                        Feed
                     </button>
                     <button
                         onClick={() => setActivePanel(2)}
-                        className={`${activePanel === 2 ? 'text-[#FF6B6B] font-semibold' :
-                            'text-foreground cursor-pointer hover:text-brand'}`}
+                        className={`${activePanel === 2 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}
                     >
-                        Following
+                        Activity
                     </button>
                 </div>
             </div>
 
-            {/* DASHBOARD CONTENT AREA */}
-            <div className="flex flex-1 w-full lg:grid lg:grid-cols-12 min-h-0 overflow-hidden" {...swipeHandlers}>
-                {/* SIDEBAR — User Identity */}
-                <div className={`
-            ${activePanel === 2 ? 'flex' : 'hidden'}
-            lg:flex flex-col flex-1 overflow-hidden min-h-0 p-4  w-full lg:col-span-4`}
+            {/* CONTENT */}
+            <div
+                className="flex flex-1 w-full min-h-0 overflow-hidden xl:grid xl:grid-cols-12 xl:gap-0 xl:mt-17"
+                {...swipeHandlers}
+            >
+                {/* LEFT: Control Panel*/}
+                <div
+                    className={`${activePanel === 0 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-4`}
                 >
                     <ControlPanel user={user} />
                 </div>
 
-                {/* MAIN FEED — Core Content */}
-                <div className={`
-            ${activePanel === 0 ? 'flex' : 'hidden'}
-            lg:flex flex-col flex-1 overflow-hidden p-4  w-full lg:col-span-5`}
+                {/* CENTER: Feed */}
+                <div
+                    className={`${activePanel === 1 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-5`}
                 >
                     <FeedPanel />
                 </div>
 
-                {/* RIGHT RAIL — Synapse & Network Context */}
-                <div className={`
-            ${activePanel === 1 ? 'flex' : 'hidden'}
-            lg:flex flex-col flex-1 w-full  lg:col-span-3 overflow-hidden p-4 `}
+                {/* RIGHT: Global Activity */}
+                <div
+                    className={`${activePanel === 2 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-3`}
                 >
                     <GlobalActivityPanel user={user} localSynapseMetadata={localSynapseMetadata} />
                 </div>
             </div>
-
-
         </div>
     );
+
 };
 
 export default DashboardLayout;

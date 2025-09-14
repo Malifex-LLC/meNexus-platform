@@ -46,41 +46,71 @@ const ControlPanel = ({user}) => {
 
 
     return (
-        <div className={`flex flex-col overflow-y-auto p-4 h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border rounded-xl`}>
-            <div className="flex flex-col  p-4 w-full h-full items-center overflow-hidden rounded-2xl border border-border shadow-lg bg-surface/70">
-                {/* Header stripe with gradient */}
-                <div className="flex flex-col  mt-4 border border-border rounded-xl w-full h-32 bg-gradient-to-r from-surface via-brand to-surface blur-xl">
-                </div>
-                {/* Avatar with glow + gradient ring */}
-                <div className="flex flex-col -mt-32 p-4">
-                    <div className="z-1">
-                        <img
-                            className="w-32  object-cover ring-4 ring-surface"
-                            src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
-                            alt={`${user.displayName}'s profile picture`}
-                        />
-                    </div>
-                </div>
+        <div className={`flex flex-col  p-2 xl:p-4 w-full h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border rounded-xl`}>
+            <div className="flex flex-col w-full h-full">
+                <div className="flex flex-col h-full w-full overflow-hidden rounded-2xl border border-border shadow-lg">
 
-                {/* Identity */}
+                    {/* Content */}
+                    <div className="relative flex flex-col items-center p-4 sm:p-6 md:p-8">
+                        <div className={`relative justify-center flex w-full h-full`}>
+                            {/* Background gradient */}
+                            <div
+                                aria-hidden
+                                className="absolute px-40  z-0  inset-0 bg-gradient-to-r from-surface via-brand to-surface blur-xl"
+                            />
+                            {/* Avatar */}
+                            <img
+                                className="z-1 w-auto h-full max-w-32 sm:max-w-48 lg:max-w-96 xl:max-w-32 rounded-xl ring-4 ring-surface shadow-md object-cover"
+                                src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                                alt={`${user.displayName}'s profile picture`}
+                                loading="lazy"
+                            />
+                        </div>
 
+                        {/* Name / handle */}
+                        <div className="z-1 flex flex-col md:hidden mt-4 text-center">
+                            <p className="font-montserrat text-foreground font-semibold text-lg sm:text-xl md:text-2xl lg:text-3xl">
+                                {user.displayName}
+                            </p>
+                            <p className="font-jetbrains text-brand text-xs sm:text-sm md:text-base lg:text-lg">
+                                @{user.handle}
+                            </p>
+                        </div>
 
-                {/* Stats row */}
-                <div className="flex justify-center mt-4 w-full text-center">
-                    <div className="p-2 mx-8">
-                        <p className="text-brand text-lg font-semibold">{followerCount}</p>
-                        <p className="text-foreground text-xs text-muted-foreground">Followers</p>
-                    </div>
-                    <div className=" flex flex-col -mt-4 items-center text-center px-4">
-                        <p className="text-foreground text-xl md:text-2xl xl:text-3xl font-semibold">{user.displayName}</p>
-                        <p className="text-brand text-sm md:text-lg xl:text-xl">@{user.handle}</p>
-                    </div>
-                    <div className="p-2 mx-8">
-                        <p className="text-brand text-lg font-semibold">{followingCount}</p>
-                        <p className="text-foreground text-xs text-muted-foreground">Following</p>
+                        {/* Stats */}
+                        <div className="z-1 w-full max-w-xl grid grid-cols-2 md:grid-cols-3 ">
+                            <div className="text-center md:text-left md:mt-4 font-montserrat">
+                                <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
+                                    {followerCount}
+                                </p>
+                                <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
+                                    Followers
+                                </p>
+                            </div>
+
+                            {/* center name on md+ */}
+                            <div className="hidden md:flex flex-col mt-4 items-center justify-center">
+                                <p className="font-montserrat text-foreground font-semibold text-lg lg:text-xl xl:text-2xl">
+                                    {user.displayName}
+                                </p>
+                                <p className="font-jetbrains text-brand text-sm lg:text-base">
+                                    @{user.handle}
+                                </p>
+                            </div>
+
+                            <div className="text-center md:text-right md:mt-4 font-montserrat">
+                                <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
+                                    {followingCount}
+                                </p>
+                                <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
+                                    Following
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div className={'flex flex-col w-full h-full overflow-y-auto border border-border rounded-xl'}>
                 <JoinedSynapsesPanel synapses={user.synapses} />
             </div>

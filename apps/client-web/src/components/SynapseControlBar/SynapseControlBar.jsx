@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import {Link, useLocation, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -98,6 +98,14 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
         }
     }
 
+    // Close drawers on ESC
+    useEffect(() => {
+        if (!showJoinedSynapsesTray) return;
+        const onKey = (e) => e.key === 'Escape' && (setShowJoinedSynapsesTray(false));
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [showJoinedSynapsesTray]);
+
     return (
 
         <div className="flex flex-col py-2 px-4 rounded-xl bg-surface">
@@ -105,8 +113,8 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                 {currentSynapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">
                         <div>
-                            <h1 className="text-3xl text-brand font-bold">{currentSynapseMetadata.metadata.name}</h1>
-                            <p className="text-lg text-foreground">
+                            <h1 className="text-3xl text-brand font-montserrat font-bold">{currentSynapseMetadata.metadata.name}</h1>
+                            <p className="text-lg text-foreground font-jetbrains">
                                 {currentSynapseMetadata.metadata.description}
                             </p>
 
@@ -143,7 +151,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                             </div>
                             <div>
                                 {showJoinedSynapsesTray && (
-                                    <div className="absolute  z-50 bg-header-bg/70 backdrop-blur-xs rounded-2xl shadow-2xl w-2xl">
+                                    <div className="absolute -ml-48 md:-ml-0  z-50 bg-header-bg/70 backdrop-blur-xs rounded-2xl shadow-2xl w-full xl:w-2xl">
                                         <JoinedSynapsesTray
                                             synapseMetadataList={synapseMetadataList}
                                         />
@@ -156,6 +164,14 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                     <div className="p-4">Loading synapse info…</div>
                 )}
             </div>
+            {/* ===== Mobile Backdrop (shared) ===== */}
+            {(showJoinedSynapsesTray) && (
+                <button
+                    className="fixed inset-0 z-[49] -mr-[100vw]  "
+                    aria-label="Close menus"
+                    onClick={() => { setShowJoinedSynapsesTray(false); }}
+                />
+            )}
         </div>
     )
 }

@@ -17,30 +17,30 @@ const IdentityQuickActionsPanel = ({ publicKey, isFollowing, setIsFollowing }) =
     }
 
     return (
-        <div className={'flex gap-8   text-foreground'}>
+        <div className={'flex w-full gap-4 justify-evenly text-foreground'}>
             {isFollowing ? (
                 <button
-                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-surface hover:bg-primary hover:tranlsate-y-[-2px]`}
+                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-surface hover:bg-brand/60 hover:tranlsate-y-[-2px]`}
                     onClick={ handleUnfollow }
                 >
                     Unfollow
                 </button>
             ): (
                 <button
-                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-brand hover:bg-primary hover:tranlsate-y-[-2px]`}
+                    className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-brand hover:bg-brand/60 hover:tranlsate-y-[-2px]`}
                     onClick={ handleFollow }
                 >
                     Follow
                 </button>
             )}
             <button
-                className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-primary hover:tranlsate-y-[-2px]`}
+                className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-brand/60 hover:tranlsate-y-[-2px]`}
                 onClick={() => {}}
             >
                 DM
             </button>
             <button
-                className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-primary hover:tranlsate-y-[-2px]`}
+                className={`p-2 w-32 bg-surface rounded-xl cursor-pointer shadow-lg hover:bg-brand/60 hover:tranlsate-y-[-2px]`}
                 onClick={() => {}}
             >
                 Invite
