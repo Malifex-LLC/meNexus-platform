@@ -5,10 +5,15 @@ import {Link, NavLink} from "react-router-dom";
 import { formatDate } from "../../../utils/dateUtils.js";
 import {useEffect, useState} from "react";
 import useGetUser from "../../../api/hooks/useGetUser.js";
+import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
+
 
 const ChatMessage = ({ message, isOwner }) => {
     const [user, setUser] = useState(null);
+    const [preview, setPreview] = useState(null);
     const { getUser, loading: userLoading, error: userError } = useGetUser();
+    const { unfurlUrl } = useUnfurlUrl();
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -22,6 +27,24 @@ const ChatMessage = ({ message, isOwner }) => {
         }
         fetchUserData();
     }, [message])
+
+    useEffect(() => {
+        setPreview(null);
+
+        const urls = extractUrls(message.content);
+        if (urls.length > 0) {
+            unfurlUrl(urls[0]).then(data => {
+                if (data) setPreview(data);
+            });
+        }
+    }, [message])
+
+    const urlRegex = /https?:\/\/[^\s]+/g;
+
+    const extractUrls = (text) => {
+        const matches = text.match(urlRegex);
+        return matches || [];
+    };
 
     if (!user) {
         return
@@ -56,7 +79,13 @@ const ChatMessage = ({ message, isOwner }) => {
 
                 <p className={`text-xl whitespace-pre-wrap break-words`}
                 >
-                    {message.content}
+                    {preview ? (
+                        <img src={preview.url}/>
+                    ) : (
+                        <div>
+                            {message.content}
+                        </div>
+                        )}
                 </p>
 
                 <span

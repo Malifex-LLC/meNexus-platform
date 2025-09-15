@@ -360,7 +360,7 @@ const SynapseLayout =({ children }) => {
             )}
 
             {/* ===== Main Grid / Content ===== */}
-            <div className="flex flex-1 p-4 gap-4 min-h-0 w-full overflow-hidden xl:grid xl:grid-cols-12">
+            <div className="flex flex-1 xl:p-4 gap-4 min-h-0 w-full overflow-hidden xl:grid xl:grid-cols-12">
                 {/* Left Column (xl+): same as left drawer */}
                 {isXL && (
                     <div className="hidden xl:flex xl:col-span-3 rounded-xl border border-border overflow-hidden shadow-2xl">
@@ -382,7 +382,7 @@ const SynapseLayout =({ children }) => {
                 <div className="flex flex-col flex-1 min-h-0 w-full xl:col-span-6 overflow-hidden">
                     <div className="flex-1 min-h-0 overflow-y-auto">
                         {activeMiddlebarTab === 'feed' ? (
-                            <div className="w-full h-full rounded-xl shadow-2xl">
+                            <div className="w-full h-full xl:rounded-xl shadow-2xl">
                                 <PostsPanel
                                     isLocalSynapse={isLocalSynapse}
                                     publicKey={sessionUser.publicKey}
@@ -395,8 +395,9 @@ const SynapseLayout =({ children }) => {
                                 />
                             </div>
                         ) : (
-                            <div className="flex w-full h-full shadow-2xl rounded-xl">
+                            <div className="flex w-full h-full shadow-2xl xl:rounded-xl">
                                 <ChatPanel
+                                    isLocalSynapse={isLocalSynapse}
                                     synapseMetadata={synapseMetadata}
                                     publicKey={sessionUser.publicKey}
                                     channels={channels}
