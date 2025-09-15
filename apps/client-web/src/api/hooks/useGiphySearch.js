@@ -3,7 +3,7 @@ import { ENDPOINTS } from '../config.js';
 
 const useGiphySearch = () => {
     const { sendRequest, loading, error } = useAxios();
-    const apiKey = 'atg4tpCdGT3jvNZtVZA3W0AgqfS8S0f5'
+    const apiKey = import.meta.env.VITE_GIPHY_API_KEY;
 
     const giphySearch = async (query) => {
         try {

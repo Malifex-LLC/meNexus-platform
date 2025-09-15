@@ -10,8 +10,10 @@ RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 # Build-time configuration for Vite
 ARG VITE_API_BASE_URL=""
 ARG VITE_WS_BASE_URL="/ws"
+ARG VITE_GIPHY_API_KEY=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 ENV VITE_WS_BASE_URL=${VITE_WS_BASE_URL}
+ENV VITE_GIPHY_API_KEY=${VITE_GIPHY_API_KEY}
 
 # Copy workspace manifests and lockfile from the repo root
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
