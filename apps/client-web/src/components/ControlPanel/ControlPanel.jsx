@@ -46,7 +46,7 @@ const ControlPanel = ({user}) => {
 
 
     return (
-        <div className={`flex flex-col  p-2 xl:p-4 w-full h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border rounded-xl`}>
+        <div className={`flex flex-col  p-2 xl:p-4 w-full h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border xl:rounded-xl`}>
             <div className="flex flex-col w-full h-full">
                 <div className="flex flex-col h-full w-full overflow-hidden rounded-2xl border border-border shadow-lg">
 

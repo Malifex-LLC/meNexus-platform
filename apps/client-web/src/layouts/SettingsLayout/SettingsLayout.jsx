@@ -87,6 +87,7 @@ const SettingsLayout = ({ children }) => {
                         Display
                     </button>
                     <button
+                        /* TODO implement real logout function/destroy session instead of navigating to login */
                         className={`flex items-center text-xl text-foreground hover:text-brand/60 hover:cursor-pointer`}
                         onClick={() => navigate('/login')}
                     >
@@ -104,7 +105,7 @@ const SettingsLayout = ({ children }) => {
                 {/** MOBILE SWIPEABLE VIEWPORT */}
                 <div className="xl:hidden w-full">
                     <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
-                        <main className="settings-layout__main-content flex flex-1 w-full p-2">
+                        <main className="settings-layout__main-content flex flex-1 w-full ">
                             <div className={`${activePanel === 0 ? 'flex' : 'hidden'} w-full flex-col`}>
                                 <ProfileSettings />
                             </div>

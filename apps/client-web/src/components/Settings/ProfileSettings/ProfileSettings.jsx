@@ -154,7 +154,7 @@ const ProfileSettings = () => {
     }, [sessionUserHandle, navigate, isHandleSet, user]);
 
     return (
-        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl">
             <h2 className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">Profile Settings</h2>
             <div className={`flex flex-col xl:grid xl:grid-cols-4  gap-8 p-4 `}>
                 <div className={`col-span-2`}>

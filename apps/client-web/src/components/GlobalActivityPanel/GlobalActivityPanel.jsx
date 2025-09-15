@@ -78,7 +78,7 @@ const  GlobalActivityPanel = ({user, localSynapseMetadata}) => {
         return <div>Loading activities...</div>
     }
     return (
-        <div className="flex flex-col min-h-0 h-full  bg-surface/70   text-foreground border border-border rounded-xl">
+        <div className="flex flex-col min-h-0 h-full  bg-surface/70   text-foreground border border-border xl:rounded-xl">
             {/* master timeline line */}
             <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
                 <button className={`text-brand font-bold `}>

@@ -108,21 +108,21 @@ const DashboardLayout = ({ children }) => {
             >
                 {/* LEFT: Control Panel*/}
                 <div
-                    className={`${activePanel === 0 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-4`}
+                    className={`${activePanel === 0 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto xl:p-4 w-full xl:col-span-4`}
                 >
                     <ControlPanel user={user} />
                 </div>
 
                 {/* CENTER: Feed */}
                 <div
-                    className={`${activePanel === 1 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-5`}
+                    className={`${activePanel === 1 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto xl:p-4 w-full xl:col-span-5`}
                 >
                     <FeedPanel />
                 </div>
 
                 {/* RIGHT: Global Activity */}
                 <div
-                    className={`${activePanel === 2 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto p-2 xl:p-4 w-full xl:col-span-3`}
+                    className={`${activePanel === 2 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto xl:p-4 w-full xl:col-span-3`}
                 >
                     <GlobalActivityPanel user={user} localSynapseMetadata={localSynapseMetadata} />
                 </div>
