@@ -12,8 +12,9 @@ import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.js
 import DisplaySettings from "../../components/Settings/DisplaySettings/DisplaySettings.jsx";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {TbLogout2} from "react-icons/tb";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 
 const SettingsLayout = ({ children }) => {
     const [activePanel, setActivePanel] = useState(0); // 0: Profile, 1: Account, 2: Display
@@ -26,7 +27,11 @@ const SettingsLayout = ({ children }) => {
     const [user, setUser] = useState(null)
     const { getUser } = useGetUser();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getSynapseMetadata } = useGetSynapseMetadata();
+
+    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const navigate = useNavigate(); // React Router navigate
+    const { synapsePublicKey } = useParams(); // Extract synapsePublicKey from the URL (if available)
 
 
     useEffect(() => {
@@ -55,6 +60,14 @@ const SettingsLayout = ({ children }) => {
         fetchUser();
     }, [sessionUser])
 
+    useEffect(() => {
+        const fetchSynapseMetadata = async () => {
+            const localSynapseData = await getSynapseMetadata();
+            setLocalSynapseMetadata(localSynapseData)
+        };
+        fetchSynapseMetadata();
+    },[synapsePublicKey]);
+
 
     if (!user || !user.publicKey) {
         return <>Loading dashboard...</>;
@@ -65,6 +78,7 @@ const SettingsLayout = ({ children }) => {
             <div className='sticky top-0 z-50 border-b border-border w-full'>
                 <Header
                     user={user}
+                    localSynapseMetadata={localSynapseMetadata}
                 />
                 {/* Mobile Nav */}
                 <div className='flex  w-full xl:hidden pt-17 py-2 justify-evenly border-b bg-background border-border text-foreground'>

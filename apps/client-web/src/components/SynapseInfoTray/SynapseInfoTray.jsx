@@ -29,6 +29,7 @@ const SynapseInfoTray = ({activeSidebarTab, setActiveSidebarTab, members, isLoca
                         isLocalSynapse={isLocalSynapse}
                         synapseMetadata={synapseMetadata}
                         publicKey={user.publicKey}
+                        user={user}
                     />
                 )}
             </div>

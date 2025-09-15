@@ -76,7 +76,7 @@ const DashboardLayout = ({ children }) => {
         <div className="flex flex-col h-[100dvh] w-full">
             {/* HEADER */}
             <div className="sticky top-0 z-50 shrink-0 border-b border-border bg-background ">
-                <Header user={user} />
+                <Header user={user} localSynapseMetadata={localSynapseMetadata}/>
 
                 {/* Nav Tabs (Mobile) */}
                 <div className="flex xl:hidden justify-around py-2 border-t border-border text-foreground mt-15">
@@ -117,7 +117,7 @@ const DashboardLayout = ({ children }) => {
                 <div
                     className={`${activePanel === 1 ? 'flex' : 'hidden'} xl:flex flex-col min-w-0 min-h-0 overflow-y-auto xl:p-4 w-full xl:col-span-5`}
                 >
-                    <FeedPanel />
+                    <FeedPanel user={user} localSynapseMetadata={localSynapseMetadata}/>
                 </div>
 
                 {/* RIGHT: Global Activity */}

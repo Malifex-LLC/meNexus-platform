@@ -89,6 +89,7 @@ const UserProfileLayout = ({ children }) => {
                 <div className={`sticky top-0 z-50 h-17 shrink-0`}>
                     <Header
                         user={user}
+                        localSynapseMetadata={localSynapseMetadata}
                     />
                 </div>
                 {/* IdentityPanel */}

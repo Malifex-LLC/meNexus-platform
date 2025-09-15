@@ -5,18 +5,23 @@ import Header from "../../components/Header/Header.jsx";
 import {useEffect, useState} from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import DiscoveredSynapsesPanel from "../../components/DiscoveredSynapsesPanel/DiscoveredSynapsesPanel.jsx";
 import useGetAllDiscoveredPeers from "../../api/hooks/useGetAllDiscoveredPeers.js";
+import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 
 
 const ExploreLayout = ({children}) => {
     const navigate = useNavigate(); // React Router navigate
+    const { synapsePublicKey } = useParams(); // Extract synapsePublicKey from the URL (if available)
 
     const [sessionUser, setSessionUser ] = useState(null)
     const [user, setUser] = useState(null)
+    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
+
     const { getUser } = useGetUser();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
+    const { getSynapseMetadata } = useGetSynapseMetadata();
 
     const { getAllDiscoveredPeers } = useGetAllDiscoveredPeers();
     const [discoveredPeers, setDiscoveredPeers] = useState(null);
@@ -57,6 +62,14 @@ const ExploreLayout = ({children}) => {
         fetchUser();
     }, [sessionUser])
 
+    useEffect(() => {
+        const fetchSynapseMetadata = async () => {
+            const localSynapseData = await getSynapseMetadata();
+            setLocalSynapseMetadata(localSynapseData)
+        };
+        fetchSynapseMetadata();
+    },[synapsePublicKey]);
+
     if (!user || !user.publicKey) {
         return <>Loading...</>;
     }
@@ -64,6 +77,7 @@ const ExploreLayout = ({children}) => {
         <div className={'flex h-[100dvh] pt-17 bg-background'}>
             <Header
                 user={user}
+                localSynapseMetadata={localSynapseMetadata}
             />
             <div className={`flex flex-col flex-1 w-full h-full p-2 xl:p-4 `}>
                 <div className={`text-foreground text-5xl xl:text-7xl font-weight-bold mb-12`}>

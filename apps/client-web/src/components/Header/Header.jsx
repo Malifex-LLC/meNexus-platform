@@ -18,7 +18,7 @@ import { GiSettingsKnobs } from "react-icons/gi";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { LuScanSearch } from "react-icons/lu";
 
-const Header = ({user}) => {
+const Header = ({user, localSynapseMetadata}) => {
 
     const { getNotifications, loading, error } = useGetNotifications()
     const { setNotificationAsRead } = useSetNotificationAsRead()
@@ -27,19 +27,11 @@ const Header = ({user}) => {
     const [showNotificationsTray, setShowNotificationsTray] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
-    const [synapseMetadata, setSynapseMetadata] = useState(null);
-    const { getSynapseMetadata } = useGetSynapseMetadata();
 
     const location = useLocation();
     const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
 
-    useEffect(() => {
-        const fetchSynapseMetadata = async () => {
-            const localSynapseData = await getSynapseMetadata();
-            setSynapseMetadata(localSynapseData);
-        }
-        fetchSynapseMetadata()
-    }, [])
+
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -73,7 +65,7 @@ const Header = ({user}) => {
     //console.log("useNotificationsWebSocket attempting to connect for user_id: ", sessionUserId);
     //connectNotificationsWebSocket(sessionUserId, handleNewNotification);
 
-    if(!synapseMetadata){
+    if(!localSynapseMetadata){
         return (
             <div className={'bg-header-bg text-foreground'}></div>
         )
@@ -86,7 +78,7 @@ const Header = ({user}) => {
                 <Link to={'/dashboard'} className={isActive('/dashboard')}>
                     <RiHomeWifiLine />
                 </Link>
-                <Link to={`/synapse/${synapseMetadata.identity.publicKey}`} className={isActive('/synapse/')}>
+                <Link to={`/synapse/${localSynapseMetadata.identity.publicKey}`} className={isActive('/synapse/')}>
                     <IoMdGitNetwork />
                 </Link>
                 <Link to={'/explore'} className={isActive('/explore')}>
@@ -95,9 +87,9 @@ const Header = ({user}) => {
                 <Link to={`/profile/${user.handle}`} className={isActive('/profile')}>
                     <RiUser6Line />
                 </Link>
-                <Link to={'/messages'} className={isActive('/messages')}>
-                    <BsMailboxFlag />
-                </Link>
+                {/*<Link to={'/messages'} className={isActive('/messages')}>*/}
+                {/*    <BsMailboxFlag />*/}
+                {/*</Link>*/}
                 <Link to={'/settings'} className={isActive('/settings')}>
                     <GiSettingsKnobs />
                 </Link>

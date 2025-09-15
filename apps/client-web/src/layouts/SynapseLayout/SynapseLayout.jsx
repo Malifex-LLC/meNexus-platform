@@ -40,6 +40,7 @@ const SynapseLayout =({ children }) => {
 
     const { synapsePublicKey } = useParams(); // Extract synapsePublicKey from the URL (if available)
     const [isLocalSynapse, setIsLocalSynapse] = useState(true);
+    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const [synapseMetadata, setSynapseMetadata] = useState(null);
     const [sessionUser, setSessionUser ] = useState({})
     const [user, setUser] = useState({})
@@ -106,6 +107,7 @@ const SynapseLayout =({ children }) => {
         const fetchSynapseMetadata = async () => {
             try {
                 const localSynapseData = await getSynapseMetadata();
+                setLocalSynapseMetadata(localSynapseData)
                 if (localSynapseData.identity.publicKey === synapsePublicKey) {
                     setSynapseMetadata(localSynapseData);
                     setIsLocalSynapse(true);
@@ -259,7 +261,7 @@ const SynapseLayout =({ children }) => {
 
                     {/* Right: Header + right hamburger (People) */}
                     <div className="flex items-center gap-2">
-                        <Header user={user} />
+                        <Header user={user} localSynapseMetadata={localSynapseMetadata}/>
                         <button
                             className="xl:hidden py-2 text-3xl text-foreground hover:text-brand/60 hover:cursor-pointer"
                             aria-label="Open right menu"

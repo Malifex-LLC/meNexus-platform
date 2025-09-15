@@ -1,49 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import useGetProfile from "../../api/hooks/useGetProfile.js";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useFollowActions from "../../api/hooks/useFollowActions.js";
-import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
-import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
-import useGetUser from "../../api/hooks/useGetUser.js";
 import FollowedUsersPanel from "../FollowedUsersPanel/FollowedUsersPanel.jsx";
 import JoinedSynapsesPanel from "../JoinedSynapsesPanel/JoinedSynapsesPanel.jsx";
-import {IoLocationSharp} from "react-icons/io5";
 
 const ControlPanel = ({user}) => {
-    const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
-    const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
-
-    const [followerCount, setFollowerCount] = useState(0);
-    const [followingCount, setFollowingCount] = useState(0);
-
-    useEffect(() => {
-        const fetchFollowerCount = async () => {
-            try {
-                const fetchedFollowerCount = await getFollowerCount(user.publicKey);
-                setFollowerCount(fetchedFollowerCount.result);
-            } catch (error) {
-                console.error("Error fetching follower count:", error);
-            }
-        }
-        fetchFollowerCount();
-    }, []);
-
-    useEffect(() => {
-        const fetchFollowingCount = async () => {
-            try {
-                const fetchedFollowingCount = await getFollowingCount(user.publicKey);
-                setFollowingCount(fetchedFollowingCount.result);
-            } catch (error) {
-                console.error("Error fetching following count:", error);
-            }
-        }
-        fetchFollowingCount();
-    }, []);
-
 
     return (
         <div className={`flex flex-col  p-2 xl:p-4 w-full h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border xl:rounded-xl`}>
@@ -81,7 +42,7 @@ const ControlPanel = ({user}) => {
                         <div className="z-1 w-full max-w-xl grid grid-cols-2 md:grid-cols-3 ">
                             <div className="text-center md:text-left md:mt-4 font-montserrat">
                                 <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
-                                    {followerCount}
+                                    {user.followers.length}
                                 </p>
                                 <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
                                     Followers
@@ -100,7 +61,7 @@ const ControlPanel = ({user}) => {
 
                             <div className="text-center md:text-right md:mt-4 font-montserrat">
                                 <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
-                                    {followingCount}
+                                    {user.following.length}
                                 </p>
                                 <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
                                     Following

@@ -17,15 +17,13 @@ import { FiFilter } from "react-icons/fi";
 import SortTray from "./SortTray.jsx";
 import FilterTray from "./FilterTray.jsx";
 
-const FeedPanel = () => {
+const FeedPanel = ({user, localSynapseMetadata}) => {
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
     const { getUser } = useGetUser();
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
-    const [localSynapse, setLocalSynapse] = useState({})
     const [sessionUser, setSessionUser ] = useState({})
-    const [user, setUser] = useState({})
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [ showFilterTray, setShowFilterTray ] = useState(false);
     const [ showSortTray, setShowSortTray ] = useState(false);
@@ -53,44 +51,13 @@ const FeedPanel = () => {
 
 
     useEffect(() => {
-        const fetchSessionUser = async () => {
-            try {
-                console.log("Fetching current user session...");
-                const response = await getSessionUser();
-                setSessionUser(response.data)
-            } catch (error) {
-                console.error("Error fetching current session user:", error);
-                navigate('/login');
-            }
-        }
-        fetchSessionUser();
-    }, [])
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (!sessionUser.publicKey) {
-                return;
-            }
-            try {
-                const response = await getUser(sessionUser.publicKey);
-                setUser(response);
-            } catch (error) {
-                console.error("Error fetching current user:", error);
-            }
-        }
-        fetchUser();
-    }, [sessionUser])
-
-    useEffect(() => {
         // TODO aggregatePosts doesn't handle local vs remote posts to pass to Post object
         const aggregatePosts = async () => {
             console.log('Aggregate Posting called');
             if (!user || !user.synapses) return;
 
-            const localSynapseData = await getSynapseMetadata();
-            setLocalSynapse(localSynapseData)
             const allPostPromises = user.synapses.map(async (synapse) => {
-                if (synapse === localSynapseData.identity.publicKey) {
+                if (synapse === localSynapseMetadata.identity.publicKey) {
                     return await getAllPosts(); // returns array
                 } else {
                     return await fetchRemotePosts(synapse); // returns array
@@ -182,7 +149,7 @@ const FeedPanel = () => {
                             >
                                 <Post
                                     key={index}
-                                    isLocalSynapse={post.synapsePublicKey === localSynapse.identity.publicKey}
+                                    isLocalSynapse={post.synapsePublicKey === localSynapseMetadata.identity.publicKey}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
                                     sessionPublicKey={user.publicKey}
