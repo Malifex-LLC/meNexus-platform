@@ -12,14 +12,14 @@ const SynapseControlBarTray = ({user, activeMiddlebarTab, setActiveMiddlebarTab,
             {/* Feed/Chat selector (your original switcher) */}
             <div className="p-2 mx-4 my-2 border border-border rounded-xl flex justify-around bg-surface text-4xl text-foreground shadow-2xl">
                 <button
-                    className={`flex justify-center w-full h-full border-r border-border ${activeMiddlebarTab === 'feed' ? 'text-brand font-bold' : 'hover:text-brand/50 hover:cursor-pointer'}`}
+                    className={`flex justify-center w-full h-full border-r border-border ${activeMiddlebarTab === 'feed' ? 'text-brand font-bold' : 'hover:text-brand/50 hover:cursor-pointer active:scale-90'}`}
                     onClick={() => setActiveMiddlebarTab('feed')}
                     aria-label="Show Feed Boards"
                 >
                     <CgFeed />
                 </button>
                 <button
-                    className={`flex justify-center w-full h-full ${activeMiddlebarTab === 'chat' ? 'text-brand font-bold' : 'hover:text-brand/50 hover:cursor-pointer'}`}
+                    className={`flex justify-center w-full h-full ${activeMiddlebarTab === 'chat' ? 'text-brand font-bold' : 'hover:text-brand/50 hover:cursor-pointer active:scale-90'}`}
                     onClick={() => setActiveMiddlebarTab('chat')}
                     aria-label="Show Chat Channels"
                 >

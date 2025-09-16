@@ -145,7 +145,7 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
                                 className={'flex text-3xl'}
                                 onClick={toggleJoinedSynapsesTray}
                             >
-                                <div className={'flex h-full text-5xl cursor-pointer mt-16 hover:text-brand/60'}>
+                                <div className={'flex h-full text-5xl cursor-pointer mt-16 hover:text-brand/60 active:scale-90'}>
                                     <IoMdArrowDropdown />
                                 </div>
                             </div>

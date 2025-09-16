@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { IoSend } from "react-icons/io5";
 import useCreateChatMessage from "../../../api/hooks/useCreateChatMessage.js";
 import useChatWebSocket  from '../../../api/hooks/useChatWebSocket.js';
@@ -38,10 +38,19 @@ const ChatMessageForm = ({isLocalSynapse, publicKey, activeChannel, sendMessage}
 
     }
 
+    // Close drawers on ESC
+    useEffect(() => {
+        if (!(isGiphyTrayOpen)) return;
+        const onKey = (e) => e.key === 'Escape' && (setIsGiphyTrayOpen(false), setIsGiphyTrayOpen(false));
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isGiphyTrayOpen]);
+
     return (
         <div className="flex flex-col w-full h-full relative">
-            {/* Tray sits directly above the form */}
+
             {isGiphyTrayOpen && (
+
                 <div className="absolute bottom-full  left-0 right-0 z-50">
                     <div className="rounded-t-xl border border-border shadow-2xl max-h-[60vh] overflow-auto">
                         <GiphyTray
@@ -54,6 +63,14 @@ const ChatMessageForm = ({isLocalSynapse, publicKey, activeChannel, sendMessage}
                     </div>
                 </div>
             )}
+            {/* ===== Mobile Backdrop (shared) ===== */}
+            {(isGiphyTrayOpen) && (
+                <button
+                    className="fixed inset-0 z-[49] "
+                    aria-label="Close menus"
+                    onClick={() => { setIsGiphyTrayOpen(false); setIsGiphyTrayOpen(false); }}
+                />
+            )}
             <div className={`flex gap-4 bg-background p-2 xl:p-4 position-fixed-bottom `}>
                 <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
@@ -62,7 +79,7 @@ const ChatMessageForm = ({isLocalSynapse, publicKey, activeChannel, sendMessage}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault(); // Prevent newline
+                            e.preventDefault();
                             handleSubmit();
                         }
                     }}

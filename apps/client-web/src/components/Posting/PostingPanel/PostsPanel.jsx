@@ -8,7 +8,6 @@ import useEditPost from "../../../api/hooks/useEditPost.js";
 import useFetchRemotePosts from "../../../api/hooks/useFetchRemotePosts.js";
 import useDeletePost from "../../../api/hooks/useDeletePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
-import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
 import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
 import useDeleteRemotePost from "../../../api/hooks/useDeleteRemotePost.js";
 

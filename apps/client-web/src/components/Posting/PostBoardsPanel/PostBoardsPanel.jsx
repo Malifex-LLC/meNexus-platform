@@ -18,7 +18,7 @@ const PostBoardsPanel = ({boards, activeBoard, setActiveBoard}) => {
                     key={board}
                     onClick={() => setActiveBoard(board)}
                     className={` p-2 mt-4 w-full text-left text-xl text-foreground shadow-lg 
-                                 border border-border rounded-xl hover:bg-brand/10 hover:translate-y-[-2px]
+                                 border border-border rounded-xl hover:bg-brand/10 hover:translate-y-[-2px] active:scale-90
             ${activeBoard === board ? "bg-brand/60 text-background" : "bg-surface"}
           `}
                 >

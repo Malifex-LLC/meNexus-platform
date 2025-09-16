@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import ProfileCard from "../ProfileCard/ProfileCard.jsx";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useGetUser from "../../api/hooks/useGetUser.js";
 
 const FollowedUsersPanel = ({following}) => {
@@ -30,8 +30,9 @@ const FollowedUsersPanel = ({following}) => {
                 </button>
             </div>
             <div className={'p-4 text-left overflow-y-auto'}>
-                {allUsers.map((user) => (
+                {allUsers.map((user, index) => (
                     <ProfileCard
+                        key={index}
                         publicKey={user.publicKey}
                         handle={user.handle}
                         profilePicture={user.profilePicture}

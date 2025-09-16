@@ -18,7 +18,7 @@ const ChattingChannelsPanel = ({channels, activeChannel, setActiveChannel}) => {
                     onClick={() => setActiveChannel(channel)}
                     className={`
             p-2 mt-4 w-full text-left text-xl text-foreground border border-border rounded-xl shadow-lg 
-            hover:bg-brand/10 hover:translate-y-[-2px]
+            hover:bg-brand/10 hover:translate-y-[-2px] active:scale-90
             ${activeChannel === channel ? "bg-brand/60 text-background  " : "bg-surface"}
           `}
                 >

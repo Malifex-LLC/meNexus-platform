@@ -5,9 +5,6 @@ import { useEffect, useState } from "react";
 import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
 import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
 import IdentityQuickActionsPanel from "./IdentityQuickActionsPanel.jsx";
-import StatusPanel from "./StatusPanel.jsx";
-import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
-import {useParams} from "react-router-dom";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
 
 const IdentityPanel = ({user, isProfileOwner}) => {
@@ -16,7 +13,6 @@ const IdentityPanel = ({user, isProfileOwner}) => {
     const [followerCount, setFollowerCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
 
-    const { getUserByHandle } = useGetUserByHandle();
     const { followCheck } = useFollowActions();
     const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
     const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
@@ -65,8 +61,8 @@ const IdentityPanel = ({user, isProfileOwner}) => {
             {/* Top Profile Section */}
             <div className={`z-1 flex flex-col w-full text-foreground rounded-xl shadow-lg `}>
                 <div className={'p-4 bg-surface rounded-xl shadow-lg'}>
-                    <p className={`text-2xl md:text-3xl xl:text-7xl font-montserrat`}>{user.displayName}</p>
-                    <p className={`text-xl md:text-xl xl:text-5xl text-brand font-jetbrains`}>@{user.handle}</p>
+                    <p className={`text-3xl md:text-4xl xl:text-5xl font-montserrat`}>{user.displayName}</p>
+                    <p className={`text-2xl md:text-3xl xl:text-4xl text-brand font-jetbrains`}>@{user.handle}</p>
                 </div>
             </div>
             <div className={'relative flex w-full  p-4 justify-center'}>

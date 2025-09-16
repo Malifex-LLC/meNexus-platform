@@ -136,7 +136,7 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
                                     <Activity
                                         activity={activity}
-                                        mode="SYNAPSE"
+                                        mode="GLOBAL"
                                         getUserById={(id) => userCacheRef.current.get(id)}
                                         getSynapseById={(id) => synapseCacheRef.current.get(id)}
                                     />

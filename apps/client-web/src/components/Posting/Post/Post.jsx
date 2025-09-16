@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
-import {Link, NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import useGetComments from "../../../api/hooks/useGetComments.js"
 import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
@@ -12,9 +12,7 @@ import useEditComment from "../../../api/hooks/useEditComment.js"
 import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
 import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
 import useGetUser from "../../../api/hooks/useGetUser.js";
-import useGetSessionUser from "../../../api/hooks/useGetSessionUser.js";
 import useFetchRemoteComments from "../../../api/hooks/useFetchRemoteComments.js";
-import { refreshComments } from "../../../utils/apiUtils.js"
 import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
 import useEditRemoteComment from "../../../api/hooks/useEditRemoteComment.js";
 import useDeleteRemotePostComment from "../../../api/hooks/useDeleteRemotePostComment.js";

@@ -8,8 +8,7 @@ import Search from "../Search/Search.jsx";
 import useGetNotifications from "../../api/hooks/useGetNotifications.js";
 import useNotificationsWebSocket from '../../api/hooks/useNotificationsWebSocket.js'
 import useSetNotificationAsRead from "../../api/hooks/useSetNotificationAsRead.js";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
-import {Link, useLocation} from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { IoMdGitNetwork } from "react-icons/io";
 import { RiHomeWifiLine } from "react-icons/ri";
 import { RiUser6Line } from "react-icons/ri";
@@ -29,7 +28,7 @@ const Header = ({user, localSynapseMetadata}) => {
     const [unreadNotifications, setUnreadNotifications] = useState(false);
 
     const location = useLocation();
-    const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground";
+    const isActive = (path) => location.pathname.startsWith(path) ? "text-brand" : "text-foreground active:scale-90";
 
 
 
@@ -73,26 +72,26 @@ const Header = ({user, localSynapseMetadata}) => {
 
     return (
         <div className="header__container flex fixed top-0 left-0 w-full p-4 gap-4 justify-center
-         bg-header-bg text-foreground border-b border-border z-100 shadow-xs">
-            <div className={`flex-1 flex justify-center gap-8 text-3xl md:text-4xl ml-[175px]`}>
-                <Link to={'/dashboard'} className={isActive('/dashboard')}>
+         bg-header-bg text-foreground border-b border-border z-100 shadow-xs h-16">
+            <div className={`flex-1 flex justify-center gap-8 text-3xl md:text-4xl `}>
+                <NavLink to={'/dashboard'} className={isActive('/dashboard')}>
                     <RiHomeWifiLine />
-                </Link>
-                <Link to={`/synapse/${localSynapseMetadata.identity.publicKey}`} className={isActive('/synapse/')}>
+                </NavLink>
+                <NavLink to={`/synapse/${localSynapseMetadata.identity.publicKey}`} className={isActive('/synapse/')}>
                     <IoMdGitNetwork />
-                </Link>
-                <Link to={'/explore'} className={isActive('/explore')}>
+                </NavLink>
+                <NavLink to={'/explore'} className={isActive('/explore')}>
                     <LuScanSearch />
-                </Link>
-                <Link to={`/profile/${user.handle}`} className={isActive('/profile')}>
+                </NavLink>
+                <NavLink to={`/profile/${user.handle}`} className={isActive('/profile')}>
                     <RiUser6Line />
-                </Link>
+                </NavLink>
                 {/*<Link to={'/messages'} className={isActive('/messages')}>*/}
                 {/*    <BsMailboxFlag />*/}
                 {/*</Link>*/}
-                <Link to={'/settings'} className={isActive('/settings')}>
+                <NavLink to={'/settings'} className={isActive('/settings')}>
                     <GiSettingsKnobs />
-                </Link>
+                </NavLink>
                 <div className="header__notifications relative  text-foreground">
                     <div
                         className={`header__notifications-tray-toggle ${
@@ -114,9 +113,9 @@ const Header = ({user, localSynapseMetadata}) => {
                     )}
                 </div>
             </div>
-            <div className="header__search  mr-8 md:mr-0">
-                <Search/>
-            </div>
+            {/*<div className="header__search  mr-8 md:mr-0">*/}
+            {/*    <Search/>*/}
+            {/*</div>*/}
         </div>
     )
 };

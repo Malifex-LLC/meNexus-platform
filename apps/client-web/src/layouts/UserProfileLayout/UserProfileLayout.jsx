@@ -1,46 +1,37 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import Header from "../../components/Header/Header.jsx";
-import Navigation from "../../components/Navigation/Navigation.jsx";
-import ControlPanel from "../../components/ControlPanel/ControlPanel.jsx";
-import ActivityFeed from "../../components/Activity/ActivityFeed/ActivityFeed.jsx";
 import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom"
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
+import {useNavigate, useOutletContext, useParams} from "react-router-dom"
 import IdentityPanel from "../../components/IdentityPanel/IdentityPanel.jsx";
 import UserOverviewPanel from "../../components/UserOverviewPanel/UserOverviewPanel.jsx";
 import UserShowcasePanel from "../../components/UserShowcasePanel/UserShowcasePanel.jsx";
 import UserActivityPanel from "../../components/UserActivityPanel/UserActivityPanel.jsx";
 import UserJoinedSynapsesPanel from "../../components/UserJoinedSynapsesPanel/UserJoinedSynapsesPanel.jsx";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
+import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
+import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
 
+function useRootContext() {
+    return useOutletContext(); // { user, localSynapseMetadata }
+}
 
 const UserProfileLayout = ({ children }) => {
+    const { sessionUser, localSynapseMetadata } = useRootContext();
     const navigate = useNavigate(); // React Router navigate
     const { handle } = useParams();
-
-    const [sessionUser, setSessionUser ] = useState(null)
     const [user, setUser] = useState(null)
-    const [currentHandle, setCurrentHandle ] = useState(null)
-    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const [activeTab, setActiveTab] = useState("overview");
     const [isProfileOwner, setIsProfileOwner] = useState(false)
     const { getUserByHandle } = useGetUserByHandle();
     const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getSynapseMetadata } = useGetSynapseMetadata();
 
     useEffect(() => {
-        const fetchSessionUser = async () => {
+        const checkProfileOwner = async () => {
             try {
-                console.log("Fetching current user session...");
-                const response = await getSessionUser();
-                setSessionUser(response.data)
                 if (!handle) {
                     navigate(`/profile/${sessionUser.handle}`)
                 }
-                if (response.data.handle === handle) {
+                if (sessionUser.handle === handle) {
                     setIsProfileOwner(true)
                 }
             } catch (error) {
@@ -48,7 +39,7 @@ const UserProfileLayout = ({ children }) => {
                 navigate('/login');
             }
         }
-        fetchSessionUser();
+        checkProfileOwner();
     }, [handle])
 
     useEffect(() => {
@@ -63,34 +54,19 @@ const UserProfileLayout = ({ children }) => {
         fetchUser();
     }, [sessionUser])
 
-    useEffect(() => {
-        const getMetadata = async () => {
-            try {
-                const metadata = await getSynapseMetadata();
-                setLocalSynapseMetadata(metadata);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        getMetadata()
-    }, [])
-
     if (!user || !user.publicKey) {
         return <div className={'h-[100dvh] bg-background'}></div>;
     }
 
     return (
-        <div className={'flex w-full items-center justify-center overflow-y-auto '}>
+        <div className={'flex h-[100dvh] w-full items-center justify-center overflow-y-auto pt-16'}>
             {/* Remove the bg-background above to see the magic below */}
             {/*<div className={`absolute top-0 left-o -z-1 pt-17 h-screen w-screen bg-gradient-to-b from-background via-primary to-background backdrop-blur-lg `}/>*/}
 
-            <div className='h-[100dvh] flex flex-col w-full'>
+            <div className='h-full flex flex-col w-full'>
                 {/* Header */}
-                <div className={`sticky top-0 z-50 h-17 shrink-0`}>
-                    <Header
-                        user={user}
-                        localSynapseMetadata={localSynapseMetadata}
-                    />
+                <div className={`sticky top-0 z-50  shrink-0`}>
+                    {/*<Header user={user} localSynapseMetadata={localSynapseMetadata}/>*/}
                 </div>
                 {/* IdentityPanel */}
                 <div className="flex flex-col xl:flex-1 w-full xl:grid xl:grid-cols-12">
@@ -143,15 +119,13 @@ const UserProfileLayout = ({ children }) => {
                             ) : (
                                 <div>Selected Tab Not Valid</div>
                             )}
-
                         </div>
-
                         {children}
                     </div>
                 </div>
             </div>
         </div>
-);
+    );
 };
 
 export default UserProfileLayout;

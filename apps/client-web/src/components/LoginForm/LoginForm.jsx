@@ -81,6 +81,7 @@ const LoginForm = () => {
                 <label>
                     Private Key:
                     <textarea
+                        inputMode={"password"}
                         className={`w-full p-4 rounded-md border border-border mt-2 bg-surface`}
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}

@@ -1,20 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import Header from "../../components/Header/Header.jsx";
 import React, {useEffect, useState} from "react";
-import useGetUser from "../../api/hooks/useGetUser.js";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import {useNavigate, useParams} from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import {useSwipeable} from "react-swipeable";
-import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import ChatPanel from "../../components/Chatting/ChatPanel/ChatPanel.jsx";
 import PostsPanel from "../../components/Posting/PostingPanel/PostsPanel.jsx";
-import SynapseControlBar from "../../components/SynapseControlBar/SynapseControlBar.jsx";
 import SynapseInfoTray from "../../components/SynapseInfoTray/SynapseInfoTray.jsx";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
-import { CgFeed } from "react-icons/cg";
-import { FaUsersViewfinder } from "react-icons/fa6";
+import SynapseControlBarTray from "../../components/SynapseControlBar/SynapseControlBarTray.jsx";
 import useGetBoardPosts from "../../api/hooks/useGetBoardPosts.js";
 import useFetchRemoteBoardPosts from "../../api/hooks/useFetchRemoteBoardPosts.js";
 import useGetSynapsePostBoards from "../../api/hooks/useGetSynapsePostBoards.js";
@@ -23,30 +16,21 @@ import useGetChannelChatMessages from "../../api/hooks/useGetChannelChatMessages
 import useGetSynapseChatChannels from "../../api/hooks/useGetSynapseChatChannels.js";
 import useFetchRemoteSynapseChatChannels from "../../api/hooks/useFetchRemoteSynapseChatChannels.js";
 import useFetchRemoteChannelChats from "../../api/hooks/useFetchRemoteChannelChats.js";
-import SynapseMembersPanel from "../../components/SynapseMembersPanel/SynapseMembersPanel.jsx";
 import useGetSynapseMembers from "../../api/hooks/useGetSynapseMembers.js";
 import useFetchRemoteSynapseMembers from "../../api/hooks/useFetchRemoteSynapseMembers.js";
-import SynapseControlBarTray from "../../components/SynapseControlBar/SynapseControlBarTray.jsx";
-import SynapseActivityPanel from "../../components/SynapseActivityPanel/SynapseActivityPanel.jsx";
-import PostBoardsPanel from "../../components/Posting/PostBoardsPanel/PostBoardsPanel.jsx";
-import ChattingChannelsPanel from "../../components/Chatting/ChattingChannelsPanel/ChattingChannelsPanel.jsx";
+import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 import { LuPanelLeftClose } from "react-icons/lu";
 import { LuPanelRightClose } from "react-icons/lu";
 
-
-
+function useRootContext() {
+    return useOutletContext(); // { sessionUser, user, localSynapseMetadata }
+}
 
 const SynapseLayout =({ children }) => {
-
+    const { sessionUser, user, localSynapseMetadata } = useRootContext();
     const { synapsePublicKey } = useParams(); // Extract synapsePublicKey from the URL (if available)
     const [isLocalSynapse, setIsLocalSynapse] = useState(true);
-    const [localSynapseMetadata, setLocalSynapseMetadata] = useState(null);
     const [synapseMetadata, setSynapseMetadata] = useState(null);
-    const [sessionUser, setSessionUser ] = useState({})
-    const [user, setUser] = useState({})
-    const { getUser } = useGetUser();
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const navigate = useNavigate(); // React Router navigate
     const [members, setMembers] = useState(null);
     const [boards, setBoards] = useState(null);
     const [activeBoard, setActiveBoard] = useState(null);
@@ -54,14 +38,11 @@ const SynapseLayout =({ children }) => {
     const [channels, setChannels] = useState(null);
     const [activeChannel, setActiveChannel] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
-
     const [activeSidebarTab, setActiveSidebarTab] = useState("activity");
     const [activeMiddlebarTab, setActiveMiddlebarTab] = useState("feed");
     const [isSynapseInfoTrayOpen, setIsSynapseInfoTrayOpen] = useState(false);
     const [isSynapseControlBarTrayOpen, setIsSynapseControlBarTrayOpen] = useState(false);
 
-
-    const { getSynapseMetadata } = useGetSynapseMetadata();
     const { getSynapseMembers } = useGetSynapseMembers();
     const { getSynapsePostBoards } = useGetSynapsePostBoards();
     const { getBoardPosts } = useGetBoardPosts();
@@ -75,41 +56,10 @@ const SynapseLayout =({ children }) => {
     const { fetchRemoteChannelChats } = useFetchRemoteChannelChats();
 
     useEffect(() => {
-        const fetchSessionUser = async () => {
-            try {
-                console.log("Fetching current user session...");
-                const response = await getSessionUser();
-                setSessionUser(response.data)
-            } catch (error) {
-                console.error("Error fetching current session user:", error);
-                navigate('/login');
-            }
-        }
-        fetchSessionUser();
-    }, [])
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (!sessionUser.publicKey) {
-                return;
-            }
-            try {
-                const response = await getUser(sessionUser.publicKey);
-                setUser(response);
-            } catch (error) {
-                console.error("Error fetching current user:", error);
-            }
-        }
-        fetchUser();
-    }, [sessionUser])
-
-    useEffect(() => {
         const fetchSynapseMetadata = async () => {
             try {
-                const localSynapseData = await getSynapseMetadata();
-                setLocalSynapseMetadata(localSynapseData)
-                if (localSynapseData.identity.publicKey === synapsePublicKey) {
-                    setSynapseMetadata(localSynapseData);
+                if (localSynapseMetadata.identity.publicKey === synapsePublicKey) {
+                    setSynapseMetadata(localSynapseMetadata);
                     setIsLocalSynapse(true);
                     const synapseMembers = await getSynapseMembers();
                     setMembers(synapseMembers);
@@ -164,7 +114,6 @@ const SynapseLayout =({ children }) => {
                     console.error("Error fetching remote Synapse posts: ", error);
                 }
             }
-
         };
         fetchSynapsePosts();
     },[synapsePublicKey, isLocalSynapse, activeBoard]);
@@ -223,7 +172,6 @@ const SynapseLayout =({ children }) => {
 
     const isXL = useIsXL();
 
-
     if (!user || !user.publicKey) {
         return <div className={'bg-background text-foreground'}>Loading Synapse...</div>;
     }
@@ -239,9 +187,9 @@ const SynapseLayout =({ children }) => {
     return (
         <div className="flex flex-col h-[100dvh]">
             {/* Header */}
-            <div className="sticky top-0 z-50 border-b border-border bg-background mt-15">
+            <div className="sticky top-0 z-50 border-b border-border bg-background pt-16">
                 <div className="flex items-center justify-between">
-                    {/* Left hamburger (Browse) */}
+                    {/* Left tray button (Browse) */}
                     <button
                         className="xl:hidden py-2 text-3xl text-foreground hover:text-brand/60 hover:cursor-pointer"
                         aria-label="Open left menu"
@@ -259,9 +207,8 @@ const SynapseLayout =({ children }) => {
                         </div>
                     )}
 
-                    {/* Right: Header + right hamburger (People) */}
+                    {/* Right tray button (Info) */}
                     <div className="flex items-center gap-2">
-                        <Header user={user} localSynapseMetadata={localSynapseMetadata}/>
                         <button
                             className="xl:hidden py-2 text-3xl text-foreground hover:text-brand/60 hover:cursor-pointer"
                             aria-label="Open right menu"
@@ -290,13 +237,8 @@ const SynapseLayout =({ children }) => {
                     id="synapse-control-bar-tray"
                     role="dialog"
                     aria-modal="true"
-                    className={`
-        fixed inset-y-0 left-0 w-80 max-w-full
-        transform transition-transform duration-300 ease-in-out
-        bg-surface/95 border-r border-border shadow-2xl
-        z-[60] xl:hidden
-        ${isSynapseControlBarTrayOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}
+                    className={`fixed inset-y-0 left-0 w-80 max-w-full transform transition-transform duration-300 ease-in-out bg-surface/95 border-r border-border shadow-2xl z-[60] xl:hidden 
+                    ${isSynapseControlBarTrayOpen ? 'translate-x-0' : '-translate-x-full'}`}
                 >
                     <div className="flex items-center justify-between p-3 border-b border-border text-foreground">
                         <h2 className="text-lg font-montserrat font-semibold">Browse</h2>
@@ -330,13 +272,8 @@ const SynapseLayout =({ children }) => {
                     id="synapse-info-tray"
                     role="dialog"
                     aria-modal="true"
-                    className={`
-        fixed inset-y-0 right-0 w-80 max-w-[90vw]
-        transform transition-transform duration-300 ease-in-out
-        bg-surface/95 border-l border-border shadow-2xl
-        z-[60] xl:hidden
-        ${isSynapseInfoTrayOpen ? 'translate-x-0' : 'translate-x-full'}
-      `}
+                    className={`fixed inset-y-0 right-0 w-80 max-w-[90vw] transform transition-transform duration-300 ease-in-out bg-surface/95 border-l border-border shadow-2xl z-[60] xl:hidden 
+                    ${isSynapseInfoTrayOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 >
                     <div className="flex items-center justify-between p-3 border-b border-border text-foreground">
                         <h2 className="text-lg font-montserrat font-semibold">Info</h2>

@@ -1,29 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import Post from "../Posting/Post/Post.jsx";
 import useFetchRemotePosts from "../../api/hooks/useFetchRemotePosts.js";
 import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
-import {useEffect, useState} from "react";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetUser from "../../api/hooks/useGetUser.js";
-import {useNavigate} from "react-router-dom";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
-import {refreshPosts} from "../../utils/apiUtils.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import { FaSortAmountUp } from "react-icons/fa";
-import { FiFilter } from "react-icons/fi";
+import { refreshPosts } from "../../utils/apiUtils.js";
 import SortTray from "./SortTray.jsx";
 import FilterTray from "./FilterTray.jsx";
+import { FaSortAmountUp } from "react-icons/fa";
+import { FiFilter } from "react-icons/fi";
 
-const FeedPanel = ({user, localSynapseMetadata}) => {
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getUser } = useGetUser();
-    const { getSynapseMetadata } = useGetSynapseMetadata();
+function useRootContext() {
+    return useOutletContext(); // { user, localSynapseMetadata }
+}
+
+const FeedPanel = () => {
+    const { sessionUser, user, localSynapseMetadata } = useRootContext();
+
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
-    const [sessionUser, setSessionUser ] = useState({})
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [ showFilterTray, setShowFilterTray ] = useState(false);
     const [ showSortTray, setShowSortTray ] = useState(false);
@@ -32,8 +31,6 @@ const FeedPanel = ({user, localSynapseMetadata}) => {
         keyword: '',
         sortBy: 'recent', // 'recent' | 'chronological' | 'trending'
     });
-
-    const navigate = useNavigate(); // React Router navigate
 
     const {
         editingPostId,
@@ -150,9 +147,10 @@ const FeedPanel = ({user, localSynapseMetadata}) => {
                                 <Post
                                     key={index}
                                     isLocalSynapse={post.synapsePublicKey === localSynapseMetadata.identity.publicKey}
+                                    synapsePublicKey={post.synapsePublicKey}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
-                                    sessionPublicKey={user.publicKey}
+                                    sessionPublicKey={sessionUser.publicKey}
                                     synapseUrl={post.synapseUrl}
                                     date={post.created_at}
                                     content={post.content}
