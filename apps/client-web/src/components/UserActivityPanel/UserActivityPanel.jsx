@@ -92,7 +92,22 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
             }));
 
             // ----- USERS -----
-            userCacheRef.current.set(user.publicKey, user);
+            const actorIds = activities.map(a => a.actor_public_key);
+            const followTargetIds = activities
+                .filter(a => a.type === 'FOLLOWED' || a.type === 'UNFOLLOWED')
+                .map(a => a.target_id);
+
+            const allUserIds = new Set([...actorIds, ...followTargetIds].filter(Boolean));
+            const missingUserIds = [...allUserIds].filter(id => !userCacheRef.current.has(id));
+
+            await Promise.all(missingUserIds.map(async (id) => {
+                try {
+                    const u = await getUser(id);
+                    if (u) userCacheRef.current.set(id, u);
+                } catch (e) {
+                    console.warn('User fetch failed for', id, e);
+                }
+            }));
 
         };
 
@@ -129,10 +144,9 @@ export default function UserActivityPanel({user, localSynapseMetadata}) {
                         </div>
 
                         {/* items for that day */}
-                        <ul className={'px-8 py-2'}>
+                        <ul className="px-8 py-2">
                             {items.map((activity, i) => (
-                                <li key={i} className="relative pl-8 py-16 ">
-                                    {/* dot */}
+                                <li key={`${activity.object_id || activity.published}-${i}`} className="relative pl-8 py-8">
                                     <span className="absolute left-3 top-6 w-3 h-3 rounded-full bg-brand" />
                                     <Activity
                                         activity={activity}
