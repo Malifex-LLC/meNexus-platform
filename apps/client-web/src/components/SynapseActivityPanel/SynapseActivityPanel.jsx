@@ -9,6 +9,7 @@ import useFetchRemoteSynapseAllActivities from "../../api/hooks/useFetchRemoteSy
 import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useGetUser from "../../api/hooks/useGetUser.js";
 import {useParams} from "react-router-dom";
+import useFetchRemoteSynapseMetadata from "../../api/hooks/useFetchRemoteSynapseMetadata.js";
 
 const yyyymmdd = ts => ts.slice(0, 10);                      // "2025-06-23"
 const dayLabel = ts =>                                       // "Jun 23", "Apr 07"
@@ -26,6 +27,7 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey, user
     const userCacheRef    = useRef(new Map()); // key: publicKey, val: user
 
     const { getAllActivities } = useGetAllActivities();
+    const { fetchRemoteSynapseMetadata } = useFetchRemoteSynapseMetadata();
     const { fetchRemoteSynapseAllActivities } = useFetchRemoteSynapseAllActivities();
     const { getSynapseMetadata } = useGetSynapseMetadata();
     const { getUser } = useGetUser();
@@ -67,6 +69,25 @@ const  SynapseActivityPanel = ({isLocalSynapse, synapseMetadata, publicKey, user
             // Preload LOCAL synapse metadata into cache (so we never re-fetch it)
             const localSynapseMetadata = await getSynapseMetadata();
             synapseCacheRef.current.set(localSynapseMetadata.identity.publicKey, localSynapseMetadata);
+
+            // ----- SYNAPSES -----
+            const synapsePublicKeys = new Set(
+                activities
+                    .filter(a => a.context_type === 'SYNAPSE' && typeof a.context_id === 'string')
+                    .map(a => a.context_id)
+            );
+
+            const missingSynapseIds = [...synapsePublicKeys].filter(id => !synapseCacheRef.current.has(id));
+            await Promise.all(missingSynapseIds.map(async (id) => {
+                try {
+                    // if it's local, skip (already set above)
+                    if (id === localSynapseMetadata.identity.publicKey) return;
+                    const remoteSynapseMetadata = await fetchRemoteSynapseMetadata(id);
+                    if (remoteSynapseMetadata) synapseCacheRef.current.set(id, remoteSynapseMetadata);
+                } catch (e) {
+                    console.warn('Synapse metadata fetch failed for', id, e);
+                }
+            }));
 
             // ----- USERS -----
             const actorIds = activities.map(a => a.actor_public_key);
