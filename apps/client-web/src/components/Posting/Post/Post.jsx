@@ -17,12 +17,20 @@ import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
 import useEditRemoteComment from "../../../api/hooks/useEditRemoteComment.js";
 import useDeleteRemotePostComment from "../../../api/hooks/useDeleteRemotePostComment.js";
 import { HiDotsHorizontal } from "react-icons/hi";
+import { BsArrowUpSquare } from "react-icons/bs";
+import {PiArrowFatUpBold} from "react-icons/pi";
+import {AiOutlineThunderbolt} from "react-icons/ai";
+import {BiComment} from "react-icons/bi";
+import {IoShareSocialOutline} from "react-icons/io5";
+
 
 
 const Post = ({
+                  mode,
                   isLocalSynapse,
                   synapsePublicKey,
                   synapseUrl,
+                  synapseName,
                   postId,
                   publicKey,
                   sessionPublicKey,
@@ -200,59 +208,125 @@ const Post = ({
     }
 
     return (
-        <div className={`grid grid-cols-12 w-full p-2 md:p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
-            {/* Left Column: Profile */}
-            <div className="flex flex-col col-span-2 items-center w-16 md:w-24 shrink-0">
-                {user.profilePicture ? (
-                    <NavLink to={`/profile/${user.handle}`}>
-                        <img
-                            className="w-16 md:w-24 rounded-lg object-cover"
-                            src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
-                            alt={`${user.displayName}'s profile picture`}
-                        />
-                    </NavLink>
-                ) : (
-                    <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
-                )}
-                {!isOwner && (
-                    isFollowing ? (
-                            <button
-                                className="mt-4 text-xs px-2 py-1 rounded-md bg-surface/60 text-foreground hover:cursor-pointer hover:bg-brand/60"
-                                onClick={isFollowing ? handleUnfollow : handleFollow}
-                            >
-                                Unfollow
-                            </button>
-                        ) : (
-                            <button
-                                className="mt-4 text-xs px-2 py-1 rounded-md bg-brand hover:cursor-pointer hover:bg-brand/60"
-                                onClick={isFollowing ? handleUnfollow : handleFollow}
-                            >
-                                Follow
-                            </button>
-                        )
-                )}
-            </div>
-
-            {/* Center Column: Content */}
-            <div className="flex flex-col col-span-9 w-full flex-1 pl-6">
-                {/* Identity */}
-                <div className={`flex flex-col`}>
+        <div className={`flex flex-col w-full p-2 md:p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+            {mode === 'GLOBAL' && (
+                <div className={`flex w-full text-xs justify-end text-neutral gap-1`}>
+                    Posted in
                     <NavLink
-                        className="text-sm md:text-xl font-montserrat font-semibold hover:underline hover:pointer-cursor"
-                        to={`/profile/${user.handle}`}
+                        className={`text-accent hover:text-accent/60 hover:underline`}
+                        to={`/synapse/${synapsePublicKey}`}
                     >
-                        {user.displayName}
+                        {synapseName}
                     </NavLink>
-                    <NavLink
-                        className={`text-xs md:text-lg text-brand font-jetbrains hover:underline hover:pointer-cursor`}
-                        to={`/profile/${user.handle}`}>
-                        @{user.handle}
-                    </NavLink>
-                    <div className="text-xs text-neutral font-montserrat">{formatDate(date)}</div>
+                </div>
+                )}
+            {/* Profile */}
+            <div className={`flex `}>
+                <div className="flex flex-col col-span-2 items-center w-16 md:w-24 shrink-0">
+                    {user.profilePicture ? (
+                        <NavLink to={`/profile/${user.handle}`}>
+                            <img
+                                className="w-16 md:w-24 rounded-lg object-cover"
+                                src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
+                                alt={`${user.displayName}'s profile picture`}
+                            />
+                        </NavLink>
+                    ) : (
+                        <div className="w-20 h-20 rounded-lg bg-muted">Loading...</div>
+                    )}
                 </div>
 
-                {/* Post Content */}
-                <div className="mt-4 font-inter">
+                {/* Metadata */}
+                <div className="flex flex-col w-full flex-1 pl-4">
+                    <div className={`flex flex-col`}>
+                        <NavLink
+                            className="text-sm md:text-xl font-montserrat font-semibold hover:underline hover:pointer-cursor"
+                            to={`/profile/${user.handle}`}
+                        >
+                            {user.displayName}
+                        </NavLink>
+                        <NavLink
+                            className={`text-xs md:text-lg text-brand font-jetbrains hover:underline hover:pointer-cursor`}
+                            to={`/profile/${user.handle}`}>
+                            @{user.handle}
+                        </NavLink>
+                        <div className="text-xs text-neutral font-montserrat">{formatDate(date)}</div>
+                    </div>
+                </div>
+                {/* Actions */}
+                <div className="relative inline-block">
+                    {/* Dots trigger */}
+                    <button
+                        onClick={toggleActionsTray}
+                        className="inline-flex items-center justify-center md:p-2 rounded-lg hover:text-brand/50 hover:cursor-pointer text-2xl md:text-3xl"
+                        aria-haspopup="menu"
+                        aria-expanded={showActions}
+                    >
+                        <HiDotsHorizontal />
+                    </button>
+
+                    {/* Actions tray */}
+                    {showActions && (
+                        <div
+                            role="menu"
+                            className="absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-border bg-surface/70 backdrop-blur-xs shadow-xl ring-1 ring-border p-2 z-50"
+                        >
+                            {isOwner && (
+                                <div className="grid gap-2">
+                                    {isEditing ? (
+                                        <button
+                                            onClick={onSave}
+                                            className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-save hover:bg-save/90 hover:cursor-pointer text-foreground"
+                                            role="menuitem"
+                                        >
+                                            Save
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={onEdit}
+                                            className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-edit hover:bg-edit-hover hover:cursor-pointer text-foreground"
+                                            role="menuitem"
+                                        >
+                                            Edit
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={() => {
+                                            onDelete();
+                                            toggleActionsTray();
+                                        }}
+                                        className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-delete hover:bg-delete-hover hover:cursor-pointer text-foreground "
+                                        role="menuitem"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
+                            {!isOwner && (
+                                isFollowing ? (
+                                    <button
+                                        className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-background hover:bg-brand/60 hover:cursor-pointer text-foreground"
+                                        onClick={isFollowing ? handleUnfollow : handleFollow}
+                                    >
+                                        Unfollow
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-brand hover:bg-brand/60 hover:cursor-pointer text-foreground"
+                                        onClick={isFollowing ? handleUnfollow : handleFollow}
+                                    >
+                                        Follow
+                                    </button>
+                                )
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+            {/* Post Content */}
+            <div className={`px-4`}>
+                <div className="w-full mt-4 font-inter">
                     {isEditing ? (
                         <textarea
                             className="w-full p-2 text-sm md:text-md lg:text-xl rounded-md bg-surface"
@@ -260,7 +334,7 @@ const Post = ({
                             onChange={onContentChange}
                         />
                     ) : (
-                        <p className="text-sm md:text-md lg:text-3xl whitespace-pre-wrap">{content}</p>
+                        <p className="w-full text-md lg:text-2xl whitespace-pre-wrap">{content}</p>
                     )}
                 </div>
 
@@ -278,7 +352,6 @@ const Post = ({
                         <video
                             className="rounded-lg max-w-full h-auto object-contain"
                             src={`${isLocalSynapse ? import.meta.env.VITE_API_BASE_URL : synapseUrl}${mediaUrl}`}
-                            alt={`${postId}'s media`}
                             controls={true}
                         />
                     </div>
@@ -294,67 +367,33 @@ const Post = ({
                     </div>
 
                 )}
+            </div>
 
-                {/* Stats */}
-                <div className="mt-4 text-xs md:text-sm  text-neutral flex gap-4 font-montserrat">
-                    <p>{likes} likes</p>
+
+            {/* Stats */}
+            <div className={`flex flex-col border-t border-border mt-8`}>
+                <div className="flex w-full justify-between mt-4 px-4 text-xs md:text-sm  text-neutral  gap-4 font-montserrat">
+                    <div className={`flex`}>
+                        <p className={`text-xs`}>{likes} Boosts</p>
+                    </div>
                     <p onClick={toggleComments} className="hover:underline cursor-pointer">
                         {showComments ? "Hide Comments" : `${comments.length} Comments`}
                     </p>
                 </div>
-
-            </div>
-
-            {/* Right Column: Actions */}
-            <div className="relative inline-block text-left">
-                {/* Dots trigger */}
-                <button
-                    onClick={toggleActionsTray}
-                    className="inline-flex items-center justify-center md:p-2 rounded-lg hover:text-brand/50 hover:cursor-pointer text-2xl md:text-3xl"
-                    aria-haspopup="menu"
-                    aria-expanded={showActions}
-                >
-                    <HiDotsHorizontal />
-                </button>
-
-                {/* Actions tray */}
-                {showActions && isOwner && (
-                    <div
-                        role="menu"
-                        className="absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-border bg-surface/70 backdrop-blur-xs shadow-xl ring-1 ring-border p-2 z-50"
+                <div className={`flex w-full gap-4 text-2xl xl:text-2xl justify-evenly px-4 py-2 mt-2`}>
+                    <button className={'hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2'}>
+                        <AiOutlineThunderbolt />
+                    </button>
+                    <button
+                        className={'hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2'}
+                        onClick={toggleComments}
                     >
-                        <div className="grid gap-2">
-                            {isEditing ? (
-                                <button
-                                    onClick={onSave}
-                                    className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-save hover:bg-save/90 hover:cursor-pointer text-foreground"
-                                    role="menuitem"
-                                >
-                                    Save
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={onEdit}
-                                    className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-edit hover:bg-edit-hover hover:cursor-pointer text-foreground"
-                                    role="menuitem"
-                                >
-                                    Edit
-                                </button>
-                            )}
-
-                            <button
-                                onClick={() => {
-                                    onDelete();
-                                    toggleActionsTray();
-                                }}
-                                className="w-full inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium bg-delete hover:bg-delete-hover hover:cursor-pointer text-foreground "
-                                role="menuitem"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                )}
+                        <BiComment />
+                    </button>
+                    <button className={'hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2'}>
+                        <IoShareSocialOutline />
+                    </button>
+                </div>
             </div>
             {/* Comments */}
             {showComments && (

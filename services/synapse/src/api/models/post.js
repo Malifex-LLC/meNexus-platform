@@ -122,7 +122,8 @@ export const getAllPosts = async (req, res) => {
                         handle: user?.handle || 'Unknown',
                         displayName: user?.displayName || 'Unknown',
                         synapsePublicKey: synapseConfig.identity.publicKey,
-                        synapseUrl: synapseConfig.identity.synapseUrl
+                        synapseUrl: synapseConfig.identity.synapseUrl,
+                        synapseName: synapseConfig.metadata.name
                     };
                 }));
                 resolve(enrichedPosts);

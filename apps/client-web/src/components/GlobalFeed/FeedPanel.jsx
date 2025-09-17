@@ -80,7 +80,7 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col flex-1  w-full h-full text-foreground bg-surface/70 xl:rounded-xl border border-border">
+        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 xl:rounded-xl border border-border">
             <div className="flex flex-col justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
                 <button className={`text-brand font-bold `}>
                     Global Feed
@@ -146,8 +146,10 @@ const FeedPanel = () => {
                             >
                                 <Post
                                     key={index}
+                                    mode={'GLOBAL'}
                                     isLocalSynapse={post.synapsePublicKey === localSynapseMetadata.identity.publicKey}
                                     synapsePublicKey={post.synapsePublicKey}
+                                    synapseName={post.synapseName}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
                                     sessionPublicKey={sessionUser.publicKey}

@@ -78,6 +78,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
                         >
                             <Post
                                 key={index}
+                                mode={'SYNAPSE'}
                                 isLocalSynapse={isLocalSynapse}
                                 synapsePublicKey={synapsePublicKey}
                                 synapseUrl={post.synapseUrl}
