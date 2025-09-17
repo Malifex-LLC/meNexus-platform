@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
 import { NavLink } from "react-router-dom";
@@ -201,7 +201,13 @@ const Post = ({
         return matches || [];
     };
 
-
+    // Close drawers on ESC
+    useEffect(() => {
+        if (!showActions) return;
+        const onKey = (e) => e.key === 'Escape' && (setShowActions(false));
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [showActions]);
 
     if (!user) {
         return
@@ -209,8 +215,16 @@ const Post = ({
 
     return (
         <div className={`flex flex-col w-full p-2 md:p-4   rounded-xl bg-background text-foreground border ${isEditing ? "border-is-editing" : "border-transparent"}`}>
+            {/* ===== Mobile Backdrop (shared) ===== */}
+            {(showActions) && (
+                <button
+                    className="fixed inset-0 z-[49] -mr-[100vw]  "
+                    aria-label="Close menus"
+                    onClick={() => { setShowActions(false); }}
+                />
+            )}
             {mode === 'GLOBAL' && (
-                <div className={`flex w-full text-xs justify-end text-neutral gap-1`}>
+                <div className={`flex w-full text-xs xl:text-sm justify-end text-neutral gap-1 mb-2`}>
                     Posted in
                     <NavLink
                         className={`text-accent hover:text-accent/60 hover:underline`}
