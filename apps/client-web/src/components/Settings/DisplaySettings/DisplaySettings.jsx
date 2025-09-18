@@ -19,17 +19,17 @@ const DisplaySettings = () => {
     };
 
     return (
-        <div className="flex flex-col  w-full m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl font-montserrat">
             <h2 className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">
                 Display Settings
             </h2>
-            <div className={`flex flex-col w-full p-4 gap-4`}>
-                <form className="flex flex-row" onSubmit={handleSubmit}>
+            <div className={`flex flex-col xl:grid xl:grid-cols-2 w-full p-4 gap-4`}>
+                <form className="flex flex-row col-span-2" onSubmit={handleSubmit}>
                     {/* Theme Selection */}
                     <label className="text-2xl text-brand">
                         Selected Theme:
                         <select
-                            className={`text-lg text-foreground`}
+                            className={`text-lg text-foreground px-4`}
                             value={theme}
                             onChange={(e) => setTheme(e.target.value)}
                         >
@@ -60,8 +60,8 @@ const DisplaySettings = () => {
                         </select>
                     </label>
                 </form>
-                <div className={`grid grid-cols-2 p-4 w-lg  rounded-xl`}>
-                    <div className={`flex flex-col col-span-1  gap-4 w-full justify-between`}>
+                <div className={`col-span-1 grid grid-cols-4 p-4 w-full  rounded-xl`}>
+                    <div className={`flex flex-col col-span-2  gap-4 w-full justify-between`}>
                         <div className={`w-full`}>Background Color</div>
                         <div className={`w-full`}>Surface Color</div>
                         <div className={`w-full`}>Brand Color</div>
@@ -70,7 +70,7 @@ const DisplaySettings = () => {
                         <div className={`w-full`}>Accent Color</div>
                         <div className={`w-full`}>Font Color</div>
                     </div>
-                    <div className={`flex flex-col col-span-1 gap-4  w-full `}>
+                    <div className={`flex flex-col col-span-2 gap-4  w-full `}>
                         <div className={`p-4 w-full bg-background border border-border`}/>
                         <div className={`p-4 w-full bg-surface border border-border`}/>
                         <div className={`p-4 w-full bg-brand border border-border`}/>
@@ -80,7 +80,7 @@ const DisplaySettings = () => {
                         <div className={`p-4 w-full bg-foreground border border-border`}/>
                     </div>
                     {/* Submit Button */}
-                    <div className={`flex w-full justify-center items-center col-span-2`}>
+                    <div className={`flex pt-4 xl:pt-16 w-full justify-center items-center col-start-2 col-span-2`}>
                         <button
                             className="m-4 w-full bg-brand hover:bg-brand/70 active:bg-surface cursor-pointer rounded-xl"
                             type="submit"

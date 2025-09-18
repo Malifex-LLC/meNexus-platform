@@ -5,9 +5,6 @@ import { useEffect, useState } from "react";
 import useGetFollowerCount from "../../api/hooks/useGetFollowerCount.js";
 import useGetFollowingCount from "../../api/hooks/useGetFollowingCount.js";
 import IdentityQuickActionsPanel from "./IdentityQuickActionsPanel.jsx";
-import StatusPanel from "./StatusPanel.jsx";
-import useGetUserByHandle from "../../api/hooks/useGetUserByHandle.js";
-import {useParams} from "react-router-dom";
 import useFollowActions from "../../api/hooks/useFollowActions.js";
 
 const IdentityPanel = ({user, isProfileOwner}) => {
@@ -16,7 +13,6 @@ const IdentityPanel = ({user, isProfileOwner}) => {
     const [followerCount, setFollowerCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
 
-    const { getUserByHandle } = useGetUserByHandle();
     const { followCheck } = useFollowActions();
     const { getFollowerCount, loading: followerCountLoading, error: followerCountError } = useGetFollowerCount();
     const { getFollowingCount, loading: followingCountLoading, error: followingCountError } = useGetFollowingCount();
@@ -60,41 +56,45 @@ const IdentityPanel = ({user, isProfileOwner}) => {
 
 
     return (
-        <div className={`relative flex flex-col p-4 h-full w-full bg-surface/70 rounded-xl border border-border shadow-lg`}>
+        <div className={`flex flex-col p-4 w-full h-full bg-surface/70 rounded-xl border border-border shadow-lg`}>
+
             {/* Top Profile Section */}
-            <div className={'p-4'}>
-                <div className={` p-4 flex flex-col text-foreground rounded-xl shadow-lg `}>
-                    <div className={'p-4 bg-surface rounded-xl shadow-lg'}>
-                        <p className={`md:text-2xl xl:text-7xl`}>{user.displayName}</p>
-                        <p className={`md:text-lg xl:text-5xl text-brand`}>@{user.handle}</p>
-                    </div>
+            <div className={`z-1 flex flex-col w-full text-foreground rounded-xl shadow-lg `}>
+                <div className={'p-4 bg-surface rounded-xl shadow-lg'}>
+                    <p className={`text-3xl md:text-4xl xl:text-5xl font-montserrat`}>{user.displayName}</p>
+                    <p className={`text-2xl md:text-3xl xl:text-4xl text-brand font-jetbrains`}>@{user.handle}</p>
                 </div>
             </div>
-            <div className={'flex px-4 justify-center  rounded-xl'}>
+            <div className={'relative flex w-full  p-4 justify-center'}>
                 <img
-                    className={`w-64 rounded-xl `}
+                    className={`z-1 w-48 xl:w-64 rounded-xl`}
                     src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                     alt={`${user.displayName}'s profile picture`}
                 />
+                {/* Background gradient */}
+                <div
+                    aria-hidden
+                    className="absolute z-0  inset-0 bg-gradient-to-r from-surface via-brand to-surface blur-xl"
+                />
             </div>
-            <div className={'flex flex-row items-center justify-center text-xl text-foreground p-4 mt-4 bg-surface rounded-xl shadow-lg'}>
-                <div className={`flex flex-col items-center text-md`}>
+            <div className={'z-1 flex flex-row w-full items-center justify-center text-xl text-foreground p-4 mt-4 bg-surface rounded-xl shadow-lg'}>
+                <div className={`flex flex-col items-center text-md font-montserrat`}>
                     <p className={`px-4 lg:px-2 xl:px-4 text-brand`}>{followerCount}</p>
                     <p className={`px-4 lg:px-2  xl:px-4`}>Followers</p>
                 </div>
-                <div className={`flex flex-col items-center text-md`}>
+                <div className={`flex flex-col items-center text-md font-montserrat`}>
                     <p className={`px-4 lg:px-2 xl:px-4 text-brand`}>{followingCount}</p>
-                    <p className={`px-4 lg:px-2 xl:px-4 `}>Following</p>
+                    <p className={`px-4 lg:px-2 xl:px-4`}>Following</p>
                 </div>
             </div>
             {/* Status */}
-            <div className={'p-4 rounded-xl shadow-lg'}>
-                <StatusPanel />
-            </div>
-            <div className={'flex flex-col items-center'}>
+            {/*<div className={'p-4 rounded-xl shadow-lg'}>*/}
+            {/*    <StatusPanel />*/}
+            {/*</div>*/}
+            <div className={'flex flex-col w-full'}>
                 {/* Quick Actions */}
                 {!isProfileOwner  ? (
-                    <div className={'flex p-4 justify-evenly rounded-xl shadow-lg w-full'}>
+                    <div className={'flex w-full p-4'}>
                         <IdentityQuickActionsPanel
                             publicKey={user.publicKey}
                             isFollowing={isFollowing}

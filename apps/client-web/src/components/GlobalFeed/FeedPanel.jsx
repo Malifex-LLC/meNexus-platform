@@ -1,31 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import Post from "../Posting/Post/Post.jsx";
 import useFetchRemotePosts from "../../api/hooks/useFetchRemotePosts.js";
 import useGetAllPosts from "../../api/hooks/useGetAllPosts.js";
-import {useEffect, useState} from "react";
-import useGetSessionUser from "../../api/hooks/useGetSessionUser.js";
-import useGetUser from "../../api/hooks/useGetUser.js";
-import {useNavigate} from "react-router-dom";
-import useGetSynapseMetadata from "../../api/hooks/useGetSynapseMetadata.js";
 import useEditPost from "../../api/hooks/useEditPost.js";
-import {refreshPosts} from "../../utils/apiUtils.js";
 import useDeletePost from "../../api/hooks/useDeletePost.js";
-import { FaSortAmountUp } from "react-icons/fa";
-import { FiFilter } from "react-icons/fi";
+import { refreshPosts } from "../../utils/apiUtils.js";
 import SortTray from "./SortTray.jsx";
 import FilterTray from "./FilterTray.jsx";
+import { FaSortAmountUp } from "react-icons/fa";
+import { FiFilter } from "react-icons/fi";
+
+function useRootContext() {
+    return useOutletContext(); // { user, localSynapseMetadata }
+}
 
 const FeedPanel = () => {
-    const { getSessionUser, loading: sessionUserLoading, error: sessionUserError } = useGetSessionUser();
-    const { getUser } = useGetUser();
-    const { getSynapseMetadata } = useGetSynapseMetadata();
+    const { sessionUser, user, localSynapseMetadata } = useRootContext();
+
     const { fetchRemotePosts, loading: synapsePostsLoading, error: synapsePostsError } = useFetchRemotePosts();
     const { getAllPosts } = useGetAllPosts();
-    const [localSynapse, setLocalSynapse] = useState({})
-    const [sessionUser, setSessionUser ] = useState({})
-    const [user, setUser] = useState({})
     const [posts, setPosts] = useState([]); // State for synapse posts
     const [ showFilterTray, setShowFilterTray ] = useState(false);
     const [ showSortTray, setShowSortTray ] = useState(false);
@@ -34,8 +31,6 @@ const FeedPanel = () => {
         keyword: '',
         sortBy: 'recent', // 'recent' | 'chronological' | 'trending'
     });
-
-    const navigate = useNavigate(); // React Router navigate
 
     const {
         editingPostId,
@@ -53,44 +48,13 @@ const FeedPanel = () => {
 
 
     useEffect(() => {
-        const fetchSessionUser = async () => {
-            try {
-                console.log("Fetching current user session...");
-                const response = await getSessionUser();
-                setSessionUser(response.data)
-            } catch (error) {
-                console.error("Error fetching current session user:", error);
-                navigate('/login');
-            }
-        }
-        fetchSessionUser();
-    }, [])
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (!sessionUser.publicKey) {
-                return;
-            }
-            try {
-                const response = await getUser(sessionUser.publicKey);
-                setUser(response);
-            } catch (error) {
-                console.error("Error fetching current user:", error);
-            }
-        }
-        fetchUser();
-    }, [sessionUser])
-
-    useEffect(() => {
         // TODO aggregatePosts doesn't handle local vs remote posts to pass to Post object
         const aggregatePosts = async () => {
             console.log('Aggregate Posting called');
             if (!user || !user.synapses) return;
 
-            const localSynapseData = await getSynapseMetadata();
-            setLocalSynapse(localSynapseData)
             const allPostPromises = user.synapses.map(async (synapse) => {
-                if (synapse === localSynapseData.identity.publicKey) {
+                if (synapse === localSynapseMetadata.identity.publicKey) {
                     return await getAllPosts(); // returns array
                 } else {
                     return await fetchRemotePosts(synapse); // returns array
@@ -116,28 +80,28 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col flex-1  h-full text-foreground bg-surface/70 rounded-xl border border-border">
-            <div className="flex flex-col justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
-                <button className={`text-brand font-bold `}>
+        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 xl:rounded-xl border border-border font-montserrat">
+            <div className="flex flex-col justify-around p-2 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-semibold`}>
                     Global Feed
                 </button>
             </div>
-            <div className="flex flex-row gap-2 p-4  border-b border-border bg-background text-lg shadow-lg">
+            <div className="flex flex-row gap-2 p-2  w-full border-b border-border bg-background text-lg shadow-lg">
                 <div className="flex flex-col w-full">
                     <input
                         type="text"
                         placeholder="Search posts..."
                         value={feedFilters.keyword}
                         onChange={(e) => setFeedFilters({ ...feedFilters, keyword: e.target.value })}
-                        className="bg-surface border border-border px-2 py-1 rounded text-foreground"
+                        className="bg-surface border border-border px-2 py-1 rounded text-foreground text-sm md:text-lg focus:outline-1 focus:outline-brand/60"
                     />
                 </div>
-                <div className={'flex flex-col w-full items-center justify-center'}>
+                <div className={'flex flex-col w-full items-center justify-center text-sm md:text-lg'}>
                     <div className={`flex flex-row w-full`}>
                         <div className="flex flex-row w-full items-center justify-center gap-2">
                             <label className="">Source</label>
                             <button
-                                className={'cursor-pointer hover:text-brand/60'}
+                                className={'flex w-full cursor-pointer hover:text-brand/60'}
                                 onClick={() => toggleFilterTray()}>
                                 <FiFilter />
                             </button>
@@ -182,10 +146,13 @@ const FeedPanel = () => {
                             >
                                 <Post
                                     key={index}
-                                    isLocalSynapse={post.synapsePublicKey === localSynapse.identity.publicKey}
+                                    mode={'GLOBAL'}
+                                    isLocalSynapse={post.synapsePublicKey === localSynapseMetadata.identity.publicKey}
+                                    synapsePublicKey={post.synapsePublicKey}
+                                    synapseName={post.synapseName}
                                     postId={post.post_id}
                                     publicKey={post.public_key}
-                                    sessionPublicKey={user.publicKey}
+                                    sessionPublicKey={sessionUser.publicKey}
                                     synapseUrl={post.synapseUrl}
                                     date={post.created_at}
                                     content={post.content}

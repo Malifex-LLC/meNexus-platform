@@ -39,6 +39,10 @@ export default {
                 'save-hover': 'rgb(var(--color-save-hover) / <alpha-value>)',
                 delete: 'rgb(var(--color-delete) / <alpha-value>)',
                 'delete-hover': 'rgb(var(--color-delete-hover) / <alpha-value>)',
+            },
+            fontFamily: {
+                jetbrains: ['JetBrains Mono', 'monospace'],
+                orbitron: ['Orbitron', 'sans-serif'],
             }
 
         }

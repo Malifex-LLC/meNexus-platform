@@ -13,7 +13,7 @@ const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
     const navigate = useNavigate();
 
     return (
-        <div className={`flex flex-col m-8 items-center text-2xl rounded-xl bg-surface`}>
+        <div className={`flex flex-col m-8 items-center text-2xl rounded-xl bg-surface font-montserrat`}>
             <ul className="p-4">
                 <li onClick={() => onSelectMenu('Profile')}
                     className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl

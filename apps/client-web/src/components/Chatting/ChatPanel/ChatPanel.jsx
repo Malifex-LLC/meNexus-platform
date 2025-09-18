@@ -6,7 +6,7 @@ import ChattingChannelsPanel from "../ChattingChannelsPanel/ChattingChannelsPane
 import ChatWindow from "../ChatWindow/ChatWindow.jsx";
 import useChatWebSocket from "../../../api/hooks/useChatWebSocket.js";
 
-const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActiveChannel, chatMessages, setChatMessages}) => {
+const ChatPanel = ({isLocalSynapse, synapseMetadata, publicKey, channels, activeChannel, setActiveChannel, chatMessages, setChatMessages}) => {
 
     const { sendMessage } = useChatWebSocket({
         wsUrl: synapseMetadata.identity.webSocketUrl,
@@ -19,7 +19,7 @@ const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActi
     });
 
     return (
-        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 border border-border rounded-xl ">
+        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 border border-border xl:rounded-xl ">
             <div className="flex flex-row flex-1 min-h-0  ">
                 <div className={'relative flex flex-col w-full'}>
                     <div className="flex-1 h-full overflow-y-auto ">
@@ -31,8 +31,9 @@ const ChatPanel = ({synapseMetadata, publicKey, channels, activeChannel, setActi
                             setChatMessages={setChatMessages}
                         />
                     </div>
-                    <div className="p-4 mt-2 border-t border-border ">
+                    <div className="mt-2 border-t border-border ">
                         <ChatMessageForm
+                            isLocalSynapse={isLocalSynapse}
                             publicKey={publicKey}
                             activeChannel={activeChannel}
                             sendMessage={sendMessage}

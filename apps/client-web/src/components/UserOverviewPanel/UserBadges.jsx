@@ -9,13 +9,13 @@ const UserBadges = () => {
     ];
 
     return (
-        <div className="flex flex-col bg-surface/70 rounded-xl shadow-lg p-6 w-full border border-border">
-            <h2 className="text-2xl font-semibold text-brand mb-2">Badges</h2>
+        <div className="flex flex-col bg-surface rounded-xl shadow-lg p-6 w-full border border-border">
+            <h2 className="text-2xl font-semibold text-brand mb-2 font-montserrat">Badges</h2>
             <div className="flex gap-2 flex-wrap">
                 {badges.map((badge, i) => (
                     <span
                         key={i}
-                        className={`text-sm px-3 py-1 rounded-full text-background font-semibold ${badge.color}`}
+                        className={`text-sm px-3 py-1 rounded-full text-background font-semibold font-inter ${badge.color}`}
                     >
                         {badge.name}
                     </span>

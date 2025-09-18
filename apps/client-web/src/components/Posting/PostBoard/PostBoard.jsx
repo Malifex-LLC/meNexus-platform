@@ -5,7 +5,7 @@ const PostBoard = ({channel, setActiveChannel}) => {
     return (
         <div>
             <button
-                className={'w-full text-left cursor-pointer'}
+                className={'w-full text-left cursor-pointer font-montserrat'}
                 onClick={() => setActiveChannel(channel)}
             >
                 {channel}

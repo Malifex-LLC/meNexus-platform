@@ -154,15 +154,15 @@ const ProfileSettings = () => {
     }, [sessionUserHandle, navigate, isHandleSet, user]);
 
     return (
-        <div className="flex flex-col  w-full m-4  text-foreground bg-surface/70 border border-border rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl font-montserrat">
             <h2 className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">Profile Settings</h2>
-            <div className={`flex flex-col xl:flex-row gap-8 p-4 `}>
-                <div className={``}>
+            <div className={`flex flex-col xl:grid xl:grid-cols-4  gap-8 p-4 `}>
+                <div className={`col-span-2 font-montserrat`}>
                     {/* Username */}
-                    <label className={`flex flex-col  w-md mb-4`}>
+                    <label className={`flex flex-col   w-full mb-4`}>
                         Display Name:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
                             value={newDisplayName}
                             onChange={(e) => setNewDisplayName(e.target.value)}
@@ -171,10 +171,10 @@ const ProfileSettings = () => {
                     </label>
 
                     {/* Handle */}
-                    <label className={`flex flex-col w-md mb-4`}>
+                    <label className={`flex flex-col w-full mb-4`}>
                         Handle:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
                             value={newHandle}
                             onChange={(e) => setNewHandle(e.target.value)}
@@ -183,10 +183,10 @@ const ProfileSettings = () => {
                     </label>
 
                     {/* Full Name */}
-                    <label className={`flex flex-col w-md mb-4`}>
+                    <label className={`flex flex-col w-full mb-4`}>
                         Profile Name:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
                             value={newProfileName}
                             onChange={(e) => setNewProfileName(e.target.value)}
@@ -195,10 +195,10 @@ const ProfileSettings = () => {
                     </label>
 
                     {/* Bio */}
-                    <label className={`flex flex-col w-md mb-4`}>
+                    <label className={`flex flex-col w-full mb-4`}>
                         Bio:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
                             value={newProfileBio}
                             onChange={(e) => setNewProfileBio(e.target.value)}
@@ -207,10 +207,10 @@ const ProfileSettings = () => {
                     </label>
 
                     {/* Location */}
-                    <label className={`flex flex-col w-md mb-4`}>
+                    <label className={`flex flex-col w-full mb-4`}>
                         Location:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
                             value={newProfileLocation}
                             onChange={(e) => setNewProfileLocation(e.target.value)}
@@ -219,24 +219,24 @@ const ProfileSettings = () => {
                     </label>
 
                     <button
-                        className={`mt-8 w-md bg-brand hover:bg-primary active:bg-surface`}
+                        className={`mt-8 w-full bg-brand hover:bg-primary active:bg-surface rounded-xl`}
                         type="button"
                         onClick={handleProfileUpdate}
                     >
                         Save Changes
                     </button>
                     {isUpdateSuccess && (
-                        <p className="profile-settings__updated-successfully text-brand">
+                        <p className="text-brand">
                             Profile settings updated successfully
                         </p>
                     )}
                     {isUpdateError && (
-                        <p className="profile-settings__updated-error text-brand">
+                        <p className="text-brand">
                             Profile settings failed to update
                         </p>
                     )}
                 </div>
-                <form className="profile-settings__form flex-1 flex flex-col overflow-y-auto">
+                <form className="flex-1 flex flex-col col-span-2 overflow-y-auto">
                     {/* Profile Picture */}
                     <div className="flex flex-col mb-6">
                         <span className="mb-2 text-lg font-semibold">Profile Picture</span>
@@ -269,7 +269,7 @@ const ProfileSettings = () => {
                         />
                     )}
                     <button
-                        className={`w-md bg-brand hover:bg-primary active:bg-surface cursor-pointer`}
+                        className={`w-full bg-brand hover:bg-primary active:bg-surface cursor-pointer rounded-xl`}
                         type="button"
                         onClick={handleProfilePictureUpload}
                     >

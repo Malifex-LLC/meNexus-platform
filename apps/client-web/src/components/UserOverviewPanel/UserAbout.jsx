@@ -8,18 +8,18 @@ const UserAbout = ({user}) => {
 
     return (
         <div className={`flex flex-col p-4 bg-surface rounded-xl shadow-lg border border-border`}>
-            <h1 className={`text-3xl text-brand`}>About</h1>
+            <h1 className={`text-3xl text-brand font-montserrat`}>About</h1>
             <div className={`flex flex-row mt-4 gap-4 px-2`}>
-                <h2 className={`text-lg text-primary`}>Bio: </h2>
-                <p className={`text-lg text-foreground`}>{user.bio}</p>
+                <h2 className={`text-lg text-primary font-montserrat`}>Bio: </h2>
+                <p className={`text-lg text-foreground font-inter`}>{user.bio}</p>
             </div>
             <div className={`flex flex-row mt-4 gap-4 px-2`} >
-                <h2 className={`flex text-lg text-primary`}>Location: </h2>
-                <p className="">{user.location}</p>
+                <h2 className={`flex text-lg text-primary font-montserrat`}>Location: </h2>
+                <p className="font-inter">{user.location}</p>
             </div>
             <div className={`flex flex-row mt-4 gap-4 px-2`} >
-                <h2 className={`flex text-lg text-primary`}>Joined: </h2>
-                <p className="">{formatDateNoTime(user.createdAt)}</p>
+                <h2 className={`flex text-lg text-primary font-montserrat`}>Joined: </h2>
+                <p className="font-inter">{formatDateNoTime(user.createdAt)}</p>
             </div>
 
         </div>

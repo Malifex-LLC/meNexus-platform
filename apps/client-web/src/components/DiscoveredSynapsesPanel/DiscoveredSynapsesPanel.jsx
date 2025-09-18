@@ -40,13 +40,14 @@ const DiscoveredSynapsesPanel = ({discoveredPeers}) => {
     }
     return (
         <div className={`flex flex-col flex-1 h-full bg-surface/70 border border-border rounded-xl shadow-xl`}>
-            <div className={`p-4 text-3xl bg-surface text-brand text-center border-b border-border rounded-t-xl`}>
+            <div className={`p-4 text-3xl bg-surface text-brand text-center font-montserrat font-bold border-b border-border rounded-t-xl`}>
                 Discovered Synapses
             </div>
             {synapseMetadata ? (
                 synapseMetadata.map((synapse, index) => {
                     return (
                         <Link
+                            className={`px-4`}
                             key={index}
                             to={`/synapse/${synapse.metadata.identity.publicKey}`}>
                             <SynapseCard

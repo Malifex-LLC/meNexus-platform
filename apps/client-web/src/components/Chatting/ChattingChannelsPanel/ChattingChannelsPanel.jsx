@@ -8,7 +8,7 @@ const ChattingChannelsPanel = ({channels, activeChannel, setActiveChannel}) => {
 
     return (
         <div className={'flex flex-col p-4 w-full'}>
-            <div className="text-foreground text-center text-xl border-b border-border">
+            <div className="text-foreground font-montserrat text-center text-xl border-b border-border">
                 Channels
             </div>
 
@@ -17,8 +17,8 @@ const ChattingChannelsPanel = ({channels, activeChannel, setActiveChannel}) => {
                     key={channel}
                     onClick={() => setActiveChannel(channel)}
                     className={`
-            rounded-xl p-2 mt-4 w-full text-left text-xl text-foreground border border-border rounded-xl shadow-lg 
-            hover:bg-brand/10 hover:translate-y-[-2px]
+            p-2 mt-4 w-full text-left text-xl text-foreground border border-border rounded-xl shadow-lg 
+            hover:bg-brand/10 hover:translate-y-[-2px] active:scale-90
             ${activeChannel === channel ? "bg-brand/60 text-background  " : "bg-surface"}
           `}
                 >

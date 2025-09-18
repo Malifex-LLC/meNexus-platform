@@ -138,7 +138,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             {/* Textarea Input */}
             <div onClick={handleFormClick}>
         <textarea
-            className="post-form__entry-field p-4 w-full bg-surface text-foreground rounded-md"
+            className="post-form__entry-field p-4 w-full bg-surface text-foreground rounded-md font-inter focus:outline-1 focus:outline-brand/60"
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
@@ -151,9 +151,9 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
             </div>
 
             {/* Button + Attach Icon */}
-            <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="flex items-center justify-center gap-4 mt-4 font-montserrat">
                 <button
-                    className="post-form__button px-4 py-2 bg-brand hover:bg-brand/60 text-white rounded-lg hover:cursor-pointer"
+                    className="post-form__button px-4 py-2 bg-brand hover:bg-brand/60 text-white rounded-lg hover:cursor-pointer active:scale-90"
                     onClick={handleSubmit}
 
                     disabled={loading}
@@ -163,7 +163,7 @@ const PostForm = ({isLocalSynapse, publicKey, synapsePublicKey, activeBoard, ref
 
                 <label
                     htmlFor="postMedia"
-                    className="w-10 h-10 flex items-center justify-center bg-surface/30 hover:bg-brand/60 active:bg-surface text-white text-2xl rounded-xl border border-border cursor-pointer transition-colors duration-150"
+                    className="w-10 h-10 flex items-center justify-center bg-surface/30 hover:bg-brand/60 active:bg-surface active:scale-90 text-white text-2xl rounded-xl border border-border cursor-pointer transition-colors duration-150"
                     title="Attach media"
                 >
                     <IoMdAttach />

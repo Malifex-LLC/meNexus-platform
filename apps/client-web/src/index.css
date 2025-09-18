@@ -7,6 +7,9 @@
   padding: 0;
   margin: 0;
 
+  overflow: hidden;
+  overscroll-behavior: none;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,10 +23,11 @@ html, body {
   width: 100%;
   height: 100%;
   box-sizing: border-box; /* Consistent box model */
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* Reset box-sizing for all elements */
 *, *::before, *::after {
   box-sizing: inherit;
 }
-

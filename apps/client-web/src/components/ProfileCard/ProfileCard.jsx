@@ -102,37 +102,34 @@ const ProfileCard = ({publicKey}) => {
     }
 
     return (
-        <div className="flex p-4 my-2 border border-border/30 rounded-xl bg-surface shadow-lg
-        hover:bg-brand/10 hover:translate-y-[-2px]">
-            <div className="flex flex-row w-full gap-4">
-                <div className="flex w-8 text-xs">
-                    <Link
-                        className="profile-card__display-name cursor-pointer"
-                        to={`/profile/${user.publicKey}`}
-                    >
+
+            <Link
+                className={`flex p-4 my-2 border border-border/30 rounded-xl bg-surface shadow-lg
+        hover:bg-brand/10 hover:translate-y-[-2px] active:scale-98`}
+                to={`/profile/${user.handle}`}>
+                <div className="flex flex-row w-full gap-4">
+                    <div className="flex w-8 text-xs">
                         <img src={`${import.meta.env.VITE_API_BASE_URL}${user.profilePicture}`}
                              alt="Avatar"/>
-                    </Link>
+                    </div>
+                    <div className={`flex flex-col`}>
+                        <Link
+                            className="text-md xl:text-lg text-foreground font-montserrat cursor-pointer hover:underline"
+                            to={`/profile/${user.handle}`}
+                        >
+                            {user.displayName}
+                        </Link>
+                        <Link
+                            className="text-xs xl:text-md text-brand font-jetbrains cursor-pointer"
+                            to={`/profile/${user.handle}`}
+                        >
+                            @{user.handle}
+                        </Link>
+                    </div>
                 </div>
-                <div className={`flex flex-col`}>
-                    <Link
-                        className="profile-card__display-name text-sm text-foreground cursor-pointer hover:underline"
-                        to={`/profile/${user.handle}`}
-                    >
-                        {user.displayName}
-                    </Link>
-                    <Link
-                        className="profile-card__handle text-xs text-brand cursor-pointer"
-                        to={`/profile/${user.handle}`}
-                    >
-                        @{user.handle}
-                    </Link>
+            </Link>
 
-                </div>
 
-            </div>
-
-        </div>
     )
 };
 

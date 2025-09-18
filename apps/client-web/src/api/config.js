@@ -94,4 +94,7 @@ export const ENDPOINTS = {
     FETCH_REMOTE_CHANNEL_CHATS: `${API_BASE_URL}/remote/fetchRemoteChannelChats`,
     JOIN_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/joinRemoteSynapse`,
     LEAVE_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/leaveRemoteSynapse`,
+
+    /*----GIPHY Routes-------------------------------------------------------------*/
+    SEARCH_GIPHY: `https://api.giphy.com/v1/gifs/search`
 };

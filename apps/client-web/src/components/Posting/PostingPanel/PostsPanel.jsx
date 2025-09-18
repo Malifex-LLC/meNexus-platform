@@ -8,7 +8,6 @@ import useEditPost from "../../../api/hooks/useEditPost.js";
 import useFetchRemotePosts from "../../../api/hooks/useFetchRemotePosts.js";
 import useDeletePost from "../../../api/hooks/useDeletePost.js";
 import useGetAllPosts from "../../../api/hooks/useGetAllPosts.js";
-import PostBoardsPanel from "../PostBoardsPanel/PostBoardsPanel.jsx";
 import useEditRemotePost from "../../../api/hooks/useEditRemotePost.js";
 import useDeleteRemotePost from "../../../api/hooks/useDeleteRemotePost.js";
 
@@ -55,7 +54,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
     }
 
     return (
-        <div className={'flex flex-col flex-1 overflow-y-auto h-full bg-surface/70 rounded-xl  px-8 space-y-8 border border-border'}>
+        <div className={'flex flex-col flex-1 overflow-y-auto h-full bg-surface/70 xl:rounded-xl  md:px-8 space-y-8 border border-border'}>
             <div className=" bg-background p-4 rounded-xl mt-4 mx-4  shadow-2xl">
                 <PostForm
                     isLocalSynapse={isLocalSynapse}
@@ -79,6 +78,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
                         >
                             <Post
                                 key={index}
+                                mode={'SYNAPSE'}
                                 isLocalSynapse={isLocalSynapse}
                                 synapsePublicKey={synapsePublicKey}
                                 synapseUrl={post.synapseUrl}
@@ -104,6 +104,7 @@ const PostsPanel = ({isLocalSynapse, publicKey, synapsePublicKey, boards, active
             ) : (
                 <div className={`flex flex-col p-4 text-2xl text-center text-foreground`}>No posts to show.</div>
             )}
+            <div className={`mb-8`}/>
         </div>
     );
 }

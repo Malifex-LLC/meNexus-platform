@@ -1,227 +1,141 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Copyright © 2025 Malifex LLC and contributors
-
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import useGetUser from "../../../api/hooks/useGetUser.js";
-import useGetSynapseMetadata from "../../../api/hooks/useGetSynapseMetadata.js";
-import useFetchRemoteSynapseMetadata from "../../../api/hooks/useFetchRemoteSynapseMetadata.js";
+import { useMemo } from "react";
 
-/* ---------------------------------------------------------------- helpers */
-
-
-
-const makeDescription = ({
-                             activity,
-                             actor,
-                             targetUser = null,
-                             targetSynapse = null,
-                             mode
-}) => {
-
+const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null, mode }) => {
     switch (activity.type) {
         case 'POSTED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> created a
                     {mode === 'SYNAPSE' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> created a new
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer hover:underline'}> post</span></Link>
-                        </>
+                        <div>
+                            <Link to={`/post/${activity.object_id}`}>
+                                <span className="text-accent cursor-pointer hover:underline"> post</span>
+                            </Link>
+                        </div>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> created a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer hover:underline'}> post</span></Link>
+                            <Link to={`/post/${activity.object_id}`}>
+                                <span className="text-secondary cursor-pointer hover:underline"> post</span>
+                            </Link>
                             <> in </>
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/synapse/${activity.context_id}`}>
+                                <span className="text-accent cursor-pointer hover:underline">
+                                    {targetSynapse?.metadata?.name || 'Unknown Synapse'}
+                                </span>
+                            </Link>
                         </>
                     )}
                 </div>
             );
-
         case 'COMMENTED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> commented on a
                     {mode === 'SYNAPSE' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> commented on a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-accent cursor-pointer hover:underline'}> post</span></Link>
-                        </>
+                        <Link to={`/post/${activity.object_id}`}>
+                            <span className="text-accent cursor-pointer hover:underline"> post</span>
+                        </Link>
                     )}
                     {mode === 'GLOBAL' && (
                         <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> commented on a
-                            <Link to={`/post/${activity.object_id}`}><span className={'text-secondary cursor-pointer hover:underline'}> post</span></Link>
+                            <Link to={`/post/${activity.object_id}`}>
+                                <span className="text-secondary cursor-pointer hover:underline"> post</span>
+                            </Link>
                             <> in </>
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
+                            <Link to={`/synapse/${activity.context_id}`}>
+                                <span className="text-accent cursor-pointer hover:underline">
+                                    {targetSynapse?.metadata?.name || 'Unknown Synapse'}
+                                </span>
+                            </Link>
                         </>
                     )}
                 </div>
             );
-
         case 'FOLLOWED':
             return (
-                <div>
-                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> followed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> followed{' '}
+                    <Link to={`/profile/${targetUser?.handle}`}>
+                        <span className="text-accent cursor-pointer">@{targetUser?.handle}</span>
+                    </Link>
                 </div>
             );
-
         case 'UNFOLLOWED':
             return (
-                <div>
-                    <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> unfollowed <Link to={`/profile/${targetUser.handle}`}><span className={'text-brand cursor-pointer'}>@{targetUser.handle}</span></Link>
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> unfollowed{' '}
+                    <Link to={`/profile/${targetUser?.handle}`}>
+                        <span className="text-accent cursor-pointer">@{targetUser?.handle}</span>
+                    </Link>
                 </div>
             );
-
         case 'JOINED':
             return (
-                <div>
-                    {mode === 'SYNAPSE' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> joined!
-                        </>
-                    )}
-                    {mode === 'GLOBAL' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> joined
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
-                        </>
-                    )}
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> joined{' '}
+                    <Link to={`/synapse/${activity.context_id}`}>
+                        <span className="text-accent cursor-pointer hover:underline">
+                            {targetSynapse?.metadata?.name || 'Unknown Synapse'}
+                        </span>
+                    </Link>
                 </div>
             );
-
         case 'LEFT':
             return (
-                <div>
-                    {mode === 'SYNAPSE' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> left!
-                        </>
-                    )}
-                    {mode === 'GLOBAL' && (
-                        <>
-                            <Link to={`/profile/${actor.handle}`}><span className={'text-brand cursor-pointer hover:underline'}>@{actor.handle}</span></Link> left
-                            <Link to={`/synapse/${activity.context_id}`}><span className={'text-accent cursor-pointer hover:underline'}> {targetSynapse.metadata.name}</span></Link>
-                        </>
-                    )}
+                <div className={`font-montserrat`}>
+                    <Link to={`/profile/${actor.handle}`}>
+                        <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
+                    </Link> left{' '}
+                    <Link to={`/synapse/${activity.context_id}`}>
+                        <span className="text-accent cursor-pointer hover:underline">
+                            {targetSynapse?.metadata?.name || 'Unknown Synapse'}
+                        </span>
+                    </Link>
                 </div>
             );
-
         default:
-            return (
-                <div>
-                    {actor.handle} did something
-                </div>
-            );
+            return <div>{actor.handle} did something</div>;
     }
-}
+};
 
-/* -------------------------------------------------------------- component */
-const Activity = ({ activity, mode }) => {
-    const [isLocalSynapse, setIsLocalSynapse] = useState(true);
-    const [synapseMetadata, setSynapseMetadata] = useState(null);
-    const [user, setUser] = useState(null);
-    const [description, setDescription] = useState(null);
-    const { getUser } = useGetUser();
-    const { getSynapseMetadata } = useGetSynapseMetadata();
-    const { fetchRemoteSynapseMetadata } = useFetchRemoteSynapseMetadata();
-
-
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const userData = await getUser(activity.actor_public_key);
-                setUser(userData);
-            } catch (error) {
-                console.error("Error fetching userData: ", error);
-            }
+const Activity = ({ activity, mode, getUserById, getSynapseById }) => {
+    const actor = useMemo(() => getUserById?.(activity.actor_public_key), [activity.actor_public_key, getUserById]);
+    const targetUser = useMemo(() => {
+        if (activity.type === 'FOLLOWED' || activity.type === 'UNFOLLOWED') {
+            return getUserById?.(activity.target_id);
         }
-        fetchUserData();
-    }, [activity.actor_public_key])
+        return null;
+    }, [activity.type, activity.target_id, getUserById]);
 
-    useEffect(() => {
-        const createDescription = async () => {
-            if (!user) return;
+    const targetSynapse = useMemo(() => {
+        if (activity.context_type === 'SYNAPSE') return getSynapseById?.(activity.context_id);
+        return null;
+    }, [activity.context_type, activity.context_id, getSynapseById]);
 
-            switch (activity.type) {
-                case 'FOLLOWED':
-                case 'UNFOLLOWED': {
-                    const targetUser = await getUser(activity.target_id);
-                    const userDescription = makeDescription({
-                        activity,
-                        actor: user,
-                        targetUser,
-                        mode,
-                    });
-                    setDescription(userDescription);
-                    break;
-                }
-
-                case 'JOINED':
-                case 'LEFT':
-                case 'POSTED':
-                case 'COMMENTED': {
-                    await fetchContextSynapse();
-                    break;
-                }
-
-                default: {
-                    const fallbackDescription = makeDescription({ activity, actor: user, mode });
-                    setDescription(fallbackDescription);
-                    break;
-                }
-            }
-        };
-
-        const fetchContextSynapse = async () => {
-            try {
-                if (activity.context_type !== 'SYNAPSE') return;
-
-                const localSynapse = await getSynapseMetadata();
-                const isLocal = localSynapse.identity.publicKey === activity.context_id;
-
-                const contextSynapse = isLocal
-                    ? localSynapse
-                    : await fetchRemoteSynapseMetadata(activity.context_id);
-
-                setSynapseMetadata(contextSynapse);
-                setIsLocalSynapse(isLocal);
-
-                const contextDescription = makeDescription({
-                    activity,
-                    actor: user,
-                    targetSynapse: contextSynapse,
-                    mode,
-                });
-
-                setDescription(contextDescription);
-            } catch (err) {
-                console.error("Error fetching context Synapse metadata:", err);
-            }
-        };
-
-        createDescription();
-    }, [user]);
-
-
+    const description = useMemo(() => {
+        if (!actor) return null;
+        return makeDescription({ activity, actor, targetUser, targetSynapse, mode });
+    }, [actor, targetUser, targetSynapse, activity, mode]);
 
     const date = new Date(activity.published);
-
-    if (!description || !user) {
-        return <div>Loading...</div>;
-    }
-
+    if (!description) return <div>Loading...</div>;
 
     return (
-        <div className="flex flex-col w-full p-4 py-5 rounded-xl text-lg
-                    bg-background/70 text-foreground shadow-2xl"
-        >
+        <div className="flex flex-col w-full p-4 py-5 rounded-xl text-lg bg-background/70 text-foreground shadow-2xl">
             {description}
-            <span className="block text-xs opacity-60 mt-1">
-                {date.toLocaleString()}
-            </span>
+            <span className="block text-xs opacity-60 mt-1">{date.toLocaleString()}</span>
         </div>
     );
 };

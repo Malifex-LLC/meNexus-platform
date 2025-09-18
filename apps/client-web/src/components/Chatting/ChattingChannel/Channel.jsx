@@ -5,7 +5,7 @@ const Channel = ({channel, setActiveChannel}) => {
     return (
         <div className={''}>
             <button
-                className={'w-full text-left  cursor-pointer'}
+                className={'w-full text-left  cursor-pointer font-inter'}
                 onClick={() => setActiveChannel(channel)}
             >
                 {channel}
