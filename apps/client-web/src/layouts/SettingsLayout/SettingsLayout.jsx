@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useSwipeable } from "react-swipeable";
 import { TbLogout2 } from "react-icons/tb";
@@ -21,6 +21,23 @@ const SettingsLayout = ({ children }) => {
         onSwipedLeft: () => setActivePanel((prev) => Math.min(prev + 1, 2)),
         onSwipedRight: () => setActivePanel((prev) => Math.max(prev - 1, 0)),
     });
+
+    // Set isXL based off window size for mounting components only once conditionally
+    function useIsXL() {
+        const [isXL, setIsXL] = React.useState(
+            typeof window !== 'undefined' && window.matchMedia('(min-width: 1280px)').matches
+        );
+        React.useEffect(() => {
+            if (typeof window === 'undefined') return;
+            const mql = window.matchMedia('(min-width: 1280px)');
+            const onChange = (e) => setIsXL(e.matches);
+            mql.addEventListener?.('change', onChange);
+            return () => mql.removeEventListener?.('change', onChange);
+        }, []);
+        return isXL;
+    }
+
+    const isXL = useIsXL();
 
     if (!user || !user.publicKey) {
         return <>Loading dashboard...</>;
@@ -67,21 +84,23 @@ const SettingsLayout = ({ children }) => {
                     {children[0]}
                 </div>
                 {/** MOBILE SWIPEABLE VIEWPORT */}
-                <div className="xl:hidden w-full">
-                    <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
-                        <main className="settings-layout__main-content flex flex-1 w-full ">
-                            <div className={`${activePanel === 0 ? 'flex' : 'hidden'} w-full flex-col`}>
-                                <ProfileSettings />
-                            </div>
-                            <div className={`${activePanel === 1 ? 'flex' : 'hidden'} w-full`}>
-                                <AccountSettings />
-                            </div>
-                            <div className={`${activePanel === 2 ? 'flex' : 'hidden'} w-full flex-col`}>
-                                <DisplaySettings />
-                            </div>
-                        </main>
+                {!isXL && (
+                    <div className="xl:hidden w-full">
+                        <div className="flex flex-1 w-full items-center  overflow-y-auto" {...swipeHandlers}>
+                            <main className="settings-layout__main-content flex flex-1 w-full ">
+                                <div className={`${activePanel === 0 ? 'flex' : 'hidden'} w-full flex-col`}>
+                                    <ProfileSettings />
+                                </div>
+                                <div className={`${activePanel === 1 ? 'flex' : 'hidden'} w-full`}>
+                                    <AccountSettings />
+                                </div>
+                                <div className={`${activePanel === 2 ? 'flex' : 'hidden'} w-full flex-col`}>
+                                    <DisplaySettings />
+                                </div>
+                            </main>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div className="hidden xl:flex flex-1 ">
                     {children[1]}
                 </div>
