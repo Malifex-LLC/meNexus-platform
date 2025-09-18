@@ -108,13 +108,13 @@ const SynapseControlBar = ({synapses = [], publicKey}) => {
 
     return (
 
-        <div className="flex flex-col py-2 px-4 rounded-xl bg-surface">
+        <div className="flex flex-col py-2 px-4 rounded-xl bg-surface font-montserrat">
             <div>
                 {currentSynapseMetadata && synapseMetadataList ? (
                     <div className="flex flex-row pt-4 text-foreground">
                         <div>
-                            <h1 className="text-3xl text-brand font-montserrat font-bold">{currentSynapseMetadata.metadata.name}</h1>
-                            <p className="text-lg text-foreground font-jetbrains">
+                            <h1 className="text-3xl text-brand font-bold">{currentSynapseMetadata.metadata.name}</h1>
+                            <p className="text-lg text-foreground">
                                 {currentSynapseMetadata.metadata.description}
                             </p>
 

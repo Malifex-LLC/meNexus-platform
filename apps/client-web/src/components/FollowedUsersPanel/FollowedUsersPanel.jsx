@@ -25,11 +25,11 @@ const FollowedUsersPanel = ({following}) => {
     return (
         <div className={'flex flex-col w-full h-full  text-foreground text-center shadow-2xl'}>
             <div className="flex justify-around p-2 gap-4 bg-surface border-b border-border text-md text-foreground shadows-2xl ">
-                <button className={`text-brand font-montserrat font-bold `}>
+                <button className={`text-md text-brand font-montserrat font-semibold`}>
                     Followed Users
                 </button>
             </div>
-            <div className={'p-4 text-left overflow-y-auto'}>
+            <div className={'px-4 text-left overflow-y-auto'}>
                 {allUsers.map((user, index) => (
                     <ProfileCard
                         key={index}

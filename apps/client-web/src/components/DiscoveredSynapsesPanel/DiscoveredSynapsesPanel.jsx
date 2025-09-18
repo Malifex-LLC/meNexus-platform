@@ -47,6 +47,7 @@ const DiscoveredSynapsesPanel = ({discoveredPeers}) => {
                 synapseMetadata.map((synapse, index) => {
                     return (
                         <Link
+                            className={`px-4`}
                             key={index}
                             to={`/synapse/${synapse.metadata.identity.publicKey}`}>
                             <SynapseCard

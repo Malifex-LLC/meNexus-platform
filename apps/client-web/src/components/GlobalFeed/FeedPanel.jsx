@@ -80,20 +80,20 @@ const FeedPanel = () => {
 
 
     return (
-        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 xl:rounded-xl border border-border">
-            <div className="flex flex-col justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
-                <button className={`text-brand font-bold `}>
+        <div className="flex flex-col w-full h-full text-foreground bg-surface/70 xl:rounded-xl border border-border font-montserrat">
+            <div className="flex flex-col justify-around p-2 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl ">
+                <button className={`text-brand font-semibold`}>
                     Global Feed
                 </button>
             </div>
-            <div className="flex flex-row gap-2 p-4  w-full border-b border-border bg-background text-lg shadow-lg">
+            <div className="flex flex-row gap-2 p-2  w-full border-b border-border bg-background text-lg shadow-lg">
                 <div className="flex flex-col w-full">
                     <input
                         type="text"
                         placeholder="Search posts..."
                         value={feedFilters.keyword}
                         onChange={(e) => setFeedFilters({ ...feedFilters, keyword: e.target.value })}
-                        className="bg-surface border border-border px-2 py-1 rounded text-foreground text-sm md:text-lg"
+                        className="bg-surface border border-border px-2 py-1 rounded text-foreground text-sm md:text-lg focus:outline-1 focus:outline-brand/60"
                     />
                 </div>
                 <div className={'flex flex-col w-full items-center justify-center text-sm md:text-lg'}>

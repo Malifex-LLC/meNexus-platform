@@ -65,11 +65,11 @@ const JoinedSynapsesPanel = ({synapses}) => {
     return (
         <div className={'flex flex-col  w-full h-full  text-foreground'}>
             <div className="flex justify-around p-2  gap-4 bg-surface border-b border-border text-md text-foreground shadows-2xl ">
-                <button className={`text-brand font-montserrat font-bold `}>
+                <button className={`text-brand font-montserrat font-semibold`}>
                     Joined Synapses
                 </button>
             </div>
-            <div className={`overflow-y-auto`}>
+            <div className={`px-4 overflow-y-auto`}>
                 {synapseMetadataList.map((metadata, index) => (
                     <Link to={`/synapse/${metadata.identity.publicKey}`} key={index}>
                         <SynapseCard

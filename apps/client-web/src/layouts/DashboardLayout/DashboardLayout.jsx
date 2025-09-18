@@ -15,9 +15,14 @@ function useRootContext() {
 const DashboardLayout = ({children }) => {
     const { user, localSynapseMetadata } = useRootContext();
     const [activePanel, setActivePanel] = useState(0); // 0: Control Panel, 1: Feed, 2: Activity
+
     const swipeHandlers = useSwipeable({
         onSwipedLeft: () => setActivePanel((prev) => Math.min(prev + 1, 2)),
         onSwipedRight: () => setActivePanel((prev) => Math.max(prev - 1, 0)),
+        trackTouch: true,
+        trackMouse: true,
+        preventDefaultTouchmoveEvent: true,
+        delta: 100,
     });
 
     if (!user || !user.publicKey) {
@@ -30,7 +35,7 @@ const DashboardLayout = ({children }) => {
             <div className=" z-50 shrink-0 border-b border-border bg-background">
 
                 {/* Nav Tabs (Mobile) */}
-                <div className="flex xl:hidden justify-around py-2 border-t border-border text-foreground">
+                <div className="flex xl:hidden justify-around py-2 border-t border-border text-md text-foreground font-oxanium">
                     <button
                         onClick={() => setActivePanel(0)}
                         className={`${activePanel === 0 ? 'text-brand font-semibold' : 'text-foreground hover:text-brand/60 hover:cursor-pointer'}`}

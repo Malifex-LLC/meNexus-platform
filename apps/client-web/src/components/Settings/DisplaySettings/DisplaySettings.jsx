@@ -19,7 +19,7 @@ const DisplaySettings = () => {
     };
 
     return (
-        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl font-montserrat">
             <h2 className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">
                 Display Settings
             </h2>
@@ -29,7 +29,7 @@ const DisplaySettings = () => {
                     <label className="text-2xl text-brand">
                         Selected Theme:
                         <select
-                            className={`text-lg text-foreground`}
+                            className={`text-lg text-foreground px-4`}
                             value={theme}
                             onChange={(e) => setTheme(e.target.value)}
                         >

@@ -17,7 +17,7 @@ const IdentityQuickActionsPanel = ({ publicKey, isFollowing, setIsFollowing }) =
     }
 
     return (
-        <div className={'flex w-full gap-4 justify-evenly text-foreground'}>
+        <div className={'flex w-full gap-4 justify-evenly text-foreground font-montserrat'}>
             {isFollowing ? (
                 <button
                     className={`p-2 w-32 rounded-xl cursor-pointer shadow-lg bg-surface hover:bg-brand/60 hover:tranlsate-y-[-2px]`}

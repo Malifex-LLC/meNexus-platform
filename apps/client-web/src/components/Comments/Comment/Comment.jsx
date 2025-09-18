@@ -161,7 +161,7 @@ const Comment = ({
                 <div className={`flex w-full mt-4 font-inter`}>
                     {isEditing ? (
                         <textarea
-                            className="flex w-full border border-border p-2 text-sm md:text-md lg:text-xl"
+                            className="flex w-full border border-border p-2 text-sm md:text-md lg:text-xl focus:outline-1 focus:outline-brand/60"
                             value={editedContent}
                             onChange={onContentChange}
                         />

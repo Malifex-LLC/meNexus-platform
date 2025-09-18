@@ -119,9 +119,9 @@ const GlobalActivityPanel = ({ user, localSynapseMetadata }) => {
     if (!activities) return <div>Loading activities...</div>;
 
     return (
-        <div className="flex flex-col min-h-0 h-full bg-surface/70 text-foreground border border-border xl:rounded-xl">
-            <div className="flex justify-around p-4 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl">
-                <button className="text-brand font-bold">Activity</button>
+        <div className="flex flex-col min-h-0 h-full bg-surface/70 text-foreground border border-border xl:rounded-xl font-montserrat">
+            <div className="flex justify-around p-2 gap-4 bg-surface border-b border-border rounded-t-xl text-2xl text-foreground shadows-2xl">
+                <button className="text-brand font-semibold">Activity</button>
             </div>
 
             <ul className="p-4 overflow-y-auto">

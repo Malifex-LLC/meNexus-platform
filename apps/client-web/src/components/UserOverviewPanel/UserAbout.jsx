@@ -15,7 +15,7 @@ const UserAbout = ({user}) => {
             </div>
             <div className={`flex flex-row mt-4 gap-4 px-2`} >
                 <h2 className={`flex text-lg text-primary font-montserrat`}>Location: </h2>
-                <p className="font-intert">{user.location}</p>
+                <p className="font-inter">{user.location}</p>
             </div>
             <div className={`flex flex-row mt-4 gap-4 px-2`} >
                 <h2 className={`flex text-lg text-primary font-montserrat`}>Joined: </h2>

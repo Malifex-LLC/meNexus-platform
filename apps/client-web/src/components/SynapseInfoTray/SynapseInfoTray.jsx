@@ -1,7 +1,12 @@
 import SynapseMembersPanel from "../SynapseMembersPanel/SynapseMembersPanel.jsx";
 import SynapseActivityPanel from "../SynapseActivityPanel/SynapseActivityPanel.jsx";
+import {useSwipeable} from "react-swipeable";
 
 const SynapseInfoTray = ({activeSidebarTab, setActiveSidebarTab, members, isLocalSynapse, synapseMetadata, user}) => {
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: () => setActiveSidebarTab('activity'),
+        onSwipedRight: () => setActiveSidebarTab('members'),
+    });
     return (
         <div className="flex flex-col h-full bg-surface/70">
             {/* Tabs */}
@@ -21,7 +26,9 @@ const SynapseInfoTray = ({activeSidebarTab, setActiveSidebarTab, members, isLoca
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-y-auto"
+                 {...swipeHandlers}
+            >
                 {activeSidebarTab === 'members' ? (
                     <SynapseMembersPanel members={members} />
                 ) : (

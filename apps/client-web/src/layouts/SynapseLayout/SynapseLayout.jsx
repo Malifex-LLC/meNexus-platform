@@ -55,6 +55,19 @@ const SynapseLayout =({ children }) => {
     const { fetchRemoteSynapseChatChannels } = useFetchRemoteSynapseChatChannels();
     const { fetchRemoteChannelChats } = useFetchRemoteChannelChats();
 
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: () => {
+            if (!isSynapseControlBarTrayOpen && !isSynapseInfoTrayOpen) setIsSynapseInfoTrayOpen(true);
+        },
+        onSwipedRight: () => {
+            if (!isSynapseControlBarTrayOpen && !isSynapseInfoTrayOpen) setIsSynapseControlBarTrayOpen(true);
+        },
+        trackTouch: true,
+        trackMouse: true,
+        preventDefaultTouchmoveEvent: true,
+        delta: 50, // min px before triggering
+    });
+
     useEffect(() => {
         const fetchSynapseMetadata = async () => {
             try {
@@ -223,21 +236,23 @@ const SynapseLayout =({ children }) => {
             </div>
 
             {/* ===== Mobile Backdrop (shared) ===== */}
-            {(isSynapseControlBarTrayOpen || isSynapseInfoTrayOpen) && (
-                <button
-                    className="fixed inset-0 bg-surface/40 backdrop-blur-sm z-[55] xl:hidden"
-                    aria-label="Close menus"
-                    onClick={() => { setIsSynapseControlBarTrayOpen(false); setIsSynapseInfoTrayOpen(false); }}
-                />
-            )}
+            <div
+                className={`fixed inset-0 z-[55] xl:hidden transition
+              ${ (isSynapseControlBarTrayOpen || isSynapseInfoTrayOpen)
+                    ? 'pointer-events-auto bg-surface/40 backdrop-blur-sm'
+                    : 'pointer-events-none bg-transparent' }`}
+                {...swipeHandlers}
+                aria-label="Close menus"
+                onClick={() => { setIsSynapseControlBarTrayOpen(false); setIsSynapseInfoTrayOpen(false); }}
+            />
 
-            {/* ===== Left Drawer (Browse) ===== */}
+            {/* ===== Left Tray (Browse) ===== */}
             {!isXL && (
                 <div
                     id="synapse-control-bar-tray"
                     role="dialog"
                     aria-modal="true"
-                    className={`fixed inset-y-0 left-0 w-80 max-w-full transform transition-transform duration-300 ease-in-out bg-surface/95 border-r border-border shadow-2xl z-[60] xl:hidden 
+                    className={`fixed inset-y-0 left-0 w-80 max-w-full transform transition-transform duration-300 ease-in-out bg-surface/95 border-r border-border shadow-2xl z-[55] xl:hidden 
                     ${isSynapseControlBarTrayOpen ? 'translate-x-0' : '-translate-x-full'}`}
                 >
                     <div className="flex items-center justify-between p-3 border-b border-border text-foreground">
@@ -266,7 +281,7 @@ const SynapseLayout =({ children }) => {
                 </div>
             )}
 
-            {/* ===== Right Drawer ===== */}
+            {/* ===== Right Tray (Info) ===== */}
             {!isXL && (
                 <div
                     id="synapse-info-tray"
@@ -299,7 +314,9 @@ const SynapseLayout =({ children }) => {
             )}
 
             {/* ===== Main Grid / Content ===== */}
-            <div className="flex flex-1 xl:p-4 gap-4 min-h-0 w-full overflow-hidden xl:grid xl:grid-cols-12">
+            <div className="flex flex-1 xl:p-4 gap-4 min-h-0 w-full overflow-hidden xl:grid xl:grid-cols-12"
+                 {...swipeHandlers}
+            >
                 {/* Left Column (xl+): same as left drawer */}
                 {isXL && (
                     <div className="hidden xl:flex xl:col-span-3 rounded-xl border border-border overflow-hidden shadow-2xl">

@@ -224,7 +224,7 @@ const Post = ({
                 />
             )}
             {mode === 'GLOBAL' && (
-                <div className={`flex w-full text-xs xl:text-sm justify-end text-neutral gap-1 mb-2`}>
+                <div className={`flex w-full text-sm xl:text-md justify-end text-neutral gap-1 mb-2`}>
                     Posted in
                     <NavLink
                         className={`text-accent hover:text-accent/60 hover:underline`}
@@ -264,7 +264,7 @@ const Post = ({
                             to={`/profile/${user.handle}`}>
                             @{user.handle}
                         </NavLink>
-                        <div className="text-xs text-neutral font-montserrat">{formatDate(date)}</div>
+                        <div className="text-xs text-neutral font-inter">{formatDate(date)}</div>
                     </div>
                 </div>
                 {/* Actions */}

@@ -40,7 +40,7 @@ const UserReputationPanel = () => {
             </div>
             <div className="flex items-center justify-between mb-3">
                 <span className="text-neutral font-montserrat">Curator:</span>
-                <span className="font-semibold font-space">{mockReputation.curator}</span>
+                <span className="font-semibold font-inter">{mockReputation.curator}</span>
             </div>
 
             {/* Endorsements */}

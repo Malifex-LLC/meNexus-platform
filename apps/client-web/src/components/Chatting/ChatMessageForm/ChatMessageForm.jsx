@@ -74,7 +74,7 @@ const ChatMessageForm = ({isLocalSynapse, publicKey, activeChannel, sendMessage}
             <div className={`flex gap-4 bg-background p-2 xl:p-4 position-fixed-bottom `}>
                 <div className={`w-full`} onClick={handleFormClick}>
                 <textarea
-                    className="w-full h-full bg-surface text-foreground rounded-xl px-4 py-2 focus:outline-1 focus:outline-brand/60"
+                    className="w-full h-full bg-surface text-foreground rounded-xl px-4 py-2 focus:outline-1 focus:outline-brand/60 font-inter"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {

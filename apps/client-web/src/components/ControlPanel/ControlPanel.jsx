@@ -10,11 +10,9 @@ const ControlPanel = ({user}) => {
         <div className={`flex flex-col  p-2 xl:p-4 w-full h-full gap-4 items-center shadow-2xl bg-surface/70 border border-border xl:rounded-xl`}>
             <div className="flex flex-col w-full h-full">
                 <div className="flex flex-col h-full w-full overflow-hidden rounded-2xl border border-border shadow-lg">
-
-                    {/* Content */}
                     <div className="relative flex flex-col items-center p-4 sm:p-6 md:p-8">
                         <div className={`relative justify-center flex w-full h-full`}>
-                            {/* Background gradient */}
+                            {/* Profile Picture + Gradient */}
                             <div
                                 aria-hidden
                                 className="absolute px-40  z-0  inset-0 bg-gradient-to-r from-surface via-brand to-surface blur-xl"
@@ -28,44 +26,34 @@ const ControlPanel = ({user}) => {
                             />
                         </div>
 
-                        {/* Name / handle */}
-                        <div className="z-1 flex flex-col md:hidden mt-4 text-center">
-                            <p className="font-montserrat text-foreground font-semibold text-lg sm:text-xl md:text-2xl lg:text-3xl">
-                                {user.displayName}
-                            </p>
-                            <p className="font-jetbrains text-brand text-xs sm:text-sm md:text-base lg:text-lg">
-                                @{user.handle}
-                            </p>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="z-1 w-full max-w-xl grid grid-cols-2 md:grid-cols-3 ">
-                            <div className="text-center md:text-left md:mt-4 font-montserrat">
-                                <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
-                                    {user.followers.length}
-                                </p>
-                                <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
-                                    Followers
-                                </p>
-                            </div>
-
-                            {/* center name on md+ */}
-                            <div className="hidden md:flex flex-col mt-4 items-center justify-center">
-                                <p className="font-montserrat text-foreground font-semibold text-lg lg:text-xl xl:text-2xl">
+                        {/* Info */}
+                        <div className="flex flex-col z-1 w-full max-w-xl  items-center mt-4 xl:mt-8">
+                            {/* User Info */}
+                            <div className="flex flex-col w-full items-center justify-center">
+                                <p className="font-montserrat text-foreground font-semibold text-3xl xl:text-4xl">
                                     {user.displayName}
                                 </p>
-                                <p className="font-jetbrains text-brand text-sm lg:text-base">
+                                <p className="font-jetbrains text-brand text-xl xl:text-2xl">
                                     @{user.handle}
                                 </p>
                             </div>
-
-                            <div className="text-center md:text-right md:mt-4 font-montserrat">
-                                <p className="text-brand font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">
-                                    {user.following.length}
-                                </p>
-                                <p className="text-foreground text-[10px] sm:text-xs md:text-sm">
-                                    Following
-                                </p>
+                            <div className={`flex w-full justify-between text-xl lg:text-2xl`}>
+                                <div className="text-center font-montserrat">
+                                    <p className="text-brand font-semibold ">
+                                        {user.followers.length}
+                                    </p>
+                                    <p className="text-foreground text-[10px]">
+                                        Followers
+                                    </p>
+                                </div>
+                                <div className="text-center font-montserrat">
+                                    <p className="text-brand font-semibold">
+                                        {user.following.length}
+                                    </p>
+                                    <p className="text-foreground text-[10px]">
+                                        Following
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

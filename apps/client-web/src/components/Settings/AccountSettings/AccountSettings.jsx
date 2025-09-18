@@ -52,7 +52,7 @@ const AccountSettings = () => {
     }
 
     return (
-        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl">
+        <div className="flex flex-col  w-full xl:m-4  text-foreground bg-surface/70 border border-border xl:rounded-xl font-montserrat">
             <div className="flex text-4xl w-full font-semibold p-8 mb-4 gap-8 items-center  bg-surface rounded-t-xl text-brand border-b border-border">
                 <FaKey />
                 Account Settings
@@ -62,7 +62,7 @@ const AccountSettings = () => {
                     <label className={`flex flex-col w-full mb-4`}>
                         Email:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="email"
                             value={newEmail}
                             onChange={(e) => setNewEmail(e.target.value)}
@@ -72,7 +72,7 @@ const AccountSettings = () => {
                     <label className={`flex flex-col w-full mb-4`}>
                         Password:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -82,7 +82,7 @@ const AccountSettings = () => {
                     <label className={`flex flex-col w-full mb-4`}>
                         Confirm Password:
                         <input
-                            className={`border border-border p-2`}
+                            className={`border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}

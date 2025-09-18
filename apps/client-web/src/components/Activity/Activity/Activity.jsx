@@ -5,7 +5,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
     switch (activity.type) {
         case 'POSTED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> created a
@@ -33,7 +33,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
             );
         case 'COMMENTED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> commented on a
@@ -59,7 +59,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
             );
         case 'FOLLOWED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> followed{' '}
@@ -70,7 +70,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
             );
         case 'UNFOLLOWED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> unfollowed{' '}
@@ -81,7 +81,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
             );
         case 'JOINED':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> joined{' '}
@@ -94,7 +94,7 @@ const makeDescription = ({ activity, actor, targetUser=null, targetSynapse=null,
             );
         case 'LEFT':
             return (
-                <div>
+                <div className={`font-montserrat`}>
                     <Link to={`/profile/${actor.handle}`}>
                         <span className="text-brand cursor-pointer hover:underline">@{actor.handle}</span>
                     </Link> left{' '}
