@@ -23,7 +23,6 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_METADATA,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_METADATA response ", response);
                         const localMetadata = response.data;
 
                         const metadataResponse = createMessage(
