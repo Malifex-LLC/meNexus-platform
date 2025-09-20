@@ -480,10 +480,8 @@ const Post = ({
 
             {/* Stats */}
             <div className={`flex flex-col border-t border-border mt-8`}>
-                <div className="flex w-full justify-between mt-4 px-4 text-xs md:text-sm  text-neutral  gap-4 font-montserrat">
-                    <div className={`flex`}>
-                        <p className={`text-xs`}>{boosts.length} Boosts</p>
-                    </div>
+                <div className={`flex w-full justify-between mt-4 px-4 text-xs md:text-sm  text-neutral  gap-4 font-montserrat`}>
+                    <p>{boosts.length} Boosts</p>
                     <p onClick={toggleComments} className="hover:underline cursor-pointer">
                         {showComments ? "Hide Comments" : `${comments.length} Comments`}
                     </p>
