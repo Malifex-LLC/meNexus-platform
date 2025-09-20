@@ -8,6 +8,7 @@ import remoteUserController from "#remotes/controllers/remoteUserController.js";
 import remotePostController from "#remotes/controllers/remotePostController.js"
 import remoteCommentController from "#remotes/controllers/remoteCommentController.js";
 import remoteChatController from "#remotes/controllers/remoteChatController.js";
+import remoteReactionController from "#remotes/controllers/remoteReactionController.js";
 
 // Define synapseRoutes and link them to corresponding controller functions
 
@@ -22,17 +23,23 @@ router.get('/fetchRemoteUsers', remoteUserController.fetchRemoteUsers);
 
 router.get('/fetchRemoteSynapseAllActivities', remoteSynapseController.fetchRemoteSynapseAllActivities)
 router.get('/fetchRemoteSynapseUserActivities', remoteSynapseController.fetchRemoteSynapseUserActivities)
+
 router.get('/fetchRemotePosts', remotePostController.fetchRemotePosts);
 router.get('/fetchRemoteBoardPosts', remotePostController.fetchRemoteBoardPosts);
 router.get('/fetchRemoteUserPosts', remotePostController.fetchRemoteUserPosts);
-router.get('/fetchRemotePostComments', remoteCommentController.fetchRemotePostComments);
 router.post('/createRemotePost', remotePostController.createRemotePost);
 router.post('/uploadRemotePostMedia', remotePostController.uploadRemotePostMedia);
 router.put('/updateRemotePost', remotePostController.updateRemotePost);
 router.delete('/deleteRemotePost', remotePostController.deleteRemotePost);
+
+router.get('/fetchRemotePostComments', remoteCommentController.fetchRemotePostComments);
 router.post('/createRemotePostComment', remoteCommentController.createRemotePostComment);
 router.put('/updateRemotePostComment', remoteCommentController.updateRemotePostComment);
 router.delete('/deleteRemotePostComment', remoteCommentController.deleteRemotePostComment);
+
+router.get('/fetchRemoteReactions', remoteReactionController.fetchRemoteReactions);
+router.post('/createRemoteReaction', remoteReactionController.createRemoteReaction);
+router.post('/deleteRemoteReaction', remoteReactionController.deleteRemoteReaction);
 
 router.get('/fetchRemoteChannelChats', remoteChatController.fetchRemoteChannelChats);
 

@@ -45,6 +45,10 @@ export const ENDPOINTS = {
     CREATE_CHAT_MESSAGE: `${API_BASE_URL}/api/chat/createChatMessage`,
     GET_CHANNEL_CHAT_MESSAGES: `${API_BASE_URL}/api/chat/getChannelChatMessages`,
 
+    CREATE_REACTION: `${API_BASE_URL}/api/reaction/createReaction`,
+    DELETE_REACTION: `${API_BASE_URL}/api/reaction/deleteReaction`,
+    GET_REACTIONS: `${API_BASE_URL}/api/reaction/getReactions`,
+
     CREATE_CONVERSATION: `${API_BASE_URL}/api/conversation/createConversation`,
     UPDATE_CONVERSATION_PARTICIPANTS: `${API_BASE_URL}/api/conversation/updateConversationParticipants`,
     GET_CONVERSATIONS: `${API_BASE_URL}/api/conversation/getConversations`,
@@ -91,6 +95,9 @@ export const ENDPOINTS = {
     CREATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/createRemotePostComment`,
     UPDATE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/updateRemotePostComment`,
     DELETE_REMOTE_POST_COMMENT: `${API_BASE_URL}/remote/deleteRemotePostComment`,
+    CREATE_REMOTE_REACTION: `${API_BASE_URL}/remote/createRemoteReaction`,
+    DELETE_REMOTE_REACTION: `${API_BASE_URL}/remote/deleteRemoteReaction`,
+    FETCH_REMOTE_REACTIONS: `${API_BASE_URL}/remote/fetchRemoteReactions`,
     FETCH_REMOTE_CHANNEL_CHATS: `${API_BASE_URL}/remote/fetchRemoteChannelChats`,
     JOIN_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/joinRemoteSynapse`,
     LEAVE_REMOTE_SYNAPSE: `${API_BASE_URL}/remote/leaveRemoteSynapse`,
