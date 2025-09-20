@@ -210,7 +210,7 @@ const Post = ({
         const boostCheck = async () => {
             if (!reactions || !reactions.length) return;
             reactions.map(reaction => {
-                if (reaction.public_key === publicKey) {
+                if (reaction.public_key === sessionPublicKey && reaction.reaction_type === 'BOOST') {
                     setIsBoosted(true);
                 }
             })
