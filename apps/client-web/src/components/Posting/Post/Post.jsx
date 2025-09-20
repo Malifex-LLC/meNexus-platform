@@ -183,6 +183,7 @@ const Post = ({
 
     useEffect(() => {
         const fetchComments = async () => {
+            setShowComments(false);
             if (isLocalSynapse) {
                 try {
                     const newComments = await getComments(resource_type, postId);
@@ -203,6 +204,7 @@ const Post = ({
     },[postId])
 
     useEffect(() => {
+        setIsBoosted();
         fetchReactions();
     }, [postId])
 
