@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import { formatDate } from "../../../utils/dateUtils.js";
 import useFollowActions from "../../../api/hooks/useFollowActions.js";
 import { NavLink } from "react-router-dom";
@@ -10,7 +10,13 @@ import Comment from '../../Comments/Comment/Comment.jsx'
 import CommentForm from '../../Comments/CommentForm/CommentForm.jsx'
 import useEditComment from "../../../api/hooks/useEditComment.js"
 import useDeleteComment from "../../../api/hooks/useDeleteComment.js";
-import useCreateNotification from "../../../api/hooks/useCreateNotification.js"
+import useCreateNotification from "../../../api/hooks/useCreateNotification.js";
+import useCreateReaction from "../../../api/hooks/useCreateReaction.js";
+import useDeleteReaction from "../../../api/hooks/useDeleteReaction.js";
+import useCreateRemoteReaction from "../../../api/hooks/useCreateRemoteReaction.js";
+import useDeleteRemoteReaction from "../../../api/hooks/useDeleteRemoteReaction.js";
+import useGetReactions from "../../../api/hooks/useGetReactions.js"
+import useFetchRemoteReactions from "../../../api/hooks/useFetchRemoteReactions.js"
 import useGetUser from "../../../api/hooks/useGetUser.js";
 import useFetchRemoteComments from "../../../api/hooks/useFetchRemoteComments.js";
 import useUnfurlUrl from "../../../api/hooks/useUnfurlUrl.js";
@@ -19,7 +25,7 @@ import useDeleteRemotePostComment from "../../../api/hooks/useDeleteRemotePostCo
 import { HiDotsHorizontal } from "react-icons/hi";
 import { BsArrowUpSquare } from "react-icons/bs";
 import {PiArrowFatUpBold} from "react-icons/pi";
-import {AiOutlineThunderbolt} from "react-icons/ai";
+import {AiFillThunderbolt, AiOutlineThunderbolt} from "react-icons/ai";
 import {BiComment} from "react-icons/bi";
 import {IoShareSocialOutline} from "react-icons/io5";
 
@@ -48,14 +54,22 @@ const Post = ({
     const isOwner = sessionPublicKey && publicKey === sessionPublicKey;
     const [user, setUser] = useState(null);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [isBoosted, setIsBoosted] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const [comments, setComments] = useState([]);
+    const [reactions, setReactions] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [preview, setPreview] = useState(null);
     const { followUser, unfollowUser, followCheck, loading: followUserLoading, error: followUserError } = useFollowActions();
     const { getComments } = useGetComments();
+    const { getReactions } = useGetReactions();
+    const { fetchRemoteReactions } = useFetchRemoteReactions();
+    const { createRemoteReaction } = useCreateRemoteReaction();
+    const { deleteRemoteReaction } = useDeleteRemoteReaction();
     const { fetchRemoteComments } = useFetchRemoteComments();
     const { createNotification } = useCreateNotification();
+    const { createReaction } = useCreateReaction();
+    const { deleteReaction } = useDeleteReaction();
     const { getUser, loading: userLoading, error: userError } = useGetUser();
     const { unfurlUrl } = useUnfurlUrl();
 
@@ -117,6 +131,29 @@ const Post = ({
         }
     };
 
+    const fetchReactions = async () => {
+        if (isLocalSynapse) {
+            try {
+                const response = await getReactions(resource_type, postId);
+                setReactions(response);
+            } catch (error) {
+                console.error("Error fetching reactions for postId: ", postId, error);
+            }
+        } else {
+            try {
+                const response = await fetchRemoteReactions(resource_type, postId, synapsePublicKey);
+                setReactions(response);
+            } catch (error) {
+                console.error("Error fetching reactions for postId: ", postId, error);
+            }
+        }
+    }
+
+    const boosts = useMemo(
+        () => reactions?.filter(reaction => reaction.reaction_type === 'BOOST'),
+        [reactions]
+    );
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -146,6 +183,7 @@ const Post = ({
 
     useEffect(() => {
         const fetchComments = async () => {
+            setShowComments(false);
             if (isLocalSynapse) {
                 try {
                     const newComments = await getComments(resource_type, postId);
@@ -162,8 +200,25 @@ const Post = ({
                 }
             }
         }
-        fetchComments(); // Only fetchComments if they are displayed
+        fetchComments();
     },[postId])
+
+    useEffect(() => {
+        setIsBoosted();
+        fetchReactions();
+    }, [postId])
+
+    useEffect(() => {
+        const boostCheck = async () => {
+            if (!reactions || !reactions.length) return;
+            reactions.map(reaction => {
+                if (reaction.public_key === sessionPublicKey && reaction.reaction_type === 'BOOST') {
+                    setIsBoosted(true);
+                }
+            })
+        }
+        boostCheck();
+    }, [reactions])
 
     useEffect(() => {
         setPreview(null);
@@ -183,6 +238,47 @@ const Post = ({
     const toggleComments = () => {
         setShowComments((prev) => !prev); // Toggle visibility
     };
+
+    const handleBoost = async () => {
+        if (isLocalSynapse) {
+            if (!isBoosted) {
+                try {
+                    await createReaction(sessionPublicKey, postId, resource_type, 'BOOST')
+                    await fetchReactions()
+                    setIsBoosted(true)
+                } catch (error) {
+                    console.error("Error creating reaction boost: ", error);
+                }
+            } else {
+                try {
+                    await deleteReaction(sessionPublicKey, postId, resource_type, 'BOOST');
+                    await fetchReactions()
+                    setIsBoosted(false);
+                } catch (error) {
+                    console.error("Error deleting reaction boost: ", error);
+                }
+            }
+        } else {
+            if (!isBoosted) {
+                try {
+                    await createRemoteReaction(sessionPublicKey, postId, resource_type, 'BOOST', synapsePublicKey)
+                    await fetchReactions();
+                    setIsBoosted(true)
+                } catch (error) {
+                    console.error("Error creating remote reaction boost: ", error);
+                }
+            } else {
+                try {
+                    await deleteRemoteReaction(sessionPublicKey, postId, resource_type, 'BOOST', synapsePublicKey);
+                    await fetchReactions();
+                    setIsBoosted(false);
+                } catch (error) {
+                    console.error("Error deleting remote reaction boost: ", error);
+                }
+            }
+        }
+
+    }
 
     const getMediaTypeFromUrl = (url) =>  {
         const extension = url.split('.').pop().toLowerCase();
@@ -386,17 +482,25 @@ const Post = ({
 
             {/* Stats */}
             <div className={`flex flex-col border-t border-border mt-8`}>
-                <div className="flex w-full justify-between mt-4 px-4 text-xs md:text-sm  text-neutral  gap-4 font-montserrat">
-                    <div className={`flex`}>
-                        <p className={`text-xs`}>{likes} Boosts</p>
-                    </div>
+                <div className={`flex w-full justify-between mt-4 px-4 text-xs md:text-sm  text-neutral  gap-4 font-montserrat`}>
+                    <p>{boosts.length} Boosts</p>
                     <p onClick={toggleComments} className="hover:underline cursor-pointer">
                         {showComments ? "Hide Comments" : `${comments.length} Comments`}
                     </p>
                 </div>
                 <div className={`flex w-full gap-4 text-2xl xl:text-2xl justify-evenly px-4 py-2 mt-2`}>
-                    <button className={'hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2'}>
-                        <AiOutlineThunderbolt />
+                    <button
+                        className={`hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2 
+                        `}
+                        onClick={handleBoost}
+                    >
+                        {isBoosted ? (
+                            <div className={`text-brand`}>
+                                <AiFillThunderbolt />
+                            </div>
+                        ) : (
+                            <AiOutlineThunderbolt />
+                        )}
                     </button>
                     <button
                         className={'hover:cursor-pointer hover:bg-brand/60 active:scale-90 rounded-sm p-2'}

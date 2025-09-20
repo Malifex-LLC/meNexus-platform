@@ -35,7 +35,7 @@ export const mergeMultiaddrs = (peerId, addrs = []) => {
 
 
 export const removeDiscoveredPeer = (peerId) => {
-    console.log('DiscoveredPeers @ removeDisocoveredPeer: ', discoveredPeers)
+    //console.log('DiscoveredPeers @ removeDisocoveredPeer: ', discoveredPeers)
     console.log('Remove discovered peer:', peerId);
     discoveredPeers.delete(peerId);
     connectedPeers.delete(peerId);
@@ -54,7 +54,7 @@ export const removeConnectedPeer = (peerId) => {
 export const getPeer = (peerId) => discoveredPeers.get(peerId);
 
 export  const getPeerByPublicKey = (publicKey) => {
-    console.log('Discovered Peers @ getPeerByPublicKey:', discoveredPeers);
+    //console.log('Discovered Peers @ getPeerByPublicKey:', discoveredPeers);
     for (const [peerId, peerData] of discoveredPeers) {
         if (peerData.publicKey === publicKey) {
             return {peerId, ...peerData}; // Return the whole peer object

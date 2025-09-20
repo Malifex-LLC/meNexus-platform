@@ -202,10 +202,11 @@ DROP TABLE IF EXISTS `Reactions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Reactions` (
-                             `reaction_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-                             `user_id` bigint unsigned NOT NULL,
+                             `reaction_id` char(36) NOT NULL,
+                             `public_key` varchar(66) NOT NULL,
                              `resource_id` bigint unsigned NOT NULL,
                              `resource_type` varchar(50) NOT NULL,
+                             `reaction_type` varchar(50) NOT NULL,
                              `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                              PRIMARY KEY (`reaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

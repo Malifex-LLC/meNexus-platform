@@ -23,7 +23,6 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_METADATA,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_METADATA response ", response);
                         const localMetadata = response.data;
 
                         const metadataResponse = createMessage(
@@ -302,6 +301,36 @@ export const handleData = async (libp2p, message) => {
                             console.warn('Cannot map publicKey to peerId - response not sent.');
                         }
                     }
+                    if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
+                        console.log(`Received REACTIONS request from ${message.meta.sender}.`);
+                        const { resourceType, resourceId } = message.payload;
+                        const response = await sendRequest({
+                            method: 'GET',
+                            url: ENDPOINTS.GET_REACTIONS,
+                            params: { resourceType, resourceId },
+                            withCredentials: true,
+                        });
+
+                        console.log("GET_REACTIONS response ", response);
+                        const reactions = response.data;
+
+                        const reactionsResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.DATA.AGGREGATE,
+                            RESOURCE_TYPES.REACTIONS,
+                            { reactions },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, reactionsResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peerId - response not sent.');
+                        }
+                    }
                     break;
 
                 case ACTION_TYPES.RESOURCE.FETCH:
@@ -475,6 +504,40 @@ export const handleData = async (libp2p, message) => {
                         const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
                         if (peerId) {
                             await sendMessage(peerId, createCommentResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
+                        console.log(`Received Create REACTION request from ${message.meta.sender}.`);
+                        const { publicKey, resourceType, resourceId, reactionType } = message.payload;
+                        const response = await sendRequest({
+                            method: 'POST',
+                            url: ENDPOINTS.CREATE_REACTION,
+                            data: {
+                                publicKey,
+                                resourceType,
+                                resourceId,
+                                reactionType,
+                            },
+                        });
+                        console.log("CREATE_REACTION response ", response);
+                        const reaction = response.data;
+
+                        const createReactionResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.CREATE,
+                            RESOURCE_TYPES.COMMENTS,
+                            { reaction },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, createReactionResponse);
                         } else {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
@@ -671,6 +734,40 @@ export const handleData = async (libp2p, message) => {
                         const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
                         if (peerId) {
                             await sendMessage(peerId, leaveSynapseResponse);
+                        } else {
+                            console.warn('Cannot map publicKey to peer-id - response not sent.');
+                        }
+                    }
+                    if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
+                        console.log(`Received DELETE REACTION request from ${message.meta.sender}.`);
+                        const { publicKey, resourceType, resourceId, reactionType } = message.payload;
+                        const response = await sendRequest({
+                            method: 'POST',
+                            url: ENDPOINTS.DELETE_REACTION,
+                            data: {
+                                publicKey,
+                                resourceType,
+                                resourceId,
+                                reactionType
+                            },
+                        });
+                        console.log('DELETE_REACTION response ', response);
+                        const deleteReaction = response.data;
+
+                        const deleteReactionResponse = createMessage(
+                            MESSAGE_TYPES.DATA.RESPONSE,
+                            ACTION_TYPES.RESOURCE.DELETE,
+                            RESOURCE_TYPES.REACTIONS,
+                            { deleteReaction },
+                            {
+                                sender: libp2p.peerId.toString(),
+                                requestId: message.meta.requestId,
+                            }
+                        );
+
+                        const { peerId } = peerStateManager.getPeerByPublicKey(message.meta.sender);
+                        if (peerId) {
+                            await sendMessage(peerId, deleteReactionResponse);
                         } else {
                             console.warn('Cannot map publicKey to peer-id - response not sent.');
                         }
