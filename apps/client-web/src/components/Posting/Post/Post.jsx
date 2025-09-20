@@ -150,7 +150,7 @@ const Post = ({
     }
 
     const boosts = useMemo(
-        () => reactions.filter(reaction => reaction.reaction_type === 'BOOST'),
+        () => reactions?.filter(reaction => reaction.reaction_type === 'BOOST'),
         [reactions]
     );
 
@@ -199,7 +199,7 @@ const Post = ({
                 }
             }
         }
-        fetchComments(); // Only fetchComments if they are displayed
+        fetchComments();
     },[postId])
 
     useEffect(() => {

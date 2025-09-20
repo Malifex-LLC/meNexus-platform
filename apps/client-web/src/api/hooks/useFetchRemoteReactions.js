@@ -16,8 +16,8 @@ const useFetchRemoteReactions = () => {
             params: {resourceType, resourceId, synapsePublicKey},
             withCredentials: true,
         });
-        console.log("useGetReactions response: ", response);
-        return response.data;
+        console.log("useFetchRemoteReactions response: ", response);
+        return response.data.reactions;
 
     }
 

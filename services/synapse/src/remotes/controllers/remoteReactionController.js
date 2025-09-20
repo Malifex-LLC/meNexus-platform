@@ -19,7 +19,7 @@ export const fetchRemoteReactions = async (req, res) => {
 
     const fetchReactionsRequest = createMessage(
         MESSAGE_TYPES.DATA.REQUEST,
-        ACTION_TYPES.DATA.AGGREGATE,
+        ACTION_TYPES.DATA.QUERY,
         RESOURCE_TYPES.REACTIONS,
         {
             resourceType,
@@ -29,7 +29,7 @@ export const fetchRemoteReactions = async (req, res) => {
     )
     try {
         const response = await sendMessageWithResponse(peerId, fetchReactionsRequest);
-        res.status(200).json({ message: 'Reactions retrieved successfully.', response });
+        res.status(200).json(response.payload);
     } catch (error) {
         console.error('Error in fetchRemoteReactions:', error);
         res.status(500).json({error: 'Failed to fetch reactions.'});
@@ -37,7 +37,7 @@ export const fetchRemoteReactions = async (req, res) => {
 }
 
 export const createRemoteReaction = async (req, res) => {
-    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.query;
+    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
     if (!publicKey || !resourceType || !resourceId || !reactionType || !synapsePublicKey) {
         return res.status(401).json({error: 'No publicKey, resourceType, resourceId, or synapsePublicKey provided.'});
     }
@@ -69,7 +69,7 @@ export const createRemoteReaction = async (req, res) => {
 }
 
 export const deleteRemoteReaction = async (req, res) => {
-    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.query;
+    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
     if (!publicKey || !resourceType || !resourceId || !reactionType || !synapsePublicKey) {
         return res.status(401).json({error: 'No publicKey, resourceType, resourceId, or synapsePublicKey provided.'});
     }
@@ -96,7 +96,7 @@ export const deleteRemoteReaction = async (req, res) => {
         res.status(200).json({ message: 'Reaction deleted successfully.', response });
     } catch (error) {
         console.error('Error in deleteRemoteReaction:', error);
-        res.status(500).json({error: 'Failed to create reaction.'});
+        res.status(500).json({error: 'Failed to delete reaction.'});
     }
 }
 
