@@ -81,7 +81,7 @@ const LoginForm = () => {
                 <label>
                     Private Key:
                     <input
-                        inputMode={"password"}
+                        type={"password"}
                         className={`w-full p-4 rounded-md border border-border mt-2 bg-surface focus:outline-1 focus:outline-brand/60`}
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}
