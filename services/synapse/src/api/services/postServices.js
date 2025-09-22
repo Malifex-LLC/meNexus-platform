@@ -1,4 +1,4 @@
-import * as Post from '../models/Post.js';
+import Post from '../models/Post.js';
 
 export const createPost = async (publicKey, activeBoard, content) => {
     return await Post.createPost(publicKey, activeBoard, content);
