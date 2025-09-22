@@ -3,6 +3,7 @@
 
 // Import the Post model
 import Post from '../models/post.js';
+import * as postService from '../services/postServices.js'
 import activityController from './activityController.js';
 import broadcastController from './broadcastController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
@@ -39,7 +40,7 @@ export const createPost = async (req, res) => {
     }
 
     try {
-        const postId = await Post.createPost(publicKey, activeBoard, content);
+        const postId = await postService.createPost(publicKey, activeBoard, content);
         const synapseConfig = await loadConfig(CONFIG_FILE)
         const activity = await activityController.createPostActivity(publicKey, postId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
         console.log('activityController.createPostActivity() response: ', activity);

@@ -8,7 +8,7 @@ import { sendRequest, replaceParams } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
-import * as postService from '#api/models/post.js';
+import * as postServices from '#api/services/postServices.js';
 import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
@@ -406,7 +406,7 @@ export const handleData = async (libp2p, message) => {
                         console.log(`Received Create POST request from ${message.meta.sender}.`);
                         console.log("Received Create POST payload:", message.payload);
                         const { publicKey, activeBoard, content } = message.payload;
-                        const response = await postService.createPost(publicKey, activeBoard, content);
+                        const response = await postServices.createPost(publicKey, activeBoard, content);
                         //console.log("CREATE_POST response ", response);
                         const post = response.data;
 
