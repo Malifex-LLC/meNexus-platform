@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 // Import Message model
-import Chat from "../models/chat.js"
+import chatServices from '../services/chatServices.js'
 
 export const createChatMessage = async (req, res) => {
     const publicKey = req.user?.publicKey;
@@ -13,7 +13,7 @@ export const createChatMessage = async (req, res) => {
     }
 
     try {
-        const chatId = await Chat.createChatMessage(publicKey, activeChannel, content);
+        const chatId = await chatServices.createChatMessage(publicKey, activeChannel, content);
         res.status(200).json({ message: 'Chat created successfully.', chatId});
     } catch (error) {
         console.error('Error in createChat:', error);
@@ -27,7 +27,7 @@ export const getChannelChatMessages = async (req, res) => {
         return res.status(400).json({error: 'Channel not found.'});
     }
     try {
-        const chats = await Chat.getChannelChatMessages(channel);
+        const chats = await chatServices.getChannelChatMessages(channel);
         res.status(200).json(chats);
     } catch (error) {
         console.error('Error in getChannelChats:', error);

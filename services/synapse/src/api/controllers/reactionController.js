@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-import Reaction from '../models/reaction.js';
+import reactionServices from '../services/reactionServices.js'
 import { v4 as uuidv4 } from 'uuid';
 import reaction from "../models/reaction.js";
 
@@ -19,7 +19,7 @@ export const createReaction = async (req, res) => {
 
     try {
         const id = uuidv4();
-        const reaction = await Reaction.createReaction(id, publicKey, resourceId, resourceType, reactionType);
+        const reaction = await reactionServices.createReaction(id, publicKey, resourceId, resourceType, reactionType);
         res.status(200).json({message: 'Reaction created successfully.', reaction});
     } catch (error) {
         console.error('Error in createReaction:', error);
@@ -40,7 +40,7 @@ export const deleteReaction = async (req, res) => {
     }
 
     try {
-        const response = await Reaction.deleteReaction(publicKey, resourceId, resourceType, reactionType);
+        const response = await reactionServices.deleteReaction(publicKey, resourceId, resourceType, reactionType);
         res.status(200).json({message: 'Reaction deleted successfully.', reaction});
     } catch (error) {
         console.error('Error in deleteReaction:', error);
@@ -55,7 +55,7 @@ export const getReactions = async (req, res) => {
     }
 
     try {
-        const response = await Reaction.getReactions(resourceId);
+        const response = await reactionServices.getReactions(resourceId);
         res.status(200).json(response);
     } catch (error) {
         console.error('Error in getReactions:', error);

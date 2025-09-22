@@ -3,7 +3,7 @@
 
 // Import the Post model
 import Post from '../models/post.js';
-import * as postService from '../services/postServices.js'
+import postService from '../services/postServices.js'
 import activityController from './activityController.js';
 import broadcastController from './broadcastController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
@@ -61,7 +61,7 @@ export const updatePost = async (req, res) => {
     }
 
     try {
-        const response = await Post.updatePost(postId, updatedContent);
+        const response = await postService.updatePost(postId, updatedContent);
         res.status(200).json({message: 'Post updated successfully.', response});
     } catch (error) {
         console.error('Error in updatePost:', error);
@@ -77,7 +77,7 @@ export const deletePost = async (req, res) => {
     }
 
     try {
-        const response = await Post.deletePost(postId);
+        const response = await postService.deletePost(postId);
         res.status(200).json({message: 'Post deleted successfully.', response});
     } catch (error) {
         console.error('Error in deletePost:', error);
@@ -165,6 +165,7 @@ export const getUserPosts = async (req, res) => {
     }
 }
 
+// TODO update for JWT
 export const uploadPostMedia = async (req, res) => {
     try {
         const busboy = Busboy({ headers: req.headers });

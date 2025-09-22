@@ -538,15 +538,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST) {
                         console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
                         const { postId, content } = message.payload;
-                        const url = replaceParams(ENDPOINTS.UPDATE_POST, {postId})
-                        console.log('updatePost url: ', url)
-
-                        const response = await sendRequest({
-                            method: 'PUT',
-                            url: url,
-                            data: { content },
-                        });
-
+                        const response = await postServices.updatePost(postId, content);
                         //console.log('updatedPost response: ', response);
                         const updatedPost = response.data;
 
@@ -572,14 +564,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
                         console.log(`Received UPDATE COMMENT request from ${message.meta.sender}.`);
                         const { commentId, content } = message.payload;
-                        const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {commentId});
-                        console.log('updateComment url ', url)
 
-                        const response = await sendRequest({
-                            method: 'PUT',
-                            url: url,
-                            data: { content },
-                        });
+                        const response = await commentServices.updateComment(commentId, content);
                         //console.log('updateComment response ', response);
                         const updatedComment = response.data;
 
@@ -643,10 +629,7 @@ export const handleData = async (libp2p, message) => {
                         const { postId } = message.payload;
                         const url = replaceParams(ENDPOINTS.DELETE_POST, {postId});
                         console.log('deletePost url ', url)
-                        const response = await sendRequest({
-                            method: 'DELETE',
-                            url: url
-                        });
+                        const response = await postServices.deletePost(postId);
                         //console.log('deletePost response: ', response);
                         const deletedPost = response.data;
 
@@ -671,12 +654,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
                         console.log(`Received DELETE POST COMMENT request from ${message.meta.sender}.`);
                         const { commentId } = message.payload;
-                        const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {commentId});
-                        console.log('deleteComment url ', url)
-                        const response = await sendRequest({
-                            method: 'DELETE',
-                            url: url
-                        });
+                        const response = await commentServices.deleteComment(commentId);
                         //console.log('deleteComment response ', response);
                         const deletedComment = response.data;
 
