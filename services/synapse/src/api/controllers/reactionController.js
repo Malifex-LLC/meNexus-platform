@@ -2,7 +2,6 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import reactionServices from '../services/reactionServices.js'
-import { v4 as uuidv4 } from 'uuid';
 import reaction from "../models/reaction.js";
 
 export const createReaction = async (req, res) => {
@@ -18,8 +17,7 @@ export const createReaction = async (req, res) => {
     }
 
     try {
-        const id = uuidv4();
-        const reaction = await reactionServices.createReaction(id, publicKey, resourceId, resourceType, reactionType);
+        const reaction = await reactionServices.createReaction(publicKey, resourceId, resourceType, reactionType);
         res.status(200).json({message: 'Reaction created successfully.', reaction});
     } catch (error) {
         console.error('Error in createReaction:', error);
