@@ -3,6 +3,7 @@
 
 // Import the Comment model
 import Comment from '../models/comment.js';
+import commentServices from '../services/commentServices.js';
 import activityController from './activityController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
 
@@ -25,7 +26,7 @@ export const createComment = async (req, res) => {
         return res.status(400).json({error: 'resourceType, resourceId, content, or publicKey not found.'});
     }
 
-    const result = await Comment.createComment(resourceType, resourceId, content, publicKey);
+    const result = await commentServices.createComment(resourceType, resourceId, content, publicKey);
 
     if (result.affectedRows === 0) {
         return res.status(500).json({error: 'Failed to create a comment'});

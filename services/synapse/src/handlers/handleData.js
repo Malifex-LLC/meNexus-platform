@@ -8,7 +8,8 @@ import { sendRequest, replaceParams } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
-import * as postServices from '#api/services/postServices.js';
+import postServices from '#api/services/postServices.js';
+import commentServices from '#api/services/commentServices.js';
 import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
@@ -474,16 +475,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
                         console.log(`Received Create COMMENTS request from ${message.meta.sender}.`);
                         const { resourceType, resourceId, content, publicKey } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.CREATE_COMMENT,
-                            data: {
-                                resourceType,
-                                resourceId,
-                                content,
-                                publicKey,
-                            },
-                        });
+                        const response = await commentServices.createComment(publicKey, resourceType, content);
                         //console.log("CREATE_POST response ", response);
                         const comment = response.data;
 
