@@ -49,7 +49,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_MEMBERS,
                             withCredentials: true,
                         });
-                        console.log('GET_SYNAPSE_MEMBERS response: ', response);
+                        //console.log('GET_SYNAPSE_MEMBERS response: ', response);
                         const members = response.data;
 
                         const membersResponse = createMessage(
@@ -77,7 +77,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_ALL_ACTIVITIES,
                             withCredentials: true,
                         });
-                        console.log('GET_ALL_ACTIVITIES response: ', response);
+                        //console.log('GET_ALL_ACTIVITIES response: ', response);
                         const activities = response.data;
 
                         const activitiesResponse = createMessage(
@@ -107,7 +107,7 @@ export const handleData = async (libp2p, message) => {
                             params: { publicKey },
                             withCredentials: true,
                         });
-                        console.log('GET_USER_ACTIVITIES response: ', response);
+                        //console.log('GET_USER_ACTIVITIES response: ', response);
                         const activities = response.data;
 
                         const activitiesResponse = createMessage(
@@ -135,7 +135,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_POST_BOARDS,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_POST_BOARDS response ", response);
+                        //console.log("GET_SYNAPSE_POST_BOARDS response ", response);
                         const postBoards = response.data;
 
                         const postBoardsResponse = createMessage(
@@ -163,7 +163,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_CHAT_CHANNELS,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_CHAT_CHANNELS response ", response);
+                        //console.log("GET_SYNAPSE_CHAT_CHANNELS response ", response);
                         const chatChannels = response.data;
 
                         const chatChannelsResponse = createMessage(
@@ -192,7 +192,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_ALL_USERS response ", response);
+                        //console.log("GET_ALL_USERS response ", response);
                         const users = response.data;
 
                         const usersResponse = createMessage(
@@ -221,7 +221,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_ALL_POSTS response ", response);
+                        //console.log("GET_ALL_POSTS response ", response);
                         const posts = response.data;
 
                         const postsResponse = createMessage(
@@ -251,7 +251,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_BOARD_POSTS response ", response);
+                        //console.log("GET_BOARD_POSTS response ", response);
                         const posts = response.data;
 
                         const postsResponse = createMessage(
@@ -281,7 +281,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_CHANNEL_CHATS response ", response);
+                        //console.log("GET_CHANNEL_CHATS response ", response);
                         const chats = response.data;
 
                         const chatsResponse = createMessage(
@@ -311,7 +311,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_REACTIONS response ", response);
+                        //console.log("GET_REACTIONS response ", response);
                         const reactions = response.data;
 
                         const reactionsResponse = createMessage(
@@ -346,7 +346,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true
                         });
 
-                        console.log("ALL_POSTS response: ", response);
+                        //console.log("ALL_POSTS response: ", response);
                         const posts = response.data;
 
                         const dataResponse = createMessage(
@@ -377,7 +377,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true
                         });
 
-                        console.log("COMMENTS response ", response);
+                        //console.log("COMMENTS response ", response);
                         const comments = response.data;
 
                         const commentsResponse = createMessage(
@@ -410,7 +410,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.CREATE_POST,
                             data: {publicKey, activeBoard, content},
                         });
-                        console.log("CREATE_POST response ", response);
+                        //console.log("CREATE_POST response ", response);
                         const post = response.data;
 
                         const createPostResponse = createMessage(
@@ -453,7 +453,7 @@ export const handleData = async (libp2p, message) => {
                             data: formData,
                             headers: formData.getHeaders?.(),
                         })
-                        console.log("UPLOAD_POST_MEDIA response: ", response);
+                        //console.log("UPLOAD_POST_MEDIA response: ", response);
                         const upload = response.data;
 
                         const uploadPostMediaResponse = createMessage(
@@ -487,7 +487,7 @@ export const handleData = async (libp2p, message) => {
                                 publicKey,
                             },
                         });
-                        console.log("CREATE_POST response ", response);
+                        //console.log("CREATE_POST response ", response);
                         const comment = response.data;
 
                         const createCommentResponse = createMessage(
@@ -521,7 +521,7 @@ export const handleData = async (libp2p, message) => {
                                 reactionType,
                             },
                         });
-                        console.log("CREATE_REACTION response ", response);
+                        //console.log("CREATE_REACTION response ", response);
                         const reaction = response.data;
 
                         const createReactionResponse = createMessage(
@@ -558,7 +558,7 @@ export const handleData = async (libp2p, message) => {
                             data: { content },
                         });
 
-                        console.log('updatedPost response: ', response);
+                        //console.log('updatedPost response: ', response);
                         const updatedPost = response.data;
 
                         const updatedPostResponse = createMessage(
@@ -591,7 +591,7 @@ export const handleData = async (libp2p, message) => {
                             url: url,
                             data: { content },
                         });
-                        console.log('updateComment response ', response);
+                        //console.log('updateComment response ', response);
                         const updatedComment = response.data;
 
                         const updatedCommentResponse = createMessage(
@@ -623,7 +623,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.JOIN_SYNAPSE,
                             params: { publicKey },
                         });
-                        console.log('joinSynapse response ', response);
+                        //console.log('joinSynapse response ', response);
                         const joined = response.data;
 
                         const updatedSynapseMembers = createMessage(
@@ -658,7 +658,7 @@ export const handleData = async (libp2p, message) => {
                             method: 'DELETE',
                             url: url
                         });
-                        console.log('deletePost response: ', response);
+                        //console.log('deletePost response: ', response);
                         const deletedPost = response.data;
 
                         const deletedPostResponse = createMessage(
@@ -688,7 +688,7 @@ export const handleData = async (libp2p, message) => {
                             method: 'DELETE',
                             url: url
                         });
-                        console.log('deleteComment response ', response);
+                        //console.log('deleteComment response ', response);
                         const deletedComment = response.data;
 
                         const deletedCommentResponse = createMessage(
@@ -717,7 +717,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.LEAVE_SYNAPSE,
                             params: { publicKey },
                         });
-                        console.log('leaveSynapse response ', response);
+                        //console.log('leaveSynapse response ', response);
                         const leaveSynapse = response.data;
 
                         const leaveSynapseResponse = createMessage(
@@ -751,7 +751,7 @@ export const handleData = async (libp2p, message) => {
                                 reactionType
                             },
                         });
-                        console.log('DELETE_REACTION response ', response);
+                        //console.log('DELETE_REACTION response ', response);
                         const deleteReaction = response.data;
 
                         const deleteReactionResponse = createMessage(
