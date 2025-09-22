@@ -8,6 +8,7 @@ import { TbLogout2 } from "react-icons/tb";
 import ProfileSettings from "../../components/Settings/ProfileSettings/ProfileSettings.jsx";
 import AccountSettings from "../../components/Settings/AccountSettings/AccountSettings.jsx";
 import DisplaySettings from "../../components/Settings/DisplaySettings/DisplaySettings.jsx";
+import useLogout from "../../api/hooks/useLogout.js";
 
 function useRootContext() {
     return useOutletContext(); // { user, localSynapseMetadata }
@@ -15,6 +16,7 @@ function useRootContext() {
 
 const SettingsLayout = ({ children }) => {
     const { user, localSynapseMetadata } = useRootContext();
+    const { logout } = useLogout();
     const navigate = useNavigate();
     const [activePanel, setActivePanel] = useState(0); // 0: Profile, 1: Account, 2: Display
     const swipeHandlers = useSwipeable({
@@ -38,6 +40,11 @@ const SettingsLayout = ({ children }) => {
     }
 
     const isXL = useIsXL();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    }
 
     if (!user || !user.publicKey) {
         return <>Loading dashboard...</>;
@@ -70,7 +77,7 @@ const SettingsLayout = ({ children }) => {
                     <button
                         /* TODO implement real logout function/destroy session instead of navigating to login */
                         className={`flex items-center text-xl text-foreground hover:text-brand/60 hover:cursor-pointer`}
-                        onClick={() => navigate('/login')}
+                        onClick={handleLogout}
                     >
                     <TbLogout2 />
                     </button>
