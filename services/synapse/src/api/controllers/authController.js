@@ -209,7 +209,12 @@ export const refresh = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false,
+        path: '/api/auth/refresh',
+    });
     return res.status(200).json({ message: 'Logged out' });
 };
 

@@ -7,10 +7,12 @@ import { TbLogout2 } from "react-icons/tb";
 
 import { CgProfile } from "react-icons/cg";
 import {useNavigate} from "react-router-dom";
+import useLogout from "../../../api/hooks/useLogout.js"
 
 const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
     // TODO Logout doesn't destroy session, just routes to login page
     const navigate = useNavigate();
+    const {logout} = useLogout();
 
     return (
         <div className={`flex flex-col m-8 items-center text-2xl rounded-xl bg-surface font-montserrat`}>
@@ -37,7 +39,7 @@ const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
                     Display
                 </li>
                 <li
-                    onClick={() => navigate('/login')}
+                    onClick={() => logout()}
                     className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
                 ${selectedMenu === 'Logout' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}>
                     <TbLogout2 />

@@ -10,10 +10,9 @@ const useLogout = () => {
 
     const logout = async () => {
         try {
-            const url = ENDPOINTS.LOGOUT;
             const response = await sendRequest( {
                 method: 'POST',
-                url: url,
+                url: ENDPOINTS.LOGOUT,
                 withCredentials: true
             });
 
