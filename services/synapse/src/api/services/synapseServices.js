@@ -16,10 +16,21 @@ export const joinSynapse = async (publicKey) => {
     if (!metadata) {
         console.error(`No metadata found in joinSynapse`);
     }
-    const result = await Synapse.addSynapseMember(publicKey);
-    const activity = await activityController.createJoinSynapseActivity(publicKey, metadata.identity.publicKey);
-    broadcastController.broadcastActivity(activity);
-    return result;
+    const db = await getGlobalUsersDB();
+    const [updatedUser] = await db.query(doc => doc._id === publicKey);
+    if(updatedUser) {
+        try {
+            updatedUser.synapses.push(metadata.identity.publicKey);
+            await db.put(updatedUser);
+            const result = await Synapse.addSynapseMember(publicKey);
+            const activity = await activityController.createJoinSynapseActivity(publicKey, metadata.identity.publicKey);
+            broadcastController.broadcastActivity(activity);
+            return result;
+        } catch (err) {
+            console.error('Error joining Synapse: ', err);
+        }
+    }
+
 }
 export const leaveSynapse = async (publicKey) => {
     const metadata = await loadConfig(CONFIG_FILE);
