@@ -4,19 +4,13 @@
 // Import the Post model
 import Post from '../models/post.js';
 import postService from '../services/postServices.js'
-import activityController from './activityController.js';
-import broadcastController from './broadcastController.js';
-import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
-
 
 import Busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
 
 import { fetchLinkPreview } from "#utils/apiUtils.js";
-
 import { fileURLToPath } from 'url';
-import {loadConfig} from "#utils/configUtils.js";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -41,10 +35,6 @@ export const createPost = async (req, res) => {
 
     try {
         const postId = await postService.createPost(publicKey, activeBoard, content);
-        const synapseConfig = await loadConfig(CONFIG_FILE)
-        const activity = await activityController.createPostActivity(publicKey, postId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
-        console.log('activityController.createPostActivity() response: ', activity);
-        broadcastController.broadcastActivity(activity);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);
