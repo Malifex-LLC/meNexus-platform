@@ -38,8 +38,8 @@ const ProfileCard = ({publicKey}) => {
         const fetchSessionUser = async () => {
             try {
                 const response = await getSessionUser();
-                if (response.status === 200 && response.data.publicKey) {
-                    setSessionPublicKey(response.data.publicKey);
+                if (response.status === 200 && response.data.user.publicKey) {
+                    setSessionPublicKey(response.data.user.publicKey);
                 } else {
                     console.error("Invalid session, redirecting to login.");
                     navigate ("/login");

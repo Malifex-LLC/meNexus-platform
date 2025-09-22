@@ -6,13 +6,12 @@ import Settings from '../models/settings.js';
 
 export const uploadProfilePicture = async (req, res) => {
     console.log('uploadType: ', req.body.uploadType)
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    // Validate session user
-    const { publicKey } = req.session.user // Extract user ID from the session
+    const publicKey = req.user?.publicKey;
 
     // Validate uploaded file
     if (!req.file) {

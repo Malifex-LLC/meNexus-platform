@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import useGetSessionUser from '../../../src/api/hooks/useGetSessionUser.js'
 import useGetCryptoChallenge from '../../../src/api/hooks/useGetCryptoChallenge.js'
 import useVerifyCryptoSignature from '../../../src/api/hooks/useVerifyCryptoSignature.js'
+import {setAccessToken} from '../../../src/utils/authUtils.js'
 import * as secp from '@noble/secp256k1';
 
 const LoginForm = () => {
@@ -46,6 +47,7 @@ const LoginForm = () => {
             const publicKeyString = secp.etc.bytesToHex(publicKey);
             const signatureString = signature.toCompactHex();
 
+            // TODO disable logging
             // Debug logs
             console.log("publicKey: ", publicKey)
             console.log("signature: ", signature)
@@ -59,13 +61,10 @@ const LoginForm = () => {
                 throw new Error('Signature verification failed');
             }
 
-            // Step 4: Fetch user session
-            const sessionResponse = await getSessionUser();
-            if (sessionResponse.status === 200 && sessionResponse.data.handle) {
-                navigate(`/dashboard`);
-            } else {
-                throw new Error('Failed to retrieve session data');
-            }
+            // Step 4: Store accessToken and redirect to Dashboard
+            console.log('verifyResponse accessToken: ', verifyResponse.data.accessToken);
+            setAccessToken(verifyResponse.data.accessToken);
+            navigate(`/dashboard`);
 
         } catch (error) {
             console.error("Error during login or session retrieval:", error);

@@ -74,7 +74,7 @@ const ProfileSettings = () => {
             setNewProfileName("");
             setNewProfileBio("");
             setNewProfileBio("");
-        } else if (response.status === 401) {
+        } else {
             setIsUpdateSuccess(false);
             setIsUpdateError(true);
         }
@@ -127,18 +127,16 @@ const ProfileSettings = () => {
                     console.log("Fetching current user session...");
                     const response = await getSessionUser();
                     console.log('sessionUser response ', response);
-                    const userData = await getUserByHandle(response.data.handle);
-                    setUser(userData);
-                    console.log('userData response: ', userData);
-                    if (response.status === 200 && response.data.handle) {
+                    setUser(response.data.user);
+                    if (response.status === 200 && response.data.user.handle) {
                         console.log("Session user handle:", response.data.handle);
                         setIsHandleSet(true);
-                        setsessionPublicKey(response.data.publicKey);
-                        setsessionUserHandle(response.data.handle);
-                        setSessionUserDisplayName(userData.displayName);
-                        setSessionUserProfileName(userData.profileName);
-                        setSessionUserProfileBio(userData.bio);
-                        setSessionUserProfileLocation(userData.location);
+                        setsessionPublicKey(response.data.user.publicKey);
+                        setsessionUserHandle(response.data.user.handle);
+                        setSessionUserDisplayName(response.data.user.displayName);
+                        setSessionUserProfileName(response.data.user.profileName);
+                        setSessionUserProfileBio(response.data.user.bio);
+                        setSessionUserProfileLocation(response.data.user.location);
                     } else {
                         console.error("Invalid session, redirecting to login.");
                         navigate('/login');

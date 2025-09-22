@@ -5,9 +5,10 @@ import express from 'express';
 const router = express.Router();
 import reactionController from '../controllers/reactionController.js';
 import {deleteReaction} from "#api/models/reaction.js";
+import {requireJwt} from "#api/middlewares/requireJwt.js";
 
-router.post('/createReaction', reactionController.createReaction);
-router.post('/deleteReaction', reactionController.deleteReaction);
+router.post('/createReaction', requireJwt(['reactions:write']), reactionController.createReaction);
+router.post('/deleteReaction', requireJwt(['reactions:write']), reactionController.deleteReaction);
 router.get('/getReactions', reactionController.getReactions);
 
 export default router;

@@ -191,7 +191,13 @@ export const fetchRemoteSynapseChatChannels = async (req, res) => {
 }
 
 export const joinRemoteSynapse = async (req, res) => {
-    const {publicKey, synapsePublicKey} = req.query;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const {synapsePublicKey} = req.query;
     if (!publicKey || !synapsePublicKey) {
         return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});
     }
@@ -218,7 +224,13 @@ export const joinRemoteSynapse = async (req, res) => {
 }
 
 export const leaveRemoteSynapse = async (req, res) => {
-    const {publicKey, synapsePublicKey} = req.query;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const {synapsePublicKey} = req.query;
     console.log('leaveRemoteSynapse request publicKey: ', publicKey, ' synapsePublicKey: ', synapsePublicKey);
     if (!publicKey || !synapsePublicKey) {
         return res.status(401).json({error: 'No user publicKey or Synapse publicKey provided.'});

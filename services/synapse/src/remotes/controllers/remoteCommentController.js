@@ -8,7 +8,13 @@ import { sendMessageWithResponse } from '#core/messenger.js'
 import * as peerStateManager from '#src/core/peerStateManager.js'
 
 export const createRemotePostComment = async (req, res) => {
-    const { resourceType, resourceId, content, publicKey, synapsePublicKey } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { resourceType, resourceId, content, synapsePublicKey } = req.body;
     if (!resourceType || !resourceId || !content || !publicKey || !synapsePublicKey) {
         return res.status(400).json({error: 'resourceType, resourceId, content, publicKey, or synapsePublicKey not found.'});
     }

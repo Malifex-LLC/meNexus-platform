@@ -14,6 +14,7 @@ router.get('/getUserIdByPublicKey', authController.getUserIdByPublicKey);
 router.get('/getAllPublicKeys', authController.getAllPublicKeys);
 router.get('/getCryptoChallenge', authController.getCryptoChallenge);
 router.post('/verifyCryptoSignature', authController.verifyCryptoSignature);
+router.post('/refresh', authController.refresh);
 router.post('/logout', authController.logout);
 router.put('/updateAccountSettings', authController.updateAccountSettings);
 

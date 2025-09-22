@@ -18,7 +18,8 @@ const __dirname = path.dirname(__filename);
 const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 export const createComment = async (req, res) => {
-    const { resourceType, resourceId, content, publicKey} = req.body;
+    const publicKey = req.user?.publicKey;
+    const { resourceType, resourceId, content } = req.body;
     console.log('createComment called from controller:', resourceType, resourceId, content, publicKey);
     if (!resourceType || !resourceId || !content || !publicKey) {
         return res.status(400).json({error: 'resourceType, resourceId, content, or publicKey not found.'});

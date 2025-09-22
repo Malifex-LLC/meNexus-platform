@@ -26,8 +26,14 @@ const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 // Post creation logic
 export const createPost = async (req, res) => {
-    const { publicKey, activeBoard, content } = req.body;
-    console.log('createPost activeBoard: ', activeBoard);
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { activeBoard, content } = req.body;
+    console.log('createPost publicKey: ', publicKey);
     if (!publicKey || !activeBoard || !content) {
         return res.status(400).json({error: 'publicKey, activeBoard or content not found.'});
     }
@@ -121,12 +127,12 @@ export const getBoardPosts = async (req, res) => {
 
 // Post fetching logic
 export const getPosts = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const publicKey  = req.session.user.publicKey; // Get the current user's publicKey
+    const publicKey = req.user?.publicKey;
     if (!publicKey) {
         return res.status(401).json({ error: 'publicKey not found!' });
     }

@@ -8,12 +8,12 @@ import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activit
 import broadcastController from "#api/controllers/broadcastController.js";
 
 export const followUser = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { publicKey } = req.session.user;
+    const publicKey = req.user?.publicKey;
     const { followedPublicKey } = req.body;
     console.log("handle Follow user: ", followedPublicKey, " for user: ", publicKey);
 
@@ -30,12 +30,12 @@ export const followUser = async (req, res) => {
 }
 
 export const unfollowUser = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { publicKey } = req.session.user; // Get the follower's user ID from the session
+    const publicKey = req.user?.publicKey;
     const { followedPublicKey } = req.body;
     console.log("handle unfollow user: ", followedPublicKey, " for user: ", publicKey);
 
@@ -51,12 +51,12 @@ export const unfollowUser = async (req, res) => {
 }
 
 export const followCheck = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { publicKey } = req.session.user; // Get the current user's ID
+    const publicKey = req.user?.publicKey; // Get the current user's ID
     const { followedPublicKey } = req.query; // ID of the user being checked
     console.log("api handling followCheck for followedPublicKey: ", followedPublicKey, "for publicKey: ", publicKey);
 

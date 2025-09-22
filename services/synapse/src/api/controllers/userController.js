@@ -12,31 +12,12 @@ export const getAllUsers = async (req, res) => {
 }
 
 export const getSessionUser = async (req, res) => {
+    if (!req.user?.publicKey) return res.status(401).json({ error: 'Not authenticated' });
 
-    console.log('getSessionUser called');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session Data:', req.session);
+    const user = await User.getUserByPublicKey(req.user.publicKey);
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    if (req.session && req.session.user) {
-        const { publicKey, handle, displayName } = req.session.user;
-
-        // Ensure the session data contains all necessary fields
-        if (!publicKey || !handle || !displayName) {
-            console.error('Incomplete session data');
-            return res.status(400).json({ error: 'Incomplete session data' });
-        }
-
-        // Send the user data stored in the session
-        console.log('User found in session:', req.session.user);
-        return res.json({
-            publicKey,
-            handle,
-            displayName
-        });
-    } else {
-        console.log('User not authenticated');
-        return res.status(401).json({ error: 'User not authenticated' });
-    }
+    return res.json({user});
 }
 
 export const getUserByPublicKey = async (req, res) => {
@@ -75,7 +56,12 @@ export const getProfile = async (req, res) => {
 }
 
 export const updateProfileSettings = async (req, res) => {
-    const { publicKey } = req.params;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
     const updatedFields = req.body;
     console.log('updateProfileSettings called for publicKey: ', publicKey);
     console.log('updateProfileSettings called for fields: ', updatedFields);
@@ -87,12 +73,10 @@ export const updateProfileSettings = async (req, res) => {
         if (updatedFields.displayName) {
             updatedUser.displayName = updatedFields.displayName;
             await db.put(updatedUser);
-            req.session.user.displayName = updatedFields.displayName;
         }
         if (updatedFields.handle) {
             updatedUser.handle = updatedFields.handle;
             await db.put(updatedUser);
-            req.session.user.handle = updatedFields.handle;
         }
         if (updatedFields.profileName) {
             updatedUser.profileName = updatedFields.profileName;
@@ -107,8 +91,8 @@ export const updateProfileSettings = async (req, res) => {
             await db.put(updatedUser);
         }
     }
-    req.session.save();
-    console.log('Updated session user data: ', req.session.user);
+
+    res.status(200).json({message: 'Updated profile setting successfully'});
 }
 
 export default {

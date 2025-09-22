@@ -8,6 +8,9 @@ import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { mintAccessToken, mintRefreshToken, verifyRefreshToken } from '#utils/jwtUtils.js';
+import { SignJWT, jwtVerify } from 'jose';
+
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -128,15 +131,34 @@ export const verifyCryptoSignature = async (req, res) => {
             const user = await User.getUserByPublicKey(publicKey);
             console.log("user: ",  user);
 
-            // Attach session data
-            req.session.user = {
-                publicKey: user.publicKey,
-                handle: user.handle,
-                displayName: user.displayName,
-            };
+            const scopes = [
+                'synapses:read', 'synapses:write',
+                'users:read', 'users:write',
+                'profiles:read','profiles:write',
+                'follow:read','follow:write',
+                'posts:read','posts:write',
+                'comments:read','comments:write',
+                'chats:read', 'chats:write',
+                'reactions:read', 'reactions:write',
+            ];
 
-            console.log('Session Data:', req.session.user);
-            res.status(200).json({message: 'publicKey validated and session user data set'});
+            const accessToken  = await mintAccessToken({ userPk: publicKey, scopes });
+            const refreshToken = await mintRefreshToken({ userPk: publicKey, scopes });
+
+            // Set httpOnly refresh cookie so the browser will send it on /api/auth/refresh
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                sameSite: 'lax',   // 'strict' is fine if all same-site; use 'none' + secure:true for cross-site
+                secure: false,     // true in production behind HTTPS
+                path: '/api/auth/refresh',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            });
+
+            return res.status(200).json({
+                accessToken,
+                tokenType: 'Bearer',
+                expiresIn: 600,
+            });
 
         }
     } catch (error) {
@@ -144,27 +166,53 @@ export const verifyCryptoSignature = async (req, res) => {
     }
 };
 
-// Logout logic
-export const logout = (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            console.error('Error during logout:', err);
-            return res.status(500).json({ error: 'Logout failed' });
+export const refresh = async (req, res) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).json({ error: 'Missing refresh token' });
         }
 
-        req.session.destroy((destroyErr) => {
-            if (destroyErr) {
-                console.error('Error destroying session:', destroyErr);
-                return res.status(500).json({ error: 'Failed to destroy session' });
-            }
+        // Verify refresh token
+        let payload;
+        try {
+            payload = await verifyRefreshToken(refreshToken);
+        } catch (err) {
+            return res.status(401).json({ error: 'Invalid or expired refresh token' });
+        }
 
-            // Clear the session cookie
-            res.clearCookie('connect.sid', { path: '/' });
-            console.log('User successfully logged out and session cleared.');
-            return res.status(200).json({ message: 'Logged out successfully' });
+        // Mint new access token
+        const accessToken = await mintAccessToken({
+            userPk: payload.pubkey,
+            scopes: payload.scopes || [],
         });
-    });
-}
+
+        // Rotate refresh token (recommended)
+        const newRefreshToken = await mintRefreshToken({
+            userPk: payload.pubkey,
+            scopes: payload.scopes || [],
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: false,                      // true in prod HTTPS
+            path: '/api/auth/refresh',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.json({ accessToken });
+    } catch (err) {
+        console.error('Refresh error:', err);
+        return res.status(500).json({ error: 'Failed to refresh session' });
+    }
+};
+
+export const logout = (req, res) => {
+    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    return res.status(200).json({ message: 'Logged out' });
+};
+
 
 export const updateAccountSettings = async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -182,6 +230,7 @@ export default {
     getAllPublicKeys,
     getCryptoChallenge,
     verifyCryptoSignature,
+    refresh,
     logout,
     updateAccountSettings
 }

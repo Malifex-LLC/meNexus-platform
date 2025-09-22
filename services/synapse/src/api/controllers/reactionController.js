@@ -6,8 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 import reaction from "../models/reaction.js";
 
 export const createReaction = async (req, res) => {
-    console.log('createReaction called from controller');
-    const { publicKey, resourceId, resourceType, reactionType } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { resourceId, resourceType, reactionType } = req.body;
     if (!publicKey || !resourceId || !resourceType || !reactionType) {
         return res.status(400).json({error: 'publicKey, resourceId, resourceType, or reactionType not found.'});
     }
@@ -23,8 +28,13 @@ export const createReaction = async (req, res) => {
 }
 
 export const deleteReaction = async (req, res) => {
-    console.log('deleteReaction called from controller');
-    const { publicKey, resourceId, resourceType, reactionType } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { resourceId, resourceType, reactionType } = req.body;
     if (!publicKey || !resourceId || !resourceType || !reactionType) {
         return res.status(400).json({error: 'publicKey, resourceId, resourceType, or reactionType not found.'});
     }

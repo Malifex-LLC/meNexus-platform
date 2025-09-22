@@ -5,7 +5,8 @@
 import Chat from "../models/chat.js"
 
 export const createChatMessage = async (req, res) => {
-    const { publicKey, activeChannel, content } = req.body;
+    const publicKey = req.user?.publicKey;
+    const { activeChannel, content } = req.body;
     console.log('createChatMessage activeChannel: ', activeChannel);
     if (!publicKey || !activeChannel || !content) {
         return res.status(400).json({error: 'publicKey, activeChannel, or content not found.'});
