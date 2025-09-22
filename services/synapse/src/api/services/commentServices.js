@@ -1,5 +1,4 @@
 import Comment from '../models/comment.js';
-import * as commentService from "#api/models/comment.js";
 
 export const createComment = async (resourceType, resourceId, content, publicKey) => {
     return await Comment.createComment(resourceType, resourceId, content, publicKey);
@@ -20,5 +19,6 @@ export const getComments = async (resourceType, resourceId) => {
 export default {
     createComment,
     updateComment,
-    deleteComment
+    deleteComment,
+    getComments
 }
