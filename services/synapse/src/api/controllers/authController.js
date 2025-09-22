@@ -209,6 +209,7 @@ export const refresh = async (req, res) => {
 };
 
 export const logout = (req, res) => {
+    console.log('logout called')
     res.clearCookie('refreshToken', {
         httpOnly: true,
         sameSite: 'lax',
