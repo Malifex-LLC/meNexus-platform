@@ -11,6 +11,7 @@ import * as peerStateManager from '#core/peerStateManager.js';
 import postServices from '#api/services/postServices.js';
 import commentServices from '#api/services/commentServices.js';
 import synapseServices from '#api/services/synapseServices.js';
+import reactionServices from "#api/services/reactionServices.js";
 import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
@@ -501,16 +502,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
                         console.log(`Received Create REACTION request from ${message.meta.sender}.`);
                         const { publicKey, resourceType, resourceId, reactionType } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.CREATE_REACTION,
-                            data: {
-                                publicKey,
-                                resourceType,
-                                resourceId,
-                                reactionType,
-                            },
-                        });
+                        const response = await reactionServices.createReaction(publicKey, resourceId, resourceType, reactionType)
                         //console.log("CREATE_REACTION response ", response);
                         const reaction = response.data;
 
