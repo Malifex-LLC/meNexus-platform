@@ -20,7 +20,7 @@ const RootLayout = () => {
         (async () => {
             try {
                 // 1) silent refresh to repopulate in-memory access token
-                const r = await fetch('http://localhost:3001/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                const r = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`, { method: 'POST', credentials: 'include' });
                 if (r.ok) {
                     const j = await r.json();
                     setAccessToken(j.accessToken);
@@ -31,6 +31,7 @@ const RootLayout = () => {
                 setUser(response.data.user)
             } catch (error) {
                 // don’t navigate until boot is done (prevents flicker loops)
+                console.error(error);
                 navigate('/login');
             } finally {
                 setBooted(true);
