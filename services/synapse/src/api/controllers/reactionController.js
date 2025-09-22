@@ -39,7 +39,7 @@ export const deleteReaction = async (req, res) => {
 
     try {
         const response = await reactionServices.deleteReaction(publicKey, resourceId, resourceType, reactionType);
-        res.status(200).json({message: 'Reaction deleted successfully.', reaction});
+        res.status(200).json({message: 'Reaction deleted successfully.', response});
     } catch (error) {
         console.error('Error in deleteReaction:', error);
         res.status(500).json({error: 'Failed to delete reaction.'});

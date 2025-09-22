@@ -79,23 +79,12 @@ export const leaveSynapse = async (req, res) => {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-
     const publicKey = req.user?.publicKey;
-    const metadata = await loadConfig(CONFIG_FILE);
-    if (!metadata) {
-        return res.status(401).json({error: 'No Synapse metadata loaded.'});
-    }
-    const db = await getGlobalUsersDB();
-    const [updatedUser] = await db.query(doc => doc._id === publicKey);
-    if(updatedUser) {
-        try {
-            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== metadata.identity.publicKey);
-            await db.put(updatedUser);
-            await synapseServices.leaveSynapse(publicKey);
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            console.error('Error leaving Synapse: ', err);
-        }
+    try {
+        const result = await synapseServices.leaveSynapse(publicKey);
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Error leaving Synapse: ', err);
     }
 }
 
