@@ -14,6 +14,11 @@ const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
     const navigate = useNavigate();
     const {logout} = useLogout();
 
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    }
+
     return (
         <div className={`flex flex-col m-8 items-center text-2xl rounded-xl bg-surface font-montserrat`}>
             <ul className="p-4">
@@ -39,7 +44,7 @@ const SettingsMenu = ({ onSelectMenu, selectedMenu }) => {
                     Display
                 </li>
                 <li
-                    onClick={() => logout()}
+                    onClick={handleLogout}
                     className={`flex gap-4 px-16 py-4 mb-8 w-full items-center rounded-xl
                 ${selectedMenu === 'Logout' ? 'bg-brand/60' : 'hover:bg-brand/10 hover:cursor-pointer'}`}>
                     <TbLogout2 />
