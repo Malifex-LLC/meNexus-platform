@@ -65,7 +65,7 @@ export const joinSynapse = async (req, res) => {
         try {
             updatedUser.synapses.push(metadata.identity.publicKey);
             await db.put(updatedUser);
-            await synapseServices.addSynapseMember(publicKey);
+            await synapseServices.joinSynapse(publicKey);
 
             res.status(200).json(updatedUser);
         } catch (err) {
@@ -91,7 +91,7 @@ export const leaveSynapse = async (req, res) => {
         try {
             updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== metadata.identity.publicKey);
             await db.put(updatedUser);
-            await synapseServices.removeSynapseMember(publicKey);
+            await synapseServices.leaveSynapse(publicKey);
             res.status(200).json(updatedUser);
         } catch (err) {
             console.error('Error leaving Synapse: ', err);
