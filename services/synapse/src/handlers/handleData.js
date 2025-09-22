@@ -475,7 +475,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
                         console.log(`Received Create COMMENTS request from ${message.meta.sender}.`);
                         const { resourceType, resourceId, content, publicKey } = message.payload;
-                        const response = await commentServices.createComment(publicKey, resourceType, content);
+                        const response = await commentServices.createComment(resourceType, resourceId, content, publicKey);
                         //console.log("CREATE_POST response ", response);
                         const comment = response.data;
 
