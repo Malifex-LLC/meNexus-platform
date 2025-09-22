@@ -10,4 +10,5 @@ export const getChannelChatMessages = async (channel) => {
 
 export default {
     createChatMessage,
+    getChannelChatMessages
 }
