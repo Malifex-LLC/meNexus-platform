@@ -693,16 +693,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
                         console.log(`Received DELETE REACTION request from ${message.meta.sender}.`);
                         const { publicKey, resourceType, resourceId, reactionType } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.DELETE_REACTION,
-                            data: {
-                                publicKey,
-                                resourceType,
-                                resourceId,
-                                reactionType
-                            },
-                        });
+                        const response = await reactionServices.deleteReaction(publicKey, resourceId, resourceType, reactionType)
                         //console.log('DELETE_REACTION response ', response);
                         const deleteReaction = response.data;
 
