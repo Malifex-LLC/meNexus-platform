@@ -10,6 +10,7 @@ import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
 import postServices from '#api/services/postServices.js';
 import commentServices from '#api/services/commentServices.js';
+import synapseServices from '#api/services/synapseServices.js';
 import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
@@ -593,11 +594,7 @@ export const handleData = async (libp2p, message) => {
                         console.log(`Received UPDATE SYNAPSE_MEMBERS request from ${message.meta.sender}.`);
                         const { publicKey } = message.payload;
 
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.JOIN_SYNAPSE,
-                            params: { publicKey },
-                        });
+                        const response = await synapseServices.joinSynapse(publicKey);
                         //console.log('joinSynapse response ', response);
                         const joined = response.data;
 
@@ -679,11 +676,7 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.SYNAPSE_MEMBERS) {
                         console.log(`Received DELETE SYNAPSE_MEMBER request from ${message.meta.sender}.`);
                         const { publicKey } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.LEAVE_SYNAPSE,
-                            params: { publicKey },
-                        });
+                        const response = await synapseServices.leaveSynapse(publicKey)
                         //console.log('leaveSynapse response ', response);
                         const leaveSynapse = response.data;
 
