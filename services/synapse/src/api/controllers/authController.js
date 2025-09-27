@@ -140,6 +140,7 @@ export const verifyCryptoSignature = async (req, res) => {
                 'comments:read','comments:write',
                 'chats:read', 'chats:write',
                 'reactions:read', 'reactions:write',
+                'settings:read', 'settings:write',
             ];
 
             const accessToken  = await mintAccessToken({ userPk: publicKey, scopes });
