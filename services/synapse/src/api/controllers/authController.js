@@ -10,8 +10,6 @@ import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { mintAccessToken, mintRefreshToken, verifyRefreshToken } from '#utils/jwtUtils.js';
-import { SignJWT, jwtVerify } from 'jose';
-
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +45,29 @@ export const createUser = async (req, res) => {
     } catch (error) {
         console.error("Error in /createUser:", error);
         return res.status(500).json({ error: 'Failed to create user'});
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { publicKey } = req.body;
+        console.log("Received data:", { publicKey});
+
+        // Validate required fields
+        if (!publicKey) {
+            console.log("Missing publicKey.");
+            return res.status(400).json({ error: 'Missing publicKey' });
+        }
+
+        const delUser = await User.deleteUser(publicKey);
+        console.log("User deleted with Public Key:", publicKey);
+        await synapseServices.leaveSynapse(publicKey)
+
+        // Return a success response
+        return res.status(200).json({ message: 'User deleted successfully', deletedUser: delUser });
+    } catch (error) {
+        console.error("Error in /deleteUser:", error);
+        return res.status(500).json({ error: 'Failed to delete user'});
     }
 }
 
@@ -233,6 +254,7 @@ export const updateAccountSettings = async (req, res) => {
 
 export default {
     createUser,
+    deleteUser,
     generateCryptoKeys,
     storePublicKey,
     getUserIdByPublicKey,

@@ -54,6 +54,16 @@ export async function createGlobalUser(publicKey, handle, displayName) {
     return userDoc;
 }
 
+export async function deleteGlobalUser(publicKey) {
+    try {
+        const db = await getGlobalUsersDB();
+        await db.del(publicKey);
+        console.log(`Deleted user for publicKey ${publicKey}`);
+    } catch (err) {
+        console.error('Error deleting global user: ', err);
+    }
+}
+
 // Fetch full user by publicKey
 export async function getUserByPublicKeyFromDB(publicKey) {
     const db = await getGlobalUsersDB();
@@ -113,10 +123,4 @@ export async function getAllUsersFromDB() {
     const users = allDocs.map(entry => entry.value);
 
     return users;
-}
-
-// Delete user
-export async function deleteUser(publicKey) {
-    const db = await getGlobalUsersDB();
-    await db.delete(publicKey);
 }
