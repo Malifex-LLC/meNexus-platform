@@ -3,6 +3,7 @@
 
 import crypto from 'crypto';
 import User from "../models/user.js" ;
+import synapseServices from '#api/services/synapseServices.js';
 import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
@@ -37,11 +38,12 @@ export const createUser = async (req, res) => {
         const synapsePublicKey = metadata.identity.publicKey;
 
         // Call the createUser function from the User model
-        const newUserId = await User.createUser(publicKey, handle, display_name, synapsePublicKey);
-        console.log("New user created with ID:", newUserId);
+        const newUser = await User.createUser(publicKey, handle, display_name, synapsePublicKey);
+        console.log("New user created with Public Key:", newUser.publicKey);
+        await synapseServices.joinSynapse(newUser.publicKey)
 
         // Return a success response
-        return res.status(200).json({ message: 'User created successfully', user_id: newUserId });
+        return res.status(200).json({ message: 'User created successfully', user_id: newUser });
     } catch (error) {
         console.error("Error in /createUser:", error);
         return res.status(500).json({ error: 'Failed to create user'});
