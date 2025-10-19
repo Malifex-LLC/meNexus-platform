@@ -41,12 +41,21 @@ if [ -f /run/secrets/DB_USER_PW ]; then
   echo "[synapse] MySQL user password loaded from secret."
 fi
 
+if [ -f /run/secrets/JWT_SECRET ]; then
+  export JWT_SECRET="$(cat /run/secrets/JWT_SECRET)"
+  echo "[synapse] JWT secret loaded from secret."
+fi
+
+if [ -f /run/secrets/JWT_REFRESH_SECRET ]; then
+  export JWT_REFRESH_SECRET="$(cat /run/secrets/JWT_REFRESH_SECRET)"
+  echo "[synapse] JWT refresh secret loaded from secret."
+fi
+
 if [ -f /run/secrets/YOUTUBE_API_KEY ]; then
   export YOUTUBE_API_KEY="$(cat /run/secrets/YOUTUBE_API_KEY)"
   echo "[synapse] YouTube API key loaded from secret."
 
 fi
-
 
 echo "[synapse] Starting Synapse…"
 exec node "$MAIN"
