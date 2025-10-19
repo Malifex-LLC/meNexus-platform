@@ -1,7 +1,7 @@
 // utils/jwtUtils.js
 import { SignJWT, jwtVerify } from 'jose';
 
-const ISS = process.env.JWT_ISSUER || 'https://synapse.local';
+const ISS = process.env.PUBLIC_URL;
 const AUD = 'menexus-client';
 
 // Secrets must be Uint8Array for jose
