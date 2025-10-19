@@ -29,7 +29,7 @@ export async function getGlobalUsersDB() {
 }
 
 // Create a new user (called when user registers)
-export async function createGlobalUser(publicKey, handle, displayName,synapsePublicKey) {
+export async function createGlobalUser(publicKey, handle, displayName) {
     const db = await getGlobalUsersDB();
 
     const userDoc = {
@@ -44,14 +44,24 @@ export async function createGlobalUser(publicKey, handle, displayName,synapsePub
         profileBanner: '/assets/default_profile_banner.jpg',
         followers: [],
         following: [],
-        synapses: [synapsePublicKey], // Will append Synapse publicKeys here when user logs in to other Synapses
-        timestamp: new Date().toISOString(),
+        synapses: [],
+        createdAt: new Date().toISOString(),
         is_online: false,
     };
 
     await db.put(userDoc);
     console.log(`Created user for publicKey ${publicKey}`);
     return userDoc;
+}
+
+export async function deleteGlobalUser(publicKey) {
+    try {
+        const db = await getGlobalUsersDB();
+        await db.del(publicKey);
+        console.log(`Deleted user for publicKey ${publicKey}`);
+    } catch (err) {
+        console.error('Error deleting global user: ', err);
+    }
 }
 
 // Fetch full user by publicKey
@@ -113,10 +123,4 @@ export async function getAllUsersFromDB() {
     const users = allDocs.map(entry => entry.value);
 
     return users;
-}
-
-// Delete user
-export async function deleteUser(publicKey) {
-    const db = await getGlobalUsersDB();
-    await db.delete(publicKey);
 }

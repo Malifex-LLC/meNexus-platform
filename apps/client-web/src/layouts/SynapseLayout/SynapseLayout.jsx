@@ -70,6 +70,7 @@ const SynapseLayout =({ children }) => {
 
     useEffect(() => {
         const fetchSynapseMetadata = async () => {
+            console.log('SynapseLayout sessionUser: ', sessionUser);
             try {
                 if (localSynapseMetadata.identity.publicKey === synapsePublicKey) {
                     setSynapseMetadata(localSynapseMetadata);

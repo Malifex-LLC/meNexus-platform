@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-// Import Express library
 import express  from 'express'
-
-// Import CORS library
 import cors from 'cors'
-
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 dotenv.config();
 
 // Configure and instantiate Express app
 export function createExpressApp () {
     const app = express();
+
+    app.use(cookieParser());
 
     // Configure CORS
     app.use(cors({

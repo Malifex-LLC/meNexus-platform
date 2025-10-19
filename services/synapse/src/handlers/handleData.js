@@ -8,6 +8,10 @@ import { sendRequest, replaceParams } from "#utils/apiUtils.js";
 import { ENDPOINTS } from "#api/config/endpoints.js";
 import { resolvePendingRequest } from "#core/messenger.js";
 import * as peerStateManager from '#core/peerStateManager.js';
+import postServices from '#api/services/postServices.js';
+import commentServices from '#api/services/commentServices.js';
+import synapseServices from '#api/services/synapseServices.js';
+import reactionServices from "#api/services/reactionServices.js";
 import FormData from 'form-data';
 
 export const handleData = async (libp2p, message) => {
@@ -49,7 +53,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_MEMBERS,
                             withCredentials: true,
                         });
-                        console.log('GET_SYNAPSE_MEMBERS response: ', response);
+                        //console.log('GET_SYNAPSE_MEMBERS response: ', response);
                         const members = response.data;
 
                         const membersResponse = createMessage(
@@ -77,7 +81,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_ALL_ACTIVITIES,
                             withCredentials: true,
                         });
-                        console.log('GET_ALL_ACTIVITIES response: ', response);
+                        //console.log('GET_ALL_ACTIVITIES response: ', response);
                         const activities = response.data;
 
                         const activitiesResponse = createMessage(
@@ -107,7 +111,7 @@ export const handleData = async (libp2p, message) => {
                             params: { publicKey },
                             withCredentials: true,
                         });
-                        console.log('GET_USER_ACTIVITIES response: ', response);
+                        //console.log('GET_USER_ACTIVITIES response: ', response);
                         const activities = response.data;
 
                         const activitiesResponse = createMessage(
@@ -135,7 +139,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_POST_BOARDS,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_POST_BOARDS response ", response);
+                        //console.log("GET_SYNAPSE_POST_BOARDS response ", response);
                         const postBoards = response.data;
 
                         const postBoardsResponse = createMessage(
@@ -163,7 +167,7 @@ export const handleData = async (libp2p, message) => {
                             url: ENDPOINTS.GET_SYNAPSE_CHAT_CHANNELS,
                             withCredentials: true,
                         });
-                        console.log("GET_SYNAPSE_CHAT_CHANNELS response ", response);
+                        //console.log("GET_SYNAPSE_CHAT_CHANNELS response ", response);
                         const chatChannels = response.data;
 
                         const chatChannelsResponse = createMessage(
@@ -192,7 +196,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_ALL_USERS response ", response);
+                        //console.log("GET_ALL_USERS response ", response);
                         const users = response.data;
 
                         const usersResponse = createMessage(
@@ -221,7 +225,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_ALL_POSTS response ", response);
+                        //console.log("GET_ALL_POSTS response ", response);
                         const posts = response.data;
 
                         const postsResponse = createMessage(
@@ -251,7 +255,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_BOARD_POSTS response ", response);
+                        //console.log("GET_BOARD_POSTS response ", response);
                         const posts = response.data;
 
                         const postsResponse = createMessage(
@@ -281,7 +285,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_CHANNEL_CHATS response ", response);
+                        //console.log("GET_CHANNEL_CHATS response ", response);
                         const chats = response.data;
 
                         const chatsResponse = createMessage(
@@ -311,7 +315,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true,
                         });
 
-                        console.log("GET_REACTIONS response ", response);
+                        //console.log("GET_REACTIONS response ", response);
                         const reactions = response.data;
 
                         const reactionsResponse = createMessage(
@@ -346,7 +350,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true
                         });
 
-                        console.log("ALL_POSTS response: ", response);
+                        //console.log("ALL_POSTS response: ", response);
                         const posts = response.data;
 
                         const dataResponse = createMessage(
@@ -377,7 +381,7 @@ export const handleData = async (libp2p, message) => {
                             withCredentials: true
                         });
 
-                        console.log("COMMENTS response ", response);
+                        //console.log("COMMENTS response ", response);
                         const comments = response.data;
 
                         const commentsResponse = createMessage(
@@ -405,12 +409,8 @@ export const handleData = async (libp2p, message) => {
                         console.log(`Received Create POST request from ${message.meta.sender}.`);
                         console.log("Received Create POST payload:", message.payload);
                         const { publicKey, activeBoard, content } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.CREATE_POST,
-                            data: {publicKey, activeBoard, content},
-                        });
-                        console.log("CREATE_POST response ", response);
+                        const response = await postServices.createPost(publicKey, activeBoard, content);
+                        //console.log("CREATE_POST response ", response);
                         const post = response.data;
 
                         const createPostResponse = createMessage(
@@ -453,7 +453,7 @@ export const handleData = async (libp2p, message) => {
                             data: formData,
                             headers: formData.getHeaders?.(),
                         })
-                        console.log("UPLOAD_POST_MEDIA response: ", response);
+                        //console.log("UPLOAD_POST_MEDIA response: ", response);
                         const upload = response.data;
 
                         const uploadPostMediaResponse = createMessage(
@@ -477,17 +477,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.COMMENTS) {
                         console.log(`Received Create COMMENTS request from ${message.meta.sender}.`);
                         const { resourceType, resourceId, content, publicKey } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.CREATE_COMMENT,
-                            data: {
-                                resourceType,
-                                resourceId,
-                                content,
-                                publicKey,
-                            },
-                        });
-                        console.log("CREATE_POST response ", response);
+                        const response = await commentServices.createComment(resourceType, resourceId, content, publicKey);
+                        //console.log("CREATE_POST response ", response);
                         const comment = response.data;
 
                         const createCommentResponse = createMessage(
@@ -511,17 +502,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
                         console.log(`Received Create REACTION request from ${message.meta.sender}.`);
                         const { publicKey, resourceType, resourceId, reactionType } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.CREATE_REACTION,
-                            data: {
-                                publicKey,
-                                resourceType,
-                                resourceId,
-                                reactionType,
-                            },
-                        });
-                        console.log("CREATE_REACTION response ", response);
+                        const response = await reactionServices.createReaction(publicKey, resourceId, resourceType, reactionType)
+                        //console.log("CREATE_REACTION response ", response);
                         const reaction = response.data;
 
                         const createReactionResponse = createMessage(
@@ -549,16 +531,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST) {
                         console.log(`Received UPDATE POST request from ${message.meta.sender}.`);
                         const { postId, content } = message.payload;
-                        const url = replaceParams(ENDPOINTS.UPDATE_POST, {postId})
-                        console.log('updatePost url: ', url)
-
-                        const response = await sendRequest({
-                            method: 'PUT',
-                            url: url,
-                            data: { content },
-                        });
-
-                        console.log('updatedPost response: ', response);
+                        const response = await postServices.updatePost(postId, content);
+                        //console.log('updatedPost response: ', response);
                         const updatedPost = response.data;
 
                         const updatedPostResponse = createMessage(
@@ -583,15 +557,9 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
                         console.log(`Received UPDATE COMMENT request from ${message.meta.sender}.`);
                         const { commentId, content } = message.payload;
-                        const url = replaceParams(ENDPOINTS.UPDATE_COMMENT, {commentId});
-                        console.log('updateComment url ', url)
 
-                        const response = await sendRequest({
-                            method: 'PUT',
-                            url: url,
-                            data: { content },
-                        });
-                        console.log('updateComment response ', response);
+                        const response = await commentServices.updateComment(commentId, content);
+                        //console.log('updateComment response ', response);
                         const updatedComment = response.data;
 
                         const updatedCommentResponse = createMessage(
@@ -618,12 +586,8 @@ export const handleData = async (libp2p, message) => {
                         console.log(`Received UPDATE SYNAPSE_MEMBERS request from ${message.meta.sender}.`);
                         const { publicKey } = message.payload;
 
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.JOIN_SYNAPSE,
-                            params: { publicKey },
-                        });
-                        console.log('joinSynapse response ', response);
+                        const response = await synapseServices.joinSynapse(publicKey);
+                        //console.log('joinSynapse response ', response);
                         const joined = response.data;
 
                         const updatedSynapseMembers = createMessage(
@@ -654,11 +618,8 @@ export const handleData = async (libp2p, message) => {
                         const { postId } = message.payload;
                         const url = replaceParams(ENDPOINTS.DELETE_POST, {postId});
                         console.log('deletePost url ', url)
-                        const response = await sendRequest({
-                            method: 'DELETE',
-                            url: url
-                        });
-                        console.log('deletePost response: ', response);
+                        const response = await postServices.deletePost(postId);
+                        //console.log('deletePost response: ', response);
                         const deletedPost = response.data;
 
                         const deletedPostResponse = createMessage(
@@ -682,13 +643,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.POST_COMMENT) {
                         console.log(`Received DELETE POST COMMENT request from ${message.meta.sender}.`);
                         const { commentId } = message.payload;
-                        const url = replaceParams(ENDPOINTS.DELETE_COMMENT, {commentId});
-                        console.log('deleteComment url ', url)
-                        const response = await sendRequest({
-                            method: 'DELETE',
-                            url: url
-                        });
-                        console.log('deleteComment response ', response);
+                        const response = await commentServices.deleteComment(commentId);
+                        //console.log('deleteComment response ', response);
                         const deletedComment = response.data;
 
                         const deletedCommentResponse = createMessage(
@@ -712,12 +668,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.SYNAPSE_MEMBERS) {
                         console.log(`Received DELETE SYNAPSE_MEMBER request from ${message.meta.sender}.`);
                         const { publicKey } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.LEAVE_SYNAPSE,
-                            params: { publicKey },
-                        });
-                        console.log('leaveSynapse response ', response);
+                        const response = await synapseServices.leaveSynapse(publicKey)
+                        //console.log('leaveSynapse response ', response);
                         const leaveSynapse = response.data;
 
                         const leaveSynapseResponse = createMessage(
@@ -741,17 +693,8 @@ export const handleData = async (libp2p, message) => {
                     if (message.resourceType === RESOURCE_TYPES.REACTIONS) {
                         console.log(`Received DELETE REACTION request from ${message.meta.sender}.`);
                         const { publicKey, resourceType, resourceId, reactionType } = message.payload;
-                        const response = await sendRequest({
-                            method: 'POST',
-                            url: ENDPOINTS.DELETE_REACTION,
-                            data: {
-                                publicKey,
-                                resourceType,
-                                resourceId,
-                                reactionType
-                            },
-                        });
-                        console.log('DELETE_REACTION response ', response);
+                        const response = await reactionServices.deleteReaction(publicKey, resourceId, resourceType, reactionType)
+                        //console.log('DELETE_REACTION response ', response);
                         const deleteReaction = response.data;
 
                         const deleteReactionResponse = createMessage(

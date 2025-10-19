@@ -3,6 +3,8 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { getAccessToken, setAccessToken, clearAccessToken } from '../../utils/authUtils.js';
+
 
 const useAxios = () => {
     const [data, setData] = useState(null);
@@ -14,12 +16,18 @@ const useAxios = () => {
         setLoading(true); // Start loading state
         setError(null); // Reset error state
         try {
+            const headers = {};
+            const token = getAccessToken();
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
             const response = await axios({
                 method, // GET/POST method specifier
                 url, // API endpoint
                 data: bodyData, // Payload for POST/PUT requests
                 params, // Query parameters for GET requests
                 withCredentials: withCredentials,
+                headers
             });
 
             setData(response); // Update fetched data

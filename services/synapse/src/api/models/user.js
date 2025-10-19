@@ -3,7 +3,7 @@
 
 // Import orbitdb connection
 import meNexus from '../config/mysql.js';
-import { createGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
+import { createGlobalUser, deleteGlobalUser, getUserByPublicKeyFromDB, getUserByHandleFromDB, getAllUsersFromDB } from "#src/orbitdb/globalUsers.js";
 
 // Import orbitDB userPublicKeys orbitdb wrapper function
 import { storePublicKeyInDB } from '#src/orbitdb/userPublicKeys.js';
@@ -17,7 +17,17 @@ export const createUser = async (publicKey, handle, displayName, synapsePublicKe
         console.error('Error creating user: ', error);
         throw new Error('Failed to create User called for publicKey');
     }
+}
 
+export const deleteUser = async (publicKey) => {
+    console.log("Delete User called for publicKey:", publicKey);
+    try {
+        const user = await deleteGlobalUser(publicKey);
+        return user;
+    } catch (error) {
+        console.error('Error deleting user: ', error);
+        throw new Error('Failed to delete User called for publicKey');
+    }
 }
 
 export const getAllUsers = async () => {
@@ -133,6 +143,7 @@ export const updateProfile = (profileFields, profileValues) => {
 
 export default {
     createUser,
+    deleteUser,
     getAllUsers,
     getUserByPublicKey,
     getUserByHandle,

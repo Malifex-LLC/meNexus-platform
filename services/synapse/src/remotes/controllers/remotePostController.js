@@ -101,7 +101,13 @@ export const fetchRemoteUserPosts = async (req, res) => {
 }
 
 export const createRemotePost = async (req, res) => {
-    const { publicKey, activeBoard, content, synapsePublicKey } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { activeBoard, content, synapsePublicKey } = req.body;
     if (!publicKey || !activeBoard || !content || !synapsePublicKey) {
         return res.status(400).json({error: 'publicKey, activeBoard, content, or synapsePublicKey not found.'});
     }

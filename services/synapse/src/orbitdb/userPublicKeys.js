@@ -57,8 +57,3 @@ export async function getAllPublicKeysInDB() {
 
     return publicKeys;
 }
-
-export async function deletePublicKey(userId) {
-    const db = await getPublicKeysDB();
-    await db.delete(userId);
-}

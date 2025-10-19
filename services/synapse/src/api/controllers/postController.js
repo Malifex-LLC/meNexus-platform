@@ -3,19 +3,14 @@
 
 // Import the Post model
 import Post from '../models/post.js';
-import activityController from './activityController.js';
-import broadcastController from './broadcastController.js';
-import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js'
-
+import postService from '../services/postServices.js'
 
 import Busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
 
 import { fetchLinkPreview } from "#utils/apiUtils.js";
-
 import { fileURLToPath } from 'url';
-import {loadConfig} from "#utils/configUtils.js";
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -26,18 +21,20 @@ const CONFIG_FILE = path.resolve(__dirname, '../../config/synapse-config.json');
 
 // Post creation logic
 export const createPost = async (req, res) => {
-    const { publicKey, activeBoard, content } = req.body;
-    console.log('createPost activeBoard: ', activeBoard);
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { activeBoard, content } = req.body;
+    console.log('createPost publicKey: ', publicKey);
     if (!publicKey || !activeBoard || !content) {
         return res.status(400).json({error: 'publicKey, activeBoard or content not found.'});
     }
 
     try {
-        const postId = await Post.createPost(publicKey, activeBoard, content);
-        const synapseConfig = await loadConfig(CONFIG_FILE)
-        const activity = await activityController.createPostActivity(publicKey, postId, CONTEXT_TYPES.SYNAPSE, synapseConfig.identity.publicKey)
-        console.log('activityController.createPostActivity() response: ', activity);
-        broadcastController.broadcastActivity(activity);
+        const postId = await postService.createPost(publicKey, activeBoard, content);
         res.status(200).json({ message: 'Post created successfully.', postId });
     } catch (error) {
         console.error('Error in createPost:', error);
@@ -54,7 +51,7 @@ export const updatePost = async (req, res) => {
     }
 
     try {
-        const response = await Post.updatePost(postId, updatedContent);
+        const response = await postService.updatePost(postId, updatedContent);
         res.status(200).json({message: 'Post updated successfully.', response});
     } catch (error) {
         console.error('Error in updatePost:', error);
@@ -70,7 +67,7 @@ export const deletePost = async (req, res) => {
     }
 
     try {
-        const response = await Post.deletePost(postId);
+        const response = await postService.deletePost(postId);
         res.status(200).json({message: 'Post deleted successfully.', response});
     } catch (error) {
         console.error('Error in deletePost:', error);
@@ -121,12 +118,12 @@ export const getBoardPosts = async (req, res) => {
 
 // Post fetching logic
 export const getPosts = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const publicKey  = req.session.user.publicKey; // Get the current user's publicKey
+    const publicKey = req.user?.publicKey;
     if (!publicKey) {
         return res.status(401).json({ error: 'publicKey not found!' });
     }
@@ -158,6 +155,7 @@ export const getUserPosts = async (req, res) => {
     }
 }
 
+// TODO update for JWT
 export const uploadPostMedia = async (req, res) => {
     try {
         const busboy = Busboy({ headers: req.headers });

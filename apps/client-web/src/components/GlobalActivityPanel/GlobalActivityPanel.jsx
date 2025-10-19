@@ -26,19 +26,19 @@ const GlobalActivityPanel = ({ user, localSynapseMetadata }) => {
 
     // TODO This method only receives new activities for the local Synapse in realtime, need to implement a pub/sub for all Synapses
     const publicKey = user.publicKey;
-    useActivityWebSocket({
-        wsUrl: localSynapseMetadata.identity.webSocketUrl,
-        publicKey,
-        onActivity: (newActivity) => {
-            const parsedDate = new Date(newActivity.published.replace(' ', 'T') + 'Z');
-            const safeActivity = {
-                ...newActivity,
-                published: parsedDate.toISOString(), // ensures consistency
-            };
-
-            setBufferedActivities(prev => [safeActivity, ...prev]);
-        }
-    });
+    // useActivityWebSocket({
+    //     wsUrl: localSynapseMetadata.identity.webSocketUrl,
+    //     publicKey,
+    //     onActivity: (newActivity) => {
+    //         const parsedDate = new Date(newActivity.published.replace(' ', 'T') + 'Z');
+    //         const safeActivity = {
+    //             ...newActivity,
+    //             published: parsedDate.toISOString(), // ensures consistency
+    //         };
+    //
+    //         setBufferedActivities(prev => [safeActivity, ...prev]);
+    //     }
+    // });
 
     // Aggregate activities from all followed synapses
     useEffect(() => {

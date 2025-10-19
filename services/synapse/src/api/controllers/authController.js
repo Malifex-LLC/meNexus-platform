@@ -3,11 +3,13 @@
 
 import crypto from 'crypto';
 import User from "../models/user.js" ;
+import synapseServices from '#api/services/synapseServices.js';
 import { storePublicKeyInDB, getUserIdByPublicKeyInDB, getAllPublicKeysInDB } from '#src/orbitdb/userPublicKeys.js'
 import { verifySignature, generateCryptoKeysUtil } from '#utils/cryptoUtils.js'
 import { loadConfig, saveConfig } from '#utils/configUtils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { mintAccessToken, mintRefreshToken, verifyRefreshToken } from '#utils/jwtUtils.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -34,14 +36,38 @@ export const createUser = async (req, res) => {
         const synapsePublicKey = metadata.identity.publicKey;
 
         // Call the createUser function from the User model
-        const newUserId = await User.createUser(publicKey, handle, display_name, synapsePublicKey);
-        console.log("New user created with ID:", newUserId);
+        const newUser = await User.createUser(publicKey, handle, display_name, synapsePublicKey);
+        console.log("New user created with Public Key:", newUser.publicKey);
+        await synapseServices.joinSynapse(newUser.publicKey)
 
         // Return a success response
-        return res.status(200).json({ message: 'User created successfully', user_id: newUserId });
+        return res.status(200).json({ message: 'User created successfully', user_id: newUser });
     } catch (error) {
         console.error("Error in /createUser:", error);
         return res.status(500).json({ error: 'Failed to create user'});
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { publicKey } = req.body;
+        console.log("Received data:", { publicKey});
+
+        // Validate required fields
+        if (!publicKey) {
+            console.log("Missing publicKey.");
+            return res.status(400).json({ error: 'Missing publicKey' });
+        }
+
+        const delUser = await User.deleteUser(publicKey);
+        console.log("User deleted with Public Key:", publicKey);
+        await synapseServices.leaveSynapse(publicKey)
+
+        // Return a success response
+        return res.status(200).json({ message: 'User deleted successfully', deletedUser: delUser });
+    } catch (error) {
+        console.error("Error in /deleteUser:", error);
+        return res.status(500).json({ error: 'Failed to delete user'});
     }
 }
 
@@ -128,15 +154,35 @@ export const verifyCryptoSignature = async (req, res) => {
             const user = await User.getUserByPublicKey(publicKey);
             console.log("user: ",  user);
 
-            // Attach session data
-            req.session.user = {
-                publicKey: user.publicKey,
-                handle: user.handle,
-                displayName: user.displayName,
-            };
+            const scopes = [
+                'synapses:read', 'synapses:write',
+                'users:read', 'users:write',
+                'profiles:read','profiles:write',
+                'follow:read','follow:write',
+                'posts:read','posts:write',
+                'comments:read','comments:write',
+                'chats:read', 'chats:write',
+                'reactions:read', 'reactions:write',
+                'settings:read', 'settings:write',
+            ];
 
-            console.log('Session Data:', req.session.user);
-            res.status(200).json({message: 'publicKey validated and session user data set'});
+            const accessToken  = await mintAccessToken({ userPk: publicKey, scopes });
+            const refreshToken = await mintRefreshToken({ userPk: publicKey, scopes });
+
+            // Set httpOnly refresh cookie so the browser will send it on /api/auth/refresh
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                sameSite: 'lax',   // 'strict' is fine if all same-site; use 'none' + secure:true for cross-site
+                secure: false,     // true in production behind HTTPS
+                path: '/api/auth/refresh',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            });
+
+            return res.status(200).json({
+                accessToken,
+                tokenType: 'Bearer',
+                expiresIn: 600,
+            });
 
         }
     } catch (error) {
@@ -144,27 +190,59 @@ export const verifyCryptoSignature = async (req, res) => {
     }
 };
 
-// Logout logic
-export const logout = (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            console.error('Error during logout:', err);
-            return res.status(500).json({ error: 'Logout failed' });
+export const refresh = async (req, res) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).json({ error: 'Missing refresh token' });
         }
 
-        req.session.destroy((destroyErr) => {
-            if (destroyErr) {
-                console.error('Error destroying session:', destroyErr);
-                return res.status(500).json({ error: 'Failed to destroy session' });
-            }
+        // Verify refresh token
+        let payload;
+        try {
+            payload = await verifyRefreshToken(refreshToken);
+        } catch (err) {
+            return res.status(401).json({ error: 'Invalid or expired refresh token' });
+        }
 
-            // Clear the session cookie
-            res.clearCookie('connect.sid', { path: '/' });
-            console.log('User successfully logged out and session cleared.');
-            return res.status(200).json({ message: 'Logged out successfully' });
+        // Mint new access token
+        const accessToken = await mintAccessToken({
+            userPk: payload.pubkey,
+            scopes: payload.scopes || [],
         });
+
+        // Rotate refresh token (recommended)
+        const newRefreshToken = await mintRefreshToken({
+            userPk: payload.pubkey,
+            scopes: payload.scopes || [],
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: false,                      // true in prod HTTPS
+            path: '/api/auth/refresh',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.json({ accessToken });
+    } catch (err) {
+        console.error('Refresh error:', err);
+        return res.status(500).json({ error: 'Failed to refresh session' });
+    }
+};
+
+export const logout = (req, res) => {
+    console.log('logout called')
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false,
+        path: '/api/auth/refresh',
     });
-}
+    return res.status(200).json({ message: 'Logged out' });
+};
+
 
 export const updateAccountSettings = async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -176,12 +254,14 @@ export const updateAccountSettings = async (req, res) => {
 
 export default {
     createUser,
+    deleteUser,
     generateCryptoKeys,
     storePublicKey,
     getUserIdByPublicKey,
     getAllPublicKeys,
     getCryptoChallenge,
     verifyCryptoSignature,
+    refresh,
     logout,
     updateAccountSettings
 }

@@ -60,12 +60,12 @@ const RegisterForm = () => {
                         <input
                             className={`text-xl text-foreground border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="text"
-                            value={`${cryptoKeys.privateKey}`}
+                            value={`${cryptoKeys.publicKey}`}
                         />
                         <input
                             className={`text-xl text-foreground border border-border p-2 focus:outline-1 focus:outline-brand/60`}
                             type="email"
-                            value={`${cryptoKeys.publicKey}`}
+                            value={`${cryptoKeys.privateKey}`}
                         />
                     </div>
                     <div className={`col-span-2 text-md text-center mt-4`}>

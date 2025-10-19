@@ -2,6 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 import Synapse from "#api/models/synapse.js"
+import synapseServices from "#api/services/synapseServices.js"
 import activityController from './activityController.js';
 import { ACTIVITY_TYPES, OBJECT_TYPES, CONTEXT_TYPES } from '#api/config/activityConstants.js';
 import * as peerStateManager from '#core/peerStateManager.js';
@@ -48,52 +49,30 @@ export const getSynapseMembers = async (req, res) => {
 }
 
 export const joinSynapse = async (req, res) => {
-    const { publicKey } = req.query;
-    if (!publicKey) {
-        return res.status(401).json({error: 'No user publicKey provided.'});
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
     }
-    const metadata = await loadConfig(CONFIG_FILE);
-    if (!metadata) {
-        return res.status(401).json({error: 'No Synapse metadata loaded.'});
-    }
-    const db = await getGlobalUsersDB();
-    const [updatedUser] = await db.query(doc => doc._id === publicKey);
-    if(updatedUser) {
-        try {
-            updatedUser.synapses.push(metadata.identity.publicKey);
-            await db.put(updatedUser);
-            await Synapse.addSynapseMember(publicKey);
-            const activity = await activityController.createJoinSynapseActivity(publicKey, metadata.identity.publicKey);
-            broadcastController.broadcastActivity(activity);
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            console.error('Error joining Synapse: ', err);
-        }
+    const publicKey = req.user?.publicKey;
+    try {
+        const result = await synapseServices.joinSynapse(publicKey);
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Error joining Synapse: ', err);
     }
 }
 
 export const leaveSynapse = async (req, res) => {
-    const { publicKey } = req.query;
-    if (!publicKey) {
-        return res.status(401).json({error: 'No user publicKey provided.'});
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
     }
-    const metadata = await loadConfig(CONFIG_FILE);
-    if (!metadata) {
-        return res.status(401).json({error: 'No Synapse metadata loaded.'});
-    }
-    const db = await getGlobalUsersDB();
-    const [updatedUser] = await db.query(doc => doc._id === publicKey);
-    if(updatedUser) {
-        try {
-            updatedUser.synapses = updatedUser.synapses.filter(synapse => synapse !== metadata.identity.publicKey);
-            await db.put(updatedUser);
-            await Synapse.removeSynapseMember(publicKey);
-            const activity = await activityController.createLeaveSynapseActivity(publicKey, metadata.identity.publicKey);
-            broadcastController.broadcastActivity(activity);
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            console.error('Error leaving Synapse: ', err);
-        }
+    const publicKey = req.user?.publicKey;
+    try {
+        const result = await synapseServices.leaveSynapse(publicKey);
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Error leaving Synapse: ', err);
     }
 }
 

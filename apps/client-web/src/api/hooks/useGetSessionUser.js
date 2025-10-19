@@ -15,7 +15,7 @@ const useGetSessionUser = () => {
                 url: ENDPOINTS.GET_SESSION_USER,
                 withCredentials: true,
             });
-
+            console.log('getSessionUser response: ', response);
             return response;
         } catch (err) {
             console.error('Error in getSessionUser:', err);

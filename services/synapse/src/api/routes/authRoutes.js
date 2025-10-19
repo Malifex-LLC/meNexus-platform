@@ -4,16 +4,19 @@
 import express from 'express';
 const router = express.Router();
 import authController from '../controllers/authController.js'
+import {requireJwt} from "#api/middlewares/requireJwt.js";
 
 // Define authRoutes and link them to corresponding controller functions
 
 router.post('/createUser', authController.createUser);
+router.post('/deleteUser', requireJwt(['users:write']), authController.deleteUser);
 router.get('/generateCryptoKeys', authController.generateCryptoKeys);
 router.post('/storePublicKey', authController.storePublicKey);
 router.get('/getUserIdByPublicKey', authController.getUserIdByPublicKey);
 router.get('/getAllPublicKeys', authController.getAllPublicKeys);
 router.get('/getCryptoChallenge', authController.getCryptoChallenge);
 router.post('/verifyCryptoSignature', authController.verifyCryptoSignature);
+router.post('/refresh', authController.refresh);
 router.post('/logout', authController.logout);
 router.put('/updateAccountSettings', authController.updateAccountSettings);
 

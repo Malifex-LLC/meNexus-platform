@@ -19,11 +19,12 @@ export const createNotification = async (req, res) => {
 }
 
 export const getNotifications = async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
         console.log("User not authenticated or session missing");
         return res.status(401).json({ error: "User not authenticated" });
     }
-    const { publicKey } = req.session.user;
+
+    const publicKey = req.user?.publicKey;
     console.log("/getNotifications called for publicKey: ", publicKey);
 
     if (!publicKey) {

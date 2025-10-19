@@ -37,7 +37,13 @@ export const fetchRemoteReactions = async (req, res) => {
 }
 
 export const createRemoteReaction = async (req, res) => {
-    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
     if (!publicKey || !resourceType || !resourceId || !reactionType || !synapsePublicKey) {
         return res.status(401).json({error: 'No publicKey, resourceType, resourceId, or synapsePublicKey provided.'});
     }
@@ -69,7 +75,13 @@ export const createRemoteReaction = async (req, res) => {
 }
 
 export const deleteRemoteReaction = async (req, res) => {
-    const { publicKey, resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
+    if (!req.user) {
+        console.log("User not authenticated or session missing");
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const publicKey = req.user?.publicKey;
+    const { resourceType, resourceId, reactionType, synapsePublicKey } = req.body;
     if (!publicKey || !resourceType || !resourceId || !reactionType || !synapsePublicKey) {
         return res.status(401).json({error: 'No publicKey, resourceType, resourceId, or synapsePublicKey provided.'});
     }

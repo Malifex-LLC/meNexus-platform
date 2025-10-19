@@ -17,7 +17,10 @@ services:
         [ -s /work/secrets/db_root_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_root_pw.txt
         [ -s /work/secrets/db_user_pw.txt ]  || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_user_pw.txt
         [ -s /work/secrets/db_admin_pw.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/db_admin_pw.txt
+        [ -s /work/secrets/jwt_secret.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/jwt_secret.txt
+        [ -s /work/secrets/jwt_refresh_secret.txt ] || head -c 48 /dev/urandom | base64 | tr -d '\n' > /work/secrets/jwt_refresh_secret.txt
         [ -f /work/secrets/youtube_api_key.txt ] || :> /work/secrets/youtube_api_key.txt
+
         echo "[bootstrap] Secrets ready in ./secrets."
 
   db:
@@ -73,6 +76,10 @@ services:
       DB_PASSWORD_FILE: /run/secrets/DB_USER_PW
       DB_DATABASE: menexus_schema
 
+      # --- JWT secrets ---
+      JWT_SECRET_FILE: /run/secrets/JWT_SECRET
+      JWT_REFRESH_SECRET_FILE: /run/secrets/JWT_REFRESH_SECRET
+
       # --- orbitDB config  ---
       GLOBAL_USERS_DB_ADDR: /orbitdb/zdpuAuqAzFotj3AvtYtob9xoLMRWqhozNC7FLHooFreM49pJS
 
@@ -99,6 +106,10 @@ services:
     secrets:
       - source: DB_USER_PW
         target: DB_USER_PW
+      - source: JWT_SECRET
+        target: JWT_SECRET
+      - source: JWT_REFRESH_SECRET
+        target: JWT_REFRESH_SECRET
       - source: YOUTUBE_API_KEY
         target: YOUTUBE_API_KEY
     volumes:
@@ -138,6 +149,10 @@ secrets:
     file: ./secrets/db_root_pw.txt
   DB_USER_PW:
     file: ./secrets/db_user_pw.txt
+  JWT_SECRET:
+    file: ./secrets/jwt_secret.txt
+  JWT_REFRESH_SECRET:
+    file: ./secrets/jwt_refresh_secret.txt
   YOUTUBE_API_KEY:
     file: ./secrets/youtube_api_key.txt
 
