@@ -1,0 +1,88 @@
+/* Malifes Theme */
+
+:root {
+    /* Foundations */
+    --color-background:         #141414;   /* Panel Background */
+    --color-surface:            #000000;   /* Panel/Card Surface */
+    --color-border:             #2A2A2A;   /* Pane Splitters */
+
+    /* Header background */
+    --color-header-bg:          #000000;   /* Header Background Color */
+
+    /* Typography */
+    --color-foreground:         #f2e5bc;   /* Primary Text */
+    --color-foreground-message: #f2e5bc;   /* Text for Chat/Direct Messages */
+    --color-foreground-message-owner: #141414;   /* Text for Chat/Direct Messages */
+    --color-neutral:            #baa997;   /* Secondary Labels */
+
+    /* Brand & Accents */
+    --color-brand:              #FF6B6B;   /* Headlines and Highlights */
+    --color-primary:            #994040;   /* Buttons / CTAs */
+    --color-accent:             #537a5a;   /* Notifications / Alerts */
+    --color-secondary:          #CC5555;   /* Secondary */
+
+    /* Action states */
+    --color-edit:               #1E1E1E;
+    --color-edit-hover:         #262626;
+    --color-is-editing:         #3B82F6;
+
+    --color-save:               #22C55E;
+    --color-save-hover:         #16A34A;
+
+    --color-delete:             #EF4444;
+    --color-delete-hover:       #B91C1C;
+}
+
+/* Options for the actual window background. Solid, gradient, animated. */
+
+/* Solid Background */
+body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+}
+
+/* Gradient Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*            to bottom,*/
+/*            var(--color-background),*/
+/*            var(--color-primary),*/
+/*            var(--color-background)*/
+/*    );*/
+/*    backdrop-filter: blur(1rem);*/
+/*}*/
+
+/* Animated Background */
+/*body {*/
+/*    background: linear-gradient(*/
+/*            270deg,*/
+/*            var(--color-background),*/
+/*            var(--color-primary),*/
+/*            var(--color-secondary),*/
+/*            var(--color-background)*/
+/*    );*/
+/*    background-size: 600% 600%;*/
+/*    animation: gradientShift 10s ease infinite;*/
+/*    backdrop-filter: blur(16px);*/
+/*}*/
+
+/*@keyframes gradientShift {*/
+/*    0% { background-position: 0% 50%; }*/
+/*    50% { background-position: 100% 50%; }*/
+/*    100% { background-position: 0% 50%; }*/
+/*}*/
+
+/* Scrollbar Styling */
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A1A;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #FF6B6B;
+    border-radius: 6px;
+}
+

@@ -43,6 +43,7 @@ const DisplaySettings = () => {
                             <option value="HighVisYellow">High Vis - Yellow</option>
                             <option value="Indigo">Indigo</option>
                             <option value="Limewire">Limewire</option>
+                            <option value="Malifex">Malifex</option>
                             <option value="Monokai">Monokai</option>
                             <option value="MoreMonstersAndSprites">More Monsters and Sprites</option>
                             <option value="OneDarkPro">One Dark Pro</option>
