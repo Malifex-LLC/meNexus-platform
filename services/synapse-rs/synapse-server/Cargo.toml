@@ -1,0 +1,21 @@
+[package]
+name = "synapse-server"
+version = "0.3.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.6"
+dotenvy = { workspace = true }
+sqlx = { version = "0.8.6", features = [
+  "runtime-tokio",
+  "macros",
+  "mysql",
+  "time",
+  "uuid",
+] }
+synapse-core = { path = "../synapse-core/" }
+time = { version = "0.3.44", features = ["formatting", "serde"] }
+tokio = { workspace = true }
+tower-http = "0.6.6"
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }

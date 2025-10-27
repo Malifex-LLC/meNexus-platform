@@ -1,0 +1,18 @@
+[workspace]
+resolver = "3"
+members = ["synapse-core", "synapse-server"]
+
+[workspace.package]
+edition = "2024"
+
+[workspace.dependencies]
+anyhow = "1.0.100"
+async-trait = "0.1.89"
+dotenvy = "0.15.7"
+libp2p = "0.56.0"
+log = "0.4.28"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+thiserror = "2.0.17"
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.41"
