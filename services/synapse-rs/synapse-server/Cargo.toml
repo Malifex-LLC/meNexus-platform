@@ -13,9 +13,12 @@ sqlx = { version = "0.8.6", features = [
   "time",
   "uuid",
 ] }
+serde = { workspace = true }
+serde_json = { workspace = true }
 synapse-core = { path = "../synapse-core/" }
+thiserror = { workspace = true }
 time = { version = "0.3.44", features = ["formatting", "serde"] }
 tokio = { workspace = true }
-tower-http = "0.6.6"
+tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
