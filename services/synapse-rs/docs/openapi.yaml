@@ -4,50 +4,69 @@ info:
   version: 0.3.0-alpha
   description: The meNexus Synapse API for v0.3.0-alpha
 servers:
-  - url: http://localhost:3002
+  - url: http://localhost:3002/v1
     description: The URL will depend on the context of your Synapse
-  - url: ws://localhost:3002
+  - url: ws://localhost:3002/v1
     description: WebSocket server for realtime updates
 security:
   - bearerAuth: []
 tags:
-  - name: activities
-    description: Operations related to activities like posts, messages, and comments
   - name: auth
     description: Authentication and session management endpoints
-  - name: conversations
-    description: Conversation (DM/group) management
-  - name: followers
-    description: User following and followers
   - name: health
     description: Server health checks
-  - name: media
-    description: Media upload and management
-  - name: peers
-    description: Peer discovery and management
   - name: settings
-    description: User and system settings
-  - name: synapses
-    description: Synapse server metadata and members
-  - name: spaces
-    description: Space (channel/room) management
-  - name: users
-    description: User profile management
-  - name: voice
-    description: Voice session management
+    description: Agent and system settings
+  - name: synapse
+    description: Local Synapse metadata and members
+  - name: peers
+    description: Discovered/connected Synapses
+  - name: modules
+    description: Modules are composable plugins that hosts can enable/disable
+  - name: channels
+    description: Channel management
+  - name: events
+    description: Operations related to events like posts, messages, and comments
+  - name: agents
+    description: Agent profile and social graph
+  - name: artifacts
+    description: Artifact upload and management
 
 
 paths:
+  /modules:
+    get:
+      tags: [modules]
+      summary: List all modules
+      description: List all modules across kinds enabled on this Synapse.
+      operationId: list_modules
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: moduleKind
+          in: query
+          required: false
+          description: Optional filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
   /health:
     get:
       tags: [health]
       summary: Get Synapse server health check
       description: Check if the Synapse's Axum server is running
       operationId: get_health
+      security: []
       responses:
         "200":
           $ref: "#/components/responses/Ok"
-        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
   /auth/challenges:
@@ -125,10 +144,10 @@ paths:
 
   /followers:
     post:
-      tags: [followers]
-      summary: Follow a user
-      description: Follow a specified user
-      operationId: follow_user
+      tags: [agents]
+      summary: Follow an agent
+      description: Follow a specified agent
+      operationId: follow_agent
       requestBody:
         required: true
         content:
@@ -136,9 +155,9 @@ paths:
             schema:
               type: object
               properties:
-                userPublicKey:
+                agentPublicKey:
                   $ref: "#/components/schemas/HexCompressedPublicKey"
-              required: [userPublicKey]
+              required: [agentPublicKey]
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -148,14 +167,14 @@ paths:
         "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /followers/{userPublicKey}:
+  /followers/{agentPublicKey}:
     delete:
-      tags: [followers]
-      summary: Unfollow a user
-      description: Unfollow the specified user
-      operationId: unfollow_user
+      tags: [agents]
+      summary: Unfollow an agent
+      description: Unfollow the specified agent
+      operationId: unfollow_agent
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -165,14 +184,14 @@ paths:
 
   /followers/check:
     get:
-      tags: [followers]
-      summary: Check if current user follows another user
-      description: Check follow status for one or more users
+      tags: [agents]
+      summary: Check if current agent follows other agents
+      description: Check follow status for one or more agents
       operationId: check_follow_status
       parameters:
-        - name: userPublicKeys
+        - name: agentPublicKeys
           in: query
-          description: Comma-separated list of user public keys to check
+          description: Comma-separated list of agent public keys to check
           required: true
           style: form
           explode: false
@@ -195,7 +214,7 @@ paths:
 
   /me:
     get:
-      tags: [users]
+      tags: [agents]
       summary: Get current session user
       description: Retrieve the authenticated user's profile
       operationId: get_current_user
@@ -208,13 +227,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Agent"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
   /me/followers:
     get:
-      tags: [followers]
+      tags: [agents]
       summary: Get followers of current user
       description: List users following the authenticated user
       operationId: list_my_followers
@@ -227,13 +246,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
   /me/following:
     get:
-      tags: [followers]
+      tags: [agents]
       summary: Get users the current user is following
       description: List users followed by the authenticated user
       operationId: list_my_following
@@ -246,13 +265,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
   /me/settings:
     patch:
-      tags: [users]
+      tags: [settings]
       summary: Update account settings
       description: Update the authenticated user's settings
       operationId: update_user_settings
@@ -261,47 +280,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserUpdate"
+              $ref: "#/components/schemas/AgentUpdate"
       responses:
         "200":
           description: Settings updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Agent"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /media/{mediaId}:
+  /artifacts/{artifactId}:
     get:
-      tags: [media]
-      summary: Get media metadata
-      description: Retrieve metadata for uploaded media
-      operationId: get_media
+      tags: [artifacts]
+      summary: Get artifact metadata
+      description: Retrieve metadata for uploaded artifact
+      operationId: get_artifact
       parameters:
-        - $ref: "#/components/parameters/MediaId"
+        - $ref: "#/components/parameters/ArtifactId"
       responses:
         "200":
-          description: Media metadata retrieved
+          description: Artifact metadata retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Media"
+                $ref: "#/components/schemas/Artifact"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [media]
-      summary: Delete specified media
-      description: Permanently delete uploaded media
-      operationId: delete_media
+      tags: [artifacts]
+      summary: Delete specified artifact
+      description: Permanently delete uploaded artifact
+      operationId: delete_artifact
       parameters:
-        - $ref: "#/components/parameters/MediaId"
+        - $ref: "#/components/parameters/ArtifactId"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -310,10 +329,11 @@ paths:
 
   /synapse:
     get:
-      tags: [synapses]
+      tags: [synapse]
       summary: Get local Synapse metadata
       description: Retrieve metadata for the local Synapse
       operationId: get_local_synapse
+      security: []
       responses:
         "200":
           description: Local Synapse metadata retrieved
@@ -324,40 +344,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Synapse"
+              example:
+                publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                name: "My Synapse"
+                description: "Local node"
+                version: "0.3.0-alpha"
+                links:
+                  - rel: "capabilities"
+                    href: "http://localhost:3002/v1/capabilities"
+                    method: "GET"
+                  - rel: "modules"
+                    href: "http://localhost:3002/v1/modules/feed"
+                    method: "GET"
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapse/activities:
+
+  /events:
     get:
-      tags: [synapses, activities]
-      summary: Get all activities for the Synapse
-      description: List all activities across the local Synapse
-      operationId: list_synapse_activities
+      tags: [events]
+      summary: Get all events (global)
+      description: List events across the Synapse with optional filters
+      operationId: list_events
       parameters:
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
-        - name: activityType
+        - name: eventType
           in: query
-          description: Filter by activity type
-          schema:
-            $ref: "#/components/schemas/ActivityType"
-        - name: spaceId
+          description: Filter by event type
+          schema: { $ref: "#/components/schemas/EventType" }
+        - name: moduleKind
           in: query
-          description: Filter by space ID
+          description: Filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+        - name: moduleSlug
+          in: query
+          description: Filter by module slug
+          schema: { $ref: "#/components/schemas/Slug" }
+        - name: channelId
+          in: query
+          description: Filter by channel
           schema:
-            $ref: "#/components/schemas/Slug"
+            type: string
+            format: uuid
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
+          headers:
+            RateLimit-Limit: { $ref: "#/components/headers/RateLimit-Limit" }
+            RateLimit-Remaining: { $ref: "#/components/headers/RateLimit-Remaining" }
+            RateLimit-Reset: { $ref: "#/components/headers/RateLimit-Reset" }
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+              schema: { $ref: "#/components/schemas/PaginatedEvents" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapse/peers:
+  /peers:
     get:
-      tags: [synapses, peers]
+      tags: [peers]
       summary: List discovered peers
       description: List connected or discovered Synapse peers
       operationId: list_peers
@@ -371,9 +416,37 @@ paths:
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
+  /capabilities:
+    get:
+      tags: [synapse]
+      summary: Get Synapse capabilities
+      description: List supported modules, event types, and extensions for this Synapse
+      operationId: get_capabilities
+      security: []
+      responses:
+        "200":
+          description: Capabilities retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Capabilities" }
+              example:
+                modules: ["feed", "forum", "livestream"]
+                eventTypes: ["post", "message", "comment", "reaction", "follow"]
+                extensions:
+                  - name: "custom-livestream"
+                    version: "1.2.0"
+                links:
+                  - rel: "modules"
+                    href: "http://localhost:3002/v1/modules"
+                    method: "GET"
+                  - rel: "modules-kind"
+                    href: "http://localhost:3002/v1/modules/feed"
+                    method: "GET"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
   /synapse/members:
     get:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: List members of this Synapse
       description: List users registered as members of the local Synapse
       operationId: list_synapse_members
@@ -386,11 +459,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Join this Synapse (current user)
       description: Register the authenticated user as a member of the local Synapse
       operationId: join_synapse
@@ -403,7 +476,7 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Leave this Synapse (current user)
       description: Remove the authenticated user from the local Synapse membership
       operationId: leave_synapse
@@ -413,14 +486,14 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapse/members/{userPublicKey}:
+  /synapse/members/{agentPublicKey}:
     delete:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Remove a member (admin only)
       description: Force remove a user from the local Synapse membership (requires admin privileges)
       operationId: remove_synapse_member
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -428,96 +501,115 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}:
+  /modules/{moduleKind}:
     get:
-      tags: [spaces]
-      summary: List spaces of a specified type
-      description: Retrieve all spaces of the given type in the local Synapse
-      operationId: list_spaces_by_type
+      tags: [modules]
+      summary: List modules of a specified kind
+      description: Retrieve all modules of the given kind in the local Synapse. Modules are composable plugins that hosts can enable/disable.
+      operationId: list_modules_by_kind
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
+        - $ref: "#/components/parameters/ModuleKind"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Spaces listed
+          description: Modules listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSpaces"
+                $ref: "#/components/schemas/PaginatedModules"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [spaces]
-      summary: Create a new space of specified type
-      description: Create a new space with the given type and configuration
-      operationId: create_space
+      tags: [modules]
+      summary: Create a new module of specified kind
+      description: Create a new module with the given kind and configuration
+      operationId: create_module
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
+        - $ref: "#/components/parameters/ModuleKind"
       requestBody:
-        $ref: "#/components/requestBodies/SpaceCreateJson"
+        $ref: "#/components/requestBodies/ModuleCreateJson"
       responses:
         "201":
-          description: Space created
+          description: Module created
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "409": { $ref: "#/components/responses/ProblemConflict" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}:
+  /modules/{moduleKind}/{moduleSlug}:
     get:
-      tags: [spaces]
-      summary: Get space by type and slug
-      description: Retrieve space metadata by type and slug within this Synapse.
-      operationId: get_space
+      tags: [modules]
+      summary: Get module by kind and slug
+      description: Retrieve module metadata by kind and slug within this Synapse. Clients should use layoutHints to adapt UIs based on host configurations.
+      operationId: get_module
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       responses:
         "200":
-          description: Space retrieved
+          description: Module retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
+              example:
+                moduleKind: "livestream"
+                moduleSlug: "town-hall"
+                name: "Town Hall"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "members"
+                  canInvite: "moderators"
+                  canModerate: "owner"
+                tags: ["video", "community"]
+                metadata: { }
+                layoutHints:
+                  component: "VideoPlayerWithChat"
+                  props:
+                    showChat: true
+                links:
+                  - rel: "events"
+                    href: "http://localhost:3002/v1/modules/livestream/town-hall/events"
+                    method: "GET"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [spaces]
-      summary: Update space
-      description: Update space fields such as name, visibility, permissions, or metadata.
-      operationId: update_space
+      tags: [modules]
+      summary: Update module
+      description: Update module properties such as name, visibility, permissions, metadata, or layoutHints.
+      operationId: update_module
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/SpaceUpdateJson"
+        $ref: "#/components/requestBodies/ModuleUpdateJson"
       responses:
         "200":
-          description: Space updated
+          description: Module updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
@@ -525,13 +617,13 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [spaces]
-      summary: Delete a specified space
-      description: Permanently delete the space identified by type and slug
-      operationId: delete_space
+      tags: [modules]
+      summary: Delete a specified module
+      description: Permanently delete the module identified by kind and slug
+      operationId: delete_module
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -539,50 +631,50 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}/activities:
+  /modules/{moduleKind}/{moduleSlug}/events:
     get:
-      tags: [spaces, activities]
-      summary: List activities from specified space
-      description: List activities for a space identified by type and slug. Use query params to filter by activity type or parent.
-      operationId: list_space_activities
+      tags: [events]
+      summary: List events from specified module
+      description: List events for a module identified by kind and slug. Use query params to filter by event type or parent.
+      operationId: list_module_events
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
-        - name: activityType
+        - name: eventType
           in: query
-          description: Filter by activity type (e.g., post, message, comment)
+          description: Filter by event type (e.g., post, message, comment)
           schema:
-            $ref: "#/components/schemas/ActivityType"
+            $ref: "#/components/schemas/EventType"
         - name: parentId
           in: query
-          description: Filter by parent activity ID (e.g., for comments on a post)
+          description: Filter by parent event ID (e.g., for comments on a post)
           schema:
             type: string
             format: uuid
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [spaces, activities]
-      summary: Create activity in specified space
-      description: Create an activity in the specified space (e.g., post, message, comment)
-      operationId: create_space_activity
+      tags: [events]
+      summary: Create event in specified module
+      description: Create an event in the specified module (e.g., post, message, comment)
+      operationId: create_module_event
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       requestBody:
-        $ref: "#/components/requestBodies/ActivityCreateJson"
+        $ref: "#/components/requestBodies/EventCreateJson"
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -592,53 +684,68 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}/activities/{activityId}:
+  /modules/{moduleKind}/{moduleSlug}/events/{eventId}:
     get:
-      tags: [activities]
-      summary: Get an activity by ID
-      description: Retrieve a single activity by its ID within the space.
-      operationId: get_space_activity
+      tags: [events]
+      summary: Get an event by ID
+      description: Retrieve a single event by its ID within the module.
+      operationId: get_module_event
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Activity retrieved
+          description: Event retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
+              example:
+                eventId: "123e4567-e89b-12d3-a456-426614174000"
+                agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "post"
+                content: "Welcome!"
+                createdAt: "2023-01-01T00:00:00Z"
+                links:
+                  - rel: "artifacts"
+                    href: "http://localhost:3002/v1/modules/feed/general/events/123e4567-e89b-12d3-a456-426614174000/artifacts"
+                    method: "GET"
+                  - rel: "module"
+                    href: "http://localhost:3002/v1/modules/feed/general"
+                    method: "GET"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [activities]
-      summary: Update an activity
-      description: Edit the content or media of an activity in the space
-      operationId: update_space_activity
+      tags: [events]
+      summary: Update an event
+      description: Edit the content or artifacts of an event in the module
+      operationId: update_module_event
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/ActivityUpdateJson"
+        $ref: "#/components/requestBodies/EventUpdateJson"
       responses:
         "200":
-          description: Activity updated
+          description: Event updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
@@ -646,14 +753,14 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [activities]
-      summary: Delete activity
-      description: Permanently delete an activity by its ID from the space.
-      operationId: delete_space_activity
+      tags: [events]
+      summary: Delete event
+      description: Permanently delete an event by its ID from the module.
+      operationId: delete_module_event
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
@@ -666,62 +773,62 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}/activities/{activityId}/media:
+  /modules/{moduleKind}/{moduleSlug}/events/{eventId}/artifacts:
     get:
-      tags: [activities, media]
-      summary: List attached media for an activity
-      description: List metadata for media attached to an activity
-      operationId: list_activity_media
+      tags: [artifacts]
+      summary: List attached artifacts for an event
+      description: List metadata for artifacts attached to an event
+      operationId: list_event_artifacts
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Media listed
+          description: Artifacts listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedMediaUris"
+                $ref: "#/components/schemas/PaginatedArtifactUris"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [activities, media]
-      summary: Upload attached media for activity
-      description: Upload media and attach it to the specified activity.
-      operationId: upload_activity_media
+      tags: [artifacts]
+      summary: Upload attached artifact for event
+      description: Upload artifact and attach it to the specified event.
+      operationId: upload_event_artifact
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       requestBody:
-        $ref: "#/components/requestBodies/MediaUpload"
+        $ref: "#/components/requestBodies/ArtifactUpload"
       responses:
         "201":
-          description: Media uploaded
+          description: Artifact uploaded
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
+                $ref: "#/components/schemas/ArtifactUploadResponse"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}/voice:
+  /modules/{moduleKind}/{moduleSlug}/voice:
     post:
-      tags: [spaces, voice]
+      tags: [modules]
       summary: Start a voice session
-      description: Start a voice session within the specified space.
-      operationId: start_space_voice_session
+      description: Start a voice session within the specified module.
+      operationId: start_module_voice_session
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       responses:
         "201":
           description: Voice session created
@@ -740,15 +847,15 @@ paths:
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /spaces/{spaceType}/{spaceSlug}/voice/{sessionId}:
+  /modules/{moduleKind}/{moduleSlug}/voice/{sessionId}:
     delete:
-      tags: [spaces, voice]
+      tags: [modules]
       summary: End voice session
-      description: End the specified voice session within the space.
-      operationId: end_space_voice_session
+      description: End the specified voice session within the module.
+      operationId: end_module_voice_session
       parameters:
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - $ref: "#/components/parameters/SessionId"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
@@ -756,74 +863,84 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations:
+  /channels:
     get:
-      tags: [conversations]
-      summary: List conversations
-      description: List all conversations for the authenticated user
-      operationId: list_conversations
+      tags: [channels]
+      summary: List channels
+      description: List all channels for the authenticated user
+      operationId: list_channels
       parameters:
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Conversations listed
+          description: Channels listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedConversations"
+                $ref: "#/components/schemas/PaginatedChannels"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations]
-      summary: Create a new conversation
-      description: Start a new conversation (e.g., DM or group)
-      operationId: create_conversation
+      tags: [channels]
+      summary: Create a new channel
+      description: Start a new channel (e.g., DM or group)
+      operationId: create_channel
       requestBody:
-        $ref: "#/components/requestBodies/ConversationCreateJson"
+        $ref: "#/components/requestBodies/ChannelCreateJson"
       responses:
         "201":
-          description: Conversation created
+          description: Channel created
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}:
+  /channels/{channelId}:
     get:
-      tags: [conversations]
-      summary: Get conversation details
-      description: Retrieve metadata for a specific conversation
-      operationId: get_conversation
+      tags: [channels]
+      summary: Get channel details
+      description: Retrieve metadata for a specific channel
+      operationId: get_channel
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       responses:
         "200":
-          description: Conversation retrieved
+          description: Channel retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
+              example:
+                channelId: "123e4567-e89b-12d3-a456-426614174111"
+                name: "General Chat"
+                links:
+                  - rel: "participants"
+                    href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/participants"
+                    method: "GET"
+                  - rel: "events"
+                    href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/events"
+                    method: "GET"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [conversations]
-      summary: Update conversation metadata
-      description: Update conversation name or other metadata
-      operationId: update_conversation
+      tags: [channels]
+      summary: Update channel metadata
+      description: Update channel name or other metadata
+      operationId: update_channel
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - name: If-Match
           in: header
           schema:
@@ -834,26 +951,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConversationUpdate"
+              $ref: "#/components/schemas/ChannelUpdate"
       responses:
         "200":
-          description: Conversation updated
+          description: Channel updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [conversations]
-      summary: Delete or leave a conversation
-      description: Leave or delete the conversation (depending on ownership)
-      operationId: delete_conversation
+      tags: [channels]
+      summary: Delete or leave a channel
+      description: Leave or delete the channel (depending on ownership)
+      operationId: delete_channel
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - name: If-Match
           in: header
           schema:
@@ -865,36 +982,36 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}/activities:
+  /channels/{channelId}/events:
     get:
-      tags: [conversations, activities]
-      summary: List activities in conversation
-      description: List activities (messages) in the conversation
-      operationId: list_conversation_activities
+      tags: [events]
+      summary: List events in channel
+      description: List events (messages) in the channel
+      operationId: list_channel_events
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations, activities]
-      summary: Create activity in conversation
-      description: Create an activity (message) in the conversation
-      operationId: create_conversation_activity
+      tags: [events]
+      summary: Create event in channel
+      description: Create an event (message) in the channel
+      operationId: create_channel_event
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       requestBody:
-        $ref: "#/components/requestBodies/ActivityCreateJson"
+        $ref: "#/components/requestBodies/EventCreateJson"
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -904,51 +1021,51 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}/activities/{activityId}:
+  /channels/{channelId}/events/{eventId}:
     get:
-      tags: [activities]
-      summary: Get activity in conversation
-      description: Retrieve a single activity by ID in the conversation
-      operationId: get_conversation_activity
+      tags: [events]
+      summary: Get event in channel
+      description: Retrieve a single event by ID in the channel
+      operationId: get_channel_event
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Activity retrieved
+          description: Event retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [activities]
-      summary: Update activity in conversation
-      description: Edit the content or media of an activity
-      operationId: update_conversation_activity
+      tags: [events]
+      summary: Update event in channel
+      description: Edit the content or artifacts of an event
+      operationId: update_channel_event
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/ActivityUpdateJson"
+        $ref: "#/components/requestBodies/EventUpdateJson"
       responses:
         "200":
-          description: Activity updated
+          description: Event updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
@@ -956,13 +1073,13 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [activities]
-      summary: Delete activity in conversation
-      description: Permanently delete an activity by ID
-      operationId: delete_conversation_activity
+      tags: [events]
+      summary: Delete event in channel
+      description: Permanently delete an event by ID
+      operationId: delete_channel_event
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
@@ -975,76 +1092,76 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}/activities/{activityId}/media:
+  /channels/{channelId}/events/{eventId}/artifacts:
     get:
-      tags: [activities, media]
-      summary: List attached media for activity in conversation
-      description: List metadata for media attached to an activity
-      operationId: list_conversation_activity_media
+      tags: [artifacts]
+      summary: List attached artifacts for event in channel
+      description: List metadata for artifacts attached to an event
+      operationId: list_channel_event_artifacts
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Media listed
+          description: Artifacts listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedMediaUris"
+                $ref: "#/components/schemas/PaginatedArtifactUris"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [activities, media]
-      summary: Upload attached media for activity in conversation
-      description: Upload media and attach it to the specified activity.
-      operationId: upload_conversation_activity_media
+      tags: [artifacts]
+      summary: Upload attached artifact for event in channel
+      description: Upload artifact and attach it to the specified event.
+      operationId: upload_channel_event_artifact
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       requestBody:
-        $ref: "#/components/requestBodies/MediaUpload"
+        $ref: "#/components/requestBodies/ArtifactUpload"
       responses:
         "201":
-          description: Media uploaded
+          description: Artifact uploaded
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
+                $ref: "#/components/schemas/ArtifactUploadResponse"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}/participants:
+  /channels/{channelId}/participants:
     get:
-      tags: [conversations, users]
-      summary: List participants in conversation
-      description: List users in the conversation
-      operationId: list_conversation_participants
+      tags: [channels, agents]
+      summary: List participants in channel
+      description: List agents in the channel
+      operationId: list_channel_participants
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       responses:
         "200":
           description: Participants listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations, users]
-      summary: Add participant to conversation
-      description: Add a user to the conversation
-      operationId: add_conversation_participant
+      tags: [channels, agents]
+      summary: Add participant to channel
+      description: Add an agent to the channel
+      operationId: add_channel_participant
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       requestBody:
         required: true
         content:
@@ -1052,25 +1169,26 @@ paths:
             schema:
               type: object
               properties:
-                userPublicKey:
+                agentPublicKey:
                   $ref: "#/components/schemas/HexCompressedPublicKey"
-              required: [userPublicKey]
+              required: [agentPublicKey]
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /conversations/{conversationId}/participants/{userPublicKey}:
+  /channels/{channelId}/participants/{agentPublicKey}:
     delete:
-      tags: [conversations, users]
-      summary: Remove participant from conversation
-      description: Remove a user from the conversation
-      operationId: remove_conversation_participant
+      tags: [channels, agents]
+      summary: Remove participant from channel
+      description: Remove an agent from the channel
+      operationId: remove_channel_participant
       parameters:
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -1079,119 +1197,179 @@ paths:
 
   # -------- Remote Synapse routes --------
 
-  /synapses/{synapsePublicKey}/activities:
+  /synapses/{synapsePublicKey}/capabilities:
     get:
-      tags: [synapses, activities]
-      summary: Get all activities for the remote Synapse
-      description: List activities from a remote Synapse
-      operationId: list_remote_synapse_activities
+      tags: [synapse]
+      summary: Get remote Synapse capabilities
+      description: List supported modules, event types, and extensions for the specified remote Synapse
+      operationId: get_remote_capabilities
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+      responses:
+        "200":
+          description: Capabilities retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Capabilities" }
+              example:
+                modules: ["feed", "forum"]
+                eventTypes: ["post", "comment"]
+                extensions:
+                  - name: "custom-livestream"
+                    version: "1.0.0"
+                links:
+                  - rel: "modules"
+                    href: "http://remote-synapse.example/v1/modules"
+                    method: "GET"
+                  - rel: "modules-kind"
+                    href: "http://remote-synapse.example/v1/modules/feed"
+                    method: "GET"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/events:
+    get:
+      tags: [events]
+      summary: Get all events for the remote Synapse
+      description: List events from a remote Synapse
+      operationId: list_remote_synapse_events
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}:
+  /synapses/{synapsePublicKey}/modules:
     get:
-      tags: [spaces]
-      summary: List spaces of a specified type on remote Synapse
-      description: Retrieve all spaces of the given type on the remote Synapse
-      operationId: list_remote_spaces_by_type
+      tags: [modules]
+      summary: List modules on remote Synapse
+      description: List all modules across kinds on the remote Synapse. Supports filtering by kind and visibility.
+      operationId: list_remote_modules
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: moduleKind
+          in: query
+          required: false
+          description: Optional filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+        - name: visibility
+          in: query
+          required: false
+          description: Filter by module visibility (e.g., public)
+          schema: { $ref: "#/components/schemas/ModuleVisibility" }
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}:
+    get:
+      tags: [modules]
+      summary: List modules of a specified kind on remote Synapse
+      description: Retrieve all modules of the given kind on the remote Synapse
+      operationId: list_remote_modules_by_kind
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Spaces listed
+          description: Modules listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSpaces"
+                $ref: "#/components/schemas/PaginatedModules"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [spaces]
-      summary: Create a new space on remote Synapse
-      description: Create a new space on the remote Synapse (if permitted)
-      operationId: create_remote_space
+      tags: [modules]
+      summary: Create a new module on remote Synapse
+      description: Create a new module on the remote Synapse (if permitted)
+      operationId: create_remote_module
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
+        - $ref: "#/components/parameters/ModuleKind"
       requestBody:
-        $ref: "#/components/requestBodies/SpaceCreateJson"
+        $ref: "#/components/requestBodies/ModuleCreateJson"
       responses:
         "201":
-          description: Space created
+          description: Module created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "409": { $ref: "#/components/responses/ProblemConflict" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}:
     get:
-      tags: [spaces]
-      summary: Get space on remote Synapse
-      description: Retrieve space metadata from remote Synapse
-      operationId: get_remote_space
+      tags: [modules]
+      summary: Get module on remote Synapse
+      description: Retrieve module metadata from remote Synapse
+      operationId: get_remote_module
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       responses:
         "200":
-          description: Space retrieved
+          description: Module retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [spaces]
-      summary: Update space on remote Synapse
-      description: Update space on remote Synapse (if permitted)
-      operationId: update_remote_space
+      tags: [modules]
+      summary: Update module on remote Synapse
+      description: Update module on remote Synapse (if permitted)
+      operationId: update_remote_module
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/SpaceUpdateJson"
+        $ref: "#/components/requestBodies/ModuleUpdateJson"
       responses:
         "200":
-          description: Space updated
+          description: Module updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Space"
+                $ref: "#/components/schemas/Module"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
@@ -1199,14 +1377,14 @@ paths:
         "409": { $ref: "#/components/responses/ProblemConflict" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [spaces]
-      summary: Delete space on remote Synapse
-      description: Delete space on remote Synapse (if permitted)
-      operationId: delete_remote_space
+      tags: [modules]
+      summary: Delete module on remote Synapse
+      description: Delete module on remote Synapse (if permitted)
+      operationId: delete_remote_module
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - name: If-Match
           in: header
           schema:
@@ -1220,98 +1398,99 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}/activities:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events:
     get:
-      tags: [spaces, activities]
-      summary: List activities from remote space
-      description: List activities from a space on remote Synapse
-      operationId: list_remote_space_activities
+      tags: [events]
+      summary: List events from remote module
+      description: List events from a module on remote Synapse
+      operationId: list_remote_module_events
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [spaces, activities]
-      summary: Create activity in remote space
-      description: Create an activity in the space on remote Synapse (if permitted)
-      operationId: create_remote_space_activity
+      tags: [events]
+      summary: Create event in remote module
+      description: Create an event in the module on remote Synapse (if permitted)
+      operationId: create_remote_module_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       requestBody:
-        $ref: "#/components/requestBodies/ActivityCreateJson"
+        $ref: "#/components/requestBodies/EventCreateJson"
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}/activities/{activityId}:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events/{eventId}:
     get:
-      tags: [activities]
-      summary: Get activity from remote space
-      description: Retrieve an activity from a space on remote Synapse
-      operationId: get_remote_space_activity
+      tags: [events]
+      summary: Get event from remote module
+      description: Retrieve an event from a module on remote Synapse
+      operationId: get_remote_module_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Activity retrieved
+          description: Event retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [activities]
-      summary: Update activity in remote space
-      description: Update an activity in the space on remote Synapse (if permitted)
-      operationId: update_remote_space_activity
+      tags: [events]
+      summary: Update event in remote module
+      description: Update an event in the module on remote Synapse (if permitted)
+      operationId: update_remote_module_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/ActivityUpdateJson"
+        $ref: "#/components/requestBodies/EventUpdateJson"
       responses:
         "200":
-          description: Activity updated
+          description: Event updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
@@ -1319,15 +1498,15 @@ paths:
         "409": { $ref: "#/components/responses/ProblemConflict" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [activities]
-      summary: Delete activity in remote space
-      description: Delete an activity from the space on remote Synapse (if permitted)
-      operationId: delete_remote_space_activity
+      tags: [events]
+      summary: Delete event in remote module
+      description: Delete an event from the module on remote Synapse (if permitted)
+      operationId: delete_remote_module_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
@@ -1341,83 +1520,83 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}/activities/{activityId}/media:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events/{eventId}/artifacts:
     get:
-      tags: [activities, media]
-      summary: List attached media for activity on remote space
-      description: List metadata for media attached to an activity on remote Synapse
-      operationId: list_remote_activity_media
+      tags: [artifacts]
+      summary: List attached artifacts for event on remote module
+      description: List metadata for artifacts attached to an event on remote Synapse
+      operationId: list_remote_event_artifacts
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Media listed
+          description: Artifacts listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedMediaUris"
+                $ref: "#/components/schemas/PaginatedArtifactUris"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [activities, media]
-      summary: Upload attached media for activity on remote space
-      description: Upload media to an activity on remote Synapse (if permitted)
-      operationId: upload_remote_activity_media
+      tags: [artifacts]
+      summary: Upload attached artifact for event on remote module
+      description: Upload artifact to an event on remote Synapse (if permitted)
+      operationId: upload_remote_event_artifact
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
       requestBody:
-        $ref: "#/components/requestBodies/MediaUpload"
+        $ref: "#/components/requestBodies/ArtifactUpload"
       responses:
         "201":
-          description: Media uploaded
+          description: Artifact uploaded
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
+                $ref: "#/components/schemas/ArtifactUploadResponse"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}/voice:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/voice:
     post:
-      tags: [spaces, voice]
-      summary: Start voice session on remote space
-      description: Start a voice session in the space on remote Synapse
-      operationId: start_remote_voice_session
+      tags: [modules]
+      summary: Start voice session on remote module
+      description: Start a voice session in the module on remote Synapse
+      operationId: start_remote_module_voice_session
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
       responses:
-        "200": { $ref: "#/components/responses/Ok" }
+        "201": { $ref: "#/components/responses/Created" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/spaces/{spaceType}/{spaceSlug}/voice/{sessionId}:
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/voice/{sessionId}:
     delete:
-      tags: [spaces, voice]
-      summary: End voice session on remote space
-      description: End a voice session in the space on remote Synapse
-      operationId: end_remote_voice_session
+      tags: [modules]
+      summary: End voice session on remote module
+      description: End a voice session in the module on remote Synapse
+      operationId: end_remote_module_voice_session
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/SpaceType"
-        - $ref: "#/components/parameters/SpaceSlug"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
         - $ref: "#/components/parameters/SessionId"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
@@ -1426,31 +1605,31 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations:
+  /synapses/{synapsePublicKey}/channels:
     get:
-      tags: [conversations]
-      summary: List conversations on remote Synapse
-      description: List conversations on remote Synapse (if applicable)
-      operationId: list_remote_conversations
+      tags: [channels]
+      summary: List channels on remote Synapse
+      description: List channels on remote Synapse (if applicable)
+      operationId: list_remote_channels
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Conversations listed
+          description: Channels listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedConversations"
+                $ref: "#/components/schemas/PaginatedChannels"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations]
-      summary: Create conversation on remote Synapse
-      description: Create a new conversation on remote Synapse
-      operationId: create_remote_conversation
+      tags: [channels]
+      summary: Create channel on remote Synapse
+      description: Create a new channel on remote Synapse
+      operationId: create_remote_channel
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
       requestBody:
@@ -1458,50 +1637,50 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConversationCreate"
+              $ref: "#/components/schemas/ChannelCreate"
       responses:
         "201":
-          description: Conversation created
+          description: Channel created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}:
+  /synapses/{synapsePublicKey}/channels/{channelId}:
     get:
-      tags: [conversations]
-      summary: Get conversation on remote Synapse
-      description: Retrieve conversation from remote Synapse
-      operationId: get_remote_conversation
+      tags: [channels]
+      summary: Get channel on remote Synapse
+      description: Retrieve channel from remote Synapse
+      operationId: get_remote_channel
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       responses:
         "200":
-          description: Conversation retrieved
+          description: Channel retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [conversations]
-      summary: Update conversation on remote Synapse
-      description: Update conversation on remote Synapse (if permitted)
-      operationId: update_remote_conversation
+      tags: [channels]
+      summary: Update channel on remote Synapse
+      description: Update channel on remote Synapse (if permitted)
+      operationId: update_remote_channel
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - name: If-Match
           in: header
           schema:
@@ -1512,14 +1691,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConversationUpdate"
+              $ref: "#/components/schemas/ChannelUpdate"
       responses:
         "200":
-          description: Conversation updated
+          description: Channel updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversation"
+                $ref: "#/components/schemas/Channel"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
@@ -1527,13 +1706,13 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [conversations]
-      summary: Delete conversation on remote Synapse
-      description: Delete or leave conversation on remote Synapse
-      operationId: delete_remote_conversation
+      tags: [channels]
+      summary: Delete channel on remote Synapse
+      description: Delete or leave channel on remote Synapse
+      operationId: delete_remote_channel
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - name: If-Match
           in: header
           schema:
@@ -1546,38 +1725,38 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}/activities:
+  /synapses/{synapsePublicKey}/channels/{channelId}/events:
     get:
-      tags: [conversations, activities]
-      summary: List activities in remote conversation
-      description: List activities in conversation on remote Synapse
-      operationId: list_remote_conversation_activities
+      tags: [events]
+      summary: List events in remote channel
+      description: List events in channel on remote Synapse
+      operationId: list_remote_channel_events
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Activities listed
+          description: Events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations, activities]
-      summary: Create activity in remote conversation
-      description: Create activity in conversation on remote Synapse
-      operationId: create_remote_conversation_activity
+      tags: [events]
+      summary: Create event in remote channel
+      description: Create event in channel on remote Synapse
+      operationId: create_remote_channel_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       requestBody:
-        $ref: "#/components/requestBodies/ActivityCreateJson"
+        $ref: "#/components/requestBodies/EventCreateJson"
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
@@ -1588,53 +1767,53 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}/activities/{activityId}:
+  /synapses/{synapsePublicKey}/channels/{channelId}/events/{eventId}:
     get:
-      tags: [activities]
-      summary: Get activity in remote conversation
-      description: Retrieve activity from conversation on remote Synapse
-      operationId: get_remote_conversation_activity
+      tags: [events]
+      summary: Get event in remote channel
+      description: Retrieve event from channel on remote Synapse
+      operationId: get_remote_channel_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Activity retrieved
+          description: Event retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     patch:
-      tags: [activities]
-      summary: Update activity in remote conversation
-      description: Update activity in conversation on remote Synapse
-      operationId: update_remote_conversation_activity
+      tags: [events]
+      summary: Update event in remote channel
+      description: Update event in channel on remote Synapse
+      operationId: update_remote_channel_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
             type: string
           required: true
       requestBody:
-        $ref: "#/components/requestBodies/ActivityUpdateJson"
+        $ref: "#/components/requestBodies/EventUpdateJson"
       responses:
         "200":
-          description: Activity updated
+          description: Event updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/Event"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
@@ -1643,14 +1822,14 @@ paths:
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [activities]
-      summary: Delete activity in remote conversation
-      description: Delete activity from conversation on remote Synapse
-      operationId: delete_remote_conversation_activity
+      tags: [events]
+      summary: Delete event in remote channel
+      description: Delete event from channel on remote Synapse
+      operationId: delete_remote_channel_event
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
         - name: If-Match
           in: header
           schema:
@@ -1664,81 +1843,81 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}/activities/{activityId}/media:
+  /synapses/{synapsePublicKey}/channels/{channelId}/events/{eventId}/artifacts:
     get:
-      tags: [activities, media]
-      summary: List attached media for activity in remote conversation
-      description: List metadata for media attached to activity on remote Synapse
-      operationId: list_remote_conversation_activity_media
+      tags: [artifacts]
+      summary: List attached artifacts for event in remote channel
+      description: List metadata for artifacts attached to event on remote Synapse
+      operationId: list_remote_channel_event_artifacts
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       responses:
         "200":
-          description: Media listed
+          description: Artifacts listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedMediaUris"
+                $ref: "#/components/schemas/PaginatedArtifactUris"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [activities, media]
-      summary: Upload attached media for activity in remote conversation
-      description: Upload media to activity on remote Synapse
-      operationId: upload_remote_conversation_activity_media
+      tags: [artifacts]
+      summary: Upload attached artifact for event in remote channel
+      description: Upload artifact to event on remote Synapse
+      operationId: upload_remote_channel_event_artifact
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
       requestBody:
-        $ref: "#/components/requestBodies/MediaUpload"
+        $ref: "#/components/requestBodies/ArtifactUpload"
       responses:
         "201":
-          description: Media uploaded
+          description: Artifact uploaded
           headers:
             Location:
               $ref: "#/components/headers/Location"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
+                $ref: "#/components/schemas/ArtifactUploadResponse"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}/participants:
+  /synapses/{synapsePublicKey}/channels/{channelId}/participants:
     get:
-      tags: [conversations, users]
-      summary: List participants in remote conversation
-      description: List users in conversation on remote Synapse
-      operationId: list_remote_conversation_participants
+      tags: [channels, agents]
+      summary: List participants in remote channel
+      description: List agents in channel on remote Synapse
+      operationId: list_remote_channel_participants
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       responses:
         "200":
           description: Participants listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [conversations, users]
-      summary: Add participant to remote conversation
-      description: Add user to conversation on remote Synapse
-      operationId: add_remote_conversation_participant
+      tags: [channels, agents]
+      summary: Add participant to remote channel
+      description: Add agent to channel on remote Synapse
+      operationId: add_remote_channel_participant
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/ChannelId"
       requestBody:
         required: true
         content:
@@ -1746,27 +1925,28 @@ paths:
             schema:
               type: object
               properties:
-                userPublicKey:
+                agentPublicKey:
                   $ref: "#/components/schemas/HexCompressedPublicKey"
-              required: [userPublicKey]
+              required: [agentPublicKey]
       responses:
         "201": { $ref: "#/components/responses/Created" }
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/conversations/{conversationId}/participants/{userPublicKey}:
+  /synapses/{synapsePublicKey}/channels/{channelId}/participants/{agentPublicKey}:
     delete:
-      tags: [conversations, users]
-      summary: Remove participant from remote conversation
-      description: Remove user from conversation on remote Synapse
-      operationId: remove_remote_conversation_participant
+      tags: [channels, agents]
+      summary: Remove participant from remote channel
+      description: Remove agent from channel on remote Synapse
+      operationId: remove_remote_channel_participant
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/ConversationId"
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -1774,36 +1954,36 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/media/{mediaId}:
+  /synapses/{synapsePublicKey}/artifacts/{artifactId}:
     get:
-      tags: [media]
-      summary: Get media metadata from remote Synapse
-      description: Retrieve media metadata from remote Synapse
-      operationId: get_remote_media
+      tags: [artifacts]
+      summary: Get artifact metadata from remote Synapse
+      description: Retrieve artifact metadata from remote Synapse
+      operationId: get_remote_artifact
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/MediaId"
+        - $ref: "#/components/parameters/ArtifactId"
       responses:
         "200":
-          description: Media metadata retrieved
+          description: Artifact metadata retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Media"
+                $ref: "#/components/schemas/Artifact"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [media]
-      summary: Delete media on remote Synapse
-      description: Delete media on remote Synapse (if permitted)
-      operationId: delete_remote_media
+      tags: [artifacts]
+      summary: Delete artifact on remote Synapse
+      description: Delete artifact on remote Synapse (if permitted)
+      operationId: delete_remote_artifact
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/MediaId"
+        - $ref: "#/components/parameters/ArtifactId"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -1813,7 +1993,7 @@ paths:
 
   /synapses/{synapsePublicKey}/members:
     get:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: List members of remote Synapse
       description: List members of the remote Synapse
       operationId: list_remote_synapse_members
@@ -1827,12 +2007,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Join remote Synapse
       description: Join the remote Synapse as a member
       operationId: join_remote_synapse
@@ -1844,9 +2024,10 @@ paths:
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "403": { $ref: "#/components/responses/ProblemForbidden" }
         "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Leave remote Synapse
       description: Leave the remote Synapse membership
       operationId: leave_remote_synapse
@@ -1858,15 +2039,15 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /synapses/{synapsePublicKey}/members/{userPublicKey}:
+  /synapses/{synapsePublicKey}/members/{agentPublicKey}:
     delete:
-      tags: [synapses, users]
+      tags: [synapse]
       summary: Remove member from remote Synapse (admin)
       description: Force remove a member from remote Synapse
       operationId: remove_remote_synapse_member
       parameters:
         - $ref: "#/components/parameters/SynapsePublicKey"
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -1874,72 +2055,72 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /users:
+  /agents:
     get:
-      tags: [users]
-      summary: List all users
-      description: List all known users in the network or Synapse
-      operationId: list_users
+      tags: [agents]
+      summary: List all agents
+      description: List all known agents in the network or Synapse
+      operationId: list_agents
       parameters:
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: Users listed
+          description: Agents listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     post:
-      tags: [users]
-      summary: Create a new user
-      description: Register a new user profile
-      operationId: create_user
+      tags: [agents]
+      summary: Create a new agent
+      description: Register a new agent profile
+      operationId: create_agent
       requestBody:
-        $ref: "#/components/requestBodies/UserCreateJson"
+        $ref: "#/components/requestBodies/AgentCreateJson"
       responses:
         "201":
-          description: User created
+          description: Agent created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Agent"
         "400": { $ref: "#/components/responses/ProblemBadRequest" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "409": { $ref: "#/components/responses/ProblemConflict" }
         "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /users/{userPublicKey}:
+  /agents/{agentPublicKey}:
     get:
-      tags: [users]
-      summary: Get user by public key
-      description: Retrieve user profile by public key
-      operationId: get_user
+      tags: [agents]
+      summary: Get agent by public key
+      description: Retrieve agent profile by public key
+      operationId: get_agent
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "200":
-          description: User retrieved
+          description: Agent retrieved
           headers:
             ETag:
               $ref: "#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Agent"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
     delete:
-      tags: [users]
-      summary: Delete user
-      description: Delete the user profile (self or admin)
-      operationId: delete_user
+      tags: [agents]
+      summary: Delete agent
+      description: Delete the agent profile (self or admin)
+      operationId: delete_agent
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
       responses:
         "204": { $ref: "#/components/responses/NoContent" }
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
@@ -1947,35 +2128,35 @@ paths:
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /users/{userPublicKey}/activities:
+  /agents/{agentPublicKey}/events:
     get:
-      tags: [users, activities]
-      summary: List user activities
-      description: List activities by a specific user
-      operationId: list_user_activities
+      tags: [agents, events]
+      summary: List agent events
+      description: List events by a specific agent
+      operationId: list_agent_events
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
         "200":
-          description: User activities listed
+          description: Agent events listed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedActivities"
+                $ref: "#/components/schemas/PaginatedEvents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /users/{userPublicKey}/followers:
+  /agents/{agentPublicKey}/followers:
     get:
-      tags: [users, followers]
+      tags: [agents]
       summary: List followers of user
       description: List followers of the specified user
       operationId: list_user_followers
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
@@ -1984,19 +2165,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
-  /users/{userPublicKey}/following:
+  /agents/{agentPublicKey}/following:
     get:
-      tags: [users, followers]
+      tags: [agents]
       summary: List users followed by specified user
       description: List users the specified user is following
       operationId: list_user_following
       parameters:
-        - $ref: "#/components/parameters/UserPublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Cursor"
       responses:
@@ -2005,18 +2186,65 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedUsers"
+                $ref: "#/components/schemas/PaginatedAgents"
         "401": { $ref: "#/components/responses/ProblemUnauthorized" }
         "404": { $ref: "#/components/responses/ProblemNotFound" }
         "500": { $ref: "#/components/responses/ProblemServerError" }
 
   /ws:
     get:
-      tags: [activities]
-      summary: WebSocket connection for realtime activities
+      tags: [events]
+      summary: WebSocket connection for realtime events
       description: >
-        Establish a WebSocket connection to receive realtime broadcasts of new activities. 
-        The server broadcasts messages in the format { type: 'newActivity', activity: { ... } }.
+        Establish a WebSocket connection to receive realtime broadcasts of new events.
+
+        **Message Format:**
+        The server sends messages using the WebSocketMessage schema with different types:
+
+        - **Connection**: Sent immediately after connection establishment
+        - **New Event**: Broadcast when new events are created across the Synapse
+        - **Error**: Sent when WebSocket-related errors occur
+
+        **Authentication:**
+        The WebSocket connection inherits the authentication from the HTTP request that initiated it.
+        Clients should include appropriate authorization headers in the initial HTTP request.
+
+        **Reconnection:**
+        Clients should implement exponential backoff for reconnection attempts.
+        The server may close connections periodically for maintenance.
+
+        **Example Messages:**
+
+        Connection confirmation:
+        ```json
+        {
+          "type": "connection",
+          "message": "Connected to meNexus Synapse",
+          "synapseInfo": {
+            "publicKey": "02abcdef...",
+            "name": "My Synapse",
+            "version": "0.3.0-alpha"
+          },
+          "timestamp": "2023-01-01T00:00:00.001Z"
+        }
+        ```
+
+        New event broadcast:
+        ```json
+        {
+          "type": "newEvent",
+          "event": {
+            "eventId": "123e4567-e89b-12d3-a456-426614174000",
+            "agentPublicKey": "02abcdef...",
+            "moduleKind": "feed",
+            "moduleSlug": "general",
+            "eventType": "post",
+            "content": "Hello world!",
+            "createdAt": "2023-01-01T00:00:00Z"
+          },
+          "timestamp": "2023-01-01T00:00:00.001Z"
+        }
+        ```
       operationId: connectWebSocket
       responses:
         "101":
@@ -2080,44 +2308,41 @@ components:
       required: false
       schema:
         type: string
-    SpaceType:
-      name: spaceType
+    ModuleKind:
+      name: moduleKind
       in: path
       required: true
-      description: Space type (e.g., feed, chat, conversation, voice)
+      description: Module kind (e.g., feed, forum, voice, board, livestream, marketplace, custom). Use 'custom' for extensions like 'custom-livestream'.
       schema:
-        $ref: "#/components/schemas/SpaceType"
-    SpaceSlug:
-      name: spaceSlug
+        $ref: "#/components/schemas/ModuleKind"
+    ModuleSlug:
+      name: moduleSlug
       in: path
       required: true
-      description: URL-safe space identifier unique per {synapse, spaceType}
+      description: URL-safe module identifier unique per {synapse, moduleKind}
       schema:
-        type: string
-        pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-        minLength: 1
-        maxLength: 64
-    ActivityId:
-      name: activityId
+        $ref: "#/components/schemas/Slug"
+    EventId:
+      name: eventId
       in: path
       required: true
-      description: The UUID for an activity
+      description: The UUID for an event
       schema:
         type: string
         format: uuid
-    ConversationId:
-      name: conversationId
+    ChannelId:
+      name: channelId
       in: path
       required: true
-      description: The UUID for a conversation (treated as space slug for unification)
+      description: The UUID for a channel
       schema:
         type: string
         format: uuid
-    MediaId:
-      name: mediaId
+    ArtifactId:
+      name: artifactId
       in: path
       required: true
-      description: The UUID for media
+      description: The UUID for artifact
       schema:
         type: string
         format: uuid
@@ -2136,16 +2361,16 @@ components:
       description: The cryptographic public key of the target Synapse
       schema:
         $ref: "#/components/schemas/HexCompressedPublicKey"
-    UserPublicKey:
-      name: userPublicKey
+    AgentPublicKey:
+      name: agentPublicKey
       in: path
       required: true
-      description: A user's cryptographic public key
+      description: An agent's cryptographic public key
       schema:
         $ref: "#/components/schemas/HexCompressedPublicKey"
 
   requestBodies:
-    SpaceCreateJson:
+    ModuleCreateJson:
       required: true
       content:
         application/json:
@@ -2154,18 +2379,42 @@ components:
             properties:
               name:
                 $ref: "#/components/schemas/NonEmptyString"
+              moduleSlug:
+                $ref: "#/components/schemas/Slug"
+                description: Optional; if omitted, the server will auto-generate a slug
               visibility:
-                $ref: "#/components/schemas/SpaceVisibility"
+                $ref: "#/components/schemas/ModuleVisibility"
               permissions:
-                $ref: "#/components/schemas/SpacePermissions"
+                $ref: "#/components/schemas/ModulePermissions"
               tags:
                 type: array
                 items: { $ref: "#/components/schemas/NonEmptyString" }
               metadata:
                 type: object
                 additionalProperties: true
+              layoutHints:
+                type: object
+                additionalProperties: true
+                description: UI rendering hints for clients (e.g., component layouts)
             required: [name]
-    SpaceUpdateJson:
+          example:
+            name: "Community Forum"
+            moduleSlug: "community-forum"
+            visibility: "public"
+            permissions:
+              canCreateEvent: "members"
+              canInvite: "moderators"
+              canModerate: "owner"
+            tags: ["discussion", "community"]
+            metadata:
+              description: "A place for community discussions and announcements"
+              category: "general"
+            layoutHints:
+              component: "ForumView"
+              props:
+                showCategories: true
+                allowPolls: true
+    ModuleUpdateJson:
       required: true
       content:
         application/json:
@@ -2175,36 +2424,85 @@ components:
               name:
                 $ref: "#/components/schemas/NonEmptyString"
               visibility:
-                $ref: "#/components/schemas/SpaceVisibility"
+                $ref: "#/components/schemas/ModuleVisibility"
               permissions:
-                $ref: "#/components/schemas/SpacePermissions"
+                $ref: "#/components/schemas/ModulePermissions"
               tags:
                 type: array
                 items: { $ref: "#/components/schemas/NonEmptyString" }
               metadata:
                 type: object
                 additionalProperties: true
-    ActivityCreateJson:
+              layoutHints:
+                type: object
+                additionalProperties: true
+          example:
+            name: "Community Discussion Forum"
+            visibility: "public"
+            permissions:
+              canCreateEvent: "everyone"
+              canInvite: "members"
+              canModerate: "moderators"
+            tags: ["discussion", "community", "announcements"]
+            metadata:
+              description: "Updated forum for community discussions and important announcements"
+              category: "general"
+              rules: "Be respectful and constructive"
+            layoutHints:
+              component: "ForumView"
+              props:
+                showCategories: true
+                allowPolls: true
+                showRules: true
+    
+    EventCreateJson:
       required: true
       content:
         application/json:
           schema:
             type: object
             properties:
-              activityType:
-                $ref: "#/components/schemas/ActivityType"
+              eventType:
+                $ref: "#/components/schemas/EventType"
               content:
                 type: string
                 minLength: 1
               parentId:
                 type: string
                 format: uuid
-              mediaUris:
+              artifactUris:
                 type: array
                 items:
-                  $ref: "#/components/schemas/MediaUri"
-            required: [activityType, content]
-    ActivityUpdateJson:
+                  $ref: "#/components/schemas/ArtifactUri"
+            required: [eventType, content]
+          examples:
+            simplePost:
+              summary: Simple text post
+              value:
+                eventType: "post"
+                content: "Excited to announce our new decentralized social platform!"
+            postWithImage:
+              summary: Post with attached image
+              value:
+                eventType: "post"
+                content: "Check out this amazing sunset I captured today! 📸"
+                artifactUris: ["https://example.com/uploads/sunset-123.jpg"]
+            commentReply:
+              summary: Comment replying to another post
+              value:
+                eventType: "comment"
+                content: "This is a great idea! I think we should also consider..."
+                parentId: "123e4567-e89b-12d3-a456-426614174000"
+            messageWithMedia:
+              summary: Direct message with multiple attachments
+              value:
+                eventType: "message"
+                content: "Here are the design files you requested, plus a quick video walkthrough."
+                artifactUris: [
+                  "https://example.com/uploads/design-mockup.pdf",
+                  "https://example.com/uploads/walkthrough.mp4"
+                ]
+    EventUpdateJson:
       required: true
       content:
         application/json:
@@ -2214,24 +2512,66 @@ components:
               content:
                 type: string
                 minLength: 1
-              mediaUris:
+              artifactUris:
                 type: array
                 items:
-                  $ref: "#/components/schemas/MediaUri"
+                  $ref: "#/components/schemas/ArtifactUri"
             required: [content]
-    ConversationCreateJson:
+          examples:
+            updateContent:
+              summary: Update post content
+              value:
+                content: "Excited to announce our new decentralized social platform! Launching next week 🚀"
+            addAttachments:
+              summary: Add attachments to existing post
+              value:
+                content: "Check out this amazing sunset I captured today! 📸"
+                artifactUris: [
+                  "https://example.com/uploads/sunset-123.jpg",
+                  "https://example.com/uploads/sunset-456.jpg"
+                ]
+    ChannelCreateJson:
       required: true
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ConversationCreate"
-    UserCreateJson:
+            $ref: "#/components/schemas/ChannelCreate"
+          examples:
+            groupChat:
+              summary: Create a group chat
+              value:
+                name: "Project Alpha Team"
+                participants: [
+                  "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+                  "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                ]
+            directMessage:
+              summary: Create a direct message (just two participants)
+              value:
+                participants: [
+                  "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+                  "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                ]
+    ChannelUpdateJson:
       required: true
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/UserCreateRequest"
-    MediaUpload:
+            $ref: "#/components/schemas/ChannelUpdate"
+          example:
+            name: "Project Alpha Team - Updated"
+    AgentCreateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentCreateRequest"
+          example:
+            publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+            handle: "bob_smith"
+            displayName: "Bob Smith"
+            agentType: "human"
+    ArtifactUpload:
       required: true
       content:
         multipart/form-data:
@@ -2256,13 +2596,33 @@ components:
   responses:
     Ok:
       description: OK
+      headers:
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
     Created:
       description: Created
       headers:
         Location:
           $ref: "#/components/headers/Location"
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
     NoContent:
       description: No Content
+      headers:
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
     AuthTokenResponse:
       description: Tokens minted successfully
       headers:
@@ -2339,43 +2699,43 @@ components:
                   name: "must not be empty"
 
   schemas:
-    Activity:
+    Event:
       type: object
       description: >
-        A unified event representing posts, messages, comments, reactions, joins/leaves,
-        follows, quotes, and future custom actions. Activities live within a space or
-        conversation context, and can optionally reference another object via `object`.
+        A discrete action/signal (post, message, comment, reaction, join/leave, follow, etc.).
+        Events live within a module or channel context, and can optionally reference another
+        object via `object`.
       properties:
-        activityId:
+        eventId:
           type: string
           format: uuid
           readOnly: true
-        userPublicKey:
+        agentPublicKey:
           $ref: "#/components/schemas/HexCompressedPublicKey"
           readOnly: true
-        spaceType:
-          $ref: "#/components/schemas/SpaceType"
+        moduleKind:
+          $ref: "#/components/schemas/ModuleKind"
           readOnly: true
-        spaceSlug:
+        moduleSlug:
           $ref: "#/components/schemas/Slug"
           readOnly: true
-        activityType:
-          $ref: "#/components/schemas/ActivityType"
-        # Threading: reply/comment to another activity in the SAME space/conversation
+        eventType:
+          $ref: "#/components/schemas/EventType"
+        # Threading: reply/comment to another event in the SAME module/channel
         parentId:
           type: string
           format: uuid
           description: >
-            Links this activity as a reply to another activity in the same context (space or conversation).
-        # Generic target the activity acts upon (user/space/synapse/activity/media/external/custom)
+            Links this event as a reply to another event in the same context (module or channel).
+        # Generic target the event acts upon (agent/module/channel/synapse/event/artifact/external/custom)
         object:
           $ref: "#/components/schemas/ObjectRef"
         # Optional textual content (required for some types; see per-type rules)
         content:
           type: string
-        mediaUris:
+        artifactUris:
           type: array
-          items: { $ref: "#/components/schemas/MediaUri" }
+          items: { $ref: "#/components/schemas/ArtifactUri" }
         createdAt:
           type: string
           format: date-time
@@ -2384,60 +2744,60 @@ components:
           type: string
           format: date-time
           readOnly: true
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
       required:
-        - activityId
-        - userPublicKey
-        - spaceType
-        - spaceSlug
-        - activityType
+        - eventId
+        - agentPublicKey
+        - eventType
         - createdAt
       example:
-        activityId: "11111111-1111-1111-1111-111111111111"
-        userPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
-        spaceType: "feed"
-        spaceSlug: "general"
-        activityType: "post"
+        eventId: "11111111-1111-1111-1111-111111111111"
+        agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        moduleKind: "feed"
+        moduleSlug: "general"
+        eventType: "post"
         content: "Hello world!"
-        mediaUris: ["https://example.com/image.jpg"]
+        artifactUris: ["https://example.com/image.jpg"]
         createdAt: "2023-01-01T00:00:00Z"
     
-    # Discriminated, strict reference to "what this activity is about"
     ObjectRef:
       oneOf:
-        - title: ActivityRef
+        - title: EventRef
           properties:
             type:
               type: string
-              enum: [activity]
+              enum: [event]
             id:
               type: string
               format: uuid
           required: [type, id]
-        - title: UserRef
+        - title: AgentRef
           properties:
             type:
               type: string
-              enum: [user]
-            userPublicKey:
+              enum: [agent]
+            agentPublicKey:
               $ref: "#/components/schemas/HexCompressedPublicKey"
-          required: [type, userPublicKey]
-        - title: SpaceRef
+          required: [type, agentPublicKey]
+        - title: ModuleRef
           properties:
             type:
               type: string
-              enum: [space]
-            spaceType: { $ref: "#/components/schemas/SpaceType" }
-            spaceSlug: { $ref: "#/components/schemas/Slug" }
-          required: [type, spaceType, spaceSlug]
-        - title: ConversationRef
+              enum: [module]
+            moduleKind: { $ref: "#/components/schemas/ModuleKind" }
+            moduleSlug: { $ref: "#/components/schemas/Slug" }
+          required: [type, moduleKind, moduleSlug]
+        - title: ChannelRef
           properties:
             type:
               type: string
-              enum: [conversation]
-            conversationId:
+              enum: [channel]
+            channelId:
               type: string
               format: uuid
-          required: [type, conversationId]
+          required: [type, channelId]
         - title: SynapseRef
           properties:
             type:
@@ -2446,15 +2806,15 @@ components:
             synapsePublicKey:
               $ref: "#/components/schemas/HexCompressedPublicKey"
           required: [type, synapsePublicKey]
-        - title: MediaRef
+        - title: ArtifactRef
           properties:
             type:
               type: string
-              enum: [media]
-            mediaId:
+              enum: [artifact]
+            artifactId:
               type: string
               format: uuid
-          required: [type, mediaId]
+          required: [type, artifactId]
         - title: ExternalRef
           properties:
             type:
@@ -2473,42 +2833,34 @@ components:
               type: string
               description: Optional identifier for custom/plugin-defined objects
           required: [type]
-      description: The object this activity acts upon.
+      description: The object this event acts upon.
 
-    ActivityType:
-      type: string
-      description: Kind of activity performed.
-      enum:
-        - post
-        - message
-        - comment
-        - reaction
-        - join
-        - leave
-        - follow
-        - custom
 
-    Space:
+    Module:
       type: object
       properties:
-        spaceType:
-          $ref: "#/components/schemas/SpaceType"
+        moduleKind:
+          $ref: "#/components/schemas/ModuleKind"
           readOnly: true
-        spaceSlug:
+        moduleSlug:
           $ref: "#/components/schemas/Slug"
           readOnly: true
         name:
           $ref: "#/components/schemas/NonEmptyString"
         visibility:
-          $ref: "#/components/schemas/SpaceVisibility"
+          $ref: "#/components/schemas/ModuleVisibility"
         permissions:
-          $ref: "#/components/schemas/SpacePermissions"
+          $ref: "#/components/schemas/ModulePermissions"
         tags:
           type: array
           items: { $ref: "#/components/schemas/NonEmptyString" }
         metadata:
           type: object
           additionalProperties: true
+        layoutHints:
+          type: object
+          additionalProperties: true
+          description: UI rendering hints for clients (e.g., component layouts)
         createdAt:
           type: string
           format: date-time
@@ -2517,34 +2869,42 @@ components:
           type: string
           format: date-time
           readOnly: true
-      required: [spaceType, spaceSlug, name]
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required: [moduleKind, moduleSlug, name]
 
-    SpaceType:
+    ModuleKind:
       type: string
-      enum: [feed, chat, conversation, voice, custom]
+      description: Module kind (e.g., feed, forum, voice, board, livestream, marketplace, custom). Use 'custom' for extensions like 'custom-livestream'.
+      enum: [feed, forum, voice, board, livestream, marketplace, custom]
 
-    SpaceVisibility:
+    ModuleVisibility:
       type: string
       enum: [public, unlisted, private]
 
-    SpacePermissions:
+    ModulePermissions:
       type: object
       properties:
-        canCreateActivity:
-          $ref: "#/components/schemas/SpaceRole"
+        canCreateEvent:
+          $ref: "#/components/schemas/ModuleRole"
         canInvite:
-          $ref: "#/components/schemas/SpaceRole"
+          $ref: "#/components/schemas/ModuleRole"
         canModerate:
-          $ref: "#/components/schemas/SpaceRole"
+          $ref: "#/components/schemas/ModuleRole"
+      example:
+        canCreateEvent: "members"
+        canInvite: "moderators"
+        canModerate: "owner"
 
-    SpaceRole:
+    ModuleRole:
       type: string
       enum: [everyone, members, moderators, owner]
 
-    Conversation:
+    Channel:
       type: object
       properties:
-        conversationId:
+        channelId:
           type: string
           format: uuid
           readOnly: true
@@ -2558,9 +2918,24 @@ components:
           type: string
           format: date-time
           readOnly: true
-      required: [conversationId]
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required: [channelId]
+      example:
+        channelId: "123e4567-e89b-12d3-a456-426614174111"
+        name: "Project Alpha Team"
+        createdAt: "2023-01-10T09:00:00Z"
+        updatedAt: "2023-01-10T09:00:00Z"
+        links:
+          - rel: "participants"
+            href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/participants"
+            method: "GET"
+          - rel: "events"
+            href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/events"
+            method: "GET"
 
-    ConversationCreate:
+    ChannelCreate:
       type: object
       properties:
         name:
@@ -2569,12 +2944,20 @@ components:
           type: array
           items: { $ref: "#/components/schemas/HexCompressedPublicKey" }
       required: [participants]
+      example:
+        name: "Project Alpha Team"
+        participants: [
+          "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+          "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+        ]
 
-    ConversationUpdate:
+    ChannelUpdate:
       type: object
       properties:
         name:
           type: string
+      example:
+        name: "Project Alpha Team - Updated"
 
     CryptoChallenge:
       type: object
@@ -2594,10 +2977,12 @@ components:
       maxLength: 66
       pattern: "^(02|03)[0-9a-fA-F]{64}$"
 
-    Media:
+    # Removed legacy Media schemas (Media, MediaUri, MediaUploadResponse)
+
+    Artifact:
       type: object
       properties:
-        mediaId:
+        artifactId:
           type: string
           format: uuid
           readOnly: true
@@ -2614,22 +2999,129 @@ components:
           type: string
           format: date-time
           readOnly: true
-      required: [mediaId, uri]
+      required: [artifactId, uri]
+      example:
+        artifactId: "123e4567-e89b-12d3-a456-426614174001"
+        uri: "https://example.com/uploads/sunset.jpg"
+        contentType: "image/jpeg"
+        size: 2048576
+        createdAt: "2023-01-01T10:00:00Z"
 
-    MediaUri:
+    ArtifactUri:
       type: string
       format: uri
 
-    MediaUploadResponse:
+    ArtifactUploadResponse:
       type: object
       properties:
-        mediaId:
+        artifactId:
           type: string
           format: uuid
         uri:
           type: string
           format: uri
-      required: [mediaId, uri]
+      required: [artifactId, uri]
+
+    Agent:
+      type: object
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+          readOnly: true
+        handle:
+          type: string
+          maxLength: 32
+        displayName:
+          type: string
+          maxLength: 50
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+        bio:
+          type: string
+          maxLength: 160
+        location:
+          type: string
+        profilePicture:
+          type: string
+          format: uri
+        profileBanner:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        isOnline:
+          type: boolean
+          description: Indicates if the agent is currently online (volatile, not persisted)
+      required: [publicKey, handle, agentType]
+      example:
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        handle: "alice"
+        displayName: "Alice Chen"
+        agentType: "human"
+        bio: "Software developer and digital nomad. Building decentralized social networks."
+        location: "San Francisco, CA"
+        profilePicture: "https://example.com/profiles/alice/avatar.jpg"
+        profileBanner: "https://example.com/profiles/alice/banner.jpg"
+        createdAt: "2023-01-15T10:30:00Z"
+        isOnline: true
+
+    AgentType:
+      type: string
+      description: The type of agent, determining its capabilities and behavior in the network
+      enum: [human, bot, service, bridge, system]
+      example: human
+
+    AgentUpdate:
+      type: object
+      properties:
+        handle:
+          type: string
+        displayName:
+          type: string
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+        bio:
+          type: string
+        location:
+          type: string
+        profilePicture:
+          type: string
+          format: uri
+        profileBanner:
+          type: string
+          format: uri
+      example:
+        displayName: "Alice Chen (Updated)"
+        agentType: "human"
+        bio: "Full-stack developer specializing in decentralized systems and cryptography."
+        location: "Berlin, Germany"
+        profilePicture: "https://example.com/profiles/alice/new-avatar.jpg"
+
+    AgentCreateRequest:
+      type: object
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+        handle:
+          type: string
+        displayName:
+          type: string
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+      required: [publicKey, handle, displayName, agentType]
+      example:
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        handle: "alice"
+        displayName: "Alice Chen"
+        agentType: "human"
+
+    EventType:
+      type: string
+      description: Kind of event performed. Use 'custom' for extensions like 'custom-livestream'.
+      enum: [post, message, comment, reaction, join, leave, follow, custom]
+
 
     NonEmptyString:
       type: string
@@ -2647,6 +3139,10 @@ components:
           type: string
           format: date-time
       required: [peerId, publicKey]
+      example:
+        peerId: "peer-001"
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        lastSeen: "2023-01-15T10:30:00Z"
 
     Problem:
       type: object
@@ -2669,6 +3165,26 @@ components:
           additionalProperties:
             type: string
       required: [title, status]
+      example:
+        type: "https://docs.menexus.dev/problems/validation-error"
+        title: "Validation failed"
+        status: 422
+        detail: "The request contains invalid data"
+        errors:
+          name: "must not be empty"
+          email: "must be a valid email address"
+
+    Link:
+      type: object
+      properties:
+        rel: { type: string }
+        href: { type: string, format: uri }
+        method: { type: string, enum: [GET, POST, PATCH, DELETE] }
+      required: [rel, href]
+      example:
+        rel: "events"
+        href: "http://localhost:3002/v1/modules/feed/general/events"
+        method: "GET"
 
     Synapse:
       type: object
@@ -2683,80 +3199,17 @@ components:
         version:
           type: string
           pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
       required: [publicKey, name]
 
-    User:
-      type: object
-      properties:
-        publicKey:
-          $ref: "#/components/schemas/HexCompressedPublicKey"
-          readOnly: true
-        handle:
-          type: string
-          maxLength: 32
-        displayName:
-          type: string
-          maxLength: 50
-        bio:
-          type: string
-          maxLength: 160
-        location:
-          type: string
-        profilePicture:
-          type: string
-          format: uri
-        profileBanner:
-          type: string
-          format: uri
-        createdAt:
-          type: string
-          format: date-time
-          readOnly: true
-        isOnline:
-          type: boolean
-          description: Indicates if the user is currently online (volatile, not persisted)
-      required: [publicKey, handle]
-      example:
-        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
-        handle: "johndoe"
-        displayName: "John Doe"
-        bio: "Software engineer"
-        createdAt: "2023-01-01T00:00:00Z"
-        isOnline: true
-
-    UserUpdate:
-      type: object
-      properties:
-        handle:
-          type: string
-        displayName:
-          type: string
-        bio:
-          type: string
-        location:
-          type: string
-        profilePicture:
-          type: string
-          format: uri
-        profileBanner:
-          type: string
-          format: uri
-
-    UserCreateRequest:
-      type: object
-      properties:
-        publicKey:
-          $ref: "#/components/schemas/HexCompressedPublicKey"
-        handle:
-          type: string
-        displayName:
-          type: string
-      required: [publicKey, handle, displayName]
+    # Removed legacy User schemas (User, UserUpdate, UserCreateRequest)
 
     VerifyCryptoSignatureRequest:
       type: object
       properties:
-        userPublicKey:
+        agentPublicKey:
           $ref: "#/components/schemas/HexCompressedPublicKey"
         challenge:
           type: string
@@ -2768,7 +3221,7 @@ components:
           minLength: 128
           maxLength: 128
           pattern: "^[0-9a-fA-F]{128}$"
-      required: [userPublicKey, challenge, signature]
+      required: [agentPublicKey, challenge, signature]
 
     Slug:
       type: string
@@ -2786,43 +3239,131 @@ components:
           type: string
           nullable: true
       required: [items]
-    PaginatedActivities:
+    PaginatedEvents:
       allOf:
         - $ref: "#/components/schemas/Paginated"
         - type: object
           properties:
             items:
               type: array
-              items: { $ref: "#/components/schemas/Activity" }
+              items: { $ref: "#/components/schemas/Event" }
           example:
             items:
-              - activityId: "123e4567-e89b-12d3-a456-426614174000"
-                # ... full activity example
+              - eventId: "123e4567-e89b-12d3-a456-426614174000"
+                agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "post"
+                content: "Welcome to our community!"
+                createdAt: "2023-01-01T10:00:00Z"
+                artifactUris: ["https://example.com/uploads/welcome-image.jpg"]
+              - eventId: "456e7890-e89b-12d3-a456-426614174001"
+                agentPublicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "comment"
+                content: "Thanks for the warm welcome!"
+                parentId: "123e4567-e89b-12d3-a456-426614174000"
+                createdAt: "2023-01-01T10:05:00Z"
             nextCursor: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-    PaginatedUsers:
+    PaginatedAgents:
       allOf:
         - $ref: "#/components/schemas/Paginated"
         - type: object
           properties:
             items:
               type: array
-              items: { $ref: "#/components/schemas/User" }
-    PaginatedSpaces:
+              items: { $ref: "#/components/schemas/Agent" }
+          example:
+            items:
+              - publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                handle: "alice"
+                displayName: "Alice Chen"
+                agentType: "human"
+                bio: "Software developer and digital nomad"
+                location: "San Francisco, CA"
+                isOnline: true
+                createdAt: "2023-01-15T10:30:00Z"
+              - publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                handle: "bob_smith"
+                displayName: "Bob Smith"
+                agentType: "human"
+                bio: "Community manager"
+                location: "Berlin, Germany"
+                isOnline: false
+                createdAt: "2023-02-01T14:20:00Z"
+            nextCursor: "eyJwYWdlIjoxLCJsaW1pdCI6NTB9"
+    PaginatedModules:
       allOf:
         - $ref: "#/components/schemas/Paginated"
         - type: object
           properties:
             items:
               type: array
-              items: { $ref: "#/components/schemas/Space" }
-    PaginatedConversations:
+              items: { $ref: "#/components/schemas/Module" }
+          example:
+            items:
+              - moduleKind: "feed"
+                moduleSlug: "general"
+                name: "General Discussion"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "members"
+                  canInvite: "moderators"
+                  canModerate: "owner"
+                tags: ["general", "discussion"]
+                createdAt: "2023-01-01T00:00:00Z"
+                updatedAt: "2023-01-01T00:00:00Z"
+              - moduleKind: "forum"
+                moduleSlug: "tech-support"
+                name: "Technical Support"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "everyone"
+                  canInvite: "moderators"
+                  canModerate: "moderators"
+                tags: ["support", "technical", "help"]
+                createdAt: "2023-01-05T10:00:00Z"
+                updatedAt: "2023-01-05T10:00:00Z"
+            nextCursor: "eyJtb2R1bGVfa2luZCI6ImZvcnVtIiwibGFzdF9pZCI6IjEyMyJ9"
+    PaginatedChannels:
       allOf:
         - $ref: "#/components/schemas/Paginated"
         - type: object
           properties:
             items:
               type: array
-              items: { $ref: "#/components/schemas/Conversation" }
+              items: { $ref: "#/components/schemas/Channel" }
+          example:
+            items:
+              - channelId: "123e4567-e89b-12d3-a456-426614174111"
+                name: "Project Alpha Team"
+                createdAt: "2023-01-10T09:00:00Z"
+                updatedAt: "2023-01-10T09:00:00Z"
+              - channelId: "456e7890-e89b-12d3-a456-426614174112"
+                name: "Random Chat"
+                createdAt: "2023-01-12T15:30:00Z"
+                updatedAt: "2023-01-12T15:30:00Z"
+            nextCursor: "eyJjaGFubmVsX2lkIjoiNDU2ZTc4OTAtZTg5Yi0xMmQzLWE0NTYtNDI2NjE0MTc0MTEyIn0"
+    PaginatedSynapses:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Synapse" }
+          example:
+            items:
+              - publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                name: "Main Community Hub"
+                description: "Primary community synapse"
+                version: "0.3.0-alpha"
+              - publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                name: "Tech Forum"
+                description: "Technical discussions and support"
+                version: "0.3.0-alpha"
+            nextCursor: "eyJzeW5hcHNlX3BrIjoiMDNmZWRjYmEwOTg3NjU0MzIxZmVkY2JhMDk4NzY1NDMyMWZlZGNiYTA5ODc2NTQzMjFmZWRjYmEwOTg3NjU0MyJ9"
     PaginatedPeers:
       allOf:
         - $ref: "#/components/schemas/Paginated"
@@ -2831,11 +3372,161 @@ components:
             items:
               type: array
               items: { $ref: "#/components/schemas/Peer" }
-    PaginatedMediaUris:
+          example:
+            items:
+              - peerId: "peer-001"
+                publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                lastSeen: "2023-01-15T10:30:00Z"
+              - peerId: "peer-002"
+                publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                lastSeen: "2023-01-15T09:45:00Z"
+            nextCursor: "eyJwZWVyX2lkIjoicGVlci0wMDIifQ"
+    Capabilities:
+      type: object
+      properties:
+        modules:
+          type: array
+          items: { $ref: "#/components/schemas/ModuleKind" }
+        eventTypes:
+          type: array
+          items: { $ref: "#/components/schemas/EventType" }
+        extensions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              version:
+                type: string
+            required: [name]
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+
+    # WebSocket Message Schemas
+    WebSocketMessage:
+      oneOf:
+        - $ref: "#/components/schemas/NewEventMessage"
+        - $ref: "#/components/schemas/ConnectionMessage"
+        - $ref: "#/components/schemas/ErrorMessage"
+      discriminator:
+        propertyName: type
+      description: Base schema for all WebSocket messages sent from the server to clients
+
+    NewEventMessage:
+      type: object
+      description: Message sent when a new event is created and broadcast to connected clients
+      properties:
+        type:
+          type: string
+          enum: [newEvent]
+          description: Message type identifier
+        event:
+          $ref: "#/components/schemas/Event"
+          description: The newly created event
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, event, timestamp]
+      example:
+        type: "newEvent"
+        event:
+          eventId: "123e4567-e89b-12d3-a456-426614174000"
+          agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+          moduleKind: "feed"
+          moduleSlug: "general"
+          eventType: "post"
+          content: "Hello world!"
+          createdAt: "2023-01-01T00:00:00Z"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    ConnectionMessage:
+      type: object
+      description: Message sent when WebSocket connection is established
+      properties:
+        type:
+          type: string
+          enum: [connection]
+          description: Message type identifier
+        message:
+          type: string
+          description: Connection confirmation message
+        synapseInfo:
+          type: object
+          description: Basic information about the connected synapse
+          properties:
+            publicKey:
+              $ref: "#/components/schemas/HexCompressedPublicKey"
+            name:
+              type: string
+            version:
+              type: string
+          required: [publicKey]
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, message, timestamp]
+      example:
+        type: "connection"
+        message: "Connected to meNexus Synapse"
+        synapseInfo:
+          publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+          name: "My Synapse"
+          version: "0.3.0-alpha"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    ErrorMessage:
+      type: object
+      description: Error message sent over WebSocket connection
+      properties:
+        type:
+          type: string
+          enum: [error]
+          description: Message type identifier
+        error:
+          type: object
+          description: Error details in problem+json format
+          properties:
+            type:
+              type: string
+              format: uri
+            title:
+              type: string
+            status:
+              type: integer
+            detail:
+              type: string
+          required: [title, status]
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, error, timestamp]
+      example:
+        type: "error"
+        error:
+          type: "https://docs.menexus.dev/problems/websocket-error"
+          title: "WebSocket Error"
+          status: 500
+          detail: "Failed to process event broadcast"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    PaginatedArtifactUris:
       allOf:
         - $ref: "#/components/schemas/Paginated"
         - type: object
           properties:
             items:
               type: array
-              items: { $ref: "#/components/schemas/MediaUri" }
+              items: { $ref: "#/components/schemas/ArtifactUri" }
+          example:
+            items: [
+              "https://example.com/uploads/image1.jpg",
+              "https://example.com/uploads/image2.png",
+              "https://example.com/uploads/document.pdf",
+              "https://example.com/uploads/video.mp4"
+            ]
+            nextCursor: "eyJhcnRpZmFjdF91cmkiOiJodHRwczovL2V4YW1wbGUuY29tL3VwbG9hZHMvdmlkZW8ubXA0In0"
