@@ -1,0 +1,3532 @@
+openapi: 3.1.0
+info:
+  title: meNexus Synapse API
+  version: 0.3.0-alpha
+  description: The meNexus Synapse API for v0.3.0-alpha
+servers:
+  - url: http://localhost:3002/v1
+    description: The URL will depend on the context of your Synapse
+  - url: ws://localhost:3002/v1
+    description: WebSocket server for realtime updates
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+    description: Authentication and session management endpoints
+  - name: health
+    description: Server health checks
+  - name: settings
+    description: Agent and system settings
+  - name: synapse
+    description: Local Synapse metadata and members
+  - name: peers
+    description: Discovered/connected Synapses
+  - name: modules
+    description: Modules are composable plugins that hosts can enable/disable
+  - name: channels
+    description: Channel management
+  - name: events
+    description: Operations related to events like posts, messages, and comments
+  - name: agents
+    description: Agent profile and social graph
+  - name: artifacts
+    description: Artifact upload and management
+
+
+paths:
+  /modules:
+    get:
+      tags: [modules]
+      summary: List all modules
+      description: List all modules across kinds enabled on this Synapse.
+      operationId: list_modules
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: moduleKind
+          in: query
+          required: false
+          description: Optional filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+  /health:
+    get:
+      tags: [health]
+      summary: Get Synapse server health check
+      description: Check if the Synapse's Axum server is running
+      operationId: get_health
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /auth/challenges:
+    post:
+      tags: [auth]
+      summary: Get Crypto Challenge
+      description: Generate a Crypto Challenge on server and store it in the session
+      operationId: get_crypto_challenge
+      security: []
+      responses:
+        "200":
+          description: Crypto challenge generated and stored in session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CryptoChallenge"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Sign crypto challenge and login
+      description: Verify signature over crypto challenge and mint access/refresh tokens
+      operationId: verify_crypto_signature
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/VerifyCryptoSignatureJson"
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthTokenResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Rotate refresh token and mint a new access token
+      description: >
+        Reads the httpOnly refreshToken cookie, validates it, rotates it (sets a new
+        refresh token cookie), and returns a fresh access token.
+      operationId: refresh_access_token
+      security:
+        - refreshCookie: []
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthTokenResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Clear refresh cookie and end session
+      description: >
+        Expires the httpOnly refreshToken cookie (if present). Idempotent. You can call
+        this even if the cookie is already missing.
+      operationId: logout_session
+      security:
+        - refreshCookie: []
+      responses:
+        "204": 
+          description: No Content
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/Set-Cookie"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /followers:
+    post:
+      tags: [agents]
+      summary: Follow an agent
+      description: Follow a specified agent
+      operationId: follow_agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentPublicKey:
+                  $ref: "#/components/schemas/HexCompressedPublicKey"
+              required: [agentPublicKey]
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /followers/{agentPublicKey}:
+    delete:
+      tags: [agents]
+      summary: Unfollow an agent
+      description: Unfollow the specified agent
+      operationId: unfollow_agent
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /followers/check:
+    get:
+      tags: [agents]
+      summary: Check if current agent follows other agents
+      description: Check follow status for one or more agents
+      operationId: check_follow_status
+      parameters:
+        - name: agentPublicKeys
+          in: query
+          description: Comma-separated list of agent public keys to check
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/HexCompressedPublicKey"
+      responses:
+        "200":
+          description: Follow status returned
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /me:
+    get:
+      tags: [agents]
+      summary: Get current session user
+      description: Retrieve the authenticated user's profile
+      operationId: get_current_user
+      responses:
+        "200":
+          description: Current user retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /me/followers:
+    get:
+      tags: [agents]
+      summary: Get followers of current user
+      description: List users following the authenticated user
+      operationId: list_my_followers
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Followers listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /me/following:
+    get:
+      tags: [agents]
+      summary: Get users the current user is following
+      description: List users followed by the authenticated user
+      operationId: list_my_following
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Followed users listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /me/settings:
+    patch:
+      tags: [settings]
+      summary: Update account settings
+      description: Update the authenticated user's settings
+      operationId: update_user_settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentUpdate"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /artifacts/{artifactId}:
+    get:
+      tags: [artifacts]
+      summary: Get artifact metadata
+      description: Retrieve metadata for uploaded artifact
+      operationId: get_artifact
+      parameters:
+        - $ref: "#/components/parameters/ArtifactId"
+      responses:
+        "200":
+          description: Artifact metadata retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artifact"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [artifacts]
+      summary: Delete specified artifact
+      description: Permanently delete uploaded artifact
+      operationId: delete_artifact
+      parameters:
+        - $ref: "#/components/parameters/ArtifactId"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapse:
+    get:
+      tags: [synapse]
+      summary: Get local Synapse metadata
+      description: Retrieve metadata for the local Synapse
+      operationId: get_local_synapse
+      security: []
+      responses:
+        "200":
+          description: Local Synapse metadata retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Synapse"
+              example:
+                publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                name: "My Synapse"
+                description: "Local node"
+                version: "0.3.0-alpha"
+                links:
+                  - rel: "capabilities"
+                    href: "http://localhost:3002/v1/capabilities"
+                    method: "GET"
+                  - rel: "modules"
+                    href: "http://localhost:3002/v1/modules/feed"
+                    method: "GET"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+
+  /events:
+    get:
+      tags: [events]
+      summary: Get all events (global)
+      description: List events across the Synapse with optional filters
+      operationId: list_events
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: eventType
+          in: query
+          description: Filter by event type
+          schema: { $ref: "#/components/schemas/EventType" }
+        - name: moduleKind
+          in: query
+          description: Filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+        - name: moduleSlug
+          in: query
+          description: Filter by module slug
+          schema: { $ref: "#/components/schemas/Slug" }
+        - name: channelId
+          in: query
+          description: Filter by channel
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Events listed
+          headers:
+            RateLimit-Limit: { $ref: "#/components/headers/RateLimit-Limit" }
+            RateLimit-Remaining: { $ref: "#/components/headers/RateLimit-Remaining" }
+            RateLimit-Reset: { $ref: "#/components/headers/RateLimit-Reset" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaginatedEvents" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /peers:
+    get:
+      tags: [peers]
+      summary: List discovered peers
+      description: List connected or discovered Synapse peers
+      operationId: list_peers
+      responses:
+        "200":
+          description: Peers listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPeers"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /capabilities:
+    get:
+      tags: [synapse]
+      summary: Get Synapse capabilities
+      description: List supported modules, event types, and extensions for this Synapse
+      operationId: get_capabilities
+      security: []
+      responses:
+        "200":
+          description: Capabilities retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Capabilities" }
+              example:
+                modules: ["feed", "forum", "livestream"]
+                eventTypes: ["post", "message", "comment", "reaction", "follow"]
+                extensions:
+                  - name: "custom-livestream"
+                    version: "1.2.0"
+                links:
+                  - rel: "modules"
+                    href: "http://localhost:3002/v1/modules"
+                    method: "GET"
+                  - rel: "modules-kind"
+                    href: "http://localhost:3002/v1/modules/feed"
+                    method: "GET"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapse/members:
+    get:
+      tags: [synapse]
+      summary: List members of this Synapse
+      description: List users registered as members of the local Synapse
+      operationId: list_synapse_members
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Members listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [synapse]
+      summary: Join this Synapse (current user)
+      description: Register the authenticated user as a member of the local Synapse
+      operationId: join_synapse
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [synapse]
+      summary: Leave this Synapse (current user)
+      description: Remove the authenticated user from the local Synapse membership
+      operationId: leave_synapse
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapse/members/{agentPublicKey}:
+    delete:
+      tags: [synapse]
+      summary: Remove a member (admin only)
+      description: Force remove a user from the local Synapse membership (requires admin privileges)
+      operationId: remove_synapse_member
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}:
+    get:
+      tags: [modules]
+      summary: List modules of a specified kind
+      description: Retrieve all modules of the given kind in the local Synapse. Modules are composable plugins that hosts can enable/disable.
+      operationId: list_modules_by_kind
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [modules]
+      summary: Create a new module of specified kind
+      description: Create a new module with the given kind and configuration
+      operationId: create_module
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+      requestBody:
+        $ref: "#/components/requestBodies/ModuleCreateJson"
+      responses:
+        "201":
+          description: Module created
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}:
+    get:
+      tags: [modules]
+      summary: Get module by kind and slug
+      description: Retrieve module metadata by kind and slug within this Synapse. Clients should use layoutHints to adapt UIs based on host configurations.
+      operationId: get_module
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      responses:
+        "200":
+          description: Module retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+              example:
+                moduleKind: "livestream"
+                moduleSlug: "town-hall"
+                name: "Town Hall"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "members"
+                  canInvite: "moderators"
+                  canModerate: "owner"
+                tags: ["video", "community"]
+                metadata: { }
+                layoutHints:
+                  component: "VideoPlayerWithChat"
+                  props:
+                    showChat: true
+                links:
+                  - rel: "events"
+                    href: "http://localhost:3002/v1/modules/livestream/town-hall/events"
+                    method: "GET"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [modules]
+      summary: Update module
+      description: Update module properties such as name, visibility, permissions, metadata, or layoutHints.
+      operationId: update_module
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/ModuleUpdateJson"
+      responses:
+        "200":
+          description: Module updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [modules]
+      summary: Delete a specified module
+      description: Permanently delete the module identified by kind and slug
+      operationId: delete_module
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}/events:
+    get:
+      tags: [events]
+      summary: List events from specified module
+      description: List events for a module identified by kind and slug. Use query params to filter by event type or parent.
+      operationId: list_module_events
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: eventType
+          in: query
+          description: Filter by event type (e.g., post, message, comment)
+          schema:
+            $ref: "#/components/schemas/EventType"
+        - name: parentId
+          in: query
+          description: Filter by parent event ID (e.g., for comments on a post)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [events]
+      summary: Create event in specified module
+      description: Create an event in the specified module (e.g., post, message, comment)
+      operationId: create_module_event
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      requestBody:
+        $ref: "#/components/requestBodies/EventCreateJson"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}/events/{eventId}:
+    get:
+      tags: [events]
+      summary: Get an event by ID
+      description: Retrieve a single event by its ID within the module.
+      operationId: get_module_event
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Event retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+              example:
+                eventId: "123e4567-e89b-12d3-a456-426614174000"
+                agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "post"
+                content: "Welcome!"
+                createdAt: "2023-01-01T00:00:00Z"
+                links:
+                  - rel: "artifacts"
+                    href: "http://localhost:3002/v1/modules/feed/general/events/123e4567-e89b-12d3-a456-426614174000/artifacts"
+                    method: "GET"
+                  - rel: "module"
+                    href: "http://localhost:3002/v1/modules/feed/general"
+                    method: "GET"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [events]
+      summary: Update an event
+      description: Edit the content or artifacts of an event in the module
+      operationId: update_module_event
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/EventUpdateJson"
+      responses:
+        "200":
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [events]
+      summary: Delete event
+      description: Permanently delete an event by its ID from the module.
+      operationId: delete_module_event
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}/events/{eventId}/artifacts:
+    get:
+      tags: [artifacts]
+      summary: List attached artifacts for an event
+      description: List metadata for artifacts attached to an event
+      operationId: list_event_artifacts
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Artifacts listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedArtifactUris"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [artifacts]
+      summary: Upload attached artifact for event
+      description: Upload artifact and attach it to the specified event.
+      operationId: upload_event_artifact
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        $ref: "#/components/requestBodies/ArtifactUpload"
+      responses:
+        "201":
+          description: Artifact uploaded
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtifactUploadResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}/voice:
+    post:
+      tags: [modules]
+      summary: Start a voice session
+      description: Start a voice session within the specified module.
+      operationId: start_module_voice_session
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      responses:
+        "201":
+          description: Voice session created
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId:
+                    type: string
+                    format: uuid
+                required: [sessionId]
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /modules/{moduleKind}/{moduleSlug}/voice/{sessionId}:
+    delete:
+      tags: [modules]
+      summary: End voice session
+      description: End the specified voice session within the module.
+      operationId: end_module_voice_session
+      parameters:
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels:
+    get:
+      tags: [channels]
+      summary: List channels
+      description: List all channels for the authenticated user
+      operationId: list_channels
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Channels listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedChannels"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [channels]
+      summary: Create a new channel
+      description: Start a new channel (e.g., DM or group)
+      operationId: create_channel
+      requestBody:
+        $ref: "#/components/requestBodies/ChannelCreateJson"
+      responses:
+        "201":
+          description: Channel created
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}:
+    get:
+      tags: [channels]
+      summary: Get channel details
+      description: Retrieve metadata for a specific channel
+      operationId: get_channel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200":
+          description: Channel retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+              example:
+                channelId: "123e4567-e89b-12d3-a456-426614174111"
+                name: "General Chat"
+                links:
+                  - rel: "participants"
+                    href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/participants"
+                    method: "GET"
+                  - rel: "events"
+                    href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/events"
+                    method: "GET"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [channels]
+      summary: Update channel metadata
+      description: Update channel name or other metadata
+      operationId: update_channel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelUpdate"
+      responses:
+        "200":
+          description: Channel updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [channels]
+      summary: Delete or leave a channel
+      description: Leave or delete the channel (depending on ownership)
+      operationId: delete_channel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}/events:
+    get:
+      tags: [events]
+      summary: List events in channel
+      description: List events (messages) in the channel
+      operationId: list_channel_events
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [events]
+      summary: Create event in channel
+      description: Create an event (message) in the channel
+      operationId: create_channel_event
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        $ref: "#/components/requestBodies/EventCreateJson"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}/events/{eventId}:
+    get:
+      tags: [events]
+      summary: Get event in channel
+      description: Retrieve a single event by ID in the channel
+      operationId: get_channel_event
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Event retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [events]
+      summary: Update event in channel
+      description: Edit the content or artifacts of an event
+      operationId: update_channel_event
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/EventUpdateJson"
+      responses:
+        "200":
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [events]
+      summary: Delete event in channel
+      description: Permanently delete an event by ID
+      operationId: delete_channel_event
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}/events/{eventId}/artifacts:
+    get:
+      tags: [artifacts]
+      summary: List attached artifacts for event in channel
+      description: List metadata for artifacts attached to an event
+      operationId: list_channel_event_artifacts
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Artifacts listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedArtifactUris"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [artifacts]
+      summary: Upload attached artifact for event in channel
+      description: Upload artifact and attach it to the specified event.
+      operationId: upload_channel_event_artifact
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        $ref: "#/components/requestBodies/ArtifactUpload"
+      responses:
+        "201":
+          description: Artifact uploaded
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtifactUploadResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}/participants:
+    get:
+      tags: [channels, agents]
+      summary: List participants in channel
+      description: List agents in the channel
+      operationId: list_channel_participants
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200":
+          description: Participants listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [channels, agents]
+      summary: Add participant to channel
+      description: Add an agent to the channel
+      operationId: add_channel_participant
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentPublicKey:
+                  $ref: "#/components/schemas/HexCompressedPublicKey"
+              required: [agentPublicKey]
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /channels/{channelId}/participants/{agentPublicKey}:
+    delete:
+      tags: [channels, agents]
+      summary: Remove participant from channel
+      description: Remove an agent from the channel
+      operationId: remove_channel_participant
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  # -------- Remote Synapse routes --------
+
+  /synapses/{synapsePublicKey}/capabilities:
+    get:
+      tags: [synapse]
+      summary: Get remote Synapse capabilities
+      description: List supported modules, event types, and extensions for the specified remote Synapse
+      operationId: get_remote_capabilities
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+      responses:
+        "200":
+          description: Capabilities retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Capabilities" }
+              example:
+                modules: ["feed", "forum"]
+                eventTypes: ["post", "comment"]
+                extensions:
+                  - name: "custom-livestream"
+                    version: "1.0.0"
+                links:
+                  - rel: "modules"
+                    href: "http://remote-synapse.example/v1/modules"
+                    method: "GET"
+                  - rel: "modules-kind"
+                    href: "http://remote-synapse.example/v1/modules/feed"
+                    method: "GET"
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/events:
+    get:
+      tags: [events]
+      summary: Get all events for the remote Synapse
+      description: List events from a remote Synapse
+      operationId: list_remote_synapse_events
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules:
+    get:
+      tags: [modules]
+      summary: List modules on remote Synapse
+      description: List all modules across kinds on the remote Synapse. Supports filtering by kind and visibility.
+      operationId: list_remote_modules
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        - name: moduleKind
+          in: query
+          required: false
+          description: Optional filter by module kind
+          schema: { $ref: "#/components/schemas/ModuleKind" }
+        - name: visibility
+          in: query
+          required: false
+          description: Filter by module visibility (e.g., public)
+          schema: { $ref: "#/components/schemas/ModuleVisibility" }
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}:
+    get:
+      tags: [modules]
+      summary: List modules of a specified kind on remote Synapse
+      description: Retrieve all modules of the given kind on the remote Synapse
+      operationId: list_remote_modules_by_kind
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Modules listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedModules"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [modules]
+      summary: Create a new module on remote Synapse
+      description: Create a new module on the remote Synapse (if permitted)
+      operationId: create_remote_module
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+      requestBody:
+        $ref: "#/components/requestBodies/ModuleCreateJson"
+      responses:
+        "201":
+          description: Module created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}:
+    get:
+      tags: [modules]
+      summary: Get module on remote Synapse
+      description: Retrieve module metadata from remote Synapse
+      operationId: get_remote_module
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      responses:
+        "200":
+          description: Module retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [modules]
+      summary: Update module on remote Synapse
+      description: Update module on remote Synapse (if permitted)
+      operationId: update_remote_module
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/ModuleUpdateJson"
+      responses:
+        "200":
+          description: Module updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Module"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [modules]
+      summary: Delete module on remote Synapse
+      description: Delete module on remote Synapse (if permitted)
+      operationId: delete_remote_module
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events:
+    get:
+      tags: [events]
+      summary: List events from remote module
+      description: List events from a module on remote Synapse
+      operationId: list_remote_module_events
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [events]
+      summary: Create event in remote module
+      description: Create an event in the module on remote Synapse (if permitted)
+      operationId: create_remote_module_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      requestBody:
+        $ref: "#/components/requestBodies/EventCreateJson"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events/{eventId}:
+    get:
+      tags: [events]
+      summary: Get event from remote module
+      description: Retrieve an event from a module on remote Synapse
+      operationId: get_remote_module_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Event retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [events]
+      summary: Update event in remote module
+      description: Update an event in the module on remote Synapse (if permitted)
+      operationId: update_remote_module_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/EventUpdateJson"
+      responses:
+        "200":
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [events]
+      summary: Delete event in remote module
+      description: Delete an event from the module on remote Synapse (if permitted)
+      operationId: delete_remote_module_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/events/{eventId}/artifacts:
+    get:
+      tags: [artifacts]
+      summary: List attached artifacts for event on remote module
+      description: List metadata for artifacts attached to an event on remote Synapse
+      operationId: list_remote_event_artifacts
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Artifacts listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedArtifactUris"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [artifacts]
+      summary: Upload attached artifact for event on remote module
+      description: Upload artifact to an event on remote Synapse (if permitted)
+      operationId: upload_remote_event_artifact
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        $ref: "#/components/requestBodies/ArtifactUpload"
+      responses:
+        "201":
+          description: Artifact uploaded
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtifactUploadResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/voice:
+    post:
+      tags: [modules]
+      summary: Start voice session on remote module
+      description: Start a voice session in the module on remote Synapse
+      operationId: start_remote_module_voice_session
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/modules/{moduleKind}/{moduleSlug}/voice/{sessionId}:
+    delete:
+      tags: [modules]
+      summary: End voice session on remote module
+      description: End a voice session in the module on remote Synapse
+      operationId: end_remote_module_voice_session
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ModuleKind"
+        - $ref: "#/components/parameters/ModuleSlug"
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels:
+    get:
+      tags: [channels]
+      summary: List channels on remote Synapse
+      description: List channels on remote Synapse (if applicable)
+      operationId: list_remote_channels
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Channels listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedChannels"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [channels]
+      summary: Create channel on remote Synapse
+      description: Create a new channel on remote Synapse
+      operationId: create_remote_channel
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelCreate"
+      responses:
+        "201":
+          description: Channel created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}:
+    get:
+      tags: [channels]
+      summary: Get channel on remote Synapse
+      description: Retrieve channel from remote Synapse
+      operationId: get_remote_channel
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200":
+          description: Channel retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [channels]
+      summary: Update channel on remote Synapse
+      description: Update channel on remote Synapse (if permitted)
+      operationId: update_remote_channel
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelUpdate"
+      responses:
+        "200":
+          description: Channel updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [channels]
+      summary: Delete channel on remote Synapse
+      description: Delete or leave channel on remote Synapse
+      operationId: delete_remote_channel
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}/events:
+    get:
+      tags: [events]
+      summary: List events in remote channel
+      description: List events in channel on remote Synapse
+      operationId: list_remote_channel_events
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [events]
+      summary: Create event in remote channel
+      description: Create event in channel on remote Synapse
+      operationId: create_remote_channel_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        $ref: "#/components/requestBodies/EventCreateJson"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}/events/{eventId}:
+    get:
+      tags: [events]
+      summary: Get event in remote channel
+      description: Retrieve event from channel on remote Synapse
+      operationId: get_remote_channel_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Event retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    patch:
+      tags: [events]
+      summary: Update event in remote channel
+      description: Update event in channel on remote Synapse
+      operationId: update_remote_channel_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        $ref: "#/components/requestBodies/EventUpdateJson"
+      responses:
+        "200":
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [events]
+      summary: Delete event in remote channel
+      description: Delete event from channel on remote Synapse
+      operationId: delete_remote_channel_event
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+        - name: If-Match
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}/events/{eventId}/artifacts:
+    get:
+      tags: [artifacts]
+      summary: List attached artifacts for event in remote channel
+      description: List metadata for artifacts attached to event on remote Synapse
+      operationId: list_remote_channel_event_artifacts
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      responses:
+        "200":
+          description: Artifacts listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedArtifactUris"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [artifacts]
+      summary: Upload attached artifact for event in remote channel
+      description: Upload artifact to event on remote Synapse
+      operationId: upload_remote_channel_event_artifact
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        $ref: "#/components/requestBodies/ArtifactUpload"
+      responses:
+        "201":
+          description: Artifact uploaded
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtifactUploadResponse"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "415": { $ref: "#/components/responses/ProblemUnsupportedMediaType" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}/participants:
+    get:
+      tags: [channels, agents]
+      summary: List participants in remote channel
+      description: List agents in channel on remote Synapse
+      operationId: list_remote_channel_participants
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200":
+          description: Participants listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [channels, agents]
+      summary: Add participant to remote channel
+      description: Add agent to channel on remote Synapse
+      operationId: add_remote_channel_participant
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentPublicKey:
+                  $ref: "#/components/schemas/HexCompressedPublicKey"
+              required: [agentPublicKey]
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/channels/{channelId}/participants/{agentPublicKey}:
+    delete:
+      tags: [channels, agents]
+      summary: Remove participant from remote channel
+      description: Remove agent from channel on remote Synapse
+      operationId: remove_remote_channel_participant
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ChannelId"
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/artifacts/{artifactId}:
+    get:
+      tags: [artifacts]
+      summary: Get artifact metadata from remote Synapse
+      description: Retrieve artifact metadata from remote Synapse
+      operationId: get_remote_artifact
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ArtifactId"
+      responses:
+        "200":
+          description: Artifact metadata retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artifact"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [artifacts]
+      summary: Delete artifact on remote Synapse
+      description: Delete artifact on remote Synapse (if permitted)
+      operationId: delete_remote_artifact
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/ArtifactId"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/members:
+    get:
+      tags: [synapse]
+      summary: List members of remote Synapse
+      description: List members of the remote Synapse
+      operationId: list_remote_synapse_members
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Members listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [synapse]
+      summary: Join remote Synapse
+      description: Join the remote Synapse as a member
+      operationId: join_remote_synapse
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+      responses:
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "429": { $ref: "#/components/responses/ProblemTooManyRequests" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [synapse]
+      summary: Leave remote Synapse
+      description: Leave the remote Synapse membership
+      operationId: leave_remote_synapse
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /synapses/{synapsePublicKey}/members/{agentPublicKey}:
+    delete:
+      tags: [synapse]
+      summary: Remove member from remote Synapse (admin)
+      description: Force remove a member from remote Synapse
+      operationId: remove_remote_synapse_member
+      parameters:
+        - $ref: "#/components/parameters/SynapsePublicKey"
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /agents:
+    get:
+      tags: [agents]
+      summary: List all agents
+      description: List all known agents in the network or Synapse
+      operationId: list_agents
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Agents listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    post:
+      tags: [agents]
+      summary: Create a new agent
+      description: Register a new agent profile
+      operationId: create_agent
+      requestBody:
+        $ref: "#/components/requestBodies/AgentCreateJson"
+      responses:
+        "201":
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "400": { $ref: "#/components/responses/ProblemBadRequest" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "409": { $ref: "#/components/responses/ProblemConflict" }
+        "422": { $ref: "#/components/responses/ProblemUnprocessableEntity" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /agents/{agentPublicKey}:
+    get:
+      tags: [agents]
+      summary: Get agent by public key
+      description: Retrieve agent profile by public key
+      operationId: get_agent
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "200":
+          description: Agent retrieved
+          headers:
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+    delete:
+      tags: [agents]
+      summary: Delete agent
+      description: Delete the agent profile (self or admin)
+      operationId: delete_agent
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "403": { $ref: "#/components/responses/ProblemForbidden" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /agents/{agentPublicKey}/events:
+    get:
+      tags: [agents, events]
+      summary: List agent events
+      description: List events by a specific agent
+      operationId: list_agent_events
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Agent events listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEvents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /agents/{agentPublicKey}/followers:
+    get:
+      tags: [agents]
+      summary: List followers of user
+      description: List followers of the specified user
+      operationId: list_user_followers
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Followers listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /agents/{agentPublicKey}/following:
+    get:
+      tags: [agents]
+      summary: List users followed by specified user
+      description: List users the specified user is following
+      operationId: list_user_following
+      parameters:
+        - $ref: "#/components/parameters/AgentPublicKey"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Followed users listed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAgents"
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "404": { $ref: "#/components/responses/ProblemNotFound" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+  /ws:
+    get:
+      tags: [events]
+      summary: WebSocket connection for realtime events
+      description: >
+        Establish a WebSocket connection to receive realtime broadcasts of new events.
+
+        **Message Format:**
+        The server sends messages using the WebSocketMessage schema with different types:
+
+        - **Connection**: Sent immediately after connection establishment
+        - **New Event**: Broadcast when new events are created across the Synapse
+        - **Error**: Sent when WebSocket-related errors occur
+
+        **Authentication:**
+        The WebSocket connection inherits the authentication from the HTTP request that initiated it.
+        Clients should include appropriate authorization headers in the initial HTTP request.
+
+        **Reconnection:**
+        Clients should implement exponential backoff for reconnection attempts.
+        The server may close connections periodically for maintenance.
+
+        **Example Messages:**
+
+        Connection confirmation:
+        ```json
+        {
+          "type": "connection",
+          "message": "Connected to meNexus Synapse",
+          "synapseInfo": {
+            "publicKey": "02abcdef...",
+            "name": "My Synapse",
+            "version": "0.3.0-alpha"
+          },
+          "timestamp": "2023-01-01T00:00:00.001Z"
+        }
+        ```
+
+        New event broadcast:
+        ```json
+        {
+          "type": "newEvent",
+          "event": {
+            "eventId": "123e4567-e89b-12d3-a456-426614174000",
+            "agentPublicKey": "02abcdef...",
+            "moduleKind": "feed",
+            "moduleSlug": "general",
+            "eventType": "post",
+            "content": "Hello world!",
+            "createdAt": "2023-01-01T00:00:00Z"
+          },
+          "timestamp": "2023-01-01T00:00:00.001Z"
+        }
+        ```
+      operationId: connectWebSocket
+      responses:
+        "101":
+          description: Switching Protocols - WebSocket connection established
+        "401": { $ref: "#/components/responses/ProblemUnauthorized" }
+        "500": { $ref: "#/components/responses/ProblemServerError" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+
+  headers:
+    Location:
+      description: URL of the created resource
+      schema:
+        type: string
+        format: uri
+    ETag:
+      description: Entity tag for optimistic concurrency
+      schema:
+        type: string
+    Set-Cookie:
+      description: Set-Cookie header for httpOnly refresh token (where applicable)
+      schema:
+        type: string
+    RateLimit-Limit:
+      description: The request limit per time window
+      schema:
+        type: integer
+    RateLimit-Remaining:
+      description: The number of requests remaining in the current time window
+      schema:
+        type: integer
+    RateLimit-Reset:
+      description: The time at which the current rate limit window resets in UTC epoch seconds
+      schema:
+        type: integer
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: Max results to return
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+    Cursor:
+      name: cursor
+      in: query
+      description: Opaque cursor for forward pagination
+      required: false
+      schema:
+        type: string
+    ModuleKind:
+      name: moduleKind
+      in: path
+      required: true
+      description: Module kind (e.g., feed, forum, voice, board, livestream, marketplace, custom). Use 'custom' for extensions like 'custom-livestream'.
+      schema:
+        $ref: "#/components/schemas/ModuleKind"
+    ModuleSlug:
+      name: moduleSlug
+      in: path
+      required: true
+      description: URL-safe module identifier unique per {synapse, moduleKind}
+      schema:
+        $ref: "#/components/schemas/Slug"
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      description: The UUID for an event
+      schema:
+        type: string
+        format: uuid
+    ChannelId:
+      name: channelId
+      in: path
+      required: true
+      description: The UUID for a channel
+      schema:
+        type: string
+        format: uuid
+    ArtifactId:
+      name: artifactId
+      in: path
+      required: true
+      description: The UUID for artifact
+      schema:
+        type: string
+        format: uuid
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: The UUID for a voice session
+      schema:
+        type: string
+        format: uuid
+    SynapsePublicKey:
+      name: synapsePublicKey
+      in: path
+      required: true
+      description: The cryptographic public key of the target Synapse
+      schema:
+        $ref: "#/components/schemas/HexCompressedPublicKey"
+    AgentPublicKey:
+      name: agentPublicKey
+      in: path
+      required: true
+      description: An agent's cryptographic public key
+      schema:
+        $ref: "#/components/schemas/HexCompressedPublicKey"
+
+  requestBodies:
+    ModuleCreateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                $ref: "#/components/schemas/NonEmptyString"
+              moduleSlug:
+                $ref: "#/components/schemas/Slug"
+                description: Optional; if omitted, the server will auto-generate a slug
+              visibility:
+                $ref: "#/components/schemas/ModuleVisibility"
+              permissions:
+                $ref: "#/components/schemas/ModulePermissions"
+              tags:
+                type: array
+                items: { $ref: "#/components/schemas/NonEmptyString" }
+              metadata:
+                type: object
+                additionalProperties: true
+              layoutHints:
+                type: object
+                additionalProperties: true
+                description: UI rendering hints for clients (e.g., component layouts)
+            required: [name]
+          example:
+            name: "Community Forum"
+            moduleSlug: "community-forum"
+            visibility: "public"
+            permissions:
+              canCreateEvent: "members"
+              canInvite: "moderators"
+              canModerate: "owner"
+            tags: ["discussion", "community"]
+            metadata:
+              description: "A place for community discussions and announcements"
+              category: "general"
+            layoutHints:
+              component: "ForumView"
+              props:
+                showCategories: true
+                allowPolls: true
+    ModuleUpdateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                $ref: "#/components/schemas/NonEmptyString"
+              visibility:
+                $ref: "#/components/schemas/ModuleVisibility"
+              permissions:
+                $ref: "#/components/schemas/ModulePermissions"
+              tags:
+                type: array
+                items: { $ref: "#/components/schemas/NonEmptyString" }
+              metadata:
+                type: object
+                additionalProperties: true
+              layoutHints:
+                type: object
+                additionalProperties: true
+          example:
+            name: "Community Discussion Forum"
+            visibility: "public"
+            permissions:
+              canCreateEvent: "everyone"
+              canInvite: "members"
+              canModerate: "moderators"
+            tags: ["discussion", "community", "announcements"]
+            metadata:
+              description: "Updated forum for community discussions and important announcements"
+              category: "general"
+              rules: "Be respectful and constructive"
+            layoutHints:
+              component: "ForumView"
+              props:
+                showCategories: true
+                allowPolls: true
+                showRules: true
+    
+    EventCreateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              eventType:
+                $ref: "#/components/schemas/EventType"
+              content:
+                type: string
+                minLength: 1
+              parentId:
+                type: string
+                format: uuid
+              artifactUris:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactUri"
+            required: [eventType, content]
+          examples:
+            simplePost:
+              summary: Simple text post
+              value:
+                eventType: "post"
+                content: "Excited to announce our new decentralized social platform!"
+            postWithImage:
+              summary: Post with attached image
+              value:
+                eventType: "post"
+                content: "Check out this amazing sunset I captured today! 📸"
+                artifactUris: ["https://example.com/uploads/sunset-123.jpg"]
+            commentReply:
+              summary: Comment replying to another post
+              value:
+                eventType: "comment"
+                content: "This is a great idea! I think we should also consider..."
+                parentId: "123e4567-e89b-12d3-a456-426614174000"
+            messageWithMedia:
+              summary: Direct message with multiple attachments
+              value:
+                eventType: "message"
+                content: "Here are the design files you requested, plus a quick video walkthrough."
+                artifactUris: [
+                  "https://example.com/uploads/design-mockup.pdf",
+                  "https://example.com/uploads/walkthrough.mp4"
+                ]
+    EventUpdateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+                minLength: 1
+              artifactUris:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactUri"
+            required: [content]
+          examples:
+            updateContent:
+              summary: Update post content
+              value:
+                content: "Excited to announce our new decentralized social platform! Launching next week 🚀"
+            addAttachments:
+              summary: Add attachments to existing post
+              value:
+                content: "Check out this amazing sunset I captured today! 📸"
+                artifactUris: [
+                  "https://example.com/uploads/sunset-123.jpg",
+                  "https://example.com/uploads/sunset-456.jpg"
+                ]
+    ChannelCreateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChannelCreate"
+          examples:
+            groupChat:
+              summary: Create a group chat
+              value:
+                name: "Project Alpha Team"
+                participants: [
+                  "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+                  "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                ]
+            directMessage:
+              summary: Create a direct message (just two participants)
+              value:
+                participants: [
+                  "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+                  "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                ]
+    ChannelUpdateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ChannelUpdate"
+          example:
+            name: "Project Alpha Team - Updated"
+    AgentCreateJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AgentCreateRequest"
+          example:
+            publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+            handle: "bob_smith"
+            displayName: "Bob Smith"
+            agentType: "human"
+    ArtifactUpload:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+                format: binary
+                description: 'Uploaded file (max size: 10MB, supported types: image/*, video/*, audio/*)'
+            required: [file]
+          encoding:
+            file:
+              contentType: image/*,video/*,audio/*
+    VerifyCryptoSignatureJson:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/VerifyCryptoSignatureRequest"
+
+  responses:
+    Ok:
+      description: OK
+      headers:
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
+    Created:
+      description: Created
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
+    NoContent:
+      description: No Content
+      headers:
+        RateLimit-Limit:
+          $ref: "#/components/headers/RateLimit-Limit"
+        RateLimit-Remaining:
+          $ref: "#/components/headers/RateLimit-Remaining"
+        RateLimit-Reset:
+          $ref: "#/components/headers/RateLimit-Reset"
+    AuthTokenResponse:
+      description: Tokens minted successfully
+      headers:
+        Set-Cookie:
+          $ref: "#/components/headers/Set-Cookie"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+                description: JWT access token
+              tokenType:
+                type: string
+                example: Bearer
+              expiresIn:
+                type: integer
+                description: Seconds until access token expiry
+            required: [accessToken, tokenType, expiresIn]
+    ProblemBadRequest:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemForbidden:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemNotFound:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemConflict:
+      description: Conflict
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemTooManyRequests:
+      description: Too Many Requests
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemServerError:
+      description: Server Error
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemUnsupportedMediaType:
+      description: Unsupported Media Type
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProblemUnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+          examples:
+            validationError:
+              value:
+                type: "https://docs.menexus.dev/problems/validation-error"
+                title: "Validation failed"
+                status: 422
+                detail: "name is required"
+                errors:
+                  name: "must not be empty"
+
+  schemas:
+    Event:
+      type: object
+      description: >
+        A discrete action/signal (post, message, comment, reaction, join/leave, follow, etc.).
+        Events live within a module or channel context, and can optionally reference another
+        object via `object`.
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          readOnly: true
+        agentPublicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+          readOnly: true
+        moduleKind:
+          $ref: "#/components/schemas/ModuleKind"
+          readOnly: true
+        moduleSlug:
+          $ref: "#/components/schemas/Slug"
+          readOnly: true
+        eventType:
+          $ref: "#/components/schemas/EventType"
+        # Threading: reply/comment to another event in the SAME module/channel
+        parentId:
+          type: string
+          format: uuid
+          description: >
+            Links this event as a reply to another event in the same context (module or channel).
+        # Generic target the event acts upon (agent/module/channel/synapse/event/artifact/external/custom)
+        object:
+          $ref: "#/components/schemas/ObjectRef"
+        # Optional textual content (required for some types; see per-type rules)
+        content:
+          type: string
+        artifactUris:
+          type: array
+          items: { $ref: "#/components/schemas/ArtifactUri" }
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required:
+        - eventId
+        - agentPublicKey
+        - eventType
+        - createdAt
+      example:
+        eventId: "11111111-1111-1111-1111-111111111111"
+        agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        moduleKind: "feed"
+        moduleSlug: "general"
+        eventType: "post"
+        content: "Hello world!"
+        artifactUris: ["https://example.com/image.jpg"]
+        createdAt: "2023-01-01T00:00:00Z"
+    
+    ObjectRef:
+      oneOf:
+        - title: EventRef
+          properties:
+            type:
+              type: string
+              enum: [event]
+            id:
+              type: string
+              format: uuid
+          required: [type, id]
+        - title: AgentRef
+          properties:
+            type:
+              type: string
+              enum: [agent]
+            agentPublicKey:
+              $ref: "#/components/schemas/HexCompressedPublicKey"
+          required: [type, agentPublicKey]
+        - title: ModuleRef
+          properties:
+            type:
+              type: string
+              enum: [module]
+            moduleKind: { $ref: "#/components/schemas/ModuleKind" }
+            moduleSlug: { $ref: "#/components/schemas/Slug" }
+          required: [type, moduleKind, moduleSlug]
+        - title: ChannelRef
+          properties:
+            type:
+              type: string
+              enum: [channel]
+            channelId:
+              type: string
+              format: uuid
+          required: [type, channelId]
+        - title: SynapseRef
+          properties:
+            type:
+              type: string
+              enum: [synapse]
+            synapsePublicKey:
+              $ref: "#/components/schemas/HexCompressedPublicKey"
+          required: [type, synapsePublicKey]
+        - title: ArtifactRef
+          properties:
+            type:
+              type: string
+              enum: [artifact]
+            artifactId:
+              type: string
+              format: uuid
+          required: [type, artifactId]
+        - title: ExternalRef
+          properties:
+            type:
+              type: string
+              enum: [external]
+            uri:
+              type: string
+              format: uri
+          required: [type, uri]
+        - title: CustomRef
+          properties:
+            type:
+              type: string
+              enum: [custom]
+            id:
+              type: string
+              description: Optional identifier for custom/plugin-defined objects
+          required: [type]
+      description: The object this event acts upon.
+
+
+    Module:
+      type: object
+      properties:
+        moduleKind:
+          $ref: "#/components/schemas/ModuleKind"
+          readOnly: true
+        moduleSlug:
+          $ref: "#/components/schemas/Slug"
+          readOnly: true
+        name:
+          $ref: "#/components/schemas/NonEmptyString"
+        visibility:
+          $ref: "#/components/schemas/ModuleVisibility"
+        permissions:
+          $ref: "#/components/schemas/ModulePermissions"
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/NonEmptyString" }
+        metadata:
+          type: object
+          additionalProperties: true
+        layoutHints:
+          type: object
+          additionalProperties: true
+          description: UI rendering hints for clients (e.g., component layouts)
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required: [moduleKind, moduleSlug, name]
+
+    ModuleKind:
+      type: string
+      description: Module kind (e.g., feed, forum, voice, board, livestream, marketplace, custom). Use 'custom' for extensions like 'custom-livestream'.
+      enum: [feed, forum, voice, board, livestream, marketplace, custom]
+
+    ModuleVisibility:
+      type: string
+      enum: [public, unlisted, private]
+
+    ModulePermissions:
+      type: object
+      properties:
+        canCreateEvent:
+          $ref: "#/components/schemas/ModuleRole"
+        canInvite:
+          $ref: "#/components/schemas/ModuleRole"
+        canModerate:
+          $ref: "#/components/schemas/ModuleRole"
+      example:
+        canCreateEvent: "members"
+        canInvite: "moderators"
+        canModerate: "owner"
+
+    ModuleRole:
+      type: string
+      enum: [everyone, members, moderators, owner]
+
+    Channel:
+      type: object
+      properties:
+        channelId:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required: [channelId]
+      example:
+        channelId: "123e4567-e89b-12d3-a456-426614174111"
+        name: "Project Alpha Team"
+        createdAt: "2023-01-10T09:00:00Z"
+        updatedAt: "2023-01-10T09:00:00Z"
+        links:
+          - rel: "participants"
+            href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/participants"
+            method: "GET"
+          - rel: "events"
+            href: "http://localhost:3002/v1/channels/123e4567-e89b-12d3-a456-426614174111/events"
+            method: "GET"
+
+    ChannelCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        participants:
+          type: array
+          items: { $ref: "#/components/schemas/HexCompressedPublicKey" }
+      required: [participants]
+      example:
+        name: "Project Alpha Team"
+        participants: [
+          "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+          "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+        ]
+
+    ChannelUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+      example:
+        name: "Project Alpha Team - Updated"
+
+    CryptoChallenge:
+      type: object
+      properties:
+        challenge:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: "^[0-9a-fA-F]{64}$"
+      required: [challenge]
+      example:
+        challenge: "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+    HexCompressedPublicKey:
+      type: string
+      minLength: 66
+      maxLength: 66
+      pattern: "^(02|03)[0-9a-fA-F]{64}$"
+
+    # Removed legacy Media schemas (Media, MediaUri, MediaUploadResponse)
+
+    Artifact:
+      type: object
+      properties:
+        artifactId:
+          type: string
+          format: uuid
+          readOnly: true
+        uri:
+          type: string
+          format: uri
+        contentType:
+          type: string
+          readOnly: true
+        size:
+          type: integer
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required: [artifactId, uri]
+      example:
+        artifactId: "123e4567-e89b-12d3-a456-426614174001"
+        uri: "https://example.com/uploads/sunset.jpg"
+        contentType: "image/jpeg"
+        size: 2048576
+        createdAt: "2023-01-01T10:00:00Z"
+
+    ArtifactUri:
+      type: string
+      format: uri
+
+    ArtifactUploadResponse:
+      type: object
+      properties:
+        artifactId:
+          type: string
+          format: uuid
+        uri:
+          type: string
+          format: uri
+      required: [artifactId, uri]
+
+    Agent:
+      type: object
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+          readOnly: true
+        handle:
+          type: string
+          maxLength: 32
+        displayName:
+          type: string
+          maxLength: 50
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+        bio:
+          type: string
+          maxLength: 160
+        location:
+          type: string
+        profilePicture:
+          type: string
+          format: uri
+        profileBanner:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        isOnline:
+          type: boolean
+          description: Indicates if the agent is currently online (volatile, not persisted)
+      required: [publicKey, handle, agentType]
+      example:
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        handle: "alice"
+        displayName: "Alice Chen"
+        agentType: "human"
+        bio: "Software developer and digital nomad. Building decentralized social networks."
+        location: "San Francisco, CA"
+        profilePicture: "https://example.com/profiles/alice/avatar.jpg"
+        profileBanner: "https://example.com/profiles/alice/banner.jpg"
+        createdAt: "2023-01-15T10:30:00Z"
+        isOnline: true
+
+    AgentType:
+      type: string
+      description: The type of agent, determining its capabilities and behavior in the network
+      enum: [human, bot, service, bridge, system]
+      example: human
+
+    AgentUpdate:
+      type: object
+      properties:
+        handle:
+          type: string
+        displayName:
+          type: string
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+        bio:
+          type: string
+        location:
+          type: string
+        profilePicture:
+          type: string
+          format: uri
+        profileBanner:
+          type: string
+          format: uri
+      example:
+        displayName: "Alice Chen (Updated)"
+        agentType: "human"
+        bio: "Full-stack developer specializing in decentralized systems and cryptography."
+        location: "Berlin, Germany"
+        profilePicture: "https://example.com/profiles/alice/new-avatar.jpg"
+
+    AgentCreateRequest:
+      type: object
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+        handle:
+          type: string
+        displayName:
+          type: string
+        agentType:
+          $ref: "#/components/schemas/AgentType"
+      required: [publicKey, handle, displayName, agentType]
+      example:
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        handle: "alice"
+        displayName: "Alice Chen"
+        agentType: "human"
+
+    EventType:
+      type: string
+      description: Kind of event performed. Use 'custom' for extensions like 'custom-livestream'.
+      enum: [post, message, comment, reaction, join, leave, follow, custom]
+
+
+    NonEmptyString:
+      type: string
+      minLength: 1
+
+    Peer:
+      type: object
+      properties:
+        peerId:
+          type: string
+          readOnly: true
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+        lastSeen:
+          type: string
+          format: date-time
+      required: [peerId, publicKey]
+      example:
+        peerId: "peer-001"
+        publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        lastSeen: "2023-01-15T10:30:00Z"
+
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          default: "about:blank"
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+      required: [title, status]
+      example:
+        type: "https://docs.menexus.dev/problems/validation-error"
+        title: "Validation failed"
+        status: 422
+        detail: "The request contains invalid data"
+        errors:
+          name: "must not be empty"
+          email: "must be a valid email address"
+
+    Link:
+      type: object
+      properties:
+        rel: { type: string }
+        href: { type: string, format: uri }
+        method: { type: string, enum: [GET, POST, PATCH, DELETE] }
+      required: [rel, href]
+      example:
+        rel: "events"
+        href: "http://localhost:3002/v1/modules/feed/general/events"
+        method: "GET"
+
+    Synapse:
+      type: object
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+          pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+      required: [publicKey, name]
+
+    # Removed legacy User schemas (User, UserUpdate, UserCreateRequest)
+
+    VerifyCryptoSignatureRequest:
+      type: object
+      properties:
+        agentPublicKey:
+          $ref: "#/components/schemas/HexCompressedPublicKey"
+        challenge:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: "^[0-9a-fA-F]{64}$"
+        signature:
+          type: string
+          minLength: 128
+          maxLength: 128
+          pattern: "^[0-9a-fA-F]{128}$"
+      required: [agentPublicKey, challenge, signature]
+
+    Slug:
+      type: string
+      pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      minLength: 1
+      maxLength: 64
+    Paginated:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object  # Generic placeholder, overridden in specific paginated schemas
+        nextCursor:
+          type: string
+          nullable: true
+      required: [items]
+    PaginatedEvents:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Event" }
+          example:
+            items:
+              - eventId: "123e4567-e89b-12d3-a456-426614174000"
+                agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "post"
+                content: "Welcome to our community!"
+                createdAt: "2023-01-01T10:00:00Z"
+                artifactUris: ["https://example.com/uploads/welcome-image.jpg"]
+              - eventId: "456e7890-e89b-12d3-a456-426614174001"
+                agentPublicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                moduleKind: "feed"
+                moduleSlug: "general"
+                eventType: "comment"
+                content: "Thanks for the warm welcome!"
+                parentId: "123e4567-e89b-12d3-a456-426614174000"
+                createdAt: "2023-01-01T10:05:00Z"
+            nextCursor: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+    PaginatedAgents:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Agent" }
+          example:
+            items:
+              - publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                handle: "alice"
+                displayName: "Alice Chen"
+                agentType: "human"
+                bio: "Software developer and digital nomad"
+                location: "San Francisco, CA"
+                isOnline: true
+                createdAt: "2023-01-15T10:30:00Z"
+              - publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                handle: "bob_smith"
+                displayName: "Bob Smith"
+                agentType: "human"
+                bio: "Community manager"
+                location: "Berlin, Germany"
+                isOnline: false
+                createdAt: "2023-02-01T14:20:00Z"
+            nextCursor: "eyJwYWdlIjoxLCJsaW1pdCI6NTB9"
+    PaginatedModules:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Module" }
+          example:
+            items:
+              - moduleKind: "feed"
+                moduleSlug: "general"
+                name: "General Discussion"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "members"
+                  canInvite: "moderators"
+                  canModerate: "owner"
+                tags: ["general", "discussion"]
+                createdAt: "2023-01-01T00:00:00Z"
+                updatedAt: "2023-01-01T00:00:00Z"
+              - moduleKind: "forum"
+                moduleSlug: "tech-support"
+                name: "Technical Support"
+                visibility: "public"
+                permissions:
+                  canCreateEvent: "everyone"
+                  canInvite: "moderators"
+                  canModerate: "moderators"
+                tags: ["support", "technical", "help"]
+                createdAt: "2023-01-05T10:00:00Z"
+                updatedAt: "2023-01-05T10:00:00Z"
+            nextCursor: "eyJtb2R1bGVfa2luZCI6ImZvcnVtIiwibGFzdF9pZCI6IjEyMyJ9"
+    PaginatedChannels:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Channel" }
+          example:
+            items:
+              - channelId: "123e4567-e89b-12d3-a456-426614174111"
+                name: "Project Alpha Team"
+                createdAt: "2023-01-10T09:00:00Z"
+                updatedAt: "2023-01-10T09:00:00Z"
+              - channelId: "456e7890-e89b-12d3-a456-426614174112"
+                name: "Random Chat"
+                createdAt: "2023-01-12T15:30:00Z"
+                updatedAt: "2023-01-12T15:30:00Z"
+            nextCursor: "eyJjaGFubmVsX2lkIjoiNDU2ZTc4OTAtZTg5Yi0xMmQzLWE0NTYtNDI2NjE0MTc0MTEyIn0"
+    PaginatedSynapses:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Synapse" }
+          example:
+            items:
+              - publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                name: "Main Community Hub"
+                description: "Primary community synapse"
+                version: "0.3.0-alpha"
+              - publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                name: "Tech Forum"
+                description: "Technical discussions and support"
+                version: "0.3.0-alpha"
+            nextCursor: "eyJzeW5hcHNlX3BrIjoiMDNmZWRjYmEwOTg3NjU0MzIxZmVkY2JhMDk4NzY1NDMyMWZlZGNiYTA5ODc2NTQzMjFmZWRjYmEwOTg3NjU0MyJ9"
+    PaginatedPeers:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Peer" }
+          example:
+            items:
+              - peerId: "peer-001"
+                publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+                lastSeen: "2023-01-15T10:30:00Z"
+              - peerId: "peer-002"
+                publicKey: "03fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543"
+                lastSeen: "2023-01-15T09:45:00Z"
+            nextCursor: "eyJwZWVyX2lkIjoicGVlci0wMDIifQ"
+    Capabilities:
+      type: object
+      properties:
+        modules:
+          type: array
+          items: { $ref: "#/components/schemas/ModuleKind" }
+        eventTypes:
+          type: array
+          items: { $ref: "#/components/schemas/EventType" }
+        extensions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              version:
+                type: string
+            required: [name]
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/Link" }
+
+    # WebSocket Message Schemas
+    WebSocketMessage:
+      oneOf:
+        - $ref: "#/components/schemas/NewEventMessage"
+        - $ref: "#/components/schemas/ConnectionMessage"
+        - $ref: "#/components/schemas/ErrorMessage"
+      discriminator:
+        propertyName: type
+      description: Base schema for all WebSocket messages sent from the server to clients
+
+    NewEventMessage:
+      type: object
+      description: Message sent when a new event is created and broadcast to connected clients
+      properties:
+        type:
+          type: string
+          enum: [newEvent]
+          description: Message type identifier
+        event:
+          $ref: "#/components/schemas/Event"
+          description: The newly created event
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, event, timestamp]
+      example:
+        type: "newEvent"
+        event:
+          eventId: "123e4567-e89b-12d3-a456-426614174000"
+          agentPublicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+          moduleKind: "feed"
+          moduleSlug: "general"
+          eventType: "post"
+          content: "Hello world!"
+          createdAt: "2023-01-01T00:00:00Z"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    ConnectionMessage:
+      type: object
+      description: Message sent when WebSocket connection is established
+      properties:
+        type:
+          type: string
+          enum: [connection]
+          description: Message type identifier
+        message:
+          type: string
+          description: Connection confirmation message
+        synapseInfo:
+          type: object
+          description: Basic information about the connected synapse
+          properties:
+            publicKey:
+              $ref: "#/components/schemas/HexCompressedPublicKey"
+            name:
+              type: string
+            version:
+              type: string
+          required: [publicKey]
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, message, timestamp]
+      example:
+        type: "connection"
+        message: "Connected to meNexus Synapse"
+        synapseInfo:
+          publicKey: "02abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+          name: "My Synapse"
+          version: "0.3.0-alpha"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    ErrorMessage:
+      type: object
+      description: Error message sent over WebSocket connection
+      properties:
+        type:
+          type: string
+          enum: [error]
+          description: Message type identifier
+        error:
+          type: object
+          description: Error details in problem+json format
+          properties:
+            type:
+              type: string
+              format: uri
+            title:
+              type: string
+            status:
+              type: integer
+            detail:
+              type: string
+          required: [title, status]
+        timestamp:
+          type: string
+          format: date-time
+          description: When this message was sent
+      required: [type, error, timestamp]
+      example:
+        type: "error"
+        error:
+          type: "https://docs.menexus.dev/problems/websocket-error"
+          title: "WebSocket Error"
+          status: 500
+          detail: "Failed to process event broadcast"
+        timestamp: "2023-01-01T00:00:00.001Z"
+
+    PaginatedArtifactUris:
+      allOf:
+        - $ref: "#/components/schemas/Paginated"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ArtifactUri" }
+          example:
+            items: [
+              "https://example.com/uploads/image1.jpg",
+              "https://example.com/uploads/image2.png",
+              "https://example.com/uploads/document.pdf",
+              "https://example.com/uploads/video.mp4"
+            ]
+            nextCursor: "eyJhcnRpZmFjdF91cmkiOiJodHRwczovL2V4YW1wbGUuY29tL3VwbG9hZHMvdmlkZW8ubXA0In0"
