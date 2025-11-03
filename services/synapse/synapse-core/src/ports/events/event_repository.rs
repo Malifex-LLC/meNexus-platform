@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
+use crate::domain::events::Event;
+use crate::errors::CoreError;
+
+#[async_trait::async_trait]
+pub trait EventRepository: Send + Sync {
+    async fn create(&self, event: Event) -> Result<Event, CoreError>;
+}
