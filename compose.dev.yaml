@@ -19,6 +19,7 @@ services:
       timeout: 3s
       retries: 10
     volumes:
+      - ./services/synapse/synapse-adapters/adapter-postgres/db/init:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql/data
 
   client-web:
