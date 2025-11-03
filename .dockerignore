@@ -5,4 +5,5 @@
 **/.DS_Store
 **/*.log
 .env*
-deploy/compose/secrets/*
+services/synapse/target
+.turbo
