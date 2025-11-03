@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright © 2025 Malifex LLC and contributors
+
+name: meNexus-dev
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=menexus_dev
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d menexus_dev"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  client-web:
+    build:
+      context: .
+      dockerfile: apps/client-web/Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+      - client-web-node-modules:/workspace/apps/client-web/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+
+  synapse:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: services/synapse/Dockerfile
+    working_dir: /workspace/services/synapse
+    volumes:
+      - .:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+      - synapse-target:/workspace/services/synapse/target
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
+      - RUST_LOG=debug
+
+volumes:
+  pgdata:
+  client-web-node-modules:
+  cargo-registry:
+  cargo-git:
+  synapse-target:
