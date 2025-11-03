@@ -1,60 +1,10 @@
-# syntax=docker/dockerfile:1
+FROM rust:1-bookworm
 
-############################
-# Build deps with pnpm workspaces
-############################
-FROM node:22-alpine AS deps
-WORKDIR /repo
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+WORKDIR /workspace/services/synapse
 
-# Workspace manifests
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
-COPY services/synapse/package.json services/synapse/package.json
+# Watcher for hot-reload
+RUN cargo install watchexec-cli
 
+EXPOSE 3000
 
-# Install all workspace deps
-RUN pnpm install --frozen-lockfile
-
-# Copy the whole repo
-COPY . .
-
-############################
-# Runtime image
-############################
-FROM node:22-alpine
-WORKDIR /app
-ENV NODE_ENV=production
-
-# ---- OCI labels ----
-ARG VERSION
-ARG VCS_REF
-ARG BUILD_DATE
-
-LABEL org.opencontainers.image.title="meNexus Synapse" \
-      org.opencontainers.image.description="Decentralized social node (Synapse) for meNexus" \
-      org.opencontainers.image.url="https://github.com/malifex-llc/menexus-platform" \
-      org.opencontainers.image.source="https://github.com/malifex-llc/menexus-platform" \
-      org.opencontainers.image.documentation="https://github.com/malifex-llc/menexus-platform#readme" \
-      org.opencontainers.image.licenses="AGPL-3.0-or-later" \
-      org.opencontainers.image.version="${VERSION}" \
-      org.opencontainers.image.revision="${VCS_REF}" \
-      org.opencontainers.image.created="${BUILD_DATE}"
-
-# Bring runtime node_modules (workspace + service)
-COPY --from=deps /repo/node_modules /app/node_modules
-COPY --from=deps /repo/services/synapse/node_modules /app/services/synapse/node_modules
-
-# Copy source
-COPY . .
-
-# Entrypoint script
-COPY services/synapse/docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Persistent data
-VOLUME ["/app/services/synapse/src/config", "/synapse/uploads", "/data/secrets"]
-
-# API + libp2p + orbitdb
-EXPOSE 3001 4001 4002
-
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["watchexec","--poll","--clear","--restart","--watch","/workspace/services/synapse","--ignore","/workspace/services/synapse/target","--","cargo","run","-p","synapse-server"]

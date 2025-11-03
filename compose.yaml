@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright © 2025 Malifex LLC and contributors
+
+name: meNexus
+services:
+  bootstrap:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+  synapse:
+  client:
+  proxy:
+secrets:
+volumes:

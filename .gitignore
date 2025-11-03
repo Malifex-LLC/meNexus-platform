@@ -24,12 +24,5 @@ node_modules
 .env
 .env.production
 .env.*.local
-deploy/compose/.env
-deploy/compose/secrets/*
-services/synapse/src/config/synapse-config.json
-services/synapse/secrets/*
-services/synapse/src/orbitdb/ipfs/
-services/synapse/src/orbitdb/keystore/
-services/synapse/src/orbitdb/orbitdb/
-services/synapse/uploads/
-services/synapse-rs/target/*
+/services/synapse/target
+.turbo

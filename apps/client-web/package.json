@@ -1,33 +1,33 @@
 {
   "name": "@menexus/client-web",
-  "version": "0.1.0-alpha.0",
-  "license": "AGPL-3.0-or-later",
-  "author": {
-    "name": "Jacob Ross",
-    "email": "jacob@malifex.dev",
-    "url": "https://malifex.dev"
-  },
-  "description": "Web based frontend for users",
   "private": true,
+  "version": "0.3.0-alpha",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
+    "clean": "rm -rf dist node_modules/.vite"
   },
   "dependencies": {
-    "@noble/secp256k1": "^2.3.0",
-    "@tailwindcss/vite": "^4.1.13",
-    "axios": "^1.12.2",
-    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-icons": "^5.5.0",
-    "react-rnd": "^10.5.2",
-    "react-router-dom": "^7.9.1",
-    "react-swipeable": "^7.0.2",
-    "tailwind-scrollbar": "^4.0.2",
-    "tailwindcss": "^4.1.13"
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/node": "^24.6.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vite": "^7.1.7"
   }
 }
