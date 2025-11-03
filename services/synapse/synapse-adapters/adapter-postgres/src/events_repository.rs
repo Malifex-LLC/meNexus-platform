@@ -4,7 +4,7 @@
 use sqlx::{Pool, Postgres};
 use synapse_core::domain::events::Event;
 use synapse_core::errors::CoreError;
-use synapse_core::ports::events::EventRepository;
+use synapse_core::ports::events::event_repository::EventRepository;
 
 pub struct PostgresEventsRepository {
     pool: Pool<Postgres>,

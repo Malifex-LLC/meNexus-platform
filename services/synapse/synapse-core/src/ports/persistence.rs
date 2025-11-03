@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::errors::CoreError;
-use crate::ports::events::EventRepository;
+use crate::ports::events::event_repository::EventRepository;
 
 #[async_trait::async_trait]
 pub trait UnitOfWork: Send {
