@@ -11,7 +11,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 synapse-core = { path = "../synapse-core/" }
 synapse-application = { path = "../synapse-application/" }
-adapter-postgres = { path = "../synapse-adapters/adapter-postgres/" }
+adapter-postgres = { path = "../synapse-adapters/adapter-postgres" }
+adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p" }
 thiserror = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }

@@ -8,6 +8,7 @@ pub mod state;
 pub mod utils;
 
 use crate::state::AppState;
+use adapter_libp2p::config::initialize;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
 use synapse_application::events::event_service::EventService;
@@ -27,6 +28,13 @@ async fn main() -> anyhow::Result<()> {
     let database_url = std::env::var("DATABASE_URL")?;
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
+
+    // Spawn libp2p initialization in the background
+    tokio::spawn(async {
+        if let Err(e) = adapter_libp2p::config::initialize().await {
+            eprintln!("libp2p initialization failed: {e}");
+        }
+    });
 
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
     let create_event = Arc::new(EventService::new(repo));
