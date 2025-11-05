@@ -18,6 +18,7 @@ use libp2p_kad::{
 use libp2p_mdns::{Config as MdnsConfig, Event as MdnsEvent, tokio::Behaviour as Mdns};
 use libp2p_swarm_derive::NetworkBehaviour;
 use synapse_core::errors::CoreError;
+use tracing::debug;
 use tracing_subscriber::EnvFilter;
 
 #[derive(NetworkBehaviour)]
@@ -89,8 +90,6 @@ pub fn create_swarm(
         })?
         .with_swarm_config(|cfg| cfg.with_idle_connection_timeout(Duration::from_secs(u64::MAX)))
         .build();
-
-    swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
 
     let mut has_bootstrap = false;
     for mut addr in bootstrap_addrs {
@@ -188,8 +187,16 @@ pub async fn initialize() -> Result<(), CoreError> {
     let mut swarm = create_swarm(bootstrap_addrs, Some(keypair)).unwrap();
 
     // If create_swarm doesn't already listen, do it here:
-    // swarm.listen_on(listen_addr).expect("listen_on failed");
+    swarm
+        .listen_on(listen_addr.clone())
+        .expect("listen_on failed");
+    debug!("libp2p listening on {listen_addr}");
 
-    run_swarm(swarm);
+    tokio::spawn(async move {
+        if let Err(e) = run_swarm(swarm).await {
+            eprintln!("run_swarm error: {e}");
+        }
+    });
+
     Ok(())
 }

@@ -51,6 +51,7 @@ services:
       - synapse-target:/workspace/services/synapse/target
     ports:
       - "3000:3000"
+      - "4000:4000"
     environment:
       - RUST_LOG=debug
       - LIBP2P_PORT=4000
