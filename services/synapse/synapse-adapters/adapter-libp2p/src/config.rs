@@ -2,8 +2,8 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use futures::StreamExt;
-use std::error::Error;
 use std::time::Duration;
+use std::{env, error::Error};
 
 use libp2p::{
     Multiaddr, PeerId, identity,
@@ -152,25 +152,44 @@ pub async fn run_swarm(mut swarm: Swarm<MyBehaviour>) -> Result<(), CoreError> {
 }
 
 pub async fn initialize() -> Result<(), CoreError> {
-    let keypair = Some(libp2p::identity::Keypair::generate_ed25519());
-    let peer_id = keypair.as_ref().unwrap().public().to_peer_id();
+    // Make both arms return a Keypair (no Option, no nested Result)
+    let keypair: identity::Keypair = match env::var("LIBP2P_KEY") {
+        Ok(key_b64) => {
+            let key_bytes = base64::decode(key_b64).expect("LIBP2P_KEY is not valid base64");
+            identity::Keypair::from_protobuf_encoding(&key_bytes)
+                .expect("LIBP2P_KEY is not a valid libp2p protobuf key")
+        }
+        Err(_) => identity::Keypair::generate_ed25519(),
+    };
+
+    let peer_id: PeerId = keypair.public().to_peer_id();
     let addr_str = format!("/ip4/127.0.0.1/tcp/63443/p2p/{}", peer_id);
-    let addr: Multiaddr = addr_str.parse().expect("Invalid Multiaddr");
+    let _addr: Multiaddr = addr_str.parse().expect("Invalid Multiaddr");
 
-    let bootstrap_strings = vec![
-        "/ip4/127.0.0.1/tcp/63443/p2p/12D3KooWCuoHGNSoFPyK3M1L4bWmtQ1xjiK6b2aNXqWS8PW3Y9Pf"
-            .to_string(),
-        "/ip4/192.168.1.60/tcp/63443/p2p/12D3KooWCuoHGNSoFPyK3M1L4bWmtQ1xjiK6b2aNXqWS8PW3Y9Pf"
-            .to_string(),
-    ];
-
+    // Parse bootstrap list (ignore empty entries)
+    let bootstrap_strings = env::var("BOOTSTRAP_LIST").unwrap_or_default();
     let mut bootstrap_addrs: Vec<Multiaddr> = Vec::new();
-    for s in bootstrap_strings {
-        let addr: Multiaddr = s.parse().unwrap();
+    for s in bootstrap_strings
+        .split(',')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
+        let addr: Multiaddr = s.parse().expect("Invalid Multiaddr in BOOTSTRAP_LIST");
         bootstrap_addrs.push(addr);
     }
 
-    let swarm = create_swarm(bootstrap_addrs, keypair).unwrap();
+    // Read listen port from env (default 0 = random)
+    let listen_port_str = env::var("LIBP2P_PORT").unwrap_or_else(|_| "0".to_string());
+    let listen_addr: Multiaddr = format!("/ip4/0.0.0.0/tcp/{}", listen_port_str)
+        .parse()
+        .expect("Invalid listen Multiaddr");
+
+    // Build and run swarm
+    let mut swarm = create_swarm(bootstrap_addrs, Some(keypair)).unwrap();
+
+    // If create_swarm doesn't already listen, do it here:
+    // swarm.listen_on(listen_addr).expect("listen_on failed");
+
     run_swarm(swarm);
     Ok(())
 }

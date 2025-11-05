@@ -52,8 +52,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
       - RUST_LOG=debug
+      - LIBP2P_PORT=4000
+      - BOOTSTRAP_LIST=
+      - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
 
 volumes:
   pgdata:
