@@ -4,6 +4,7 @@ members = [
   "synapse-adapters/adapter-libp2p",
   "synapse-adapters/adapter-postgres",
   "synapse-application",
+  "synapse-config",
   "synapse-core",
   "synapse-server",
 ]
@@ -14,6 +15,7 @@ edition = "2024"
 [workspace.dependencies]
 anyhow = "1.0.100"
 async-trait = "0.1.89"
+base64 = "0.22.1"
 dotenvy = "0.15.7"
 futures = "0.3.31"
 log = "0.4.28"

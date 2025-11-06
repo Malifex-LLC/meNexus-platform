@@ -3,7 +3,7 @@
 
 use crate::config::Libp2pEvent;
 use crate::discovery::setup_bootstrap;
-use crate::{TransportConfig, config::Libp2pBehaviour};
+use crate::{config::Libp2pBehaviour, transport::TransportConfig};
 use futures::StreamExt;
 use libp2p::{
     noise, ping,
@@ -16,6 +16,7 @@ use synapse_core::errors::CoreError;
 use tracing::debug;
 
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, CoreError> {
+    debug!("Creating swarm for config: {config:?}");
     let kad_cfg = KadConfig::default();
     let mut swarm = libp2p::SwarmBuilder::with_existing_identity(config.keypair)
         .with_tokio()

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::TransportConfig;
+use crate::transport::TransportConfig;
 use base64;
 use libp2p::Multiaddr;
 use libp2p::identity::{Keypair, PeerId};
@@ -9,6 +9,9 @@ use libp2p::ping;
 use libp2p_kad::{self, Event as KadEvent, store::MemoryStore};
 use libp2p_swarm_derive::NetworkBehaviour;
 use std::env;
+use std::fs;
+use std::path::PathBuf;
+use synapse_config::SynapseConfig;
 use synapse_core::errors::CoreError;
 use tracing::debug;
 
@@ -37,15 +40,10 @@ impl From<KadEvent> for Libp2pEvent {
     }
 }
 
-pub fn parse_config_from_env() -> Result<TransportConfig, CoreError> {
-    let keypair: Keypair = match env::var("LIBP2P_KEY") {
-        Ok(key_b64) => {
-            let key_bytes = base64::decode(key_b64).expect("LIBP2P_KEY is not valid base64");
-            Keypair::from_protobuf_encoding(&key_bytes)
-                .expect("LIBP2P_KEY is not a valid libp2p protobuf key")
-        }
-        Err(_) => Keypair::generate_ed25519(),
-    };
+pub fn parse_config(config: &SynapseConfig) -> Result<TransportConfig, CoreError> {
+    let s = std::fs::read_to_string(&config.identity.key_path).unwrap();
+    let b = base64::decode(s.trim()).unwrap();
+    let keypair = libp2p::identity::Keypair::from_protobuf_encoding(&b).unwrap();
 
     let peer_id: PeerId = keypair.public().to_peer_id();
     let addr_str = format!("/ip4/127.0.0.1/tcp/63443/p2p/{}", peer_id);

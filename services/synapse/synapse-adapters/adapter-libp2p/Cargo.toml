@@ -13,6 +13,8 @@ libp2p = { version = "0.56.0", features = [
   "tcp",
   "tokio",
   "yamux",
+  "secp256k1",
+  "serde",
 ] }
 libp2p-kad = "0.48.0"
 libp2p-mdns = { version = "0.48.0", features = ["tokio"] }
@@ -20,6 +22,7 @@ libp2p-swarm-derive = "0.35.1"
 serde = { workspace = true }
 serde_json = { workspace = true }
 synapse-core = { path = "../../synapse-core" }
+synapse-config = { path = "../../synapse-config" }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
