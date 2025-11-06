@@ -3172,8 +3172,16 @@ dependencies = [
 name = "synapse-application"
 version = "0.1.0"
 dependencies = [
+ "adapter-libp2p",
  "async-trait",
+ "base64",
+ "futures",
+ "libp2p",
+ "libp2p-kad",
+ "libp2p-mdns",
+ "libp2p-swarm-derive",
  "synapse-core",
+ "tokio",
  "uuid",
 ]
 

@@ -6,7 +6,7 @@ edition.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 base64 = "0.22.1"
-futures = "0.3.31"
+futures = { workspace = true }
 libp2p = { version = "0.56.0", features = [
   "noise",
   "ping",

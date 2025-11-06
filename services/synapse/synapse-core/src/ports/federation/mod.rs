@@ -3,6 +3,9 @@
 
 use async_trait::async_trait;
 
+use crate::domain::federation::PeerInfo;
+use crate::errors::CoreError;
+
 // Outbound Port
 #[async_trait]
 pub trait SnpTransport: Send + Sync {}

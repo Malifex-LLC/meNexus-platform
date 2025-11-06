@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+pub mod federation_service;
+
 use async_trait::async_trait;
 use std::sync::Arc;
 use synapse_core::ports::federation::{MessageHandler, SnpTransport};
@@ -11,6 +13,3 @@ pub struct SnpMessenger<T: SnpTransport> {
 }
 
 impl<T: SnpTransport> SnpMessenger<T> {}
-
-#[async_trait]
-impl<T: SnpTransport> MessageHandler for SnpMessenger<T> {}
