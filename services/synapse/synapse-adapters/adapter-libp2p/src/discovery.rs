@@ -5,6 +5,7 @@ use libp2p::multiaddr::Protocol;
 use libp2p::{Multiaddr, Swarm};
 
 use crate::config::Libp2pBehaviour;
+use tracing::debug;
 
 pub fn setup_bootstrap(swarm: &mut Swarm<Libp2pBehaviour>, bootstrap_list: Vec<Multiaddr>) {
     for mut addr in bootstrap_list {
@@ -15,13 +16,13 @@ pub fn setup_bootstrap(swarm: &mut Swarm<Libp2pBehaviour>, bootstrap_list: Vec<M
                 .kad
                 .add_address(&bootstrap_peer, addr.clone());
             if let Err(e) = swarm.dial(addr) {
-                eprintln!("Failed to dial bootstrap: {e}");
+                debug!("Failed to dial bootstrap: {e}");
             }
         } else {
-            eprintln!("Bootstrap addr missing /p2p suffix");
+            debug!("Bootstrap addr missing /p2p suffix");
         }
     }
     if let Err(e) = swarm.behaviour_mut().kad.bootstrap() {
-        eprintln!("Bootstrap failed: {e}");
+        debug!("Bootstrap failed: {e}");
     }
 }

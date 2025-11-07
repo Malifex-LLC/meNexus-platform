@@ -13,7 +13,7 @@ use libp2p::{
 };
 use libp2p_kad::{self, Config as KadConfig, Mode, store::MemoryStore};
 use std::time::Duration;
-use tracing::info;
+use tracing::{debug, info};
 
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
     info!("Creating swarm for config: {config:?}");
@@ -45,20 +45,20 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
     Ok(swarm)
 }
 
-pub async fn run_swarm(mut swarm: Swarm<Libp2pBehaviour>) {
+pub async fn run_swarm(mut swarm: Swarm<Libp2pBehaviour>) -> Result<(), Libp2pAdapterError> {
     info!("Running swarm...");
     loop {
         match swarm.select_next_some().await {
-            SwarmEvent::NewListenAddr { address, .. } => println!("Listening on {address:?}"),
-            SwarmEvent::Behaviour(Libp2pEvent::Ping(event)) => println!("{event:?}"),
-            SwarmEvent::Behaviour(Libp2pEvent::Kad(event)) => println!("{event:?}"),
-            SwarmEvent::ConnectionEstablished { peer_id, .. } => println!("Connected to {peer_id}"),
-            SwarmEvent::ConnectionClosed { peer_id, .. } => println!("Disconnected from {peer_id}"),
+            SwarmEvent::NewListenAddr { address, .. } => info!("Listening on {address:?}"),
+            SwarmEvent::Behaviour(Libp2pEvent::Ping(event)) => info!("{event:?}"),
+            SwarmEvent::Behaviour(Libp2pEvent::Kad(event)) => info!("{event:?}"),
+            SwarmEvent::ConnectionEstablished { peer_id, .. } => info!("Connected to {peer_id}"),
+            SwarmEvent::ConnectionClosed { peer_id, .. } => info!("Disconnected from {peer_id}"),
             SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
                 if let Some(id) = peer_id {
-                    println!("Dial error for {id}: {error}");
+                    debug!("Dial error for {id}: {error}");
                 } else {
-                    println!("Dial error: {error}");
+                    debug!("Dial error: {error}");
                 }
             }
             _ => {}

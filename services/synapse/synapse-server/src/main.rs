@@ -8,10 +8,11 @@ pub mod state;
 pub mod utils;
 
 use crate::state::AppState;
+use adapter_libp2p::initialize_p2p;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
 use synapse_application::events::event_service::EventService;
-use synapse_application::federation::federation_service::initialize_p2p;
+use synapse_config::get_synapse_config;
 
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
@@ -40,7 +41,8 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
 
-    initialize_p2p().await?;
+    let config = get_synapse_config()?;
+    initialize_p2p(config).await?;
 
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
     let create_event = Arc::new(EventService::new(repo));

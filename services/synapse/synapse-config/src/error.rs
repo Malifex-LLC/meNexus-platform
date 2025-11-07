@@ -16,6 +16,8 @@ pub enum SynapseConfigError {
     PasreUrl(#[from] url::ParseError),
     #[error("var error: {0}")]
     Var(#[from] std::env::VarError),
+    #[error("convert error: {0}")]
+    Convert(#[from] std::convert::Infallible),
     #[error("serde_json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
     #[error("Other error: {0}")]
@@ -29,6 +31,7 @@ impl From<SynapseConfigError> for ConfigError {
             SynapseConfigError::Libp2p(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::ParseInt(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::Var(e) => ConfigError::Other(e.to_string()),
+            SynapseConfigError::Convert(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::SerdeJson(e) => ConfigError::SerdeJson(e),
             SynapseConfigError::PasreUrl(e) => ConfigError::Url(e),
             SynapseConfigError::Other(e) => ConfigError::Other(e),

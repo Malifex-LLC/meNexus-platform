@@ -18,3 +18,9 @@ pub async fn create_libp2p_transport(
     let transport = Libp2pTransport::new(transport_config);
     Ok(transport)
 }
+
+pub async fn initialize_p2p(config: SynapseConfig) -> Result<(), TransportError> {
+    let transport = create_libp2p_transport(config).await?;
+    transport.start().await?;
+    Ok(())
+}

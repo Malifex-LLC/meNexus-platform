@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::swarm::{create_swarm, run_swarm};
+use crate::{
+    errors::Libp2pAdapterError,
+    swarm::{create_swarm, run_swarm},
+};
 use async_trait::async_trait;
 use libp2p::{Multiaddr, identity::Keypair};
-use synapse_core::{errors::CoreError, ports::federation::SnpTransport};
+use synapse_core::ports::federation::SnpTransport;
 
 pub struct Libp2pTransport {
     config: TransportConfig,
@@ -22,9 +25,9 @@ impl Libp2pTransport {
         Self { config }
     }
 
-    pub async fn start(&self) -> Result<(), CoreError> {
+    pub async fn start(&self) -> Result<(), Libp2pAdapterError> {
         let swarm = create_swarm(self.config.clone());
-        tokio::spawn(async move { run_swarm(swarm.unwrap()).await });
+        tokio::spawn(async move { run_swarm(swarm?).await });
         Ok(())
     }
 }

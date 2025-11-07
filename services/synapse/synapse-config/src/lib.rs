@@ -47,7 +47,7 @@ pub struct ApiConfig {
     port: u16,
 }
 
-pub fn load_or_init_config(config_path: PathBuf) -> Result<SynapseConfig, ConfigError> {
+pub fn load_or_init_config(config_path: PathBuf) -> Result<SynapseConfig, SynapseConfigError> {
     if config_path.exists() {
         let contents = fs::read_to_string(&config_path)?;
         let config: SynapseConfig = serde_json::from_str(&contents)?;
@@ -108,4 +108,10 @@ pub fn generate_secp256k1_keypair(key_path: &PathBuf) -> Result<Keypair, Synapse
     }
     fs::write(key_path, encoded)?;
     Ok(keypair)
+}
+
+pub fn get_synapse_config() -> Result<SynapseConfig, SynapseConfigError> {
+    let config_path: PathBuf = env::var("CONFIG_PATH")?.parse()?;
+    let synapse_config = load_or_init_config(config_path)?;
+    Ok(synapse_config)
 }
