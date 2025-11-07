@@ -3,9 +3,6 @@
 
 pub mod snp;
 
-use crate::errors::CoreError;
-use async_trait::async_trait;
-
 // Add domain types
 #[derive(Debug, Clone)]
 pub struct PeerInfo {
@@ -17,7 +14,7 @@ pub struct PeerInfo {
 #[derive(Debug, Clone)]
 pub enum TransportEvent {
     PeerConnected(PeerInfo),
-    PeerDisconnected(String), // peer_id
-    ListeningOn(String),      // address
+    PeerDisconnected(String),
+    ListeningOn(String),
     BootstrapCompleted,
 }

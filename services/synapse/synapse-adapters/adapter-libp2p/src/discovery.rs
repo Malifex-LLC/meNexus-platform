@@ -3,7 +3,6 @@
 
 use libp2p::multiaddr::Protocol;
 use libp2p::{Multiaddr, Swarm};
-use std::env;
 
 use crate::config::Libp2pBehaviour;
 

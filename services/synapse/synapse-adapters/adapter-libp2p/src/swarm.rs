@@ -3,6 +3,7 @@
 
 use crate::config::Libp2pEvent;
 use crate::discovery::setup_bootstrap;
+use crate::errors::Libp2pAdapterError;
 use crate::{config::Libp2pBehaviour, transport::TransportConfig};
 use futures::StreamExt;
 use libp2p::{
@@ -15,7 +16,7 @@ use std::time::Duration;
 use synapse_core::errors::CoreError;
 use tracing::debug;
 
-pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, CoreError> {
+pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
     debug!("Creating swarm for config: {config:?}");
     let kad_cfg = KadConfig::default();
     let mut swarm = libp2p::SwarmBuilder::with_existing_identity(config.keypair)
@@ -24,8 +25,7 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, C
             tcp::Config::default(),
             noise::Config::new,
             yamux::Config::default,
-        )
-        .unwrap()
+        )?
         .with_behaviour(|key| {
             let mut kad = libp2p_kad::Behaviour::with_config(
                 key.public().to_peer_id(),
@@ -37,11 +37,10 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, C
                 ping: ping::Behaviour::default(),
                 kad,
             })
-        })
-        .unwrap()
+        })?
         .with_swarm_config(|cfg| cfg.with_idle_connection_timeout(Duration::from_secs(u64::MAX)))
         .build();
-    swarm.listen_on(config.listen_addr);
+    swarm.listen_on(config.listen_addr)?;
     setup_bootstrap(&mut swarm, config.bootstrap_addrs);
     debug!("Libp2p swarm created");
     Ok(swarm)

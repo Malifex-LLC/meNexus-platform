@@ -3,9 +3,8 @@
 
 pub mod federation_service;
 
-use async_trait::async_trait;
 use std::sync::Arc;
-use synapse_core::ports::federation::{MessageHandler, SnpTransport};
+use synapse_core::ports::federation::SnpTransport;
 
 // Application service
 pub struct SnpMessenger<T: SnpTransport> {

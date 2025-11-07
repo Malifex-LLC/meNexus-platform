@@ -3,12 +3,12 @@
 
 use crate::{SynapseConfig, get_synapse_config};
 use adapter_libp2p::create_libp2p_transport;
-use synapse_core::errors::CoreError;
+use synapse_core::CoreError;
 
 pub async fn initialize_p2p() -> Result<(), CoreError> {
     // Create transport
-    let config: SynapseConfig = get_synapse_config().unwrap();
-    let mut transport = create_libp2p_transport(config).await?;
+    let config: SynapseConfig = get_synapse_config()?;
+    let transport = create_libp2p_transport(config).await?;
 
     // Start - this runs the swarm event loop
     transport.start().await?;

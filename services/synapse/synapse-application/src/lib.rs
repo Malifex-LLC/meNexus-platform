@@ -9,9 +9,10 @@ use std::path::PathBuf;
 use synapse_config::SynapseConfig;
 use synapse_config::load_or_init_config;
 use synapse_core::errors::CoreError;
+use synapse_core::ports::config::errors::ConfigError;
 
-pub fn get_synapse_config() -> Result<SynapseConfig, CoreError> {
-    let config_path: PathBuf = env::var("CONFIG_PATH").unwrap().parse().unwrap();
-    let synapse_config = load_or_init_config(config_path).unwrap();
+pub fn get_synapse_config() -> Result<SynapseConfig, ConfigError> {
+    let config_path: PathBuf = env::var("CONFIG_PATH")?.parse()?;
+    let synapse_config = load_or_init_config(config_path)?;
     Ok(synapse_config)
 }

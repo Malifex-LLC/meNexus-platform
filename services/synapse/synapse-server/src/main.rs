@@ -40,15 +40,14 @@ async fn main() -> anyhow::Result<()> {
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
-    let port: u16 = env::var("AXUM_PORT")
-        .unwrap()
+    let port: u16 = env::var("AXUM_PORT")?
         .parse()
         .expect("Failed to parse AXUM_PORT");
     let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
 
-    let listener = tokio::net::TcpListener::bind(socket).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(socket).await?;
     info!("Server running on http://{socket}");
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

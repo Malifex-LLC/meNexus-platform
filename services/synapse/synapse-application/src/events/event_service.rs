@@ -4,8 +4,8 @@
 use crate::events::{CreateEventCommand, CreateEventUseCase};
 use std::sync::Arc;
 use synapse_core::domain::events::Event;
-use synapse_core::errors::CoreError;
 use synapse_core::ports::events::event_repository::EventRepository;
+use synapse_core::{CoreError, PersistenceError};
 use uuid::Uuid;
 
 pub struct EventService<R: EventRepository> {
@@ -22,12 +22,12 @@ impl<R: EventRepository> EventService<R> {
 impl<R: EventRepository + Send + Sync> CreateEventUseCase for EventService<R> {
     async fn execute(&self, cmd: CreateEventCommand) -> Result<Event, CoreError> {
         if cmd.event_type.trim().is_empty() {
-            return Err(CoreError::Validation(
+            return Err(CoreError::persistence(
                 "event_type must not be empty".to_string(),
             ));
         }
         if cmd.agent_public_key.trim().is_empty() {
-            return Err(CoreError::Validation(
+            return Err(CoreError::persistence(
                 "agent_public_key must not be empty".to_string(),
             ));
         }
@@ -38,6 +38,6 @@ impl<R: EventRepository + Send + Sync> CreateEventUseCase for EventService<R> {
             agent_public_key: cmd.agent_public_key,
         };
 
-        self.repo.create(event).await
+        Ok(self.repo.create(event).await?)
     }
 }

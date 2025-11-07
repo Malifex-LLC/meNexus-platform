@@ -29,4 +29,5 @@ time = { version = "0.3.44", features = [
 ] }
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 tracing = "0.1.41"
+url = "2.5.7"
 uuid = "1.18.1"
