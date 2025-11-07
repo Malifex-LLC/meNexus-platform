@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+use crate::error::PostgresAdapterError;
+use async_trait::async_trait;
 use sqlx::{Pool, Postgres};
+use synapse_core::PersistenceError;
 use synapse_core::domain::events::Event;
-use synapse_core::errors::CoreError;
 use synapse_core::ports::events::event_repository::EventRepository;
 
 pub struct PostgresEventsRepository {
@@ -16,9 +18,9 @@ impl PostgresEventsRepository {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl EventRepository for PostgresEventsRepository {
-    async fn create(&self, event: Event) -> Result<Event, CoreError> {
+    async fn create(&self, event: Event) -> Result<Event, PersistenceError> {
         let row = sqlx::query!(
             r#"
             INSERT INTO events (event_id, event_type, agent_public_key)
@@ -31,7 +33,7 @@ impl EventRepository for PostgresEventsRepository {
         )
         .fetch_one(&self.pool)
         .await
-        .map_err(|err| CoreError::infrastructure(err))?;
+        .map_err(|err| PersistenceError::Other(err.to_string()))?;
 
         Ok(Event {
             event_id: row.event_id,

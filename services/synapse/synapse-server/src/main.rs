@@ -8,25 +8,41 @@ pub mod state;
 pub mod utils;
 
 use crate::state::AppState;
+use adapter_libp2p::initialize_p2p;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
 use synapse_application::events::event_service::EventService;
+use synapse_config::get_synapse_config;
 
+use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
+use time::format_description;
 use tower_http::trace::TraceLayer;
 use tracing::info;
+use tracing_subscriber::fmt::time::LocalTime;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     tracing_subscriber::fmt()
+        //.compact()
+        .with_thread_names(true)
+        .with_target(true)
+        .with_level(true)
+        .with_line_number(true)
+        .with_file(true)
+        .with_ansi(true)
+        .pretty()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
     let database_url = std::env::var("DATABASE_URL")?;
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
+
+    let config = get_synapse_config()?;
+    initialize_p2p(config).await?;
 
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
     let create_event = Arc::new(EventService::new(repo));
@@ -36,12 +52,14 @@ async fn main() -> anyhow::Result<()> {
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
-    let port = 3000;
+    let port: u16 = env::var("AXUM_PORT")?
+        .parse()
+        .expect("Failed to parse AXUM_PORT");
     let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
 
-    let listener = tokio::net::TcpListener::bind(socket).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(socket).await?;
     info!("Server running on http://{socket}");
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

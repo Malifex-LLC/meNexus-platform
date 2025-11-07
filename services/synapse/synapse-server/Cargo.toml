@@ -9,12 +9,18 @@ dotenvy = { workspace = true }
 anyhow = "1.0.100"
 serde = { workspace = true }
 serde_json = { workspace = true }
-synapse-core = { path = "../synapse-core/" }
-synapse-application = { path = "../synapse-application/" }
-adapter-postgres = { path = "../synapse-adapters/adapter-postgres/" }
+synapse-core = { path = "../synapse-core" }
+synapse-application = { path = "../synapse-application" }
+synapse-config = { path = "../synapse-config" }
+adapter-postgres = { path = "../synapse-adapters/adapter-postgres" }
+adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p" }
 thiserror = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 tracing = { workspace = true }
-tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.20", features = [
+  "fmt",
+  "local-time",
+  "env-filter",
+] }

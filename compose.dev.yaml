@@ -46,18 +46,26 @@ services:
     working_dir: /workspace/services/synapse
     volumes:
       - .:/workspace
+      - synapse-data:/data
       - cargo-registry:/usr/local/cargo/registry
       - cargo-git:/usr/local/cargo/git
       - synapse-target:/workspace/services/synapse/target
     ports:
       - "3000:3000"
+      - "4000:4000"
     environment:
-      - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
       - RUST_LOG=debug
+      - CONFIG_PATH=/data/synapse_config.json
+      - KEY_PATH=/data/key.path
+      - AXUM_PORT=3000
+      - LIBP2P_PORT=4000
+      - BOOTSTRAP_LIST=
+      - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
 
 volumes:
   pgdata:
   client-web-node-modules:
   cargo-registry:
   cargo-git:
+  synapse-data:
   synapse-target:

@@ -5,6 +5,7 @@ pub mod agents;
 pub mod artifacts;
 pub mod auth;
 pub mod channels;
+pub mod crypto;
 pub mod entities;
 pub mod events;
 pub mod federation;

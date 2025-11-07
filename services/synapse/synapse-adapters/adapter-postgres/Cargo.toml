@@ -4,6 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+thiserror = { workspace = true }
 async-trait = { workspace = true }
 synapse-core = { path = "../../synapse-core" }
 sqlx = { version = "0.8.6", features = [
