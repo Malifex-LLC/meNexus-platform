@@ -3,7 +3,7 @@
 
 pub mod event_service;
 
-use synapse_core::{PersistenceError, domain::events::Event, errors::CoreError};
+use synapse_core::{domain::events::Event, errors::CoreError};
 
 #[derive(Clone, Debug)]
 pub struct CreateEventCommand {
@@ -15,4 +15,3 @@ pub struct CreateEventCommand {
 pub trait CreateEventUseCase: Send + Sync {
     async fn execute(&self, cmd: CreateEventCommand) -> Result<Event, CoreError>;
 }
-

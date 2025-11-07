@@ -7,7 +7,7 @@ pub mod errors;
 pub mod swarm;
 pub mod transport;
 
-use crate::{config::parse_config, errors::Libp2pAdapterError, transport::Libp2pTransport};
+use crate::{config::parse_config, transport::Libp2pTransport};
 use synapse_config::SynapseConfig;
 use synapse_core::TransportError;
 

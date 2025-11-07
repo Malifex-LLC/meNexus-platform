@@ -16,13 +16,23 @@ use synapse_application::federation::federation_service::initialize_p2p;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
+use time::format_description;
 use tower_http::trace::TraceLayer;
 use tracing::info;
+use tracing_subscriber::fmt::time::LocalTime;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     tracing_subscriber::fmt()
+        //.compact()
+        .with_thread_names(true)
+        .with_target(true)
+        .with_level(true)
+        .with_line_number(true)
+        .with_file(true)
+        .with_ansi(true)
+        .pretty()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
@@ -30,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
 
-    initialize_p2p().await;
+    initialize_p2p().await?;
 
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
     let create_event = Arc::new(EventService::new(repo));

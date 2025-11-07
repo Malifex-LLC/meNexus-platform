@@ -7,7 +7,6 @@ pub mod events_repository;
 use crate::error::PostgresAdapterError;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use std::time::Duration;
-use synapse_core::errors::CoreError;
 
 pub async fn create_pool(database_url: &str) -> Result<Pool<Postgres>, PostgresAdapterError> {
     Ok(PgPoolOptions::new()

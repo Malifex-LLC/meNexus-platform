@@ -3,7 +3,6 @@
 
 use crate::PersistenceError;
 use crate::domain::events::Event;
-use crate::errors::CoreError;
 
 #[async_trait::async_trait]
 pub trait EventRepository: Send + Sync {

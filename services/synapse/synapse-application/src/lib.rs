@@ -8,7 +8,6 @@ use std::env;
 use std::path::PathBuf;
 use synapse_config::SynapseConfig;
 use synapse_config::load_or_init_config;
-use synapse_core::errors::CoreError;
 use synapse_core::ports::config::errors::ConfigError;
 
 pub fn get_synapse_config() -> Result<SynapseConfig, ConfigError> {

@@ -9,7 +9,6 @@ use crate::state::AppState;
 use synapse_application::events::CreateEventCommand;
 use synapse_application::events::CreateEventUseCase;
 use synapse_core::domain::events::Event;
-use tracing::debug;
 
 #[derive(Deserialize)]
 struct CreateEventRequest {

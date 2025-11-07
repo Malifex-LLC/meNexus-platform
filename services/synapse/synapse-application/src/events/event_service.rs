@@ -3,9 +3,9 @@
 
 use crate::events::{CreateEventCommand, CreateEventUseCase};
 use std::sync::Arc;
+use synapse_core::CoreError;
 use synapse_core::domain::events::Event;
 use synapse_core::ports::events::event_repository::EventRepository;
-use synapse_core::{CoreError, PersistenceError};
 use uuid::Uuid;
 
 pub struct EventService<R: EventRepository> {

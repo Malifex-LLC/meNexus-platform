@@ -13,11 +13,10 @@ use libp2p::{
 };
 use libp2p_kad::{self, Config as KadConfig, Mode, store::MemoryStore};
 use std::time::Duration;
-use synapse_core::errors::CoreError;
-use tracing::debug;
+use tracing::info;
 
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
-    debug!("Creating swarm for config: {config:?}");
+    info!("Creating swarm for config: {config:?}");
     let kad_cfg = KadConfig::default();
     let mut swarm = libp2p::SwarmBuilder::with_existing_identity(config.keypair)
         .with_tokio()
@@ -42,12 +41,12 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
         .build();
     swarm.listen_on(config.listen_addr)?;
     setup_bootstrap(&mut swarm, config.bootstrap_addrs);
-    debug!("Libp2p swarm created");
+    info!("Libp2p swarm created");
     Ok(swarm)
 }
 
 pub async fn run_swarm(mut swarm: Swarm<Libp2pBehaviour>) {
-    debug!("Running swarm...");
+    info!("Running swarm...");
     loop {
         match swarm.select_next_some().await {
             SwarmEvent::NewListenAddr { address, .. } => println!("Listening on {address:?}"),
