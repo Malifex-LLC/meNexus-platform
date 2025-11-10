@@ -5,9 +5,17 @@ pub mod errors;
 
 use async_trait::async_trait;
 
-// Outbound Port
+use crate::{TransportError, domain::events::Event};
+
+// Outbound port
 #[async_trait]
-pub trait SnpTransport: Send + Sync {}
+pub trait FederationTransport: Send + Sync {
+    async fn send_message(
+        &self,
+        synapse_public_key: String,
+        event: Event,
+    ) -> Result<Event, TransportError>;
+}
 
 // Inbound port
 #[async_trait]

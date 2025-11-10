@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
-use synapse_core::ports::config::errors::ConfigError;
 use url::Url;
 
 use crate::error::SynapseConfigError;

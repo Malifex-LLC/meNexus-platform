@@ -11,7 +11,9 @@ use crate::state::AppState;
 use adapter_libp2p::initialize_p2p;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
-use synapse_application::events::event_service::EventService;
+use synapse_application::events::CreateLocalEventUseCase;
+use synapse_application::events::event_service::EventIngestService;
+use synapse_application::events::event_service::{LocalEventService, RemoteEventService};
 use synapse_config::get_synapse_config;
 
 use std::env;
@@ -42,11 +44,20 @@ async fn main() -> anyhow::Result<()> {
     migrate(&pool).await?;
 
     let config = get_synapse_config()?;
-    initialize_p2p(config).await?;
+    let transport = initialize_p2p(config).await?;
 
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
-    let create_event = Arc::new(EventService::new(repo));
-    let state = AppState { create_event };
+    // Build the ingest service (concrete)
+    let ingest = Arc::new(EventIngestService::new(repo));
+    // Wrap ingest with the use-case service and erase the type to the trait object
+    let create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync> =
+        Arc::new(LocalEventService::new(ingest.clone()));
+
+    let create_remote_event = Arc::new(RemoteEventService::new(Arc::new(transport)));
+    let state = AppState {
+        create_local_event,
+        create_remote_event,
+    };
 
     let app = api::routes()
         .with_state(state)

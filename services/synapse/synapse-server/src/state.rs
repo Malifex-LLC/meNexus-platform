@@ -2,9 +2,11 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use std::sync::Arc;
-use synapse_application::events::CreateEventUseCase;
+use synapse_application::events::CreateLocalEventUseCase;
+use synapse_application::events::CreateRemoteEventUseCase;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub create_event: Arc<dyn CreateEventUseCase>,
+    pub create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync>,
+    pub create_remote_event: Arc<dyn CreateRemoteEventUseCase + Send + Sync>,
 }

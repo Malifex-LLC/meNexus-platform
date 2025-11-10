@@ -2,6 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 pub mod config;
+pub mod control;
 pub mod discovery;
 pub mod errors;
 pub mod swarm;
@@ -19,8 +20,8 @@ pub async fn create_libp2p_transport(
     Ok(transport)
 }
 
-pub async fn initialize_p2p(config: SynapseConfig) -> Result<(), TransportError> {
-    let transport = create_libp2p_transport(config).await?;
+pub async fn initialize_p2p(config: SynapseConfig) -> Result<Libp2pTransport, TransportError> {
+    let mut transport = create_libp2p_transport(config).await?;
     transport.start().await?;
-    Ok(())
+    Ok(transport)
 }
