@@ -17,7 +17,7 @@ edition = "2024"
 anyhow = "1.0.100"
 async-trait = "0.1.89"
 base64 = "0.22.1"
-dashmap = "6.1.0"
+dashmap = { version = "6.1.0", features = ["serde"] }
 dotenvy = "0.15.7"
 futures = "0.3.31"
 log = "0.4.28"

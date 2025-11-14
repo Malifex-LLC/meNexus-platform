@@ -61,6 +61,7 @@ async fn main() -> anyhow::Result<()> {
     let state = AppState {
         create_local_event,
         create_remote_event,
+        known_peers: known_peers.clone(),
     };
 
     let app = api::routes()

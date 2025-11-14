@@ -20,6 +20,7 @@ pub mod synapses;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .merge(health::routes())
         .merge(events::routes())
+        .merge(federation::routes())
+        .merge(health::routes())
 }
