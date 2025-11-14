@@ -16,6 +16,7 @@ use libp2p_swarm_derive::NetworkBehaviour;
 
 use serde::{Deserialize, Serialize};
 use synapse_config::SynapseConfig;
+use synapse_core::domain::events::Event;
 
 #[derive(NetworkBehaviour)]
 #[behaviour(out_event = "Libp2pEvent")]
@@ -53,17 +54,17 @@ impl From<JsonReqResEvent> for Libp2pEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RpcRequest {
     pub action: String,
-    pub payload: serde_json::Value,
+    pub event: Event,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RpcResponse {
     pub ok: bool,
-    pub message: Option<String>,
+    pub event: Option<Event>,
 }
 
 pub fn parse_config(config: &SynapseConfig) -> Result<TransportConfig, Libp2pAdapterError> {
-    let s = std::fs::read_to_string(&config.identity.key_path)?;
+    let s = std::fs::read_to_string(&config.identity.private_key_path)?;
     let b = general_purpose::STANDARD.decode(s.trim())?;
     let keypair = identity::Keypair::from_protobuf_encoding(&b)?;
 

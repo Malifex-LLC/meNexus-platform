@@ -43,13 +43,12 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
 
-    let config = get_synapse_config()?;
-    let transport = initialize_p2p(config).await?;
-
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
-    // Build the ingest service (concrete)
     let ingest = Arc::new(EventIngestService::new(repo));
-    // Wrap ingest with the use-case service and erase the type to the trait object
+
+    let config = get_synapse_config()?;
+    let transport = initialize_p2p(config, ingest.clone()).await?;
+
     let create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync> =
         Arc::new(LocalEventService::new(ingest.clone()));
 

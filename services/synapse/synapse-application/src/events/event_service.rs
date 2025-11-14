@@ -4,11 +4,15 @@
 use crate::events::{
     CreateEventCommand, CreateLocalEventUseCase, CreateRemoteEventCommand, CreateRemoteEventUseCase,
 };
+use async_trait::async_trait;
 use std::sync::Arc;
+use synapse_config::SynapseConfig;
+use synapse_config::get_synapse_config;
 use synapse_core::CoreError;
 use synapse_core::domain::events::Event;
 use synapse_core::ports::events::event_repository::EventRepository;
 use synapse_core::ports::federation::FederationTransport;
+use synapse_core::ports::federation::MessageHandler;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
@@ -22,7 +26,7 @@ impl<R: EventRepository> LocalEventService<R> {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl<R: EventRepository + Send + Sync> CreateLocalEventUseCase for LocalEventService<R> {
     async fn execute(&self, cmd: CreateEventCommand) -> Result<Event, CoreError> {
         if cmd.event_type.trim().is_empty() {
@@ -72,6 +76,58 @@ impl<R: EventRepository> EventIngestService<R> {
     }
 }
 
+#[async_trait]
+impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> {
+    async fn handle_message(&self, event: Event) -> Result<Event, CoreError> {
+        match event.event_type.as_str() {
+            "synapse:get_public_key" => {
+                self.ingest(event).await?;
+                let config = get_synapse_config().unwrap();
+                let public_key = config.identity.public_key;
+                let res_event = Event {
+                    id: Uuid::new_v4(),
+                    created_at: OffsetDateTime::now_utc(),
+                    event_type: "synapse: return_public_key".to_string(),
+                    module_kind: None,
+                    module_slug: None,
+                    agent: public_key.clone(),
+                    target: None,
+                    previous: None,
+                    content: Some(public_key.clone()),
+                    artifacts: None,
+                    metadata: None,
+                    links: None,
+                    data: None,
+                    expiration: None,
+                };
+                Ok(res_event)
+            }
+            _ => {
+                self.ingest(event).await?;
+                let config = get_synapse_config().unwrap();
+                let public_key = config.identity.public_key;
+                let res_event = Event {
+                    id: Uuid::new_v4(),
+                    created_at: OffsetDateTime::now_utc(),
+                    event_type: "synapse:failed_to_handle_message".to_string(),
+                    module_kind: None,
+                    module_slug: None,
+                    agent: public_key.clone(),
+                    target: None,
+                    previous: None,
+                    content: Some(public_key.clone()),
+                    artifacts: None,
+                    metadata: None,
+                    links: None,
+                    data: None,
+                    expiration: None,
+                };
+                Ok(res_event)
+            }
+        }
+    }
+}
+
 pub struct RemoteEventService<T: FederationTransport> {
     transport: Arc<T>,
 }
@@ -82,7 +138,7 @@ impl<T: FederationTransport> RemoteEventService<T> {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl<T: FederationTransport + Send + Sync> CreateRemoteEventUseCase for RemoteEventService<T> {
     async fn execute(&self, cmd: CreateRemoteEventCommand) -> Result<Event, CoreError> {
         if cmd.event.event_type.trim().is_empty() {

@@ -9,19 +9,25 @@ pub mod swarm;
 pub mod transport;
 
 use crate::{config::parse_config, transport::Libp2pTransport};
+use std::sync::Arc;
 use synapse_config::SynapseConfig;
 use synapse_core::TransportError;
+use synapse_core::ports::federation::MessageHandler;
 
 pub async fn create_libp2p_transport(
     config: SynapseConfig,
+    handler: Arc<dyn MessageHandler + Send + Sync>,
 ) -> Result<Libp2pTransport, TransportError> {
     let transport_config = parse_config(&config)?;
-    let transport = Libp2pTransport::new(transport_config);
+    let transport = Libp2pTransport::new(transport_config, handler);
     Ok(transport)
 }
 
-pub async fn initialize_p2p(config: SynapseConfig) -> Result<Libp2pTransport, TransportError> {
-    let mut transport = create_libp2p_transport(config).await?;
+pub async fn initialize_p2p(
+    config: SynapseConfig,
+    handler: Arc<dyn MessageHandler + Send + Sync>,
+) -> Result<Libp2pTransport, TransportError> {
+    let mut transport = create_libp2p_transport(config, handler).await?;
     transport.start().await?;
     Ok(transport)
 }

@@ -9,6 +9,7 @@ use crate::errors::Libp2pAdapterError;
 use crate::{config::Libp2pBehaviour, transport::TransportConfig};
 use futures::StreamExt;
 use libp2p::StreamProtocol;
+use libp2p::identity::{PeerId, PublicKey};
 use libp2p::request_response::OutboundRequestId;
 use libp2p::request_response::ProtocolSupport;
 use libp2p::request_response::json;
@@ -20,10 +21,15 @@ use libp2p::{
 };
 use libp2p_kad::{self, Config as KadConfig, Mode, store::MemoryStore};
 use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::Duration;
 use synapse_core::TransportError;
+use synapse_core::domain::events::Event;
+use synapse_core::ports::federation::MessageHandler;
+use time::OffsetDateTime;
 use tokio::sync::{mpsc, oneshot};
 use tracing::info;
+use uuid::Uuid;
 
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
     info!("Creating swarm for config: {config:?}");
@@ -65,9 +71,9 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
 pub async fn run_swarm(
     mut swarm: Swarm<Libp2pBehaviour>,
     mut rx: mpsc::Receiver<Control>,
+    handler: Arc<dyn MessageHandler + Send + Sync>,
 ) -> Result<(), Libp2pAdapterError> {
     info!("Running swarm...");
-    //let mut known_peers: HashMap<PublicKey, PeerId> = HashMap::new();
     let mut pending: HashMap<
         OutboundRequestId,
         oneshot::Sender<Result<RpcResponse, TransportError>>,
@@ -97,15 +103,43 @@ pub async fn run_swarm(
                         established_in: _,
                     } => {
                         info!("Connected to {peer_id}");
+                        let req = RpcRequest {
+                            action: "synapse:get_public_key".to_string(),
+                            event: Event {
+                                id: Uuid::new_v4(),
+                                created_at: OffsetDateTime::now_utc(),
+                                event_type: "synapse:get_public_key".to_string(),
+                                module_kind: None,
+                                module_slug: None,
+                                agent: String::new(), // optional: fill with your local pk (see note below)
+                                target: None,
+                                previous: None,
+                                content: None,
+                                artifacts: None,
+                                metadata: None,
+                                links: None,
+                                data: None,
+                                expiration: None,
+                            },
+                        };
+                        let _ = swarm.behaviour_mut().req_res.send_request(&peer_id, req);
                     }
                     SwarmEvent::ConnectionClosed { peer_id, .. } => info!("Disconnected from {peer_id}"),
                     SwarmEvent::Behaviour(Libp2pEvent::ReqRes(ev)) => match ev {
                         ReqResEvent::Message { message, .. } => match message {
                             ReqResMessage::Request { request, channel, .. } => {
                                 // Inbound request: handle and reply
-                                // TODO: call your app logic here; demo returns OK
-                                let resp = RpcResponse { ok: true, message: None };
-                                let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                match handler.handle_message(request.event).await {
+                                    Ok(saved) => {
+                                        let resp = RpcResponse { ok: true, event: Some(saved) };
+                                        let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                    }
+                                    Err(err) => {
+                                        tracing::warn!("ingest/handle failed: {err:?}");
+                                        let resp = RpcResponse { ok: false, event: None };
+                                        let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                    }
+                                }
                             }
                             ReqResMessage::Response { request_id, response } => {
                                 if let Some(ch) = pending.remove(&request_id) {

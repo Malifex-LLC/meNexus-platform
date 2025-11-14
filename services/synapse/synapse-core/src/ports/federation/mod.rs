@@ -5,6 +5,7 @@ pub mod errors;
 
 use async_trait::async_trait;
 
+use crate::CoreError;
 use crate::{TransportError, domain::events::Event};
 
 // Outbound port
@@ -19,4 +20,6 @@ pub trait FederationTransport: Send + Sync {
 
 // Inbound port
 #[async_trait]
-pub trait MessageHandler: Send + Sync {}
+pub trait MessageHandler: Send + Sync {
+    async fn handle_message(&self, event: Event) -> Result<Event, CoreError>;
+}
