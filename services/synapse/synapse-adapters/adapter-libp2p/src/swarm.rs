@@ -7,6 +7,7 @@ use crate::control::Control;
 use crate::discovery::setup_bootstrap;
 use crate::errors::Libp2pAdapterError;
 use crate::{config::Libp2pBehaviour, transport::TransportConfig};
+use dashmap::DashMap;
 use futures::StreamExt;
 use libp2p::StreamProtocol;
 use libp2p::identity::{PeerId, PublicKey};
@@ -28,9 +29,8 @@ use synapse_core::domain::events::Event;
 use synapse_core::ports::federation::MessageHandler;
 use time::OffsetDateTime;
 use tokio::sync::{mpsc, oneshot};
-use tracing::info;
+use tracing::{debug, info};
 use uuid::Uuid;
-
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
     info!("Creating swarm for config: {config:?}");
     let kad_cfg = KadConfig::default();
@@ -55,7 +55,7 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
             let req_res =
                 json::Behaviour::<RpcRequest, RpcResponse>::new(protocols, Default::default());
             Ok(Libp2pBehaviour {
-                ping: ping::Behaviour::default(),
+                //ping: ping::Behaviour::default(),
                 kad,
                 req_res,
             })
@@ -72,6 +72,7 @@ pub async fn run_swarm(
     mut swarm: Swarm<Libp2pBehaviour>,
     mut rx: mpsc::Receiver<Control>,
     handler: Arc<dyn MessageHandler + Send + Sync>,
+    known_peers: Arc<DashMap<String, String>>,
 ) -> Result<(), Libp2pAdapterError> {
     info!("Running swarm...");
     let mut pending: HashMap<
@@ -111,7 +112,7 @@ pub async fn run_swarm(
                                 event_type: "synapse:get_public_key".to_string(),
                                 module_kind: None,
                                 module_slug: None,
-                                agent: String::new(), // optional: fill with your local pk (see note below)
+                                agent: String::new(),
                                 target: None,
                                 previous: None,
                                 content: None,
@@ -126,12 +127,14 @@ pub async fn run_swarm(
                     }
                     SwarmEvent::ConnectionClosed { peer_id, .. } => info!("Disconnected from {peer_id}"),
                     SwarmEvent::Behaviour(Libp2pEvent::ReqRes(ev)) => match ev {
-                        ReqResEvent::Message { message, .. } => match message {
+                        ReqResEvent::Message { peer, message, .. } => match message {
                             ReqResMessage::Request { request, channel, .. } => {
                                 // Inbound request: handle and reply
+                            info!("Recieved incoming message: {:?}", request);
                                 match handler.handle_message(request.event).await {
                                     Ok(saved) => {
                                         let resp = RpcResponse { ok: true, event: Some(saved) };
+                                        info!("Sending outbound response: {:?}", resp);
                                         let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
                                     }
                                     Err(err) => {
@@ -143,7 +146,15 @@ pub async fn run_swarm(
                             }
                             ReqResMessage::Response { request_id, response } => {
                                 if let Some(ch) = pending.remove(&request_id) {
-                                    let _ = ch.send(Ok(response));
+                                    let _ = ch.send(Ok(response.clone()));
+                                }
+
+                                if let Some(evt) = response.event {
+                                    if evt.event_type == "synapse:return_public_key" {
+                                        let pk_str = evt.content.clone().unwrap();
+                                        known_peers.insert(pk_str, peer.to_string());
+                                        info!("known_peers after response event: {:?}", known_peers);
+                                    }
                                 }
                             }
                         },

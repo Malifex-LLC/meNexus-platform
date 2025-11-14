@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::config::RpcRequest;
@@ -11,6 +12,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
+use dashmap::DashMap;
 use libp2p::identity::PublicKey;
 use libp2p::{Multiaddr, PeerId, identity::Keypair};
 use synapse_core::CoreError;
@@ -25,6 +27,7 @@ pub struct Libp2pTransport {
     tx: mpsc::Sender<Control>,
     rx: Option<mpsc::Receiver<Control>>,
     inbound_handler: Arc<dyn MessageHandler>,
+    known_peers: Arc<DashMap<String, String>>,
 }
 
 #[derive(Clone, Debug)]
@@ -35,13 +38,18 @@ pub struct TransportConfig {
 }
 
 impl Libp2pTransport {
-    pub fn new(config: TransportConfig, handler: Arc<dyn MessageHandler + Send + Sync>) -> Self {
+    pub fn new(
+        config: TransportConfig,
+        handler: Arc<dyn MessageHandler + Send + Sync>,
+        known_peers: Arc<DashMap<String, String>>,
+    ) -> Self {
         let (tx, rx) = mpsc::channel::<Control>(64);
         Self {
             config,
             tx,
             rx: Some(rx),
             inbound_handler: handler,
+            known_peers,
         }
     }
 
@@ -49,8 +57,10 @@ impl Libp2pTransport {
         let swarm = create_swarm(self.config.clone())?;
         let rx = self.rx.take().expect("transport already started");
         let handler = self.inbound_handler.clone();
+        let known_peers = self.known_peers.clone();
+
         tokio::spawn(async move {
-            if let Err(e) = run_swarm(swarm, rx, handler).await {
+            if let Err(e) = run_swarm(swarm, rx, handler, known_peers).await {
                 warn!("libp2p swarm exited with error: {e:?}");
             }
         });

@@ -21,7 +21,7 @@ use synapse_core::domain::events::Event;
 #[derive(NetworkBehaviour)]
 #[behaviour(out_event = "Libp2pEvent")]
 pub struct Libp2pBehaviour {
-    pub ping: ping::Behaviour,
+    //pub ping: ping::Behaviour,
     pub kad: libp2p_kad::Behaviour<MemoryStore>,
     pub req_res: JsonBehaviour<RpcRequest, RpcResponse>,
 }

@@ -87,7 +87,7 @@ impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> 
                 let res_event = Event {
                     id: Uuid::new_v4(),
                     created_at: OffsetDateTime::now_utc(),
-                    event_type: "synapse: return_public_key".to_string(),
+                    event_type: "synapse:return_public_key".to_string(),
                     module_kind: None,
                     module_slug: None,
                     agent: public_key.clone(),
