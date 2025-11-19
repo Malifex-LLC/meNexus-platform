@@ -78,7 +78,7 @@ impl<R: EventRepository> EventIngestService<R> {
 
 #[async_trait]
 impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> {
-    async fn handle_message(&self, event: Event) -> Result<Event, CoreError> {
+    async fn handle_message(&self, event: Event) -> Result<Option<Vec<Event>>, CoreError> {
         match event.event_type.as_str() {
             "synapse:get_public_key" => {
                 self.ingest(event).await?;
@@ -100,7 +100,12 @@ impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> 
                     data: None,
                     expiration: None,
                 };
-                Ok(res_event)
+                let events = vec![res_event];
+                Ok(Some(events))
+            }
+            "synapse:list_all_events" => {
+                let events = self.repo.retrieve("all".to_string()).await.unwrap();
+                Ok(events)
             }
             _ => {
                 self.ingest(event).await?;
@@ -122,7 +127,8 @@ impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> 
                     data: None,
                     expiration: None,
                 };
-                Ok(res_event)
+                let events = vec![res_event];
+                Ok(Some(events))
             }
         }
     }

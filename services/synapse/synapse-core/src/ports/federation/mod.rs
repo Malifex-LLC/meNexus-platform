@@ -21,5 +21,5 @@ pub trait FederationTransport: Send + Sync {
 // Inbound port
 #[async_trait]
 pub trait MessageHandler: Send + Sync {
-    async fn handle_message(&self, event: Event) -> Result<Event, CoreError>;
+    async fn handle_message(&self, event: Event) -> Result<Option<Vec<Event>>, CoreError>;
 }

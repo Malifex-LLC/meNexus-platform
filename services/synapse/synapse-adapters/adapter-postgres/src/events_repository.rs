@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use serde_json::Value as JsonValue;
-use sqlx::{Pool, Postgres};
+use sqlx::postgres::PgRow;
+use sqlx::{Pool, Postgres, query};
 use synapse_core::PersistenceError;
 use synapse_core::domain::events::{Event, ObjectRef};
 use synapse_core::ports::events::event_repository::EventRepository;
@@ -117,5 +118,72 @@ impl EventRepository for PostgresEventsRepository {
             data: row.data, // Option<Vec<u8>>
             expiration: row.expiration,
         })
+    }
+
+    async fn retrieve(&self, event_type: String) -> Result<Option<Vec<Event>>, PersistenceError> {
+        match event_type.as_str() {
+            "all" => {
+                let rows = sqlx::query!(
+                    r#"
+                        SELECT
+                        id,
+                        created_at,
+                        event_type,
+                        module_kind,
+                        module_slug,
+                        agent,
+                        target      as "target?: JsonValue",
+                        previous,
+                        content,
+                        artifacts   as "artifacts?: Vec<String>",
+                        metadata    as "metadata?: JsonValue",
+                        links       as "links?: Vec<String>",
+                        data        as "data?: Vec<u8>",
+                        expiration
+                        FROM events
+                    "#
+                )
+                .fetch_all(&self.pool)
+                .await
+                .map_err(|e| PersistenceError::Other(e.to_string()))?;
+
+                let events = rows
+                    .into_iter()
+                    .map(|row| {
+                        let target: Option<ObjectRef> = row
+                            .target
+                            .map(serde_json::from_value)
+                            .transpose()
+                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+
+                        let metadata = row
+                            .metadata
+                            .map(serde_json::from_value)
+                            .transpose()
+                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+
+                        Ok(Event {
+                            id: row.id,
+                            created_at: row.created_at,
+                            event_type: row.event_type,
+                            module_kind: row.module_kind,
+                            module_slug: row.module_slug,
+                            agent: row.agent,
+                            target,
+                            previous: row.previous,
+                            content: row.content,
+                            artifacts: row.artifacts,
+                            metadata,
+                            links: row.links,
+                            data: row.data,
+                            expiration: row.expiration,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, PersistenceError>>()?;
+
+                Ok(Some(events))
+            }
+            _ => Ok(None),
+        }
     }
 }

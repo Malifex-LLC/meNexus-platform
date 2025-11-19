@@ -133,7 +133,7 @@ pub async fn run_swarm(
                             info!("Recieved incoming message: {:?}", request);
                                 match handler.handle_message(request.event).await {
                                     Ok(saved) => {
-                                        let resp = RpcResponse { ok: true, event: Some(saved) };
+                                        let resp = RpcResponse { ok: true, event: Some(saved.unwrap()[0].clone()) };
                                         info!("Sending outbound response: {:?}", resp);
                                         let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
                                     }
