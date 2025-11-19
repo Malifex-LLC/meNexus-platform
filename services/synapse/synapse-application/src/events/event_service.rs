@@ -146,7 +146,10 @@ impl<T: FederationTransport> RemoteEventService<T> {
 
 #[async_trait]
 impl<T: FederationTransport + Send + Sync> CreateRemoteEventUseCase for RemoteEventService<T> {
-    async fn execute(&self, cmd: CreateRemoteEventCommand) -> Result<Event, CoreError> {
+    async fn execute(
+        &self,
+        cmd: CreateRemoteEventCommand,
+    ) -> Result<Option<Vec<Event>>, CoreError> {
         if cmd.event.event_type.trim().is_empty() {
             return Err(CoreError::transport(
                 "event_type must not be empty".to_string(),

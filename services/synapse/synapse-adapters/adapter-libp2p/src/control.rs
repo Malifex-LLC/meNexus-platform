@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::config::{RpcRequest, RpcResponse};
 use libp2p::PeerId;
+use protocol_snp::SnpMessage;
 use synapse_core::TransportError;
 use tokio::sync::oneshot;
 
 pub enum Control {
-    SendRpc {
+    SendSnp {
         peer: PeerId,
-        request: RpcRequest,
-        ret: oneshot::Sender<Result<RpcResponse, TransportError>>,
+        request: SnpMessage,
+        ret: oneshot::Sender<Result<SnpMessage, TransportError>>,
     },
 }

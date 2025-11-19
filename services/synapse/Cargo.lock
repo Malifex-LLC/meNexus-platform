@@ -15,6 +15,7 @@ dependencies = [
  "libp2p-kad",
  "libp2p-mdns",
  "libp2p-swarm-derive",
+ "protocol-snp",
  "serde",
  "serde_json",
  "synapse-config",
@@ -2654,6 +2655,7 @@ dependencies = [
 name = "protocol-snp"
 version = "0.1.0"
 dependencies = [
+ "serde",
  "synapse-core",
  "time",
  "uuid",

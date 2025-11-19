@@ -38,24 +38,23 @@ struct CreateEventRequest {
 }
 
 #[derive(Serialize)]
-pub struct EventResult {
+pub struct LocalEventResult {
     event: Event,
+}
+
+#[derive(Serialize)]
+pub struct RemoteEventResult {
+    event: Option<Vec<Event>>,
 }
 
 #[derive(Deserialize)]
 struct ListRemoteEventsRequest {
     event_type: String,
-    agent: String,
-    module_kind: Option<String>,
-    module_slug: Option<String>,
-    target: Option<ObjectRef>,
-    previous: Option<Uuid>,
-    content: Option<String>,
-    artifacts: Option<Vec<String>>,
-    metadata: Option<HashMap<String, String>>,
-    links: Option<Vec<String>>,
-    data: Option<Vec<u8>>,
-    expiration: Option<OffsetDateTime>,
+}
+
+#[derive(Serialize)]
+struct ListRemoteEventsResult {
+    events: Option<Vec<Event>>,
 }
 
 pub fn routes() -> Router<AppState> {
@@ -74,7 +73,7 @@ pub fn routes() -> Router<AppState> {
 async fn create_local_event(
     State(_app): State<AppState>,
     Json(body): Json<CreateEventRequest>,
-) -> Result<(StatusCode, Json<EventResult>), AppError> {
+) -> Result<(StatusCode, Json<LocalEventResult>), AppError> {
     let cmd = CreateEventCommand {
         event_type: body.event_type,
         module_kind: body.module_kind,
@@ -91,14 +90,17 @@ async fn create_local_event(
         ..Default::default()
     };
     let created = _app.create_local_event.execute(cmd).await?;
-    Ok((StatusCode::CREATED, Json(EventResult { event: created })))
+    Ok((
+        StatusCode::CREATED,
+        Json(LocalEventResult { event: created }),
+    ))
 }
 
 async fn create_remote_event(
     State(_app): State<AppState>,
     Path(synapse_public_key): Path<String>,
     Json(body): Json<CreateEventRequest>,
-) -> Result<(StatusCode, Json<EventResult>), AppError> {
+) -> Result<(StatusCode, Json<RemoteEventResult>), AppError> {
     let inner = CreateEventCommand {
         event_type: body.event_type,
         module_kind: body.module_kind,
@@ -122,27 +124,30 @@ async fn create_remote_event(
 
     let created = _app.create_remote_event.execute(cmd).await?;
 
-    Ok((StatusCode::CREATED, Json(EventResult { event: created })))
+    Ok((
+        StatusCode::CREATED,
+        Json(RemoteEventResult { event: created }),
+    ))
 }
 
 async fn list_remote_events(
     State(_app): State<AppState>,
     Path(synapse_public_key): Path<String>,
     Json(body): Json<ListRemoteEventsRequest>,
-) -> Result<(StatusCode, Json<EventResult>), AppError> {
+) -> Result<(StatusCode, Json<ListRemoteEventsResult>), AppError> {
     let inner = CreateEventCommand {
         event_type: body.event_type,
-        module_kind: body.module_kind,
-        module_slug: body.module_slug,
-        agent: body.agent,
-        target: body.target,
-        previous: body.previous,
-        content: body.content,
-        artifacts: body.artifacts,
-        metadata: body.metadata,
-        links: body.links,
-        data: body.data,
-        expiration: body.expiration,
+        module_kind: None,
+        module_slug: None,
+        agent: "100".to_string(),
+        target: None,
+        previous: None,
+        content: None,
+        artifacts: None,
+        metadata: None,
+        links: None,
+        data: None,
+        expiration: None,
         ..Default::default()
     };
 
@@ -151,7 +156,10 @@ async fn list_remote_events(
         event: inner,
     };
 
-    let created = _app.create_remote_event.execute(cmd).await?;
+    let results = _app.create_remote_event.execute(cmd).await?;
 
-    Ok((StatusCode::CREATED, Json(EventResult { event: created })))
+    Ok((
+        StatusCode::CREATED,
+        Json(ListRemoteEventsResult { events: results }),
+    ))
 }

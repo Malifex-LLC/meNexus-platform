@@ -7,3 +7,4 @@ edition.workspace = true
 synapse-core = { path = "../../synapse-core" }
 time = { workspace = true }
 uuid = { workspace = true }
+serde = { workspace = true }

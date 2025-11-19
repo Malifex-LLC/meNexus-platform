@@ -14,6 +14,7 @@ use libp2p::{Multiaddr, identity};
 use libp2p_kad::{self, Event as KadEvent, store::MemoryStore};
 use libp2p_swarm_derive::NetworkBehaviour;
 
+use protocol_snp::SnpMessage;
 use serde::{Deserialize, Serialize};
 use synapse_config::SynapseConfig;
 use synapse_core::domain::events::Event;
@@ -23,10 +24,10 @@ use synapse_core::domain::events::Event;
 pub struct Libp2pBehaviour {
     //pub ping: ping::Behaviour,
     pub kad: libp2p_kad::Behaviour<MemoryStore>,
-    pub req_res: JsonBehaviour<RpcRequest, RpcResponse>,
+    pub req_res: JsonBehaviour<SnpMessage, SnpMessage>,
 }
 
-type JsonReqResEvent = ReqResEvent<RpcRequest, RpcResponse>;
+type JsonReqResEvent = ReqResEvent<SnpMessage, SnpMessage>;
 
 #[derive(Debug)]
 pub enum Libp2pEvent {
@@ -49,18 +50,6 @@ impl From<JsonReqResEvent> for Libp2pEvent {
     fn from(e: JsonReqResEvent) -> Self {
         Libp2pEvent::ReqRes(e)
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RpcRequest {
-    pub action: String,
-    pub event: Event,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RpcResponse {
-    pub ok: bool,
-    pub event: Option<Event>,
 }
 
 pub fn parse_config(config: &SynapseConfig) -> Result<TransportConfig, Libp2pAdapterError> {

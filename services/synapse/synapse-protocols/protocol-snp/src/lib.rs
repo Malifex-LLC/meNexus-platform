@@ -1,21 +1,38 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use synapse_core::CoreEvent;
+use serde::{Deserialize, Serialize};
+use synapse_core::domain::events::Event;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SnpMessage {
-    version: String,
-    id: Uuid,
-    correlation_id: Uuid,
-    destination: Destination,
-    agent_public_key: String,
-    timestamp: OffsetDateTime,
-    payload: CoreEvent,
-    signature: String,
+    pub version: String,
+    pub id: Uuid,
+    pub correlation_id: Uuid,
+    pub destination: Destination,
+    pub agent_public_key: String,
+    pub timestamp: OffsetDateTime,
+    pub payload: SnpPayload,
+    pub signature: String,
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum SnpPayload {
+    Command {
+        action: String,
+        event: Event,
+    },
+    Reply {
+        ok: bool,
+        event: Option<Event>,
+        events: Option<Vec<Event>>,
+        error: Option<String>,
+    },
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum Destination {
     Local,
     Synapse { id: String },

@@ -15,7 +15,7 @@ pub trait FederationTransport: Send + Sync {
         &self,
         synapse_public_key: String,
         event: Event,
-    ) -> Result<Event, TransportError>;
+    ) -> Result<Option<Vec<Event>>, TransportError>;
 }
 
 // Inbound port

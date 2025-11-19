@@ -28,6 +28,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 synapse-core = { path = "../../synapse-core" }
 synapse-config = { path = "../../synapse-config" }
+protocol-snp = { path = "../../synapse-protocols/protocol-snp" }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }

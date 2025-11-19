@@ -2,7 +2,6 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::config::Libp2pEvent;
-use crate::config::{RpcRequest, RpcResponse};
 use crate::control::Control;
 use crate::discovery::setup_bootstrap;
 use crate::errors::Libp2pAdapterError;
@@ -21,6 +20,11 @@ use libp2p::{
     tcp, yamux,
 };
 use libp2p_kad::{self, Config as KadConfig, Mode, store::MemoryStore};
+use protocol_snp::{
+    Destination::{Local, Multicast, Synapse},
+    SnpMessage,
+    SnpPayload::{Command, Reply},
+};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
@@ -31,6 +35,7 @@ use time::OffsetDateTime;
 use tokio::sync::{mpsc, oneshot};
 use tracing::{debug, info};
 use uuid::Uuid;
+
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {
     info!("Creating swarm for config: {config:?}");
     let kad_cfg = KadConfig::default();
@@ -49,11 +54,11 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
             );
             kad.set_mode(Some(Mode::Server));
             let protocols = [(
-                StreamProtocol::new("/menexus/rpc/1.0.0"),
+                StreamProtocol::new("/menexus/snp/1.0.0"),
                 ProtocolSupport::Full,
             )];
             let req_res =
-                json::Behaviour::<RpcRequest, RpcResponse>::new(protocols, Default::default());
+                json::Behaviour::<SnpMessage, SnpMessage>::new(protocols, Default::default());
             Ok(Libp2pBehaviour {
                 //ping: ping::Behaviour::default(),
                 kad,
@@ -77,14 +82,14 @@ pub async fn run_swarm(
     info!("Running swarm...");
     let mut pending: HashMap<
         OutboundRequestId,
-        oneshot::Sender<Result<RpcResponse, TransportError>>,
+        oneshot::Sender<Result<SnpMessage, TransportError>>,
     > = HashMap::new();
 
     loop {
         tokio::select! {
             Some(ctrl) = rx.recv() => {
                 match ctrl {
-                    Control::SendRpc { peer, request, ret } => {
+                    Control::SendSnp { peer, request, ret } => {
                         let req_id = swarm.behaviour_mut().req_res.send_request(&peer, request);
                         pending.insert(req_id, ret);
                     }
@@ -104,42 +109,103 @@ pub async fn run_swarm(
                         established_in: _,
                     } => {
                         info!("Connected to {peer_id}");
-                        let req = RpcRequest {
-                            action: "synapse:get_public_key".to_string(),
-                            event: Event {
-                                id: Uuid::new_v4(),
-                                created_at: OffsetDateTime::now_utc(),
-                                event_type: "synapse:get_public_key".to_string(),
-                                module_kind: None,
-                                module_slug: None,
-                                agent: String::new(),
-                                target: None,
-                                previous: None,
-                                content: None,
-                                artifacts: None,
-                                metadata: None,
-                                links: None,
-                                data: None,
-                                expiration: None,
+                        let req = SnpMessage {
+                            version: "1.0.0".to_string(),
+                            id: Uuid::new_v4(),
+                            correlation_id: Uuid::new_v4(),
+                            destination: Synapse { id: peer_id.to_string() },
+                            agent_public_key: "agent_public_key".to_string(),
+                            timestamp: OffsetDateTime::now_utc(),
+                            payload: Command {
+                                action: "synapse:get_public_key".to_string(),
+                                event: Event {
+                                    id: Uuid::new_v4(),
+                                    created_at: OffsetDateTime::now_utc(),
+                                    event_type: "synapse:get_public_key".to_string(),
+                                    module_kind: None,
+                                    module_slug: None,
+                                    agent: String::new(),
+                                    target: None,
+                                    previous: None,
+                                    content: None,
+                                    artifacts: None,
+                                    metadata: None,
+                                    links: None,
+                                    data: None,
+                                    expiration: None,
+                                },
                             },
+                            signature: "signature".to_string(),
                         };
                         let _ = swarm.behaviour_mut().req_res.send_request(&peer_id, req);
                     }
+
+
                     SwarmEvent::ConnectionClosed { peer_id, .. } => info!("Disconnected from {peer_id}"),
                     SwarmEvent::Behaviour(Libp2pEvent::ReqRes(ev)) => match ev {
                         ReqResEvent::Message { peer, message, .. } => match message {
                             ReqResMessage::Request { request, channel, .. } => {
                                 // Inbound request: handle and reply
-                            info!("Recieved incoming message: {:?}", request);
-                                match handler.handle_message(request.event).await {
-                                    Ok(saved) => {
-                                        let resp = RpcResponse { ok: true, event: Some(saved.unwrap()[0].clone()) };
-                                        info!("Sending outbound response: {:?}", resp);
-                                        let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                info!("Recieved incoming message: {:?}", request);
+                                match request.payload {
+                                    Command { action: _, event } => {
+                                        match handler.handle_message(event).await {
+                                            Ok(saved) => {
+                                                let resp = SnpMessage {
+                                                    version: "1.0.0".to_string(),
+                                                    id: Uuid::new_v4(),
+                                                    correlation_id: Uuid::new_v4(),
+                                                    destination: Synapse { id: peer.to_string() },
+                                                    agent_public_key: "agent_public_key".to_string(),
+                                                    timestamp: OffsetDateTime::now_utc(),
+                                                    payload: Reply {
+                                                        ok: true,
+                                                        event: None,
+                                                        events: saved,
+                                                        error: None,
+                                                    },
+                                                    signature: "signature".to_string(),
+                                                };
+                                                info!("Sending outbound response: {:?}", resp);
+                                                let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                            }
+                                            Err(err) => {
+                                                tracing::warn!("ingest/handle failed: {err:?}");
+                                                let resp = SnpMessage {
+                                                    version: "1.0.0".to_string(),
+                                                    id: Uuid::new_v4(),
+                                                    correlation_id: Uuid::new_v4(),
+                                                    destination: Synapse { id: peer.to_string() },
+                                                    agent_public_key: "agent_public_key".to_string(),
+                                                    timestamp: OffsetDateTime::now_utc(),
+                                                    payload: Reply {
+                                                        ok: false,
+                                                        event: None,
+                                                        events: None,
+                                                        error: Some(err.to_string()),
+                                                    },
+                                                    signature: "signature".to_string(),
+                                                };
+                                                let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                            }
+                                        }
                                     }
-                                    Err(err) => {
-                                        tracing::warn!("ingest/handle failed: {err:?}");
-                                        let resp = RpcResponse { ok: false, event: None };
+                                    _ => {
+                                        let resp = SnpMessage {
+                                            version: "1.0.0".to_string(),
+                                            id: Uuid::new_v4(),
+                                            correlation_id: Uuid::new_v4(),
+                                            destination: Synapse { id: peer.to_string() },
+                                            agent_public_key: "agent_public_key".to_string(),
+                                            timestamp: OffsetDateTime::now_utc(),
+                                            payload: Reply {
+                                                ok: false,
+                                                event: None,
+                                                events: None,
+                                                error: Some("unsupported payload".into()),
+                                            },
+                                            signature: "signature".to_string(),
+                                        };
                                         let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
                                     }
                                 }
@@ -149,11 +215,12 @@ pub async fn run_swarm(
                                     let _ = ch.send(Ok(response.clone()));
                                 }
 
-                                if let Some(evt) = response.event {
+                                if let Reply { ok: true, event: Some(evt), .. } = &response.payload {
                                     if evt.event_type == "synapse:return_public_key" {
-                                        let pk_str = evt.content.clone().unwrap();
-                                        known_peers.insert(pk_str, peer.to_string());
-                                        info!("known_peers after response event: {:?}", known_peers);
+                                        if let Some(pk_str) = evt.content.clone() {
+                                            known_peers.insert(pk_str, peer.to_string());
+                                            info!("known_peers after response event: {:?}", known_peers);
+                                        }
                                     }
                                 }
                             }

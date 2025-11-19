@@ -4,7 +4,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::config::RpcRequest;
 use crate::control::Control;
 use crate::{
     errors::Libp2pAdapterError,
@@ -15,12 +14,19 @@ use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use dashmap::DashMap;
 use libp2p::identity::PublicKey;
 use libp2p::{Multiaddr, PeerId, identity::Keypair};
+use protocol_snp::{
+    Destination::{Local, Multicast, Synapse},
+    SnpMessage,
+    SnpPayload::{Command, Reply},
+};
 use synapse_core::CoreError;
 use synapse_core::domain::events::Event;
 use synapse_core::ports::federation::MessageHandler;
 use synapse_core::{TransportError, ports::federation::FederationTransport};
+use time::OffsetDateTime;
 use tokio::sync::{mpsc, oneshot};
 use tracing::warn;
+use uuid::Uuid;
 
 pub struct Libp2pTransport {
     config: TransportConfig,
@@ -74,18 +80,29 @@ impl FederationTransport for Libp2pTransport {
         &self,
         synapse_public_key: String,
         event: Event,
-    ) -> Result<Event, TransportError> {
+    ) -> Result<Option<Vec<Event>>, TransportError> {
         let peer_id = peer_id_from_urlsafe_b64_pk(&synapse_public_key)
             .map_err(|e| TransportError::Other(e.to_string()))?;
 
-        let req = RpcRequest {
-            action: event.event_type.clone(),
-            event: event.clone(),
+        let req = SnpMessage {
+            version: "1.0.0".to_string(),
+            id: Uuid::new_v4(),
+            correlation_id: Uuid::new_v4(),
+            destination: Synapse {
+                id: peer_id.to_string(),
+            },
+            agent_public_key: "agent_public_key".to_string(),
+            timestamp: OffsetDateTime::now_utc(),
+            payload: Command {
+                action: event.event_type.clone(),
+                event: event.clone(),
+            },
+            signature: "signature".to_string(),
         };
 
         let (ret_tx, ret_rx) = oneshot::channel();
         self.tx
-            .send(Control::SendRpc {
+            .send(Control::SendSnp {
                 peer: peer_id,
                 request: req,
                 ret: ret_tx,
@@ -99,7 +116,24 @@ impl FederationTransport for Libp2pTransport {
             .map_err(|e| TransportError::Other(e.to_string()))?;
 
         let _ = resp;
-        Ok(event)
+        match resp.payload {
+            Reply {
+                ok: true,
+                event: Some(event),
+                ..
+            } => Ok(Some(vec![event])),
+            Reply {
+                ok: true,
+                events: Some(events),
+                ..
+            } => Ok(Some(events)),
+            Reply {
+                ok: false,
+                error: Some(error),
+                ..
+            } => Err(TransportError::Other(error)),
+            _ => Err(TransportError::Other("unexpected response payload".into())),
+        }
     }
 }
 
