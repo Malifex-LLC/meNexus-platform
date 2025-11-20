@@ -3,14 +3,13 @@
 
 pub mod error;
 
-use base64::{Engine as _, engine::general_purpose};
+use base64::{Engine as _, engine::general_purpose, engine::general_purpose::URL_SAFE_NO_PAD};
 use libp2p::Multiaddr;
 use libp2p::identity::{Keypair, PeerId};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
-use synapse_core::ports::config::errors::ConfigError;
 use url::Url;
 
 use crate::error::SynapseConfigError;
@@ -29,7 +28,8 @@ pub struct SynapseConfig {
 pub struct IdentityConfig {
     pub name: String,
     pub description: String,
-    pub key_path: PathBuf,
+    pub public_key: String,
+    pub private_key_path: PathBuf,
     pub public_url: Url,
 }
 
@@ -54,7 +54,7 @@ pub fn load_or_init_config(config_path: PathBuf) -> Result<SynapseConfig, Synaps
         Ok(config)
     } else {
         let port: u16 = env::var("AXUM_PORT")?.parse()?;
-        let key_path: PathBuf = env::var("KEY_PATH")?.parse()?;
+        let private_key_path: PathBuf = env::var("PRIVATE_KEY_PATH")?.parse()?;
         let announce: Vec<String> = env::var("ANNOUNCE")?
             .split(',')
             .map(|s| s.trim().to_string())
@@ -66,7 +66,9 @@ pub fn load_or_init_config(config_path: PathBuf) -> Result<SynapseConfig, Synaps
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect();
-        let keypair = generate_secp256k1_keypair(&key_path)?;
+        let keypair = generate_secp256k1_keypair(&private_key_path)?;
+        let pk_bytes = keypair.public().encode_protobuf();
+        let pk_str = URL_SAFE_NO_PAD.encode(pk_bytes);
         let peer_id: PeerId = keypair.public().to_peer_id();
         let addr_str = format!("/ip4/127.0.0.1/tcp/63443/p2p/{}", peer_id);
         let _addr: Multiaddr = addr_str.parse().expect("Invalid Multiaddr");
@@ -80,7 +82,8 @@ pub fn load_or_init_config(config_path: PathBuf) -> Result<SynapseConfig, Synaps
             identity: IdentityConfig {
                 name: "New Synapse".to_string(),
                 description: "A new init Synapse config".to_string(),
-                key_path,
+                public_key: pk_str,
+                private_key_path,
                 public_url: Url::parse("http://localhost")?,
             },
             p2p: P2pConfig {

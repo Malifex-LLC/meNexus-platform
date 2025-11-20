@@ -6,6 +6,7 @@ pub mod domain;
 pub mod errors;
 pub mod ports;
 
+pub use domain::events::CoreEvent;
 pub use errors::CoreError;
 pub use ports::federation::errors::TransportError;
 pub use ports::persistence::errors::PersistenceError;

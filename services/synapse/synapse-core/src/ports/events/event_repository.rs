@@ -6,5 +6,6 @@ use crate::domain::events::Event;
 
 #[async_trait::async_trait]
 pub trait EventRepository: Send + Sync {
-    async fn create(&self, event: Event) -> Result<Event, PersistenceError>;
+    async fn record(&self, event: Event) -> Result<Event, PersistenceError>;
+    async fn retrieve(&self, event_type: String) -> Result<Option<Vec<Event>>, PersistenceError>;
 }

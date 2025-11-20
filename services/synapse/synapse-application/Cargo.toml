@@ -4,6 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+time = { workspace = true }
 adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p/" }
 base64 = "0.22.1"
 futures = { workspace = true }

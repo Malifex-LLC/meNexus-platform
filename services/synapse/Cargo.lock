@@ -8,19 +8,24 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64",
+ "dashmap",
  "futures",
  "libp2p",
+ "libp2p-identity",
  "libp2p-kad",
  "libp2p-mdns",
  "libp2p-swarm-derive",
+ "protocol-snp",
  "serde",
  "serde_json",
  "synapse-config",
  "synapse-core",
  "thiserror 2.0.17",
+ "time",
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]
@@ -28,10 +33,13 @@ name = "adapter-postgres"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "serde",
+ "serde_json",
  "sqlx",
  "synapse-core",
  "thiserror 2.0.17",
  "time",
+ "url",
  "uuid",
 ]
 
@@ -619,6 +627,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.108",
+]
+
+[[package]]
+name = "dashmap"
+version = "6.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5041cc499144891f3790297212f32a74fb938e5136a14943f338ef9e0ae276cf"
+dependencies = [
+ "cfg-if",
+ "crossbeam-utils",
+ "hashbrown 0.14.5",
+ "lock_api",
+ "once_cell",
+ "parking_lot_core",
+ "serde",
 ]
 
 [[package]]
@@ -1605,6 +1628,7 @@ dependencies = [
  "libp2p-core",
  "libp2p-dns",
  "libp2p-gossipsub",
+ "libp2p-identify",
  "libp2p-identity",
  "libp2p-kad",
  "libp2p-mdns",
@@ -1612,6 +1636,7 @@ dependencies = [
  "libp2p-noise",
  "libp2p-ping",
  "libp2p-quic",
+ "libp2p-request-response",
  "libp2p-swarm",
  "libp2p-tcp",
  "libp2p-upnp",
@@ -1717,6 +1742,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "libp2p-identify"
+version = "0.47.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ab792a8b68fdef443a62155b01970c81c3aadab5e659621b063ef252a8e65e8"
+dependencies = [
+ "asynchronous-codec",
+ "either",
+ "futures",
+ "futures-bounded",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "smallvec",
+ "thiserror 2.0.17",
+ "tracing",
+]
+
+[[package]]
 name = "libp2p-identity"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1792,6 +1838,7 @@ checksum = "805a555148522cb3414493a5153451910cb1a146c53ffbf4385708349baf62b7"
 dependencies = [
  "futures",
  "libp2p-core",
+ "libp2p-identify",
  "libp2p-identity",
  "libp2p-ping",
  "libp2p-swarm",
@@ -1862,6 +1909,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "libp2p-request-response"
+version = "0.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9f1cca83488b90102abac7b67d5c36fc65bc02ed47620228af7ed002e6a1478"
+dependencies = [
+ "async-trait",
+ "futures",
+ "futures-bounded",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "tracing",
+]
+
+[[package]]
 name = "libp2p-swarm"
 version = "0.47.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1873,6 +1939,7 @@ dependencies = [
  "futures-timer",
  "libp2p-core",
  "libp2p-identity",
+ "libp2p-swarm-derive",
  "lru",
  "multistream-select",
  "rand 0.8.5",
@@ -2582,6 +2649,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.108",
+]
+
+[[package]]
+name = "protocol-snp"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "synapse-core",
+ "time",
+ "uuid",
 ]
 
 [[package]]
@@ -3421,6 +3498,7 @@ dependencies = [
  "libp2p-swarm-derive",
  "synapse-config",
  "synapse-core",
+ "time",
  "tokio",
  "uuid",
 ]
@@ -3467,6 +3545,7 @@ dependencies = [
  "adapter-postgres",
  "anyhow",
  "axum",
+ "dashmap",
  "dotenvy",
  "serde",
  "serde_json",
@@ -3479,6 +3558,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

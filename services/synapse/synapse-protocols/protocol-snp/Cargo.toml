@@ -1,0 +1,10 @@
+[package]
+name = "protocol-snp"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+synapse-core = { path = "../../synapse-core" }
+time = { workspace = true }
+uuid = { workspace = true }
+serde = { workspace = true }

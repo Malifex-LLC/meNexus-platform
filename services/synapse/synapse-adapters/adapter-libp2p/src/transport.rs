@@ -1,16 +1,39 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+use std::collections::HashMap;
+use std::sync::Arc;
+
+use crate::control::Control;
 use crate::{
     errors::Libp2pAdapterError,
     swarm::{create_swarm, run_swarm},
 };
 use async_trait::async_trait;
-use libp2p::{Multiaddr, identity::Keypair};
-use synapse_core::ports::federation::SnpTransport;
+use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
+use dashmap::DashMap;
+use libp2p::identity::PublicKey;
+use libp2p::{Multiaddr, PeerId, identity::Keypair};
+use protocol_snp::{
+    Destination::{Local, Multicast, Synapse},
+    SnpMessage,
+    SnpPayload::{Command, Reply},
+};
+use synapse_core::CoreError;
+use synapse_core::domain::events::Event;
+use synapse_core::ports::federation::MessageHandler;
+use synapse_core::{TransportError, ports::federation::FederationTransport};
+use time::OffsetDateTime;
+use tokio::sync::{mpsc, oneshot};
+use tracing::warn;
+use uuid::Uuid;
 
 pub struct Libp2pTransport {
     config: TransportConfig,
+    tx: mpsc::Sender<Control>,
+    rx: Option<mpsc::Receiver<Control>>,
+    inbound_handler: Arc<dyn MessageHandler>,
+    known_peers: Arc<DashMap<String, String>>,
 }
 
 #[derive(Clone, Debug)]
@@ -21,16 +44,96 @@ pub struct TransportConfig {
 }
 
 impl Libp2pTransport {
-    pub fn new(config: TransportConfig) -> Self {
-        Self { config }
+    pub fn new(
+        config: TransportConfig,
+        handler: Arc<dyn MessageHandler + Send + Sync>,
+        known_peers: Arc<DashMap<String, String>>,
+    ) -> Self {
+        let (tx, rx) = mpsc::channel::<Control>(64);
+        Self {
+            config,
+            tx,
+            rx: Some(rx),
+            inbound_handler: handler,
+            known_peers,
+        }
     }
 
-    pub async fn start(&self) -> Result<(), Libp2pAdapterError> {
-        let swarm = create_swarm(self.config.clone());
-        tokio::spawn(async move { run_swarm(swarm?).await });
+    pub async fn start(&mut self) -> Result<(), Libp2pAdapterError> {
+        let swarm = create_swarm(self.config.clone())?;
+        let rx = self.rx.take().expect("transport already started");
+        let handler = self.inbound_handler.clone();
+        let known_peers = self.known_peers.clone();
+
+        tokio::spawn(async move {
+            if let Err(e) = run_swarm(swarm, rx, handler, known_peers).await {
+                warn!("libp2p swarm exited with error: {e:?}");
+            }
+        });
         Ok(())
     }
 }
 
 #[async_trait]
-impl SnpTransport for Libp2pTransport {}
+impl FederationTransport for Libp2pTransport {
+    async fn send_message(
+        &self,
+        synapse_public_key: String,
+        event: Event,
+    ) -> Result<Option<Vec<Event>>, TransportError> {
+        let peer_id = peer_id_from_urlsafe_b64_pk(&synapse_public_key)
+            .map_err(|e| TransportError::Other(e.to_string()))?;
+
+        let req = SnpMessage {
+            version: "1.0.0".to_string(),
+            id: Uuid::new_v4(),
+            correlation_id: Uuid::new_v4(),
+            destination: Synapse {
+                id: peer_id.to_string(),
+            },
+            agent_public_key: "agent_public_key".to_string(),
+            timestamp: OffsetDateTime::now_utc(),
+            payload: Command {
+                action: event.event_type.clone(),
+                event: event.clone(),
+            },
+            signature: "signature".to_string(),
+        };
+
+        let (ret_tx, ret_rx) = oneshot::channel();
+        self.tx
+            .send(Control::SendSnp {
+                peer: peer_id,
+                request: req,
+                ret: ret_tx,
+            })
+            .await
+            .map_err(|_| TransportError::Other("swarm control channel closed".into()))?;
+
+        let resp = ret_rx
+            .await
+            .map_err(|_| TransportError::Other("swarm dropped response".into()))?
+            .map_err(|e| TransportError::Other(e.to_string()))?;
+
+        let _ = resp;
+        match resp.payload {
+            Reply {
+                ok: true,
+                events: Some(events),
+                ..
+            } => Ok(Some(events)),
+            Reply {
+                ok: false,
+                error: Some(error),
+                ..
+            } => Err(TransportError::Other(error)),
+            _ => Err(TransportError::Other("unexpected response payload".into())),
+        }
+    }
+}
+
+fn peer_id_from_urlsafe_b64_pk(s: &str) -> Result<PeerId, Libp2pAdapterError> {
+    let bytes = URL_SAFE_NO_PAD.decode(s)?;
+    let pk = PublicKey::try_decode_protobuf(&bytes)?;
+    Ok(pk.to_peer_id())
+}

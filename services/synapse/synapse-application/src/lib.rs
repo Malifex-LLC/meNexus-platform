@@ -2,4 +2,3 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 pub mod events;
-pub mod federation;

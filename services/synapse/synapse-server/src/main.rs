@@ -9,11 +9,16 @@ pub mod utils;
 
 use crate::state::AppState;
 use adapter_libp2p::initialize_p2p;
+
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
-use synapse_application::events::event_service::EventService;
+use synapse_application::events::CreateLocalEventUseCase;
+use synapse_application::events::event_service::EventIngestService;
+use synapse_application::events::event_service::{LocalEventService, RemoteEventService};
 use synapse_config::get_synapse_config;
 
+use dashmap::DashMap;
+use std::collections::HashMap;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
@@ -41,12 +46,23 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
 
-    let config = get_synapse_config()?;
-    initialize_p2p(config).await?;
-
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
-    let create_event = Arc::new(EventService::new(repo));
-    let state = AppState { create_event };
+    let ingest = Arc::new(EventIngestService::new(repo));
+
+    let known_peers = Arc::new(DashMap::<String, String>::new());
+
+    let config = get_synapse_config()?;
+    let transport = initialize_p2p(config, ingest.clone(), known_peers.clone()).await?;
+
+    let create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync> =
+        Arc::new(LocalEventService::new(ingest.clone()));
+
+    let create_remote_event = Arc::new(RemoteEventService::new(Arc::new(transport)));
+    let state = AppState {
+        create_local_event,
+        create_remote_event,
+        known_peers: known_peers.clone(),
+    };
 
     let app = api::routes()
         .with_state(state)
