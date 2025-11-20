@@ -118,22 +118,10 @@ pub async fn run_swarm(
                             timestamp: OffsetDateTime::now_utc(),
                             payload: Command {
                                 action: "synapse:get_public_key".to_string(),
-                                event: Event {
-                                    id: Uuid::new_v4(),
-                                    created_at: OffsetDateTime::now_utc(),
-                                    event_type: "synapse:get_public_key".to_string(),
-                                    module_kind: None,
-                                    module_slug: None,
-                                    agent: String::new(),
-                                    target: None,
-                                    previous: None,
-                                    content: None,
-                                    artifacts: None,
-                                    metadata: None,
-                                    links: None,
-                                    data: None,
-                                    expiration: None,
-                                },
+                                event: Event::new()
+                                    .with_event_type("synapse:get_public_key")
+                                    .with_module_kind("core")
+                                    .build()
                             },
                             signature: "signature".to_string(),
                         };
