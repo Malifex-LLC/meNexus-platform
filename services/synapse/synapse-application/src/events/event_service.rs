@@ -13,21 +13,24 @@ use synapse_core::domain::events::Event;
 use synapse_core::ports::events::event_repository::EventRepository;
 use synapse_core::ports::federation::FederationTransport;
 use synapse_core::ports::federation::MessageHandler;
+use synapse_core::ports::modules::ModuleRegistry;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-pub struct LocalEventService<R: EventRepository> {
-    ingest: Arc<EventIngestService<R>>,
+pub struct LocalEventService<R: EventRepository, T: ModuleRegistry> {
+    ingest: Arc<EventIngestService<R, T>>,
 }
 
-impl<R: EventRepository> LocalEventService<R> {
-    pub fn new(ingest: Arc<EventIngestService<R>>) -> Self {
+impl<R: EventRepository, T: ModuleRegistry> LocalEventService<R, T> {
+    pub fn new(ingest: Arc<EventIngestService<R, T>>) -> Self {
         Self { ingest }
     }
 }
 
 #[async_trait]
-impl<R: EventRepository + Send + Sync> CreateLocalEventUseCase for LocalEventService<R> {
+impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> CreateLocalEventUseCase
+    for LocalEventService<R, T>
+{
     async fn execute(&self, cmd: CreateEventCommand) -> Result<Event, CoreError> {
         if cmd.event_type.trim().is_empty() {
             return Err(CoreError::persistence(
@@ -61,13 +64,14 @@ impl<R: EventRepository + Send + Sync> CreateLocalEventUseCase for LocalEventSer
     }
 }
 
-pub struct EventIngestService<R: EventRepository> {
+pub struct EventIngestService<R: EventRepository, T: ModuleRegistry> {
+    registry: Arc<T>,
     repo: Arc<R>,
 }
 
-impl<R: EventRepository> EventIngestService<R> {
-    pub fn new(repo: Arc<R>) -> Self {
-        Self { repo }
+impl<R: EventRepository, T: ModuleRegistry> EventIngestService<R, T> {
+    pub fn new(repo: Arc<R>, registry: Arc<T>) -> Self {
+        Self { registry, repo }
     }
 
     pub async fn ingest(&self, event: Event) -> Result<Event, CoreError> {
@@ -77,38 +81,24 @@ impl<R: EventRepository> EventIngestService<R> {
 }
 
 #[async_trait]
-impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> {
+impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> MessageHandler
+    for EventIngestService<R, T>
+{
     async fn handle_message(&self, event: Event) -> Result<Option<Vec<Event>>, CoreError> {
-        match event.event_type.as_str() {
-            "synapse:get_public_key" => {
-                self.ingest(event).await?;
-                let config = get_synapse_config().unwrap();
-                let public_key = config.identity.public_key;
-                let res_event = Event::new()
-                    .with_event_type("synapse:return_public_key")
-                    .with_agent(public_key.clone())
-                    .with_content(public_key.clone())
-                    .build();
-                let events = vec![res_event];
-                Ok(Some(events))
+        let replies = match event.module_kind.as_deref() {
+            Some(kind) => {
+                let module = self.registry.get(kind).unwrap();
+                module.handle_event(&event).await?
             }
-            "synapse:list_all_events" => {
-                let events = self.repo.retrieve("all".to_string()).await.unwrap();
-                Ok(events)
+            None => {
+                return Err(CoreError::Validation(
+                    "unable to validate module_kind".to_string(),
+                ));
             }
-            _ => {
-                self.ingest(event).await?;
-                let config = get_synapse_config().unwrap();
-                let public_key = config.identity.public_key;
-                let res_event = Event::new()
-                    .with_event_type("synapse:failed_to_handle_message")
-                    .with_agent(public_key.clone())
-                    .with_content(public_key.clone())
-                    .build();
-                let events = vec![res_event];
-                Ok(Some(events))
-            }
-        }
+        };
+
+        self.ingest(event).await?;
+        Ok(replies)
     }
 }
 

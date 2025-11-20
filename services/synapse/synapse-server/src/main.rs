@@ -12,16 +12,19 @@ use adapter_libp2p::initialize_p2p;
 
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::{create_pool, migrate};
-use synapse_application::events::CreateLocalEventUseCase;
-use synapse_application::events::event_service::EventIngestService;
-use synapse_application::events::event_service::{LocalEventService, RemoteEventService};
-use synapse_config::get_synapse_config;
-
 use dashmap::DashMap;
+use module_core::CoreModule;
+use module_posts::PostsModule;
 use std::collections::HashMap;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
+use synapse_application::events::CreateLocalEventUseCase;
+use synapse_application::events::event_service::EventIngestService;
+use synapse_application::events::event_service::{LocalEventService, RemoteEventService};
+use synapse_application::modules::InMemoryModuleRegistry;
+use synapse_config::get_synapse_config;
+use synapse_core::ports::modules::ModuleRegistry;
 use time::format_description;
 use tower_http::trace::TraceLayer;
 use tracing::info;
@@ -46,8 +49,15 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool(&database_url).await?;
     migrate(&pool).await?;
 
+    let module_registry = Arc::new(InMemoryModuleRegistry::new());
     let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
-    let ingest = Arc::new(EventIngestService::new(repo));
+    let ingest = Arc::new(EventIngestService::new(
+        repo.clone(),
+        module_registry.clone(),
+    ));
+
+    module_registry.register(Arc::new(CoreModule::new(repo.clone())))?;
+    module_registry.register(Arc::new(PostsModule::new()))?;
 
     let known_peers = Arc::new(DashMap::<String, String>::new());
 
