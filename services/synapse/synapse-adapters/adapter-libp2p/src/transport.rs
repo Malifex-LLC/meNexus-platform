@@ -119,11 +119,6 @@ impl FederationTransport for Libp2pTransport {
         match resp.payload {
             Reply {
                 ok: true,
-                event: Some(event),
-                ..
-            } => Ok(Some(vec![event])),
-            Reply {
-                ok: true,
                 events: Some(events),
                 ..
             } => Ok(Some(events)),

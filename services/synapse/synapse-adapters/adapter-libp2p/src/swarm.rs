@@ -160,7 +160,6 @@ pub async fn run_swarm(
                                                     timestamp: OffsetDateTime::now_utc(),
                                                     payload: Reply {
                                                         ok: true,
-                                                        event: None,
                                                         events: saved,
                                                         error: None,
                                                     },
@@ -180,7 +179,6 @@ pub async fn run_swarm(
                                                     timestamp: OffsetDateTime::now_utc(),
                                                     payload: Reply {
                                                         ok: false,
-                                                        event: None,
                                                         events: None,
                                                         error: Some(err.to_string()),
                                                     },
@@ -200,7 +198,6 @@ pub async fn run_swarm(
                                             timestamp: OffsetDateTime::now_utc(),
                                             payload: Reply {
                                                 ok: false,
-                                                event: None,
                                                 events: None,
                                                 error: Some("unsupported payload".into()),
                                             },
@@ -214,12 +211,18 @@ pub async fn run_swarm(
                                 if let Some(ch) = pending.remove(&request_id) {
                                     let _ = ch.send(Ok(response.clone()));
                                 }
-
-                                if let Reply { ok: true, event: Some(evt), .. } = &response.payload {
-                                    if evt.event_type == "synapse:return_public_key" {
-                                        if let Some(pk_str) = evt.content.clone() {
-                                            known_peers.insert(pk_str, peer.to_string());
-                                            info!("known_peers after response event: {:?}", known_peers);
+                                if let Reply { ok: true, events: Some(events), .. } = &response.payload {
+                                    for evt in events.iter() {
+                                        match evt.event_type.as_str() {
+                                            "synapse:return_public_key" => {
+                                                if let Some(pk) = evt.content.clone() {
+                                                    known_peers.insert(pk, peer.to_string());
+                                                }
+                                            }
+                                            "synapse:list_all_events" => {
+                                                debug!("synapse:list_all_events called!");
+                                            }
+                                            _ => {}
                                         }
                                     }
                                 }

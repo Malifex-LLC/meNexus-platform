@@ -84,22 +84,11 @@ impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> 
                 self.ingest(event).await?;
                 let config = get_synapse_config().unwrap();
                 let public_key = config.identity.public_key;
-                let res_event = Event {
-                    id: Uuid::new_v4(),
-                    created_at: OffsetDateTime::now_utc(),
-                    event_type: "synapse:return_public_key".to_string(),
-                    module_kind: None,
-                    module_slug: None,
-                    agent: public_key.clone(),
-                    target: None,
-                    previous: None,
-                    content: Some(public_key.clone()),
-                    artifacts: None,
-                    metadata: None,
-                    links: None,
-                    data: None,
-                    expiration: None,
-                };
+                let res_event = Event::new()
+                    .with_event_type("synapse:return_public_key")
+                    .with_agent(public_key.clone())
+                    .with_content(public_key.clone())
+                    .build();
                 let events = vec![res_event];
                 Ok(Some(events))
             }
@@ -111,22 +100,11 @@ impl<R: EventRepository + Send + Sync> MessageHandler for EventIngestService<R> 
                 self.ingest(event).await?;
                 let config = get_synapse_config().unwrap();
                 let public_key = config.identity.public_key;
-                let res_event = Event {
-                    id: Uuid::new_v4(),
-                    created_at: OffsetDateTime::now_utc(),
-                    event_type: "synapse:failed_to_handle_message".to_string(),
-                    module_kind: None,
-                    module_slug: None,
-                    agent: public_key.clone(),
-                    target: None,
-                    previous: None,
-                    content: Some(public_key.clone()),
-                    artifacts: None,
-                    metadata: None,
-                    links: None,
-                    data: None,
-                    expiration: None,
-                };
+                let res_event = Event::new()
+                    .with_event_type("synapse:failed_to_handle_message")
+                    .with_agent(public_key.clone())
+                    .with_content(public_key.clone())
+                    .build();
                 let events = vec![res_event];
                 Ok(Some(events))
             }
