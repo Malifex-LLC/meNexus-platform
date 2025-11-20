@@ -207,9 +207,6 @@ pub async fn run_swarm(
                                                     known_peers.insert(pk, peer.to_string());
                                                 }
                                             }
-                                            "synapse:list_all_events" => {
-                                                debug!("synapse:list_all_events called!");
-                                            }
                                             _ => {}
                                         }
                                     }

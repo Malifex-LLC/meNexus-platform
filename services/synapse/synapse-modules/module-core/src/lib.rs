@@ -48,6 +48,18 @@ impl Module for CoreModule {
                 let events = vec![res_event];
                 Ok(Some(events))
             }
+            "synapse:create_event" => {
+                let config = get_synapse_config().unwrap();
+                let public_key = config.identity.public_key;
+                let res_event = Event::new()
+                    .with_event_type("synapse:event_created")
+                    .with_module_kind("core")
+                    .with_agent(public_key.clone())
+                    .with_content(public_key.clone())
+                    .build();
+                let events = vec![res_event];
+                Ok(Some(events))
+            }
             "synapse:list_all_events" => {
                 let events = self.repo.retrieve("all".to_string()).await.unwrap();
                 Ok(events)

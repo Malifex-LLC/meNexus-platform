@@ -119,9 +119,9 @@ impl FederationTransport for Libp2pTransport {
         match resp.payload {
             Reply {
                 ok: true,
-                events: Some(events),
+                events,
                 ..
-            } => Ok(Some(events)),
+            } => Ok(events),
             Reply {
                 ok: false,
                 error: Some(error),
