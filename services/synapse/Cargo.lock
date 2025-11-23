@@ -2172,9 +2172,13 @@ name = "module-posts"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "axum",
  "serde",
  "serde_json",
+ "synapse-application",
+ "synapse-config",
  "synapse-core",
+ "thiserror 2.0.17",
  "time",
  "tracing",
  "uuid",

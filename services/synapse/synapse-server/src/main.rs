@@ -15,6 +15,7 @@ use adapter_postgres::{create_pool, migrate};
 use dashmap::DashMap;
 use module_core::CoreModule;
 use module_posts::PostsModule;
+use module_posts::{PostsDeps, routes as module_posts_routes};
 use std::collections::HashMap;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
@@ -57,7 +58,7 @@ async fn main() -> anyhow::Result<()> {
     ));
 
     module_registry.register(Arc::new(CoreModule::new(repo.clone())))?;
-    module_registry.register(Arc::new(PostsModule::new()))?;
+    module_registry.register(Arc::new(PostsModule::new(repo.clone())))?;
 
     let known_peers = Arc::new(DashMap::<String, String>::new());
 
@@ -69,12 +70,24 @@ async fn main() -> anyhow::Result<()> {
 
     let create_remote_event = Arc::new(RemoteEventService::new(Arc::new(transport)));
     let state = AppState {
+        repo: repo.clone(),
         create_local_event,
         create_remote_event,
         known_peers: known_peers.clone(),
     };
 
+    impl axum::extract::FromRef<AppState> for PostsDeps {
+        fn from_ref(app: &AppState) -> Self {
+            PostsDeps {
+                repo: app.repo.clone(),
+                create_local_event: app.create_local_event.clone(),
+                create_remote_event: app.create_remote_event.clone(),
+            }
+        }
+    }
+
     let app = api::routes()
+        .merge(module_posts_routes::<AppState>())
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 

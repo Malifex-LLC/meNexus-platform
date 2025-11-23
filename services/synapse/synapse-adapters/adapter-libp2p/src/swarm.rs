@@ -9,7 +9,6 @@ use crate::{config::Libp2pBehaviour, transport::TransportConfig};
 use dashmap::DashMap;
 use futures::StreamExt;
 use libp2p::StreamProtocol;
-use libp2p::identity::{PeerId, PublicKey};
 use libp2p::request_response::OutboundRequestId;
 use libp2p::request_response::ProtocolSupport;
 use libp2p::request_response::json;
@@ -33,7 +32,7 @@ use synapse_core::domain::events::Event;
 use synapse_core::ports::federation::MessageHandler;
 use time::OffsetDateTime;
 use tokio::sync::{mpsc, oneshot};
-use tracing::{debug, info};
+use tracing::info;
 use uuid::Uuid;
 
 pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, Libp2pAdapterError> {

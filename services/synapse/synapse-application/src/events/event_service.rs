@@ -6,8 +6,6 @@ use crate::events::{
 };
 use async_trait::async_trait;
 use std::sync::Arc;
-use synapse_config::SynapseConfig;
-use synapse_config::get_synapse_config;
 use synapse_core::CoreError;
 use synapse_core::domain::events::Event;
 use synapse_core::ports::events::event_repository::EventRepository;
