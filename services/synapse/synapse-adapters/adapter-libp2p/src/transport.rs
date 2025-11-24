@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::control::Control;
@@ -19,7 +18,6 @@ use protocol_snp::{
     SnpMessage,
     SnpPayload::{Command, Reply},
 };
-use synapse_core::CoreError;
 use synapse_core::domain::events::Event;
 use synapse_core::ports::federation::MessageHandler;
 use synapse_core::{TransportError, ports::federation::FederationTransport};
@@ -118,10 +116,8 @@ impl FederationTransport for Libp2pTransport {
         let _ = resp;
         match resp.payload {
             Reply {
-                ok: true,
-                events: Some(events),
-                ..
-            } => Ok(Some(events)),
+                ok: true, events, ..
+            } => Ok(events),
             Reply {
                 ok: false,
                 error: Some(error),

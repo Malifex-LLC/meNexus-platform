@@ -137,7 +137,7 @@ async fn list_remote_events(
 ) -> Result<(StatusCode, Json<ListRemoteEventsResult>), AppError> {
     let inner = CreateEventCommand {
         event_type: body.event_type,
-        module_kind: None,
+        module_kind: Some("core".to_string()),
         module_slug: None,
         agent: "100".to_string(),
         target: None,

@@ -6,6 +6,8 @@ members = [
   "synapse-application",
   "synapse-config",
   "synapse-core",
+  "synapse-modules/module-core",
+  "synapse-modules/module-posts",
   "synapse-protocols/protocol-snp",
   "synapse-server",
 ]
@@ -16,6 +18,7 @@ edition = "2024"
 [workspace.dependencies]
 anyhow = "1.0.100"
 async-trait = "0.1.89"
+axum = "0.8.6"
 base64 = "0.22.1"
 dashmap = { version = "6.1.0", features = ["serde"] }
 dotenvy = "0.15.7"

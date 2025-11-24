@@ -15,9 +15,7 @@ use libp2p_kad::{self, Event as KadEvent, store::MemoryStore};
 use libp2p_swarm_derive::NetworkBehaviour;
 
 use protocol_snp::SnpMessage;
-use serde::{Deserialize, Serialize};
 use synapse_config::SynapseConfig;
-use synapse_core::domain::events::Event;
 
 #[derive(NetworkBehaviour)]
 #[behaviour(out_event = "Libp2pEvent")]

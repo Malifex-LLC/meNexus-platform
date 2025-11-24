@@ -10,7 +10,6 @@ pub mod transport;
 
 use crate::{config::parse_config, transport::Libp2pTransport};
 use dashmap::DashMap;
-use std::collections::HashMap;
 use std::sync::Arc;
 use synapse_config::SynapseConfig;
 use synapse_core::TransportError;
