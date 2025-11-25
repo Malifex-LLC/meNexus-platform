@@ -70,6 +70,48 @@ impl Libp2pTransport {
         });
         Ok(())
     }
+
+    pub fn public_key_for_peer(&self, peer_id: &str) -> Option<String> {
+        self.known_peers
+            .iter()
+            .find(|entry| entry.value() == peer_id)
+            .map(|entry| entry.key().clone())
+    }
+
+    pub async fn announce_profile(&self, profile_pk: &str) -> Result<(), TransportError> {
+        let key = profile_pk.as_bytes().to_vec();
+        self.tx.send(Control::Provide { key }).await.unwrap();
+        Ok(())
+    }
+
+    pub async fn lookup_profile_providers(
+        &self,
+        profile_pk: &str,
+    ) -> Result<Vec<String>, TransportError> {
+        let key = profile_pk.as_bytes().to_vec();
+        let (ret_tx, ret_rx) = oneshot::channel();
+
+        self.tx
+            .send(Control::QueryProviders { key, ret: ret_tx })
+            .await
+            .map_err(|_| TransportError::Other("swarm control channel closed".into()))?;
+
+        let peers = ret_rx
+            .await
+            .map_err(|_| TransportError::Other("provider query dropped".into()))?;
+
+        let mut providers = Vec::new();
+        for peer in peers {
+            let peer_str = peer.to_string();
+            if let Some(public_key) = self.public_key_for_peer(&peer_str) {
+                providers.push(public_key);
+            } else {
+                warn!("Can resolve public_key for provided PeerId")
+            }
+        }
+
+        Ok(providers)
+    }
 }
 
 #[async_trait]

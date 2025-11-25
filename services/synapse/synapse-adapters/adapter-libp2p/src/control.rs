@@ -12,4 +12,11 @@ pub enum Control {
         request: SnpMessage,
         ret: oneshot::Sender<Result<SnpMessage, TransportError>>,
     },
+    Provide {
+        key: Vec<u8>,
+    },
+    QueryProviders {
+        key: Vec<u8>,
+        ret: oneshot::Sender<Vec<PeerId>>,
+    },
 }

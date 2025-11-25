@@ -13,6 +13,7 @@ use std::sync::Arc;
 use synapse_application::events::{
     CreateEventCommand, CreateLocalEventUseCase, CreateRemoteEventCommand, CreateRemoteEventUseCase,
 };
+use synapse_core::ports::profiles::profile_repository::ProfileDiscovery;
 use synapse_core::{
     CoreError, PersistenceError,
     domain::{
@@ -117,6 +118,7 @@ impl Module for ProfilesModule {
 pub struct ProfilesDeps {
     pub doc_store: Arc<dyn ProfilesDocStore>,
     pub profile_repo: Arc<dyn ProfilesRepository>,
+    pub profile_discovery: Arc<dyn ProfileDiscovery>,
     pub create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync>,
     pub create_remote_event: Arc<dyn CreateRemoteEventUseCase + Send + Sync>,
 }
@@ -274,6 +276,10 @@ pub async fn register(
         ..Default::default()
     };
     deps.create_local_event.execute(cmd).await?;
+    deps.profile_discovery
+        .announce(&body.public_key)
+        .await
+        .unwrap();
 
     let profile = deps
         .profile_repo
@@ -296,41 +302,99 @@ struct ProfileFetchResult {
 
 async fn get_profile_http(
     axum::extract::State(deps): axum::extract::State<ProfilesDeps>,
-    axum::extract::Path(public_key): axum::extract::Path<String>,
-) -> Result<(StatusCode, axum::Json<Option<Profile>>), ModuleProfilesError> {
-    let bytes = deps.doc_store.get_doc(&public_key).await.unwrap();
+    Path(public_key): Path<String>,
+) -> Result<(StatusCode, Json<Option<Profile>>), ModuleProfilesError> {
     let profile = deps.profile_repo.get_profile(&public_key).await.unwrap();
-    Ok((StatusCode::OK, axum::Json(profile)))
+    if let Some(profile) = profile {
+        return Ok((StatusCode::OK, Json(Some(profile))));
+    }
+
+    let trimmed = public_key.trim().to_string();
+    let inner = CreateEventCommand {
+        event_type: "profiles:get_profile".into(),
+        module_kind: Some("profiles".into()),
+        agent: "local-agent".into(),
+        target: Some(ObjectRef::Agent(trimmed.clone())),
+        ..Default::default()
+    };
+
+    if let Ok(candidates) = deps.profile_discovery.providers(&trimmed).await {
+        for provider_pk in candidates {
+            if let Some(_bytes) =
+                fetch_profile_from_peer(&deps, &provider_pk, &trimmed, &inner).await?
+            {
+                // doc is now cached locally; return the freshly loaded profile
+                let profile = deps.profile_repo.get_profile(&trimmed).await.unwrap();
+                return Ok((StatusCode::OK, Json(profile)));
+            }
+        }
+    }
+
+    Ok((StatusCode::NOT_FOUND, Json(None)))
 }
 
 async fn get_profile_remote_http(
     axum::extract::State(deps): axum::extract::State<ProfilesDeps>,
-    axum::extract::Path((synapse_public_key, public_key)): axum::extract::Path<(String, String)>,
-) -> Result<(StatusCode, axum::Json<Option<Vec<u8>>>), ModuleProfilesError> {
+    Path((synapse_public_key, public_key)): Path<(String, String)>,
+) -> Result<(StatusCode, Json<Option<Vec<u8>>>), ModuleProfilesError> {
+    let trimmed_pk = public_key.trim();
     let inner = CreateEventCommand {
         event_type: "profiles:get_profile".into(),
         module_kind: Some("profiles".into()),
-        agent: "local-agent".into(), // TODO: set real agent
-        target: Some(ObjectRef::Agent(public_key.clone())),
+        agent: "local-agent".into(),
+        target: Some(ObjectRef::Agent(trimmed_pk.to_string())),
         ..Default::default()
     };
+
+    if let Ok(candidates) = deps.profile_discovery.providers(trimmed_pk).await {
+        for peer_pk in candidates {
+            match fetch_profile_from_peer(&deps, &peer_pk, trimmed_pk, &inner).await? {
+                Some(bytes) => return Ok((StatusCode::OK, Json(Some(bytes)))),
+                None => continue,
+            }
+        }
+    }
+
+    // Fallback to the explicit synapse supplied in the URL
+    match fetch_profile_from_peer(&deps, &synapse_public_key, trimmed_pk, &inner).await? {
+        Some(bytes) => Ok((StatusCode::OK, Json(Some(bytes)))),
+        None => Ok((StatusCode::OK, Json(None))),
+    }
+}
+
+async fn fetch_profile_from_peer(
+    deps: &ProfilesDeps,
+    peer_public_key: &str,
+    profile_public_key: &str,
+    inner: &CreateEventCommand,
+) -> Result<Option<Vec<u8>>, ModuleProfilesError> {
     let cmd = CreateRemoteEventCommand {
-        synapse_public_key,
-        event: inner,
+        synapse_public_key: peer_public_key.to_string(),
+        event: inner.clone(),
     };
+
     let reply = deps.create_remote_event.execute(cmd).await?;
+
     if let Some(events) = reply {
         if let Some(evt) = events
             .into_iter()
             .find(|e| e.event_type == "profiles:profile")
         {
             if let Some(bytes) = &evt.data {
-                deps.doc_store.upsert_doc(&public_key, bytes).await.unwrap();
-                return Ok((StatusCode::OK, axum::Json(Some(bytes.clone()))));
+                deps.doc_store
+                    .upsert_doc(profile_public_key, bytes)
+                    .await
+                    .unwrap();
+                deps.profile_discovery
+                    .announce(profile_public_key)
+                    .await
+                    .unwrap();
+
+                return Ok(Some(bytes.clone()));
             }
         }
     }
-    Ok((StatusCode::OK, axum::Json(None)))
+    Ok(None)
 }
 
 #[derive(Deserialize)]
@@ -383,5 +447,7 @@ async fn set_profile_http(
         ..Default::default()
     };
     let evt = deps.create_local_event.execute(cmd).await?;
+    deps.profile_discovery.announce(&public_key).await.unwrap();
+
     Ok((StatusCode::CREATED, axum::Json(evt)))
 }

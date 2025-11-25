@@ -18,7 +18,10 @@ use libp2p::{
     swarm::{Swarm, SwarmEvent},
     tcp, yamux,
 };
-use libp2p_kad::{self, Config as KadConfig, Mode, store::MemoryStore};
+use libp2p_kad::{
+    self, Config as KadConfig, Event as KademliaEvent, GetProvidersOk, Mode, QueryId, QueryResult,
+    store::MemoryStore,
+};
 use protocol_snp::{
     Destination::{Local, Multicast, Synapse},
     SnpMessage,
@@ -83,6 +86,8 @@ pub async fn run_swarm(
         OutboundRequestId,
         oneshot::Sender<Result<SnpMessage, TransportError>>,
     > = HashMap::new();
+    let mut provider_queries: HashMap<QueryId, oneshot::Sender<Vec<libp2p::PeerId>>> =
+        HashMap::new();
 
     loop {
         tokio::select! {
@@ -92,13 +97,48 @@ pub async fn run_swarm(
                         let req_id = swarm.behaviour_mut().req_res.send_request(&peer, request);
                         pending.insert(req_id, ret);
                     }
+                    Control::Provide {key} => {
+                        if let Err(e) = swarm.behaviour_mut().kad.start_providing(key.into()) {
+                            tracing::warn!("start_providing failed: {e:?}");
+                        }
+                    }
+                    Control::QueryProviders { key, ret } => {
+                        let query_id = swarm.behaviour_mut().kad.get_providers(key.into());
+                        provider_queries.insert(query_id, ret);
+                    }
                 }
             },
             event = swarm.select_next_some() => {
                 match event {
                     SwarmEvent::NewListenAddr { address, .. } => info!("Listening on {address:?}"),
                     SwarmEvent::Behaviour(Libp2pEvent::Ping(event)) => info!("{event:?}"),
-                    SwarmEvent::Behaviour(Libp2pEvent::Kad(event)) => info!("{event:?}"),
+                    SwarmEvent::Behaviour(Libp2pEvent::Kad(event)) => match event {
+                        KademliaEvent::OutboundQueryProgressed { id, result, .. } => {
+                            if let Some(ret) = provider_queries.remove(&id) {
+                                match result {
+                                    QueryResult::GetProviders(Ok(ok)) => {
+                                        match ok {
+                                            GetProvidersOk::FoundProviders { providers, .. } => {
+                                                let providers = providers.into_iter().collect();
+                                                let _ = ret.send(providers);
+                                            }
+                                            GetProvidersOk::FinishedWithNoAdditionalRecord { .. } => {
+                                                let _ = ret.send(Vec::new());
+                                            }
+                                        }
+                                    }
+                                    QueryResult::GetProviders(Err(_)) => {
+                                        let _ = ret.send(Vec::new());
+                                    }
+                                    _ => {
+                                        // Put sender back if this wasn't the final GetProviders result
+                                        provider_queries.insert(id, ret);
+                                    }
+                                }
+                            }
+                        }
+                        _ => {}
+                    },
                     SwarmEvent::ConnectionEstablished {
                         peer_id,
                         connection_id: _,

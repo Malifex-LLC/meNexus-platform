@@ -26,8 +26,10 @@ use synapse_application::events::CreateLocalEventUseCase;
 use synapse_application::events::event_service::EventIngestService;
 use synapse_application::events::event_service::{LocalEventService, RemoteEventService};
 use synapse_application::modules::InMemoryModuleRegistry;
+use synapse_application::profiles::profile_service::ProfileDiscoveryTransport;
 use synapse_config::get_synapse_config;
 use synapse_core::ports::modules::ModuleRegistry;
+use synapse_core::ports::profiles::profile_repository::ProfileDiscovery;
 use time::format_description;
 use tower_http::trace::TraceLayer;
 use tracing::info;
@@ -72,16 +74,20 @@ async fn main() -> anyhow::Result<()> {
     let known_peers = Arc::new(DashMap::<String, String>::new());
 
     let config = get_synapse_config()?;
-    let transport = initialize_p2p(config, ingest.clone(), known_peers.clone()).await?;
+    let transport =
+        Arc::new(initialize_p2p(config.clone(), ingest.clone(), known_peers.clone()).await?);
+
+    let profile_discovery = Arc::new(ProfileDiscoveryTransport::new(transport.clone()));
 
     let create_local_event: Arc<dyn CreateLocalEventUseCase + Send + Sync> =
         Arc::new(LocalEventService::new(ingest.clone()));
 
-    let create_remote_event = Arc::new(RemoteEventService::new(Arc::new(transport)));
+    let create_remote_event = Arc::new(RemoteEventService::new(transport.clone()));
     let state = AppState {
         event_repo: event_repo.clone(),
         profile_doc_store: profile_doc_store.clone(),
         profile_repo: profile_repo.clone(),
+        profile_discovery: profile_discovery.clone(),
         create_local_event,
         create_remote_event,
         known_peers: known_peers.clone(),
@@ -92,6 +98,7 @@ async fn main() -> anyhow::Result<()> {
             ProfilesDeps {
                 doc_store: app.profile_doc_store.clone(),
                 profile_repo: app.profile_repo.clone(),
+                profile_discovery: app.profile_discovery.clone(),
                 create_local_event: app.create_local_event.clone(),
                 create_remote_event: app.create_remote_event.clone(),
             }
