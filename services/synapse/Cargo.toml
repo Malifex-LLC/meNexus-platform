@@ -7,7 +7,7 @@ members = [
   "synapse-config",
   "synapse-core",
   "synapse-modules/module-core",
-  "synapse-modules/module-posts",
+  "synapse-modules/module-posts", "synapse-modules/module-profiles",
   "synapse-protocols/protocol-snp",
   "synapse-server",
 ]

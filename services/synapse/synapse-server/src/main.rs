@@ -11,11 +11,13 @@ use crate::state::AppState;
 use adapter_libp2p::initialize_p2p;
 
 use adapter_postgres::events_repository::PostgresEventsRepository;
+use adapter_postgres::profiles_repository::{PostgresProfilesDocStore, PostgresProfilesRepository};
 use adapter_postgres::{create_pool, migrate};
 use dashmap::DashMap;
 use module_core::CoreModule;
 use module_posts::PostsModule;
 use module_posts::{PostsDeps, routes as module_posts_routes};
+use module_profiles::{ProfilesDeps, ProfilesModule, routes as module_profiles_routes};
 use std::collections::HashMap;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
@@ -51,14 +53,21 @@ async fn main() -> anyhow::Result<()> {
     migrate(&pool).await?;
 
     let module_registry = Arc::new(InMemoryModuleRegistry::new());
-    let repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
+    let event_repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
     let ingest = Arc::new(EventIngestService::new(
-        repo.clone(),
+        event_repo.clone(),
         module_registry.clone(),
     ));
 
-    module_registry.register(Arc::new(CoreModule::new(repo.clone())))?;
-    module_registry.register(Arc::new(PostsModule::new(repo.clone())))?;
+    let profile_repo = Arc::new(PostgresProfilesRepository::new(pool.clone()));
+    let profile_doc_store = Arc::new(PostgresProfilesDocStore::new(pool.clone()));
+
+    module_registry.register(Arc::new(CoreModule::new(event_repo.clone())))?;
+    module_registry.register(Arc::new(ProfilesModule::new(
+        profile_repo.clone(),
+        profile_doc_store.clone(),
+    )))?;
+    module_registry.register(Arc::new(PostsModule::new(event_repo.clone())))?;
 
     let known_peers = Arc::new(DashMap::<String, String>::new());
 
@@ -70,16 +79,29 @@ async fn main() -> anyhow::Result<()> {
 
     let create_remote_event = Arc::new(RemoteEventService::new(Arc::new(transport)));
     let state = AppState {
-        repo: repo.clone(),
+        event_repo: event_repo.clone(),
+        profile_doc_store: profile_doc_store.clone(),
+        profile_repo: profile_repo.clone(),
         create_local_event,
         create_remote_event,
         known_peers: known_peers.clone(),
     };
 
+    impl axum::extract::FromRef<AppState> for ProfilesDeps {
+        fn from_ref(app: &AppState) -> Self {
+            ProfilesDeps {
+                doc_store: app.profile_doc_store.clone(),
+                profile_repo: app.profile_repo.clone(),
+                create_local_event: app.create_local_event.clone(),
+                create_remote_event: app.create_remote_event.clone(),
+            }
+        }
+    }
+
     impl axum::extract::FromRef<AppState> for PostsDeps {
         fn from_ref(app: &AppState) -> Self {
             PostsDeps {
-                repo: app.repo.clone(),
+                repo: app.event_repo.clone(),
                 create_local_event: app.create_local_event.clone(),
                 create_remote_event: app.create_remote_event.clone(),
             }
@@ -88,6 +110,7 @@ async fn main() -> anyhow::Result<()> {
 
     let app = api::routes()
         .merge(module_posts_routes::<AppState>())
+        .merge(module_profiles_routes::<AppState>())
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 

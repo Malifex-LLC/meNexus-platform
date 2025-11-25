@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 use async_trait::async_trait;
 use serde_json::Value as JsonValue;
 use sqlx::postgres::PgRow;

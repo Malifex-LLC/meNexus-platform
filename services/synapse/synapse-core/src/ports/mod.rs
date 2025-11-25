@@ -12,5 +12,6 @@ pub mod federation;
 pub mod modules;
 pub mod peers;
 pub mod persistence;
+pub mod profiles;
 pub mod settings;
 pub mod synapses;
