@@ -3,6 +3,7 @@
 
 pub mod error;
 pub mod events_repository;
+pub mod profiles_repository;
 
 use crate::error::PostgresAdapterError;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};

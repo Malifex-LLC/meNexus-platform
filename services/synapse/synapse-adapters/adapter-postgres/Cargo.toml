@@ -6,6 +6,7 @@ edition.workspace = true
 [dependencies]
 thiserror = { workspace = true }
 async-trait = { workspace = true }
+module-profiles = { path = "../../synapse-modules/module-profiles" }
 synapse-core = { path = "../../synapse-core" }
 sqlx = { version = "0.8.6", features = [
   "runtime-tokio",

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use synapse_core::CoreError;
 use thiserror::Error;

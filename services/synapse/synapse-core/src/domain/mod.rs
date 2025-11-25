@@ -11,5 +11,6 @@ pub mod events;
 pub mod federation;
 pub mod modules;
 pub mod peers;
+pub mod profiles;
 pub mod settings;
 pub mod synapses;
