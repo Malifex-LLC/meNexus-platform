@@ -3,10 +3,12 @@
 
 use std::sync::Arc;
 
+use adapter_libp2p::transport::Libp2pTransport;
 use async_trait::async_trait;
 use synapse_core::{
-    PersistenceError, domain::profiles::Profile,
-    ports::profiles::profile_repository::ProfilesRepository,
+    PersistenceError, TransportError,
+    domain::profiles::Profile,
+    ports::profiles::profile_repository::{ProfileDiscovery, ProfilesRepository},
 };
 
 pub struct ProfileService {
@@ -24,5 +26,28 @@ impl ProfilesRepository for ProfileService {
     }
     async fn delete_profile(&self, public_key: &str) -> Result<(), PersistenceError> {
         self.repo.delete_profile(public_key).await
+    }
+}
+
+pub struct ProfileDiscoveryTransport {
+    transport: Arc<Libp2pTransport>,
+}
+
+impl ProfileDiscoveryTransport {
+    pub fn new(transport: Arc<Libp2pTransport>) -> Self {
+        Self { transport }
+    }
+}
+
+#[async_trait]
+impl ProfileDiscovery for ProfileDiscoveryTransport {
+    async fn announce(&self, profile_pk: &str) -> Result<(), TransportError> {
+        self.transport.announce_profile(profile_pk).await?;
+        Ok(())
+    }
+
+    async fn providers(&self, profile_pk: &str) -> Result<Vec<String>, TransportError> {
+        let peers = self.transport.lookup_profile_providers(profile_pk).await?;
+        Ok(peers)
     }
 }
