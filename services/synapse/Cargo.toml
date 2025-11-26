@@ -5,7 +5,7 @@ members = [
   "synapse-adapters/adapter-postgres",
   "synapse-application",
   "synapse-config",
-  "synapse-core",
+  "synapse-core", "synapse-modules/module-auth",
   "synapse-modules/module-core",
   "synapse-modules/module-posts", "synapse-modules/module-profiles",
   "synapse-protocols/protocol-snp",

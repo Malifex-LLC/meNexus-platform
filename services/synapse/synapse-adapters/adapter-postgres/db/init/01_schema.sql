@@ -38,3 +38,18 @@ CREATE TABLE profiles (
     updated_at      timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE challenges (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent         TEXT NOT NULL,
+  nonce         TEXT NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at    TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE sessions (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent         TEXT NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at    TIMESTAMPTZ NOT NULL,
+  revoked       bool NOT NULL
+);

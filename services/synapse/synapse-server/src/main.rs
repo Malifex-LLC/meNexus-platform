@@ -10,10 +10,14 @@ pub mod utils;
 use crate::state::AppState;
 use adapter_libp2p::initialize_p2p;
 
+use adapter_postgres::auth_repository::PostgresAuthRepository;
+use adapter_postgres::crypto_repository::PostgresCryptoRepository;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::profiles_repository::{PostgresProfilesDocStore, PostgresProfilesRepository};
 use adapter_postgres::{create_pool, migrate};
 use dashmap::DashMap;
+use module_auth::routes as module_auth_routes;
+use module_auth::{AuthDeps, AuthModule};
 use module_core::CoreModule;
 use module_posts::PostsModule;
 use module_posts::{PostsDeps, routes as module_posts_routes};
@@ -56,6 +60,8 @@ async fn main() -> anyhow::Result<()> {
 
     let module_registry = Arc::new(InMemoryModuleRegistry::new());
     let event_repo = Arc::new(PostgresEventsRepository::new(pool.clone()));
+    let crypto_repo = Arc::new(PostgresCryptoRepository::new(pool.clone()));
+    let session_repo = Arc::new(PostgresAuthRepository::new(pool.clone()));
     let ingest = Arc::new(EventIngestService::new(
         event_repo.clone(),
         module_registry.clone(),
@@ -65,6 +71,10 @@ async fn main() -> anyhow::Result<()> {
     let profile_doc_store = Arc::new(PostgresProfilesDocStore::new(pool.clone()));
 
     module_registry.register(Arc::new(CoreModule::new(event_repo.clone())))?;
+    module_registry.register(Arc::new(AuthModule::new(
+        session_repo.clone(),
+        crypto_repo.clone(),
+    )))?;
     module_registry.register(Arc::new(ProfilesModule::new(
         profile_repo.clone(),
         profile_doc_store.clone(),
@@ -85,6 +95,8 @@ async fn main() -> anyhow::Result<()> {
     let create_remote_event = Arc::new(RemoteEventService::new(transport.clone()));
     let state = AppState {
         event_repo: event_repo.clone(),
+        crypto_repo: crypto_repo.clone(),
+        session_repo: session_repo.clone(),
         profile_doc_store: profile_doc_store.clone(),
         profile_repo: profile_repo.clone(),
         profile_discovery: profile_discovery.clone(),
@@ -92,6 +104,15 @@ async fn main() -> anyhow::Result<()> {
         create_remote_event,
         known_peers: known_peers.clone(),
     };
+
+    impl axum::extract::FromRef<AppState> for AuthDeps {
+        fn from_ref(app: &AppState) -> Self {
+            AuthDeps {
+                crypto_repo: app.crypto_repo.clone(),
+                session_repo: app.session_repo.clone(),
+            }
+        }
+    }
 
     impl axum::extract::FromRef<AppState> for ProfilesDeps {
         fn from_ref(app: &AppState) -> Self {
@@ -116,6 +137,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let app = api::routes()
+        .merge(module_auth_routes::<AppState>())
         .merge(module_posts_routes::<AppState>())
         .merge(module_profiles_routes::<AppState>())
         .with_state(state)

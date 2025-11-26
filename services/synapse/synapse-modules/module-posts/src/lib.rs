@@ -26,7 +26,6 @@ use uuid::Uuid;
 
 use crate::errors::ModulePostsError;
 
-// implement module port
 pub struct PostsModule {
     kind: String,
     version: String,

@@ -2292,6 +2292,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-auth"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "base64",
+ "getrandom 0.3.4",
+ "hex",
+ "k256",
+ "rand 0.9.2",
+ "rand_core 0.9.3",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "synapse-application",
+ "synapse-config",
+ "synapse-core",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "module-core"
 version = "0.1.0"
 dependencies = [
@@ -3763,6 +3787,7 @@ dependencies = [
  "axum",
  "dashmap",
  "dotenvy",
+ "module-auth",
  "module-core",
  "module-posts",
  "module-profiles",
