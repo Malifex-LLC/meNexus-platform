@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+pub mod auth_repository;
+pub mod crypto_repository;
 pub mod error;
 pub mod events_repository;
 pub mod profiles_repository;
