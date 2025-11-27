@@ -7,6 +7,8 @@ pub mod middleware;
 pub mod state;
 pub mod utils;
 
+use axum::extract::FromRef;
+
 use crate::state::AppState;
 use adapter_libp2p::initialize_p2p;
 
@@ -15,16 +17,20 @@ use adapter_postgres::crypto_repository::PostgresCryptoRepository;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::profiles_repository::{PostgresProfilesDocStore, PostgresProfilesRepository};
 use adapter_postgres::{create_pool, migrate};
+use client_web::Shell;
 use dashmap::DashMap;
+use leptos::config::LeptosOptions;
+use leptos::view;
+use leptos_axum::{LeptosRoutes, generate_route_list};
 use module_auth::routes as module_auth_routes;
 use module_auth::{AuthDeps, AuthModule};
 use module_core::CoreModule;
 use module_posts::PostsModule;
 use module_posts::{PostsDeps, routes as module_posts_routes};
 use module_profiles::{ProfilesDeps, ProfilesModule, routes as module_profiles_routes};
-use std::collections::HashMap;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::path::PathBuf;
 use std::sync::Arc;
 use synapse_application::events::CreateLocalEventUseCase;
 use synapse_application::events::event_service::EventIngestService;
@@ -34,10 +40,46 @@ use synapse_application::profiles::profile_service::ProfileDiscoveryTransport;
 use synapse_config::get_synapse_config;
 use synapse_core::ports::modules::ModuleRegistry;
 use synapse_core::ports::profiles::profile_repository::ProfileDiscovery;
-use time::format_description;
+use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-use tracing_subscriber::fmt::time::LocalTime;
+
+impl axum::extract::FromRef<AppState> for AuthDeps {
+    fn from_ref(app: &AppState) -> Self {
+        AuthDeps {
+            crypto_repo: app.crypto_repo.clone(),
+            session_repo: app.session_repo.clone(),
+        }
+    }
+}
+
+impl axum::extract::FromRef<AppState> for ProfilesDeps {
+    fn from_ref(app: &AppState) -> Self {
+        ProfilesDeps {
+            doc_store: app.profile_doc_store.clone(),
+            profile_repo: app.profile_repo.clone(),
+            profile_discovery: app.profile_discovery.clone(),
+            create_local_event: app.create_local_event.clone(),
+            create_remote_event: app.create_remote_event.clone(),
+        }
+    }
+}
+
+impl axum::extract::FromRef<AppState> for PostsDeps {
+    fn from_ref(app: &AppState) -> Self {
+        PostsDeps {
+            repo: app.event_repo.clone(),
+            create_local_event: app.create_local_event.clone(),
+            create_remote_event: app.create_remote_event.clone(),
+        }
+    }
+}
+
+impl FromRef<AppState> for LeptosOptions {
+    fn from_ref(state: &AppState) -> Self {
+        state.leptos_options.clone()
+    }
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -93,6 +135,9 @@ async fn main() -> anyhow::Result<()> {
         Arc::new(LocalEventService::new(ingest.clone()));
 
     let create_remote_event = Arc::new(RemoteEventService::new(transport.clone()));
+
+    let leptos_options = client_web::leptos_options();
+
     let state = AppState {
         event_repo: event_repo.clone(),
         crypto_repo: crypto_repo.clone(),
@@ -103,43 +148,23 @@ async fn main() -> anyhow::Result<()> {
         create_local_event,
         create_remote_event,
         known_peers: known_peers.clone(),
+        leptos_options: leptos_options.clone(),
     };
 
-    impl axum::extract::FromRef<AppState> for AuthDeps {
-        fn from_ref(app: &AppState) -> Self {
-            AuthDeps {
-                crypto_repo: app.crypto_repo.clone(),
-                session_repo: app.session_repo.clone(),
-            }
-        }
-    }
-
-    impl axum::extract::FromRef<AppState> for ProfilesDeps {
-        fn from_ref(app: &AppState) -> Self {
-            ProfilesDeps {
-                doc_store: app.profile_doc_store.clone(),
-                profile_repo: app.profile_repo.clone(),
-                profile_discovery: app.profile_discovery.clone(),
-                create_local_event: app.create_local_event.clone(),
-                create_remote_event: app.create_remote_event.clone(),
-            }
-        }
-    }
-
-    impl axum::extract::FromRef<AppState> for PostsDeps {
-        fn from_ref(app: &AppState) -> Self {
-            PostsDeps {
-                repo: app.event_repo.clone(),
-                create_local_event: app.create_local_event.clone(),
-                create_remote_event: app.create_remote_event.clone(),
-            }
-        }
-    }
-
+    let routes = generate_route_list({
+        let opts = leptos_options.clone();
+        move || view! { <Shell options=opts.clone()/> }
+    });
+    let static_site_dir = PathBuf::from(leptos_options.site_root.as_ref());
     let app = api::routes()
         .merge(module_auth_routes::<AppState>())
         .merge(module_posts_routes::<AppState>())
         .merge(module_profiles_routes::<AppState>())
+        .leptos_routes(&state, routes, {
+            let opts = leptos_options.clone();
+            move || view! { <Shell options=opts.clone()/> }
+        })
+        .fallback_service(ServeDir::new(static_site_dir))
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 

@@ -22,20 +22,7 @@ services:
       - ./services/synapse/synapse-adapters/adapter-postgres/db/init:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql/data
 
-  client-web:
-    build:
-      context: .
-      dockerfile: apps/client-web/Dockerfile
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      - /workspace/node_modules
-      - client-web-node-modules:/workspace/apps/client-web/node_modules
-    ports:
-      - "5173:5173"
-    environment:
-      - NODE_ENV=development
-
+  # Single service using cargo-leptos to handle both frontend and backend
   synapse:
     depends_on:
       db:
@@ -43,13 +30,14 @@ services:
     build:
       context: .
       dockerfile: services/synapse/Dockerfile
-    working_dir: /workspace/services/synapse
+    working_dir: /workspace
+    command: ["cargo", "leptos", "watch", "--project", "client-web"]
     volumes:
       - .:/workspace
       - synapse-data:/data
       - cargo-registry:/usr/local/cargo/registry
       - cargo-git:/usr/local/cargo/git
-      - synapse-target:/workspace/services/synapse/target
+      - synapse-target:/workspace/target
     ports:
       - "3000:3000"
       - "4000:4000"
@@ -62,10 +50,10 @@ services:
       - ANNOUNCE=
       - BOOTSTRAP_LIST=
       - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
+      - LEPTOS_WASM_BINDGEN_VERSION=0.2.105
 
 volumes:
   pgdata:
-  client-web-node-modules:
   cargo-registry:
   cargo-git:
   synapse-data:
