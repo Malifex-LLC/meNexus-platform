@@ -1,0 +1,27 @@
+[package]
+name = "client-web"
+version = "0.1.0"
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { version = "0.8.14" }
+leptos_router = { version = "0.8.10" }
+leptos_meta = { version = "0.8.5" }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+wasm-bindgen = { version = "=0.2.105", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+[features]
+default = []
+ssr = [
+    "dep:tokio",
+    "leptos/ssr",
+]
+hydrate = [
+    "dep:wasm-bindgen",
+    "dep:console_error_panic_hook",
+    "leptos/hydrate",
+]

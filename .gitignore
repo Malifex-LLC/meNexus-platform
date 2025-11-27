@@ -7,9 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-.pnpm-store
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,5 +22,4 @@ node_modules
 .env
 .env.production
 .env.*.local
-/services/synapse/target
-.turbo
+target

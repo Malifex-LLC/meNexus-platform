@@ -2,8 +2,10 @@ FROM rust:1-bookworm
 
 WORKDIR /workspace/services/synapse
 
-# Watcher for hot-reload
-RUN cargo install watchexec-cli
+# Tooling shared by backend runtime and frontend watcher
+RUN rustup target add wasm32-unknown-unknown \
+  && cargo install watchexec-cli \
+  && cargo install cargo-leptos --locked
 
 EXPOSE 3000
 
