@@ -206,7 +206,7 @@ pub async fn run_swarm(
                                                     timestamp: OffsetDateTime::now_utc(),
                                                     payload: Reply {
                                                         ok: false,
-                                                        events: None,
+                                                        events: vec![],
                                                         error: Some(err.to_string()),
                                                     },
                                                     signature: "signature".to_string(),
@@ -225,7 +225,7 @@ pub async fn run_swarm(
                                             timestamp: OffsetDateTime::now_utc(),
                                             payload: Reply {
                                                 ok: false,
-                                                events: None,
+                                                events: vec![],
                                                 error: Some("unsupported payload".into()),
                                             },
                                             signature: "signature".to_string(),
@@ -238,7 +238,7 @@ pub async fn run_swarm(
                                 if let Some(ch) = pending.remove(&request_id) {
                                     let _ = ch.send(Ok(response.clone()));
                                 }
-                                if let Reply { ok: true, events: Some(events), .. } = &response.payload {
+                                if let Reply { ok: true, events: events, .. } = &response.payload {
                                     for evt in events.iter() {
                                         match evt.event_type.as_str() {
                                             "synapse:return_public_key" => {

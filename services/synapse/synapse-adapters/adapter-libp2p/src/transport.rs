@@ -120,7 +120,7 @@ impl FederationTransport for Libp2pTransport {
         &self,
         synapse_public_key: String,
         event: Event,
-    ) -> Result<Option<Vec<Event>>, TransportError> {
+    ) -> Result<Vec<Event>, TransportError> {
         let peer_id = peer_id_from_urlsafe_b64_pk(&synapse_public_key)
             .map_err(|e| TransportError::Other(e.to_string()))?;
 

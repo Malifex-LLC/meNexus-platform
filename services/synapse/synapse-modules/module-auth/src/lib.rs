@@ -64,9 +64,9 @@ impl Module for AuthModule {
     fn version(&self) -> Result<String, CoreError> {
         Ok(self.version.clone())
     }
-    async fn handle_event(&self, event: &Event) -> Result<Option<Vec<Event>>, CoreError> {
+    async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError> {
         match event.event_type.as_str() {
-            _ => Ok(None),
+            _ => Ok(vec![]),
         }
     }
 }

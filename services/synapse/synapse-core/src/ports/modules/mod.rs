@@ -9,7 +9,7 @@ use std::sync::Arc;
 pub trait Module: Send + Sync {
     fn kind(&self) -> Result<String, CoreError>;
     fn version(&self) -> Result<String, CoreError>;
-    async fn handle_event(&self, event: &Event) -> Result<Option<Vec<Event>>, CoreError>;
+    async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError>;
 }
 
 #[async_trait]

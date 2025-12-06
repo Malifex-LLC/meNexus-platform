@@ -30,6 +30,9 @@ output-name = "client-web"
 lib-features = ["hydrate"]
 # Bind to 0.0.0.0 for Docker
 site-addr = "0.0.0.0:3000"
+# Tailwind CSS input file
+tailwind-input-file = "apps/client-web/style/SalmonRoasted.css"
+tailwind-config-file = "tailwind.config.js"
 
 [workspace.dependencies]
 anyhow = "1.0.100"

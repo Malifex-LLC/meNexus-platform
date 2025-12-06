@@ -56,7 +56,7 @@ impl Module for ProfilesModule {
         Ok(self.version.clone())
     }
 
-    async fn handle_event(&self, event: &Event) -> Result<Option<Vec<Event>>, CoreError> {
+    async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError> {
         match event.event_type.as_str() {
             "profiles:get_profile" => {
                 let target_pk = match &event.target {
@@ -75,7 +75,7 @@ impl Module for ProfilesModule {
                     .with_target(ObjectRef::Agent(target_pk))
                     .with_data(bytes.unwrap().clone()) // Option<Vec<u8>>
                     .build();
-                Ok(Some(vec![reply]))
+                Ok(vec![reply])
             }
 
             "profiles:set_profile" => {
@@ -106,10 +106,10 @@ impl Module for ProfilesModule {
                     .with_target(ObjectRef::Agent(owner_pk))
                     .with_data(new_bytes)
                     .build();
-                Ok(Some(vec![reply]))
+                Ok(vec![reply])
             }
 
-            _ => Ok(None),
+            _ => Ok(vec![]),
         }
     }
 }
@@ -373,25 +373,23 @@ async fn fetch_profile_from_peer(
         event: inner.clone(),
     };
 
-    let reply = deps.create_remote_event.execute(cmd).await?;
+    let events = deps.create_remote_event.execute(cmd).await?;
 
-    if let Some(events) = reply {
-        if let Some(evt) = events
-            .into_iter()
-            .find(|e| e.event_type == "profiles:profile")
-        {
-            if let Some(bytes) = &evt.data {
-                deps.doc_store
-                    .upsert_doc(profile_public_key, bytes)
-                    .await
-                    .unwrap();
-                deps.profile_discovery
-                    .announce(profile_public_key)
-                    .await
-                    .unwrap();
+    if let Some(evt) = events
+        .into_iter()
+        .find(|e| e.event_type == "profiles:profile")
+    {
+        if let Some(bytes) = &evt.data {
+            deps.doc_store
+                .upsert_doc(profile_public_key, bytes)
+                .await
+                .unwrap();
+            deps.profile_discovery
+                .announce(profile_public_key)
+                .await
+                .unwrap();
 
-                return Ok(Some(bytes.clone()));
-            }
+            return Ok(Some(bytes.clone()));
         }
     }
     Ok(None)

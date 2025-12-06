@@ -17,9 +17,10 @@ use adapter_postgres::crypto_repository::PostgresCryptoRepository;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::profiles_repository::{PostgresProfilesDocStore, PostgresProfilesRepository};
 use adapter_postgres::{create_pool, migrate};
-use client_web::Shell;
+use client_web::app::Shell;
 use dashmap::DashMap;
 use leptos::config::LeptosOptions;
+use leptos::prelude::provide_context;
 use leptos::view;
 use leptos_axum::{LeptosRoutes, generate_route_list};
 use module_auth::routes as module_auth_routes;
@@ -151,6 +152,9 @@ async fn main() -> anyhow::Result<()> {
         leptos_options: leptos_options.clone(),
     };
 
+    let posts_deps = PostsDeps::from_ref(&state);
+    let auth_deps = AuthDeps::from_ref(&state);
+
     let routes = generate_route_list({
         let opts = leptos_options.clone();
         move || view! { <Shell options=opts.clone()/> }
@@ -160,10 +164,21 @@ async fn main() -> anyhow::Result<()> {
         .merge(module_auth_routes::<AppState>())
         .merge(module_posts_routes::<AppState>())
         .merge(module_profiles_routes::<AppState>())
-        .leptos_routes(&state, routes, {
-            let opts = leptos_options.clone();
-            move || view! { <Shell options=opts.clone()/> }
-        })
+        .leptos_routes_with_context(
+            &state,
+            routes,
+            {
+                move || {
+                    // Provide deps to server functions via context
+                    provide_context(posts_deps.clone());
+                    provide_context(auth_deps.clone());
+                }
+            },
+            {
+                let opts = leptos_options.clone();
+                move || view! { <Shell options=opts.clone()/> }
+            },
+        )
         .fallback_service(ServeDir::new(static_site_dir))
         .with_state(state)
         .layer(TraceLayer::new_for_http());
