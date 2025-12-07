@@ -10,7 +10,6 @@ use k256::ecdsa::{Signature, SigningKey, VerifyingKey, signature::DigestSigner};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_router::components::A;
-use leptos_router::hooks::use_navigate;
 use sha2::{Digest, Sha256};
 
 #[component]
@@ -30,8 +29,6 @@ pub fn LoginForm() -> impl IntoView {
         let private_key_hex = private_key.get();
 
         spawn_local(async move {
-            let navigate = use_navigate();
-
             let private_key_hex = private_key_hex.trim();
 
             let private_key_bytes = hex::decode(private_key_hex).expect("invalid hex private key");
@@ -67,7 +64,9 @@ pub fn LoginForm() -> impl IntoView {
 
             match verify_challenge_result {
                 Ok(resp) => {
-                    navigate("/", Default::default());
+                    // Full page reload to ensure SSR picks up the new session cookie
+                    let window = web_sys::window().expect("no window");
+                    window.location().set_href("/").expect("failed to redirect");
                 }
                 Err(err) => {
                     leptos::logging::log!("Login failed: {err}");

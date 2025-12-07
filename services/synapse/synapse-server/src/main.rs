@@ -29,7 +29,8 @@ use module_auth::types::AuthDeps;
 use module_core::CoreModule;
 use module_posts::PostsModule;
 use module_posts::{PostsDeps, routes as module_posts_routes};
-use module_profiles::{ProfilesDeps, ProfilesModule, routes as module_profiles_routes};
+use module_profiles::types::ProfilesDeps;
+use module_profiles::{ProfilesModule, routes as module_profiles_routes};
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::PathBuf;
@@ -155,6 +156,7 @@ async fn main() -> anyhow::Result<()> {
 
     let posts_deps = PostsDeps::from_ref(&state);
     let auth_deps = AuthDeps::from_ref(&state);
+    let profile_deps = ProfilesDeps::from_ref(&state);
 
     let routes = generate_route_list({
         let opts = leptos_options.clone();
@@ -173,6 +175,7 @@ async fn main() -> anyhow::Result<()> {
                     // Provide deps to server functions via context
                     provide_context(posts_deps.clone());
                     provide_context(auth_deps.clone());
+                    provide_context(profile_deps.clone());
                 }
             },
             {

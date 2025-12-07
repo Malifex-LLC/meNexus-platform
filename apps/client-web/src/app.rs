@@ -15,6 +15,10 @@ use leptos_router::{
     components::{Route, Router, Routes},
     path,
 };
+use module_profiles::server_fns::get_session_user_profile;
+use synapse_core::domain::profiles::Profile;
+
+pub type SessionUserProfile = Resource<Result<Option<Profile>, ServerFnError>>;
 
 #[component]
 pub fn Shell(options: LeptosOptions) -> impl IntoView {
@@ -44,6 +48,13 @@ pub fn Shell(options: LeptosOptions) -> impl IntoView {
 
 #[component]
 pub fn App() -> impl IntoView {
+    let session_user = Resource::new(
+        || (), // No dependencies - fetch once
+        |_| get_session_user_profile(),
+    );
+
+    provide_context(session_user);
+
     view! {
         <Router>
             <Routes fallback=SynapsePage>

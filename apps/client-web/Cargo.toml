@@ -7,6 +7,7 @@ edition.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+getrandom = { workspace = true }
 icondata = "0.6.0"
 leptos = { version = "0.8.14" }
 leptos_icons = "0.7.0"
@@ -18,6 +19,10 @@ module-posts = { path = "../../services/synapse/synapse-modules/module-posts", f
 module-auth = { path = "../../services/synapse/synapse-modules/module-auth", features = [
   "hydrate",
 ] }
+module-profiles = { path = "../../services/synapse/synapse-modules/module-profiles", features = [
+  "hydrate",
+] }
+synapse-core = { path = "../../services/synapse/synapse-core" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.105", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }

@@ -607,6 +607,7 @@ name = "client-web"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "getrandom 0.3.4",
  "icondata",
  "leptos",
  "leptos_icons",
@@ -614,6 +615,8 @@ dependencies = [
  "leptos_router",
  "module-auth",
  "module-posts",
+ "module-profiles",
+ "synapse-core",
  "tokio",
  "wasm-bindgen",
 ]
@@ -3168,6 +3171,7 @@ dependencies = [
  "time",
  "tracing",
  "uuid",
+ "web-sys",
 ]
 
 [[package]]
@@ -3213,6 +3217,9 @@ dependencies = [
  "automerge",
  "axum",
  "base64",
+ "leptos",
+ "leptos_axum",
+ "module-auth",
  "serde",
  "serde_json",
  "synapse-application",
