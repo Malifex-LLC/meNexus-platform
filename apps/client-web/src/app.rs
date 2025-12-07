@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::layouts::main_layout::MainLayout;
 use crate::layouts::three_column_module_layout::ThreeColumnModuleLayout;
+use crate::pages::dashboard_page::DashboardPage;
+use crate::pages::login_page::LoginPage;
+use crate::pages::profile_page::ProfilePage;
+use crate::pages::register_page::RegisterPage;
+use crate::pages::settings_page::SettingsPage;
+use crate::pages::synapse_page::SynapsePage;
+use crate::{layouts::main_layout::MainLayout, pages::search_page::SearchPage};
 use leptos::prelude::*;
 use leptos_meta::{Meta, MetaTags, Stylesheet, Title, provide_meta_context};
+use leptos_router::{
+    components::{Route, Router, Routes},
+    path,
+};
 
 #[component]
 pub fn Shell(options: LeptosOptions) -> impl IntoView {
@@ -35,8 +45,16 @@ pub fn Shell(options: LeptosOptions) -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     view! {
-        <MainLayout>
-            <ThreeColumnModuleLayout/>
-        </MainLayout>
+        <Router>
+            <Routes fallback=SynapsePage>
+                <Route path=path!("/register") view=RegisterPage/>
+                <Route path=path!("/login") view=LoginPage/>
+                <Route path=path!("/") view=DashboardPage/>
+                <Route path=path!("/synapse") view=SynapsePage/>
+                <Route path=path!("/profile") view=ProfilePage/>
+                <Route path=path!("/search") view=SearchPage/>
+                <Route path=path!("/settings") view=SettingsPage/>
+            </Routes>
+        </Router>
     }
 }

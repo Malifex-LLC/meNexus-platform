@@ -7,10 +7,15 @@ edition.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+icondata = "0.6.0"
 leptos = { version = "0.8.14" }
+leptos_icons = "0.7.0"
 leptos_router = { version = "0.8.10" }
 leptos_meta = { version = "0.8.5" }
 module-posts = { path = "../../services/synapse/synapse-modules/module-posts", features = [
+  "hydrate",
+] }
+module-auth = { path = "../../services/synapse/synapse-modules/module-auth", features = [
   "hydrate",
 ] }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }

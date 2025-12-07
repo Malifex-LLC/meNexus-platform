@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
 use crate::server::PostsDeps;
-use std::collections::HashMap;
 #[cfg(feature = "ssr")]
 use synapse_core::ports::events::event_repository::EventFilter;
 

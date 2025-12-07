@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-pub mod control_panel;
-pub mod simple_counter;
+#[cfg(any(feature = "ssr", feature = "hydrate"))]
+pub mod components;
