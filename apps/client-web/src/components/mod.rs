@@ -2,7 +2,27 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 pub mod control_panel;
+pub mod dashboard;
 pub mod module_container;
+pub mod profile;
+pub mod search;
+pub mod settings;
 pub mod simple_counter;
 
-pub use module_container::{ModulePanel, ModuleTab, TabbedModules, tabs, ActiveTabSignal};
+pub use dashboard::{
+    FeedFilters, GlobalCompose, GlobalFeed, GlobalPostCard, NetworkStatsWidget, TrendingSidebar,
+};
+pub use module_container::{ActiveTabSignal, ModulePanel, ModuleTab, TabbedModules, tabs};
+pub use profile::{
+    ProfileData, ProfileHeader, ProfileOverview, ProfileShowcase, ProfileTab, ProfileTabs,
+    ReputationCard,
+};
+pub use search::{
+    BrowseByCategory, CompactSearchBar, EmptySearchState, FeaturedSynapses, NoResultsState,
+    PostResultCard, SearchBar, SearchCategory, SearchFilters, SearchResults, SearchScope,
+    SuggestedUsers, SynapseResultCard, TagResultCard, TrendingPosts, TrendingTags, UserResultCard,
+};
+pub use settings::{
+    AccountSettings, AppearanceSettings, DataSettings, NetworkSettings, NotificationSettings,
+    PrivacySettings, ProfileSettings, SecuritySettings, SettingsSidebar, SettingsTab,
+};

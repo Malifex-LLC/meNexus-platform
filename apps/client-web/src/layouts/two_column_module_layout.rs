@@ -24,14 +24,15 @@ pub fn TwoColumnModuleLayout() -> impl IntoView {
     let session_user =
         use_context::<SessionUserProfile>().expect("SessionUserProfile context not found");
 
+    // TODO yikes
     let session_user_profile = session_user.get().unwrap().unwrap().unwrap();
 
     let (active_column, set_active_column) = signal(ActiveColumn::Left);
 
-    // Define tabs for left column (Posts + Livestream)
+    // Define tabs for left column
     let left_column_tabs = vec![tabs::posts(), tabs::chat()];
 
-    // Define tabs for right column (Chat + Activity)
+    // Define tabs for right column
     let right_column_tabs = vec![tabs::members(), tabs::activity()];
 
     view! {

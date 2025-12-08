@@ -55,8 +55,8 @@ pub fn MainLayout(children: Children) -> impl IntoView {
                     </div>
                 </header>
 
-                // Main content
-                <main class="flex-1 w-full h-full overflow-hidden">
+                // Main content - each page handles its own scrolling
+                <main class="flex-1 w-full min-h-0 overflow-hidden">
                     {children()}
                 </main>
             </div>
