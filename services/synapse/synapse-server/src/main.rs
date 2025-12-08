@@ -27,8 +27,9 @@ use module_auth::http::AuthModule;
 use module_auth::http::routes as module_auth_routes;
 use module_auth::types::AuthDeps;
 use module_core::CoreModule;
-use module_posts::PostsModule;
-use module_posts::{PostsDeps, routes as module_posts_routes};
+use module_posts::http::PostsModule;
+use module_posts::http::routes as module_posts_routes;
+use module_posts::types::PostsDeps;
 use module_profiles::types::ProfilesDeps;
 use module_profiles::{ProfilesModule, routes as module_profiles_routes};
 use std::env;
@@ -74,6 +75,9 @@ impl axum::extract::FromRef<AppState> for PostsDeps {
             repo: app.event_repo.clone(),
             create_local_event: app.create_local_event.clone(),
             create_remote_event: app.create_remote_event.clone(),
+            doc_store: app.profile_doc_store.clone(),
+            profile_repo: app.profile_repo.clone(),
+            profile_discovery: app.profile_discovery.clone(),
         }
     }
 }

@@ -31,16 +31,20 @@ pub fn PostCard(
 
     // Truncate public key for display
     let short_key = if author_public_key.len() > 12 {
-        format!("{}...{}", &author_public_key[..6], &author_public_key[author_public_key.len()-4..])
+        format!(
+            "{}...{}",
+            &author_public_key[..6],
+            &author_public_key[author_public_key.len() - 4..]
+        )
     } else {
         author_public_key.clone()
     };
 
     view! {
-        <article class="group relative bg-gradient-to-br from-panel to-card border border-border/50 rounded-xl overflow-hidden transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
+        <article class="group relative bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
             // Subtle top accent line
             <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand/20 to-transparent"></div>
-            
+
             <div class="p-5">
                 // Header: Avatar + Author Info + Timestamp
                 <div class="flex items-start gap-4">
@@ -48,7 +52,7 @@ pub fn PostCard(
                     <div class="relative flex-shrink-0">
                         {if !author_avatar.is_empty() {
                             view! {
-                                <img 
+                                <img
                                     src=author_avatar.clone()
                                     alt=format!("{}'s avatar", author_name)
                                     class="w-12 h-12 rounded-full object-cover ring-2 ring-border/50 group-hover:ring-brand/30 transition-all"
@@ -101,7 +105,7 @@ pub fn PostCard(
                 // Actions Bar
                 <div class="mt-5 pl-16 flex items-center gap-1">
                     // Like button
-                    <button 
+                    <button
                         class="group/btn flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200 hover:bg-brand/10"
                         on:click=move |_| {
                             if is_liked.get() {
@@ -112,14 +116,14 @@ pub fn PostCard(
                             set_is_liked.update(|l| *l = !*l);
                         }
                     >
-                        <svg 
+                        <svg
                             class=move || format!(
                                 "w-5 h-5 transition-all duration-200 {} {}",
                                 if is_liked.get() { "fill-brand text-brand scale-110" } else { "fill-none text-foreground/50 group-hover/btn:text-brand" },
                                 "group-hover/btn:scale-110"
                             )
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                             stroke-width="2"
                         >
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>

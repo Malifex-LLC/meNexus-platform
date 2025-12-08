@@ -16,8 +16,15 @@ enum ActiveColumn {
     Right,
 }
 
+use crate::app::SessionUserProfile;
+
 #[component]
 pub fn TwoColumnModuleLayout() -> impl IntoView {
+    let session_user =
+        use_context::<SessionUserProfile>().expect("SessionUserProfile context not found");
+
+    let session_user_profile = session_user.get().unwrap().unwrap().unwrap();
+
     let (active_column, set_active_column) = signal(ActiveColumn::Left);
 
     // Define tabs for left column (Posts + Livestream)
@@ -40,7 +47,7 @@ pub fn TwoColumnModuleLayout() -> impl IntoView {
                     )>
                         <TabbedModules tabs=left_column_tabs>
                             <ModulePanel id="posts">
-                                <PostsFeed/>
+                                <PostsFeed session_user_profile=session_user_profile/>
                             </ModulePanel>
                             <ModulePanel id="chat">
                                 <ChatFeed/>

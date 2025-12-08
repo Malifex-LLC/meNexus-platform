@@ -12,8 +12,15 @@ enum ActiveColumn {
     Right,
 }
 
+use crate::app::SessionUserProfile;
+
 #[component]
 pub fn ThreeColumnModuleLayout() -> impl IntoView {
+    let session_user =
+        use_context::<SessionUserProfile>().expect("SessionUserProfile context not found");
+
+    let session_user_profile = session_user.get().unwrap().unwrap().unwrap();
+
     let (active_column, set_active_column) = signal(ActiveColumn::Center);
 
     view! {
@@ -38,7 +45,7 @@ pub fn ThreeColumnModuleLayout() -> impl IntoView {
                         "h-full overflow-hidden lg:col-span-6 lg:block {}",
                         if active_column.get() == ActiveColumn::Center { "block" } else { "hidden" }
                     )>
-                        <PostsFeed/>
+                        <PostsFeed session_user_profile=session_user_profile/>
                     </div>
 
                     // Right column
@@ -73,7 +80,7 @@ pub fn ThreeColumnModuleLayout() -> impl IntoView {
                         </svg>
                         "Left"
                     </button>
-                    
+
                     <button
                         class=move || format!(
                             "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-medium text-xs transition-all {}",
@@ -90,7 +97,7 @@ pub fn ThreeColumnModuleLayout() -> impl IntoView {
                         </svg>
                         "Feed"
                     </button>
-                    
+
                     <button
                         class=move || format!(
                             "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-medium text-xs transition-all {}",

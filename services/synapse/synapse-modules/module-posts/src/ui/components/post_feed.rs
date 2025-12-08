@@ -2,15 +2,17 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::{
-    server_fns::{list_posts_for_channel},
-    ui::components::compose_bar::ComposeBar,
-    ui::components::post_card::PostCard,
+    server_fns::list_posts_for_channel_server, types::ListPostsForChannelRequest,
+    ui::components::compose_bar::ComposeBar, ui::components::post_card::PostCard,
 };
 use leptos::prelude::*;
+use synapse_core::domain::profiles::Profile;
 
 /// Main posts feed component - responsive with collapsible channel selector
 #[component]
-pub fn PostsFeed() -> impl IntoView {
+pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
+    provide_context(session_user_profile);
+
     let channels = vec![
         "general".to_string(),
         "memes".to_string(),
@@ -18,23 +20,38 @@ pub fn PostsFeed() -> impl IntoView {
     ];
     let channels_for_dropdown = channels.clone();
     let channels_for_sidebar = channels.clone();
-    
+
     let (active_channel, set_active_channel) = signal(channels[0].clone());
     let (show_channel_dropdown, set_show_channel_dropdown) = signal(false);
     let (show_sidebar, set_show_sidebar) = signal(false);
+    let (refresh, set_refresh) = signal(0usize);
 
     let posts = Resource::new(
-        move || active_channel.get(),
-        |channel: String| async move { list_posts_for_channel(channel).await.unwrap_or_default() },
+        move || (active_channel.get(), refresh.get()),
+        |(channel, refresh_counter): (String, usize)| async move {
+            list_posts_for_channel_server(ListPostsForChannelRequest {
+                event_type: "posts:create_post".to_string(),
+                channel,
+            })
+            .await
+            .unwrap_or_default()
+        },
     );
 
+    let on_post_created = {
+        let set_refresh = set_refresh.clone();
+        Callback::new(move |_: ()| {
+            set_refresh.update(|n| *n += 1);
+        })
+    };
+
     view! {
-        <div class="flex h-full w-full bg-background relative">
+        <div class="flex h-full w-full bg-panel/70 relative">
             // Mobile sidebar overlay
             {move || {
                 if show_sidebar.get() {
                     view! {
-                        <div 
+                        <div
                             class="fixed inset-0 bg-black/50 z-40 lg:hidden"
                             on:click=move |_| set_show_sidebar.set(false)
                         ></div>
@@ -60,7 +77,7 @@ pub fn PostsFeed() -> impl IntoView {
                             </div>
                             <h2 class="text-foreground font-semibold text-sm">"Channels"</h2>
                         </div>
-                        <button 
+                        <button
                             class="p-1.5 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors lg:hidden"
                             on:click=move |_| set_show_sidebar.set(false)
                         >
@@ -130,7 +147,7 @@ pub fn PostsFeed() -> impl IntoView {
                 // Compact header with channel selector
                 <header class="flex-shrink-0 flex items-center gap-2 px-2 py-1.5 border-b border-border/50 bg-panel/30">
                     // Hamburger menu (mobile)
-                    <button 
+                    <button
                         class="p-1.5 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors lg:hidden"
                         on:click=move |_| set_show_sidebar.set(true)
                     >
@@ -141,7 +158,7 @@ pub fn PostsFeed() -> impl IntoView {
 
                     // Channel selector dropdown
                     <div class="relative flex-1 min-w-0">
-                        <button 
+                        <button
                             class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-foreground/5 transition-colors"
                             on:click=move |_| set_show_channel_dropdown.update(|v| *v = !*v)
                         >
@@ -166,7 +183,7 @@ pub fn PostsFeed() -> impl IntoView {
                                             let channel_id_for_click = channel.clone();
                                             let channel_name = channel.clone();
                                             view! {
-                                                <button 
+                                                <button
                                                     class=move || format!(
                                                         "w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors {}",
                                                         if active_channel.get() == channel_id_for_class {
@@ -250,7 +267,7 @@ pub fn PostsFeed() -> impl IntoView {
                             } else {
                                 view! {
                                     <div class="p-2 sm:p-3 space-y-2 sm:space-y-3">
-                                        {posts_list.iter().map(|post| view! {
+                                        {posts_list.iter().rev().map(|post| view! {
                                             <PostCard
                                                 id=post.id.clone()
                                                 author_public_key=post.author_public_key.clone()
@@ -273,7 +290,10 @@ pub fn PostsFeed() -> impl IntoView {
                 </div>
 
                 // Compose bar
-                <ComposeBar channel=active_channel />
+                <ComposeBar
+                    channel=active_channel
+                    on_post_created=on_post_created
+                />
             </main>
         </div>
     }

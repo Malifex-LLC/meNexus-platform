@@ -136,47 +136,42 @@ pub fn TabbedModules(
             <div class="flex-shrink-0 flex items-center gap-1 px-3 py-2 border-b border-border/50 bg-panel/50 backdrop-blur-sm">
                 // Module tabs
                 <div class="flex items-center">
-                    <For
-                        each=move || tabs.clone()
-                        key=|tab| tab.id
-                        children=move |tab| {
-                            let tab_id = tab.id;
-                            let tab_name = tab.name;
-                            let tab_icon = tab.icon;
-                            let tab_badge = tab.badge;
+                    {tabs.iter().map(|tab| {
+                        let tab_id = tab.id;
+                        let tab_name = tab.name;
+                        let tab_icon = tab.icon;
+                        let tab_badge = tab.badge;
 
-                            view! {
-                                <button
+                        view! {
+                            <button
+                                class=move || format!(
+                                    "group relative flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200 -mb-px {}",
+                                    if active_tab.get() == tab_id {
+                                        "bg-background text-brand border border-border/50 border-b-background z-10"
+                                    } else {
+                                        "text-foreground/50 hover:text-foreground bg-transparent border border-transparent"
+                                    }
+                                )
+                                on:click=move |_| active_tab.set(tab_id)
+                                title=tab_name
+                            >
+                                // Icon
+                                <svg
                                     class=move || format!(
-                                        "group relative flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200 -mb-px {}",
+                                        "w-5 h-5 transition-all {}",
                                         if active_tab.get() == tab_id {
-                                            "bg-background text-brand border border-border/50 border-b-background z-10"
+                                            "text-brand scale-110"
                                         } else {
-                                            "text-foreground/50 hover:text-foreground bg-transparent border border-transparent"
+                                            "text-foreground/40 group-hover:text-foreground/60"
                                         }
                                     )
-                                    on:click=move |_| {
-                                        active_tab.set(tab_id);
-                                    }
-                                    title=tab_name
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
                                 >
-                                    // Icon
-                                    <svg
-                                        class=move || format!(
-                                            "w-5 h-5 transition-all {}",
-                                            if active_tab.get() == tab_id {
-                                                "text-brand scale-110"
-                                            } else {
-                                                "text-foreground/40 group-hover:text-foreground/60"
-                                            }
-                                        )
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path stroke-linecap="round" stroke-linejoin="round" d=tab_icon></path>
-                                    </svg>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d=tab_icon></path>
+                                </svg>
 
                                     // Name
                                     <span class=move || format!(
@@ -186,24 +181,23 @@ pub fn TabbedModules(
                                         {tab_name}
                                     </span>
 
-                                    // Badge
-                                    {move || {
-                                        if let Some(badge_signal) = tab_badge {
-                                            let count = badge_signal.get();
-                                            if count > 0 {
-                                                return view! {
-                                                    <span class="min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-xs font-bold">
-                                                        {if count > 99 { "99+".to_string() } else { count.to_string() }}
-                                                    </span>
-                                                }.into_any();
-                                            }
+                                // Badge
+                                {move || {
+                                    if let Some(badge_signal) = tab_badge {
+                                        let count = badge_signal.get();
+                                        if count > 0 {
+                                            return view! {
+                                                <span class="min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-xs font-bold">
+                                                    {if count > 99 { "99+".to_string() } else { count.to_string() }}
+                                                </span>
+                                            }.into_any();
                                         }
-                                        view! { <span></span> }.into_any()
-                                    }}
-                                </button>
-                            }
+                                    }
+                                    view! { <span></span> }.into_any()
+                                }}
+                            </button>
                         }
-                    />
+                    }).collect_view()}
                 </div>
 
                 // Spacer

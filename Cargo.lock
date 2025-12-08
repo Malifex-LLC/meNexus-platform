@@ -3258,6 +3258,7 @@ dependencies = [
  "axum-extra",
  "leptos",
  "leptos_axum",
+ "leptos_meta",
  "reqwasm",
  "serde",
  "serde_json",

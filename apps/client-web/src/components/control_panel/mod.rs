@@ -9,6 +9,7 @@ pub mod synapses_list;
 pub mod user_profile_card;
 
 use crate::components::control_panel::following_list::FollowingList;
+use crate::components::control_panel::identity_panel::IdentityPanel;
 use crate::components::control_panel::nav_bar::NavBar;
 use crate::components::control_panel::notifications_dropdown::NotificationsDropdown;
 use crate::components::control_panel::synapses_list::SynapsesList;
@@ -41,7 +42,7 @@ pub fn ControlPanel(
                     // Close button (mobile only)
                     {if let Some(close) = on_close {
                         view! {
-                            <button 
+                            <button
                                 class="p-1.5 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors lg:hidden"
                                 on:click=move |_| close.run(())
                             >
@@ -59,7 +60,8 @@ pub fn ControlPanel(
             // Scrollable content area
             <div class="flex-1 overflow-y-auto scrollbar-thin p-2 space-y-3">
                 // User Profile Card
-                <UserProfileCard />
+                // <UserProfileCard />
+                <IdentityPanel />
 
                 // Quick Actions Bar
                 <div class="flex items-center gap-1.5">
