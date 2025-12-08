@@ -2,7 +2,7 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use async_trait::async_trait;
-use module_profiles::ProfileDoc;
+use module_profiles::http::ProfileDoc;
 use sqlx::{Pool, Postgres, query};
 use synapse_core::PersistenceError;
 use synapse_core::domain::profiles::Profile;

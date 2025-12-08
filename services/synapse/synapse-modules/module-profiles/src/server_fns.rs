@@ -9,28 +9,28 @@ use crate::types::ProfilesDeps;
 #[cfg(feature = "ssr")]
 use module_auth::types::AuthDeps;
 
-#[server(GetSessionUserProfile, "/api")]
+#[server(GetSessionUserProfile, "/api/profiles")]
 pub async fn get_session_user_profile() -> Result<Option<Profile>, ServerFnError> {
+    use crate::service::get_profile;
+
     use axum::http::header;
     use leptos_axum::extract;
     use tracing::debug;
 
     let headers: axum::http::HeaderMap = extract().await?;
-    
+
     let cookie_header = headers.get(header::COOKIE);
     debug!("Cookie header: {:?}", cookie_header);
-    
+
     let session_id = cookie_header
         .and_then(|value| value.to_str().ok())
         .and_then(|cookies| {
             debug!("Cookies string: {}", cookies);
-            cookies
-                .split(';')
-                .find_map(|cookie| {
-                    let trimmed = cookie.trim();
-                    debug!("Checking cookie: '{}'", trimmed);
-                    trimmed.strip_prefix("menexus_session=")
-                })
+            cookies.split(';').find_map(|cookie| {
+                let trimmed = cookie.trim();
+                debug!("Checking cookie: '{}'", trimmed);
+                trimmed.strip_prefix("menexus_session=")
+            })
         });
 
     debug!("Extracted session_id: {:?}", session_id);
@@ -51,12 +51,13 @@ pub async fn get_session_user_profile() -> Result<Option<Profile>, ServerFnError
         .map_err(|e| ServerFnError::new(format!("Session lookup failed: {}", e)))?;
 
     debug!("Found session for agent: {}", session.agent);
-    let profile = profile_deps
-        .profile_repo
-        .get_profile(&session.agent)
-        .await
-        .map_err(|e| ServerFnError::new(format!("Profile lookup failed: {}", e)))?;
-    
+    // let profile = profile_deps
+    //     .profile_repo
+    //     .get_profile(&session.agent)
+    //     .await
+    //     .map_err(|e| ServerFnError::new(format!("Profile lookup failed: {}", e)))?;
+    let profile = get_profile(profile_deps, session.agent).await.unwrap();
+
     debug!("Profile result: {:?}", profile);
     Ok(profile)
 }
