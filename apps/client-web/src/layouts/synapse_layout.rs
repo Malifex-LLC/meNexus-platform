@@ -3,13 +3,15 @@
 
 use crate::layouts::main_layout::MainLayout;
 use crate::layouts::three_column_module_layout::ThreeColumnModuleLayout;
+use crate::layouts::two_column_module_layout::TwoColumnModuleLayout;
 use leptos::prelude::*;
 
 #[component]
 pub fn SynapseLayout() -> impl IntoView {
     view! {
         <MainLayout>
-            <ThreeColumnModuleLayout/>
+            // <ThreeColumnModuleLayout/>
+            <TwoColumnModuleLayout/>
         </MainLayout>
     }
 }

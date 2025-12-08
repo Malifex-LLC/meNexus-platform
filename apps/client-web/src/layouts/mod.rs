@@ -10,3 +10,4 @@ pub mod search_layout;
 pub mod settings_layout;
 pub mod synapse_layout;
 pub mod three_column_module_layout;
+pub mod two_column_module_layout;
