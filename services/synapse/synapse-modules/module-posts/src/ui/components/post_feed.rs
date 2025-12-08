@@ -46,7 +46,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
     };
 
     view! {
-        <div class="flex h-full w-full bg-panel/70 relative">
+        <div class="flex h-full w-full bg-panel relative">
             // Mobile sidebar overlay
             {move || {
                 if show_sidebar.get() {
@@ -266,7 +266,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                                 }.into_any()
                             } else {
                                 view! {
-                                    <div class="p-2 sm:p-3 space-y-2 sm:space-y-3">
+                                    <div class="p-2 m-4 sm:p-3 space-y-8 sm:space-y-3">
                                         {posts_list.iter().rev().map(|post| view! {
                                             <PostCard
                                                 id=post.id.clone()

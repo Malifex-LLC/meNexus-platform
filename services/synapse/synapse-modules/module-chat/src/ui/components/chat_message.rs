@@ -69,7 +69,7 @@ pub fn ChatMessageCard(
 
     view! {
         <div class=move || format!(
-            "group relative flex gap-3 py-1.5 px-4 transition-colors hover:bg-foreground/[0.02] {}",
+            "group relative flex gap-3 py-1.5 p-4 bg-card border border-border/50 rounded-xl transition-colors hover:bg-foreground/[0.02] {}",
             if is_own_message { "flex-row-reverse" } else { "" }
         )>
             // Avatar column

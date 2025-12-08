@@ -120,7 +120,7 @@ pub fn ActivityFeed() -> impl IntoView {
     let new_count = activities.iter().filter(|a| a.is_new).count();
 
     view! {
-        <div class="flex flex-col h-full bg-panel/30 border border-border/30 rounded-xl overflow-hidden">
+        <div class="flex flex-col h-full bg-panel border border-border/30 rounded-xl overflow-hidden">
             // Header
             <header class="flex-shrink-0 px-4 py-3 border-b border-border/30 bg-panel/50 backdrop-blur-sm">
                 <div class="flex items-center justify-between">

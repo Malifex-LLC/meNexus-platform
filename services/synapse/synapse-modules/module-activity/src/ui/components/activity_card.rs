@@ -79,7 +79,7 @@ pub fn ActivityCard(activity: Activity) -> impl IntoView {
 
     view! {
         <article class=move || format!(
-            "group relative flex gap-4 p-4 border border-border rounded-xl transition-all duration-200 hover:bg-foreground/[0.02] {}",
+            "group relative flex gap-4 p-4 bg-card/50 border border-border rounded-xl transition-all duration-200 hover:bg-foreground/[0.02] {}",
             if is_new { "bg-brand/[0.03] border border-brand" } else { "" }
         )>
             // Avatar with activity type indicator

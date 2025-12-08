@@ -42,7 +42,7 @@ pub fn ChatFeed() -> impl IntoView {
     let total_unread: u32 = rooms.iter().map(|r| r.unread_count).sum();
 
     view! {
-        <div class="flex h-full w-full bg-background relative">
+        <div class="flex h-full w-full bg-panel relative">
             // Mobile sidebar overlay
             {move || {
                 if show_sidebar.get() {
@@ -308,7 +308,7 @@ pub fn ChatFeed() -> impl IntoView {
                     </div>
 
                     // Messages list
-                    <div class="pb-2">
+                    <div class="p-2 m-4 space-y-8">
                         {messages.iter().enumerate().map(|(i, message)| {
                             let show_author = if i == 0 {
                                 true
