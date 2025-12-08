@@ -81,6 +81,14 @@ pub mod tabs {
         )
     }
 
+    pub fn members() -> ModuleTab {
+        ModuleTab::new(
+            "members",
+            "Members",
+            "M17 20a4 4 0 00-8 0m10-7a3 3 0 11-6 0 3 3 0 016 0zm-8 0a3 3 0 11-6 0 3 3 0 016 0zm-4 7a4 4 0 118 0m6 0a6 6 0 00-12 0",
+        )
+    }
+
     pub fn calendar() -> ModuleTab {
         ModuleTab::new(
             "calendar",

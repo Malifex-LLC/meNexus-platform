@@ -7,6 +7,7 @@ use module_activity::ui::components::activity_feed::ActivityFeed;
 use module_chat::ui::components::chat_feed::ChatFeed;
 use module_creator::ui::components::creator_feed::CreatorFeed;
 use module_livestream::ui::components::LivestreamFeed;
+use module_members::ui::components::members_list::MembersList;
 use module_posts::ui::components::post_feed::PostsFeed;
 
 /// Column identifiers for mobile switching
@@ -31,7 +32,7 @@ pub fn TwoColumnModuleLayout() -> impl IntoView {
     let left_column_tabs = vec![tabs::posts(), tabs::chat()];
 
     // Define tabs for right column (Chat + Activity)
-    let right_column_tabs = vec![tabs::activity()];
+    let right_column_tabs = vec![tabs::members(), tabs::activity()];
 
     view! {
         <div class="flex flex-col h-full w-full overflow-hidden">
@@ -61,6 +62,9 @@ pub fn TwoColumnModuleLayout() -> impl IntoView {
                         if active_column.get() == ActiveColumn::Right { "block" } else { "hidden" }
                     )>
                         <TabbedModules tabs=right_column_tabs>
+                            <ModulePanel id="members">
+                                <MembersList/>
+                            </ModulePanel>
                             <ModulePanel id="activity">
                                 <ActivityFeed/>
                             </ModulePanel>

@@ -28,6 +28,9 @@ module-creator = { path = "../../services/synapse/synapse-modules/module-creator
 module-livestream = { path = "../../services/synapse/synapse-modules/module-livestream", features = [
   "hydrate",
 ] }
+module-members = { path = "../../services/synapse/synapse-modules/module-members", features = [
+  "hydrate",
+] }
 module-posts = { path = "../../services/synapse/synapse-modules/module-posts", features = [
   "hydrate",
 ] }

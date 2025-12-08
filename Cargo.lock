@@ -618,6 +618,7 @@ dependencies = [
  "module-chat",
  "module-creator",
  "module-livestream",
+ "module-members",
  "module-posts",
  "module-profiles",
  "synapse-core",
@@ -3247,6 +3248,15 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.17",
  "tracing",
+]
+
+[[package]]
+name = "module-members"
+version = "0.1.0"
+dependencies = [
+ "leptos",
+ "leptos_router",
+ "serde",
 ]
 
 [[package]]
