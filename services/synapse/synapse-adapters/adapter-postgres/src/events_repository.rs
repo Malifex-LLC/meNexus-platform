@@ -7,7 +7,9 @@ use sqlx::postgres::PgRow;
 use sqlx::{Pool, Postgres, query};
 use synapse_core::PersistenceError;
 use synapse_core::domain::events::{Event, ObjectRef};
-use synapse_core::ports::events::event_repository::EventRepository;
+use synapse_core::ports::events::event_repository::{EventFilter, EventRepository};
+use time::OffsetDateTime;
+use uuid::Uuid;
 
 pub struct PostgresEventsRepository {
     pool: Pool<Postgres>,
@@ -17,6 +19,29 @@ impl PostgresEventsRepository {
     pub fn new(pool: Pool<Postgres>) -> Self {
         Self { pool }
     }
+}
+
+#[derive(Debug)]
+struct EventRow {
+    id: Uuid,
+    created_at: OffsetDateTime,
+    event_type: String,
+    module_kind: Option<String>,
+    module_slug: Option<String>,
+    agent: String,
+    // the alias `"target?: JsonValue"` maps to this field
+    target: Option<JsonValue>,
+    previous: Option<Uuid>,
+    content: Option<String>,
+    // `"artifacts?: Vec<String>"` maps here
+    artifacts: Option<Vec<String>>,
+    // `"metadata?: JsonValue"` maps here
+    metadata: Option<JsonValue>,
+    // `"links?: Vec<String>"` maps here
+    links: Option<Vec<String>>,
+    // `"data?: Vec<u8>"` maps here
+    data: Option<Vec<u8>>,
+    expiration: Option<OffsetDateTime>,
 }
 
 #[async_trait]
@@ -123,133 +148,286 @@ impl EventRepository for PostgresEventsRepository {
         })
     }
 
-    async fn retrieve(&self, event_type: String) -> Result<Option<Vec<Event>>, PersistenceError> {
-        match event_type.as_str() {
-            "all" => {
-                let rows = sqlx::query!(
-                    r#"
-                        SELECT
-                        id,
-                        created_at,
-                        event_type,
-                        module_kind,
-                        module_slug,
-                        agent,
-                        target      as "target?: JsonValue",
-                        previous,
-                        content,
-                        artifacts   as "artifacts?: Vec<String>",
-                        metadata    as "metadata?: JsonValue",
-                        links       as "links?: Vec<String>",
-                        data        as "data?: Vec<u8>",
-                        expiration
-                        FROM events
-                    "#
-                )
-                .fetch_all(&self.pool)
-                .await
-                .map_err(|e| PersistenceError::Other(e.to_string()))?;
+    async fn retrieve(&self, filter: EventFilter) -> Result<Vec<Event>, PersistenceError> {
+        let EventFilter {
+            event_type,
+            module_kind,
+            module_slug,
+        } = filter;
 
-                let events = rows
-                    .into_iter()
-                    .map(|row| {
-                        let target: Option<ObjectRef> = row
-                            .target
-                            .map(serde_json::from_value)
-                            .transpose()
-                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+        let rows: Vec<EventRow> = match (
+            event_type.as_deref(),
+            module_kind.as_deref(),
+            module_slug.as_deref(),
+        ) {
+            // 1) No filters: all events
+            (None, None, None) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                "#
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                        let metadata = row
-                            .metadata
-                            .map(serde_json::from_value)
-                            .transpose()
-                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+            // 2) Only event_type
+            (Some(event_type), None, None) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE event_type = $1
+                "#,
+                event_type
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                        Ok(Event {
-                            id: row.id,
-                            created_at: row.created_at,
-                            event_type: row.event_type,
-                            module_kind: row.module_kind,
-                            module_slug: row.module_slug,
-                            agent: row.agent,
-                            target,
-                            previous: row.previous,
-                            content: row.content,
-                            artifacts: row.artifacts,
-                            metadata,
-                            links: row.links,
-                            data: row.data,
-                            expiration: row.expiration,
-                        })
-                    })
-                    .collect::<Result<Vec<_>, PersistenceError>>()?;
+            // 3) Only module_kind
+            (None, Some(module_kind), None) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE module_kind = $1
+                "#,
+                module_kind
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                Ok(Some(events))
-            }
-            "posts:create_post" => {
-                let rows = sqlx::query!(
-                    r#"
-                            SELECT
-                            id,
-                            created_at,
-                            event_type,
-                            module_kind,
-                            module_slug,
-                            agent,
-                            target      as "target?: JsonValue",
-                            previous,
-                            content,
-                            artifacts   as "artifacts?: Vec<String>",
-                            metadata    as "metadata?: JsonValue",
-                            links       as "links?: Vec<String>",
-                            data        as "data?: Vec<u8>",
-                            expiration
-                            FROM events
-                            WHERE event_type = $1
-                            "#,
-                    "posts:create_post"
-                )
-                .fetch_all(&self.pool)
-                .await
-                .map_err(|e| PersistenceError::Other(e.to_string()))?;
+            // 4) Only module_slug
+            (None, None, Some(module_slug)) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE module_slug = $1
+                "#,
+                module_slug
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                let events = rows
-                    .into_iter()
-                    .map(|row| {
-                        let target: Option<ObjectRef> = row
-                            .target
-                            .map(serde_json::from_value)
-                            .transpose()
-                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+            // 5) event_type + module_kind
+            (Some(event_type), Some(module_kind), None) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE event_type = $1
+                  AND module_kind = $2
+                "#,
+                event_type,
+                module_kind
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                        let metadata = row
-                            .metadata
-                            .map(serde_json::from_value)
-                            .transpose()
-                            .map_err(|e| PersistenceError::Other(e.to_string()))?;
+            // 6) event_type + module_slug
+            (Some(event_type), None, Some(module_slug)) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE event_type = $1
+                  AND module_slug = $2
+                "#,
+                event_type,
+                module_slug
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                        Ok(Event {
-                            id: row.id,
-                            created_at: row.created_at,
-                            event_type: row.event_type,
-                            module_kind: row.module_kind,
-                            module_slug: row.module_slug,
-                            agent: row.agent,
-                            target,
-                            previous: row.previous,
-                            content: row.content,
-                            artifacts: row.artifacts,
-                            metadata,
-                            links: row.links,
-                            data: row.data,
-                            expiration: row.expiration,
-                        })
-                    })
-                    .collect::<Result<Vec<_>, PersistenceError>>()?;
+            // 7) module_kind + module_slug
+            (None, Some(module_kind), Some(module_slug)) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE module_kind = $1
+                  AND module_slug = $2
+                "#,
+                module_kind,
+                module_slug
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
 
-                Ok(Some(events))
-            }
-            _ => Ok(None),
-        }
+            // 8) event_type + module_kind + module_slug
+            (Some(event_type), Some(module_kind), Some(module_slug)) => sqlx::query_as!(
+                EventRow,
+                r#"
+                SELECT
+                    id,
+                    created_at,
+                    event_type,
+                    module_kind,
+                    module_slug,
+                    agent,
+                    target      as "target?: JsonValue",
+                    previous,
+                    content,
+                    artifacts   as "artifacts?: Vec<String>",
+                    metadata    as "metadata?: JsonValue",
+                    links       as "links?: Vec<String>",
+                    data        as "data?: Vec<u8>",
+                    expiration
+                FROM events
+                WHERE event_type = $1
+                  AND module_kind = $2
+                  AND module_slug = $3
+                "#,
+                event_type,
+                module_kind,
+                module_slug
+            )
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|err| PersistenceError::Other(err.to_string()))?,
+        };
+
+        // Map EventRow -> Event
+        let events = rows
+            .into_iter()
+            .map(|row| {
+                let target: Option<ObjectRef> = row
+                    .target
+                    .map(serde_json::from_value)
+                    .transpose()
+                    .map_err(|err| PersistenceError::Other(err.to_string()))?;
+
+                let metadata = row
+                    .metadata
+                    .map(serde_json::from_value)
+                    .transpose()
+                    .map_err(|err| PersistenceError::Other(err.to_string()))?;
+
+                Ok(Event {
+                    id: row.id,
+                    created_at: row.created_at,
+                    event_type: row.event_type,
+                    module_kind: row.module_kind,
+                    module_slug: row.module_slug,
+                    agent: row.agent,
+                    target,
+                    previous: row.previous,
+                    content: row.content,
+                    artifacts: row.artifacts,
+                    metadata,
+                    links: row.links,
+                    data: row.data,
+                    expiration: row.expiration,
+                })
+            })
+            .collect::<Result<Vec<_>, PersistenceError>>()?;
+
+        Ok(events)
     }
 }

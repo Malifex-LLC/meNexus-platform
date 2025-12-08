@@ -30,6 +30,9 @@ output-name = "client-web"
 lib-features = ["hydrate"]
 # Bind to 0.0.0.0 for Docker
 site-addr = "0.0.0.0:3000"
+# Tailwind CSS input file
+tailwind-input-file = "apps/client-web/style/SalmonRoasted.css"
+tailwind-config-file = "tailwind.config.js"
 
 [workspace.dependencies]
 anyhow = "1.0.100"
@@ -39,6 +42,7 @@ base64 = "0.22.1"
 dashmap = { version = "6.1.0", features = ["serde"] }
 dotenvy = "0.15.7"
 futures = "0.3.31"
+getrandom = { version = "0.3", features = ["wasm_js"] }
 log = "0.4.28"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
@@ -51,4 +55,4 @@ time = { version = "0.3.44", features = [
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "sync"] }
 tracing = "0.1.41"
 url = "2.5.7"
-uuid = { version = "1.18.1", features = ["serde", "v4"] }
+uuid = { version = "1.18.1", features = ["serde", "v4", "js"] }

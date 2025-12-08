@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+#[cfg(feature = "ssr")]
 use axum::{Json, http::StatusCode, response::IntoResponse};
+#[cfg(feature = "ssr")]
 use synapse_core::CoreError;
+#[cfg(feature = "ssr")]
 use thiserror::Error;
 
+#[cfg(feature = "ssr")]
 #[derive(Error, Debug)]
 pub enum ModulePostsError {
     #[error("Bad request: {0}")]
@@ -19,6 +23,7 @@ pub enum ModulePostsError {
     Other(String),
 }
 
+#[cfg(feature = "ssr")]
 impl From<synapse_core::errors::CoreError> for ModulePostsError {
     fn from(err: synapse_core::errors::CoreError) -> Self {
         match err {
@@ -51,6 +56,7 @@ impl From<synapse_core::errors::CoreError> for ModulePostsError {
     }
 }
 
+#[cfg(feature = "ssr")]
 impl IntoResponse for ModulePostsError {
     fn into_response(self) -> axum::response::Response {
         let (status, message) = match self {

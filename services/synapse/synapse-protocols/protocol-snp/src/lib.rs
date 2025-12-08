@@ -26,7 +26,7 @@ pub enum SnpPayload {
     },
     Reply {
         ok: bool,
-        events: Option<Vec<Event>>,
+        events: Vec<Event>,
         error: Option<String>,
     },
 }

@@ -44,7 +44,7 @@ pub struct LocalEventResult {
 
 #[derive(Serialize)]
 pub struct RemoteEventResult {
-    event: Option<Vec<Event>>,
+    event: Vec<Event>,
 }
 
 #[derive(Deserialize)]
@@ -54,7 +54,7 @@ struct ListRemoteEventsRequest {
 
 #[derive(Serialize)]
 struct ListRemoteEventsResult {
-    events: Option<Vec<Event>>,
+    events: Vec<Event>,
 }
 
 pub fn routes() -> Router<AppState> {

@@ -6,8 +6,11 @@ use std::sync::Arc;
 use synapse_config::get_synapse_config;
 use synapse_core::{
     CoreError,
-    domain::events::Event,
-    ports::{events::event_repository::EventRepository, modules::Module},
+    domain::events::{self, Event},
+    ports::{
+        events::event_repository::{EventFilter, EventRepository},
+        modules::Module,
+    },
 };
 
 pub struct CoreModule {
@@ -34,7 +37,7 @@ impl Module for CoreModule {
     fn version(&self) -> Result<String, CoreError> {
         Ok(self.version.clone())
     }
-    async fn handle_event(&self, event: &Event) -> Result<Option<Vec<Event>>, CoreError> {
+    async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError> {
         match event.event_type.as_str() {
             "synapse:get_public_key" => {
                 let config = get_synapse_config().unwrap();
@@ -46,7 +49,7 @@ impl Module for CoreModule {
                     .with_content(public_key.clone())
                     .build();
                 let events = vec![res_event];
-                Ok(Some(events))
+                Ok(events)
             }
             "synapse:create_event" => {
                 let config = get_synapse_config().unwrap();
@@ -58,14 +61,25 @@ impl Module for CoreModule {
                     .with_content(public_key.clone())
                     .build();
                 let events = vec![res_event];
-                Ok(Some(events))
+                Ok(events)
             }
             "synapse:list_all_events" => {
-                let events = self.repo.retrieve("all".to_string()).await.unwrap();
+                let events = self
+                    .repo
+                    .retrieve(EventFilter {
+                        event_type: None,
+                        module_kind: None,
+                        module_slug: None,
+                    })
+                    .await
+                    .unwrap();
                 Ok(events)
             }
 
-            _ => Ok(None),
+            _ => {
+                let events: Vec<Event> = vec![];
+                Ok(events)
+            }
         }
     }
 }

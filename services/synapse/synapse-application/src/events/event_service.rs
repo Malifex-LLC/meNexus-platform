@@ -82,7 +82,7 @@ impl<R: EventRepository, T: ModuleRegistry> EventIngestService<R, T> {
 impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> MessageHandler
     for EventIngestService<R, T>
 {
-    async fn handle_message(&self, event: Event) -> Result<Option<Vec<Event>>, CoreError> {
+    async fn handle_message(&self, event: Event) -> Result<Vec<Event>, CoreError> {
         let replies = match event.module_kind.as_deref() {
             Some(kind) => {
                 let module = self.registry.get(kind).unwrap();
@@ -112,10 +112,7 @@ impl<T: FederationTransport> RemoteEventService<T> {
 
 #[async_trait]
 impl<T: FederationTransport + Send + Sync> CreateRemoteEventUseCase for RemoteEventService<T> {
-    async fn execute(
-        &self,
-        cmd: CreateRemoteEventCommand,
-    ) -> Result<Option<Vec<Event>>, CoreError> {
+    async fn execute(&self, cmd: CreateRemoteEventCommand) -> Result<Vec<Event>, CoreError> {
         if cmd.event.event_type.trim().is_empty() {
             return Err(CoreError::transport(
                 "event_type must not be empty".to_string(),

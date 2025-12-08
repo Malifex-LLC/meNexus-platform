@@ -40,6 +40,5 @@ pub trait CreateLocalEventUseCase: Send + Sync {
 
 #[async_trait::async_trait]
 pub trait CreateRemoteEventUseCase: Send + Sync {
-    async fn execute(&self, cmd: CreateRemoteEventCommand)
-    -> Result<Option<Vec<Event>>, CoreError>;
+    async fn execute(&self, cmd: CreateRemoteEventCommand) -> Result<Vec<Event>, CoreError>;
 }

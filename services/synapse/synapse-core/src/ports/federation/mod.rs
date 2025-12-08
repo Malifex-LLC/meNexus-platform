@@ -15,11 +15,11 @@ pub trait FederationTransport: Send + Sync {
         &self,
         synapse_public_key: String,
         event: Event,
-    ) -> Result<Option<Vec<Event>>, TransportError>;
+    ) -> Result<Vec<Event>, TransportError>;
 }
 
 // Inbound port
 #[async_trait]
 pub trait MessageHandler: Send + Sync {
-    async fn handle_message(&self, event: Event) -> Result<Option<Vec<Event>>, CoreError>;
+    async fn handle_message(&self, event: Event) -> Result<Vec<Event>, CoreError>;
 }

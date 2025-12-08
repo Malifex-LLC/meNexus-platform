@@ -17,17 +17,20 @@ use adapter_postgres::crypto_repository::PostgresCryptoRepository;
 use adapter_postgres::events_repository::PostgresEventsRepository;
 use adapter_postgres::profiles_repository::{PostgresProfilesDocStore, PostgresProfilesRepository};
 use adapter_postgres::{create_pool, migrate};
-use client_web::Shell;
+use client_web::app::Shell;
 use dashmap::DashMap;
 use leptos::config::LeptosOptions;
+use leptos::prelude::provide_context;
 use leptos::view;
 use leptos_axum::{LeptosRoutes, generate_route_list};
-use module_auth::routes as module_auth_routes;
-use module_auth::{AuthDeps, AuthModule};
+use module_auth::http::AuthModule;
+use module_auth::http::routes as module_auth_routes;
+use module_auth::types::AuthDeps;
 use module_core::CoreModule;
 use module_posts::PostsModule;
 use module_posts::{PostsDeps, routes as module_posts_routes};
-use module_profiles::{ProfilesDeps, ProfilesModule, routes as module_profiles_routes};
+use module_profiles::types::ProfilesDeps;
+use module_profiles::{ProfilesModule, routes as module_profiles_routes};
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::PathBuf;
@@ -151,6 +154,10 @@ async fn main() -> anyhow::Result<()> {
         leptos_options: leptos_options.clone(),
     };
 
+    let posts_deps = PostsDeps::from_ref(&state);
+    let auth_deps = AuthDeps::from_ref(&state);
+    let profile_deps = ProfilesDeps::from_ref(&state);
+
     let routes = generate_route_list({
         let opts = leptos_options.clone();
         move || view! { <Shell options=opts.clone()/> }
@@ -160,10 +167,22 @@ async fn main() -> anyhow::Result<()> {
         .merge(module_auth_routes::<AppState>())
         .merge(module_posts_routes::<AppState>())
         .merge(module_profiles_routes::<AppState>())
-        .leptos_routes(&state, routes, {
-            let opts = leptos_options.clone();
-            move || view! { <Shell options=opts.clone()/> }
-        })
+        .leptos_routes_with_context(
+            &state,
+            routes,
+            {
+                move || {
+                    // Provide deps to server functions via context
+                    provide_context(posts_deps.clone());
+                    provide_context(auth_deps.clone());
+                    provide_context(profile_deps.clone());
+                }
+            },
+            {
+                let opts = leptos_options.clone();
+                move || view! { <Shell options=opts.clone()/> }
+            },
+        )
         .fallback_service(ServeDir::new(static_site_dir))
         .with_state(state)
         .layer(TraceLayer::new_for_http());

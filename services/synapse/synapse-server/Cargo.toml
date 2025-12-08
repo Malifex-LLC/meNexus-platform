@@ -18,10 +18,10 @@ synapse-config = { path = "../synapse-config" }
 adapter-postgres = { path = "../synapse-adapters/adapter-postgres" }
 adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p" }
 dashmap = { workspace = true }
-module-auth = { path = "../synapse-modules/module-auth" }
+module-auth = { path = "../synapse-modules/module-auth", features = ["ssr"] }
 module-core = { path = "../synapse-modules/module-core" }
 module-profiles = { path = "../synapse-modules/module-profiles" }
-module-posts = { path = "../synapse-modules/module-posts" }
+module-posts = { path = "../synapse-modules/module-posts", features = ["ssr"] }
 thiserror = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }

@@ -51,6 +51,7 @@ services:
       - BOOTSTRAP_LIST=
       - DATABASE_URL=postgres://postgres:example@db:5432/menexus_dev
       - LEPTOS_WASM_BINDGEN_VERSION=0.2.105
+      - LEPTOS_TAILWIND_VERSION=v4.1.5
 
 volumes:
   pgdata:
