@@ -22,6 +22,9 @@ pub fn ControlPanel(
     /// Callback when close button is clicked (for mobile)
     #[prop(into, optional)]
     on_close: Option<Callback<()>>,
+    /// Callback when collapse button is clicked (for desktop)
+    #[prop(into, optional)]
+    on_collapse: Option<Callback<()>>,
 ) -> impl IntoView {
     view! {
         <div class="flex flex-col h-full bg-panel border-r border-border/50">
@@ -39,29 +42,47 @@ pub fn ControlPanel(
                             <p class="text-[10px] text-foreground/40 font-mono">"v0.3.0-alpha"</p>
                         </div>
                     </A>
-                    // Close button (mobile only)
-                    {if let Some(close) = on_close {
-                        view! {
-                            <button
-                                class="p-1.5 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors lg:hidden"
-                                on:click=move |_| close.run(())
-                            >
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        }.into_any()
-                    } else {
-                        view! { <span></span> }.into_any()
-                    }}
+                    <div class="flex items-center gap-1">
+                        // Collapse button (desktop only)
+                        {if let Some(collapse) = on_collapse {
+                            view! {
+                                <button
+                                    class="hidden lg:flex p-1.5 rounded-lg text-foreground/40 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                                    on:click=move |_| collapse.run(())
+                                    title="Collapse Control Panel"
+                                >
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                            }.into_any()
+                        } else {
+                            view! { <span></span> }.into_any()
+                        }}
+                        // Close button (mobile only)
+                        {if let Some(close) = on_close {
+                            view! {
+                                <button
+                                    class="p-1.5 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors lg:hidden"
+                                    on:click=move |_| close.run(())
+                                >
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            }.into_any()
+                        } else {
+                            view! { <span></span> }.into_any()
+                        }}
+                    </div>
                 </div>
             </div>
 
             // Scrollable content area
             <div class="flex-1 overflow-y-auto scrollbar-thin p-2 space-y-3">
                 // User Profile Card
-                // <UserProfileCard />
-                <IdentityPanel />
+                <UserProfileCard />
+                // <IdentityPanel />
 
                 // Quick Actions Bar
                 <div class="flex items-center gap-1.5">
@@ -94,10 +115,10 @@ pub fn ControlPanel(
             // Footer with network status
             <div class="flex-shrink-0 p-2 border-t border-border/30 bg-background/30">
                 <div class="flex items-center justify-between text-[10px]">
-                    <span class="flex items-center gap-1.5 text-emerald-400">
+                    <span class="flex items-center gap-1.5 text-status-online">
                         <span class="relative flex h-1.5 w-1.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-online opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 status-online"></span>
                         </span>
                         "Online"
                     </span>

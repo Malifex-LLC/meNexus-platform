@@ -1,0 +1,106 @@
+/*
+ * malifex USER THEME
+ * ==================
+ * 
+ * malifex theme.
+ * Make it darker.
+ */
+
+:root {
+    /* LAYOUT */
+    --theme-bg-window: #000000;
+    --theme-bg-panel: #000000;
+    --theme-bg-surface: #141414;
+    --theme-bg-elevated: #504945;
+    --theme-bg-input: #1d2021;
+    --theme-bg-overlay: rgba(0, 0, 0, 0.6);
+    
+    /* BORDERS */
+    --theme-border: #3A3A3A;
+    --theme-border-subtle: #3c3836;
+    --theme-border-strong: #665c54;
+    
+    /* TEXT */
+    --theme-text-primary: #f2e5bc;
+    --theme-text-secondary: #a89984;
+    --theme-text-subtle: #665c54;
+    --theme-text-disabled: #504945;
+    
+    /* ACCENT */
+    --theme-accent: #ff6b6b;
+    --theme-accent-hover: #fabd2f;
+    --theme-accent-muted: rgba(254, 128, 25, 0.15);
+    --theme-accent-text: #1d2021;
+    --theme-secondary: #83a598;
+    --theme-secondary-hover: #8ec07c;
+    
+    /* INTERACTIVE */
+    --theme-hover: rgba(235, 219, 178, 0.05);
+    --theme-active: rgba(235, 219, 178, 0.08);
+    --theme-focus: #fe8019;
+    
+    /* STATUS */
+    --theme-status-online: #537a5a;
+    --theme-status-offline: #928374;
+    --theme-status-busy: #ed254e;
+    --theme-status-away: #f9dc5c;
+    --theme-status-streaming: #fb4934;
+    
+    /* SEMANTIC */
+    --theme-success: #34c300;
+    --theme-success-muted: rgba(184, 187, 38, 0.15);
+    --theme-warning: #facc15;
+    --theme-warning-muted: rgba(250, 189, 47, 0.15);
+    --theme-error: #fb4934;
+    --theme-error-muted: rgba(251, 73, 52, 0.15);
+    --theme-info: #83a598;
+    --theme-info-muted: rgba(131, 165, 152, 0.15);
+    
+    /* ROLES */
+    --theme-role-owner: #fabd2f;
+    --theme-role-owner-bg: rgba(250, 189, 47, 0.15);
+    --theme-role-admin: #fb4934;
+    --theme-role-admin-bg: rgba(251, 73, 52, 0.15);
+    --theme-role-moderator: #fa5914;
+    --theme-role-moderator-bg: rgba(211, 134, 155, 0.15);
+    --theme-role-member: #928374;
+    --theme-role-member-bg: rgba(146, 131, 116, 0.15);
+    
+    /* MESSAGES */
+    --theme-msg-own-bg: #fe8019;
+    --theme-msg-own-text: #1d2021;
+    --theme-msg-other-bg: #3c3836;
+    --theme-msg-other-text: #ebdbb2;
+    --theme-msg-system-bg: rgba(235, 219, 178, 0.05);
+    --theme-msg-system-text: #a89984;
+    
+    /* STATS */
+    --theme-stat-primary: #83a598;
+    --theme-stat-secondary: #d3869b;
+    --theme-stat-tertiary: #fabd2f;
+    --theme-stat-positive: #b8bb26;
+    --theme-stat-negative: #fb4934;
+    
+    /* REPUTATION */
+    --theme-rep-newcomer: #928374;
+    --theme-rep-contributor: #83a598;
+    --theme-rep-established: #b8bb26;
+    --theme-rep-trusted: #d3869b;
+    --theme-rep-respected: #fabd2f;
+    --theme-rep-distinguished: #fb4934;
+    --theme-rep-elite: #d3869b;
+    --theme-rep-legendary: #fe8019;
+    
+    /* NOTIFICATIONS */
+    --theme-notif-mention: #83a598;
+    --theme-notif-like: #fb4934;
+    --theme-notif-follow: #d3869b;
+    --theme-notif-reply: #b8bb26;
+    --theme-notif-system: #928374;
+}
+
+body {
+    background: var(--theme-bg-window);
+}
+
+

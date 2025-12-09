@@ -93,7 +93,7 @@ pub fn ProfileHeader(#[prop(into)] profile: ProfileData) -> impl IntoView {
                         // Online indicator
                         {if is_online {
                             view! {
-                                <div class="absolute bottom-2 right-2 w-5 h-5 bg-emerald-500 rounded-full ring-4 ring-panel"></div>
+                                <div class="absolute bottom-2 right-2 w-5 h-5 status-online rounded-full ring-4 ring-panel"></div>
                             }.into_any()
                         } else {
                             view! { <span></span> }.into_any()

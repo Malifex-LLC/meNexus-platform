@@ -29,7 +29,13 @@ pub fn GlobalPostCard(#[prop(into)] post: GlobalPost) -> impl IntoView {
         .collect::<String>()
         .to_uppercase();
 
-    let synapse_initial = post.synapse_name.chars().next().unwrap_or('S').to_uppercase().to_string();
+    let synapse_initial = post
+        .synapse_name
+        .chars()
+        .next()
+        .unwrap_or('S')
+        .to_uppercase()
+        .to_string();
 
     // Check if content has code block
     let has_code = post.content.contains("```");
@@ -38,12 +44,12 @@ pub fn GlobalPostCard(#[prop(into)] post: GlobalPost) -> impl IntoView {
         <article class="group relative bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-200 hover:border-border hover:shadow-lg hover:shadow-black/5">
             // Source indicator - shows which Synapse this is from
             <div class="px-4 py-2 bg-foreground/[0.02] border-b border-border/30 flex items-center gap-2">
-                <A 
+                <A
                     href=format!("/synapses/{}", post.synapse_id)
                     attr:class="flex items-center gap-2 hover:text-brand transition-colors"
                 >
-                    <div class="w-5 h-5 rounded bg-violet-500/20 flex items-center justify-center">
-                        <span class="text-violet-400 font-bold text-[9px]">{synapse_initial}</span>
+                    <div class="w-5 h-5 rounded bg-secondary/20 flex items-center justify-center">
+                        <span class="text-secondary font-bold text-[9px]">{synapse_initial}</span>
                     </div>
                     <span class="text-xs font-medium text-foreground/60">{post.synapse_name.clone()}</span>
                 </A>
@@ -74,19 +80,19 @@ pub fn GlobalPostCard(#[prop(into)] post: GlobalPost) -> impl IntoView {
                             }.into_any()
                         }}
                         // Online indicator
-                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card"></div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-status-online rounded-full border-2 border-card"></div>
                     </A>
 
                     // Author info
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <A 
+                            <A
                                 href=format!("/profiles/{}", post.author_handle)
                                 attr:class="font-semibold text-foreground hover:text-brand transition-colors"
                             >
                                 {post.author_name.clone()}
                             </A>
-                            
+
                             {if post.author_verified {
                                 view! {
                                     <svg class="w-4 h-4 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
@@ -197,10 +203,10 @@ pub fn GlobalPostCard(#[prop(into)] post: GlobalPost) -> impl IntoView {
                         )
                         on:click=move |_| set_is_bookmarked.update(|v| *v = !*v)
                     >
-                        <svg 
+                        <svg
                             class=move || format!("w-4 h-4 {}", if is_bookmarked.get() { "fill-current" } else { "fill-none" })
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                             stroke-width="2"
                         >
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
@@ -222,7 +228,7 @@ pub fn GlobalPostCard(#[prop(into)] post: GlobalPost) -> impl IntoView {
 /// Simple code block rendering (basic implementation)
 fn render_content_with_code(content: &str) -> impl IntoView {
     let parts: Vec<&str> = content.split("```").collect();
-    
+
     view! {
         <div>
             {parts.iter().enumerate().map(|(i, part)| {
@@ -234,7 +240,7 @@ fn render_content_with_code(content: &str) -> impl IntoView {
                     } else {
                         ("code", part.to_string())
                     };
-                    
+
                     view! {
                         <div class="my-3 rounded-lg overflow-hidden border border-border/50 bg-background/50">
                             <div class="flex items-center justify-between px-3 py-1.5 bg-foreground/5 border-b border-border/30">

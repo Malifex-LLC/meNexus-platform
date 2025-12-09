@@ -3,7 +3,9 @@
 
 pub mod control_panel;
 pub mod dashboard;
+pub mod messenger;
 pub mod module_container;
+pub mod notifications;
 pub mod profile;
 pub mod search;
 pub mod settings;
@@ -25,4 +27,15 @@ pub use search::{
 pub use settings::{
     AccountSettings, AppearanceSettings, DataSettings, NetworkSettings, NotificationSettings,
     PrivacySettings, ProfileSettings, SecuritySettings, SettingsSidebar, SettingsTab,
+};
+pub use notifications::{
+    AllNotificationsView, AnalyticsPanel, BroadcastAlertCard, BroadcastsPanel, BroadcastsSection,
+    ConnectionNotificationCard, ConnectionsPanel, ConnectionsSection, ContentNotificationCard,
+    ContentPanel, ContentSection, NotificationCategory, NotificationsSidebar, QuickActionsPanel,
+    StatusOverview, SystemNotificationCard, SystemPanel, SystemSection,
+};
+pub use messenger::{
+    ChatHeader, Conversation, ConversationFilter, ConversationInfo, ConversationItem,
+    ConversationList, ConversationType, Message, MessageBubble, MessageComposer, MessageContent,
+    MessageReaction, MessageStatus, MessageThread, Participant,
 };

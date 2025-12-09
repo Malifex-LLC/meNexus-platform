@@ -184,7 +184,7 @@ pub fn ActivityFeed() -> impl IntoView {
                 <div class="flex items-center justify-between text-xs">
                     <div class="flex items-center gap-2 text-foreground/40">
                         <span class="flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="w-1.5 h-1.5 rounded-full status-online animate-pulse"></span>
                             "Live updates"
                         </span>
                     </div>

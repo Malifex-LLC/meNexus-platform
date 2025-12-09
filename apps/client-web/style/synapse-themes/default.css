@@ -1,0 +1,133 @@
+/*
+ * DEFAULT SYNAPSE THEME
+ * =====================
+ * 
+ * A neutral dark theme that works well as a starting point.
+ * Synapse hosts can copy this to create custom themes.
+ * 
+ * IMPORTANT: Synapse themes use --synapse-* prefix.
+ * The base.css file maps these to --theme-* within .synapse-themed
+ * 
+ * Structure is IDENTICAL to user themes for easy adaptation.
+ * To convert a user theme to synapse theme:
+ *   1. Copy the user theme file
+ *   2. Replace all --theme- with --synapse-
+ *   3. Replace :root with .synapse-themed
+ */
+
+.synapse-themed {
+    /* ========================================
+       LAYOUT COLORS
+       ======================================== */
+    --synapse-bg-window: #141414;
+    --synapse-bg-panel: #0f0f0f;
+    --synapse-bg-surface: #1a1a1a;
+    --synapse-bg-elevated: #242424;
+    --synapse-bg-input: #0f0f0f;
+    --synapse-bg-overlay: rgba(0, 0, 0, 0.6);
+    
+    /* ========================================
+       BORDER COLORS
+       ======================================== */
+    --synapse-border: #2a2a2a;
+    --synapse-border-subtle: #1f1f1f;
+    --synapse-border-strong: #3a3a3a;
+    
+    /* ========================================
+       TEXT/TYPOGRAPHY COLORS
+       ======================================== */
+    --synapse-text-primary: #f5f5f5;
+    --synapse-text-secondary: #888888;
+    --synapse-text-subtle: #555555;
+    --synapse-text-disabled: #3a3a3a;
+    
+    /* ========================================
+       BRAND/ACCENT COLORS
+       ======================================== */
+    --synapse-accent: #6366f1;
+    --synapse-accent-hover: #818cf8;
+    --synapse-accent-muted: rgba(99, 102, 241, 0.15);
+    --synapse-accent-text: #ffffff;
+    --synapse-secondary: #8b5cf6;
+    --synapse-secondary-hover: #a78bfa;
+    
+    /* ========================================
+       INTERACTIVE STATES
+       ======================================== */
+    --synapse-hover: rgba(255, 255, 255, 0.05);
+    --synapse-active: rgba(255, 255, 255, 0.08);
+    --synapse-focus: #6366f1;
+    
+    /* ========================================
+       STATUS INDICATORS
+       ======================================== */
+    --synapse-status-online: #10b981;
+    --synapse-status-offline: #6b7280;
+    --synapse-status-busy: #ef4444;
+    --synapse-status-away: #f59e0b;
+    --synapse-status-streaming: #f43f5e;
+    
+    /* ========================================
+       SEMANTIC COLORS
+       ======================================== */
+    --synapse-success: #10b981;
+    --synapse-success-muted: rgba(16, 185, 129, 0.15);
+    --synapse-warning: #f59e0b;
+    --synapse-warning-muted: rgba(245, 158, 11, 0.15);
+    --synapse-error: #ef4444;
+    --synapse-error-muted: rgba(239, 68, 68, 0.15);
+    --synapse-info: #3b82f6;
+    --synapse-info-muted: rgba(59, 130, 246, 0.15);
+    
+    /* ========================================
+       ROLE COLORS
+       ======================================== */
+    --synapse-role-owner: #fbbf24;
+    --synapse-role-owner-bg: rgba(251, 191, 36, 0.15);
+    --synapse-role-admin: #f43f5e;
+    --synapse-role-admin-bg: rgba(244, 63, 94, 0.15);
+    --synapse-role-moderator: #8b5cf6;
+    --synapse-role-moderator-bg: rgba(139, 92, 246, 0.15);
+    --synapse-role-member: #6b7280;
+    --synapse-role-member-bg: rgba(107, 114, 128, 0.15);
+    
+    /* ========================================
+       MESSAGE COLORS
+       ======================================== */
+    --synapse-msg-own-bg: #6366f1;
+    --synapse-msg-own-text: #ffffff;
+    --synapse-msg-other-bg: #1a1a1a;
+    --synapse-msg-other-text: #f5f5f5;
+    --synapse-msg-system-bg: rgba(255, 255, 255, 0.05);
+    --synapse-msg-system-text: #888888;
+    
+    /* ========================================
+       STAT/METRIC COLORS
+       ======================================== */
+    --synapse-stat-primary: #38bdf8;
+    --synapse-stat-secondary: #a78bfa;
+    --synapse-stat-tertiary: #f59e0b;
+    --synapse-stat-positive: #10b981;
+    --synapse-stat-negative: #f43f5e;
+    
+    /* ========================================
+       REPUTATION LEVELS
+       ======================================== */
+    --synapse-rep-newcomer: #6b7280;
+    --synapse-rep-contributor: #38bdf8;
+    --synapse-rep-established: #10b981;
+    --synapse-rep-trusted: #8b5cf6;
+    --synapse-rep-respected: #f59e0b;
+    --synapse-rep-distinguished: #f43f5e;
+    --synapse-rep-elite: #d946ef;
+    --synapse-rep-legendary: #6366f1;
+    
+    /* ========================================
+       NOTIFICATION COLORS
+       ======================================== */
+    --synapse-notif-mention: #3b82f6;
+    --synapse-notif-like: #f43f5e;
+    --synapse-notif-follow: #8b5cf6;
+    --synapse-notif-reply: #10b981;
+    --synapse-notif-system: #6b7280;
+}

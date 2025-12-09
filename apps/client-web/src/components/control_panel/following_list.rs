@@ -50,19 +50,19 @@ pub fn FollowingList() -> impl IntoView {
     view! {
         <div class="space-y-1">
             // Header
-            <button 
+            <button
                 class="w-full flex items-center justify-between px-1 py-1 text-[10px] font-medium text-foreground/40 uppercase tracking-wider hover:text-foreground/60 transition-colors"
                 on:click=move |_| set_is_expanded.update(|v| *v = !*v)
             >
                 <div class="flex items-center gap-1.5">
-                    <svg class="w-3 h-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-3 h-3 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                     <span>"Following"</span>
                     <span class="text-foreground/30">"("{following.len()}")"</span>
-                    <span class="text-emerald-400/70">{online_count}" online"</span>
+                    <span class="text-status-online/70">{online_count}" online"</span>
                 </div>
-                <svg 
+                <svg
                     class=move || format!("w-3 h-3 transition-transform {}", if is_expanded.get() { "" } else { "-rotate-90" })
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
                 >
@@ -79,7 +79,7 @@ pub fn FollowingList() -> impl IntoView {
                                 let handle = user.handle.clone();
                                 let display_name = user.display_name.clone();
                                 let is_online = user.is_online;
-                                
+
                                 let initials: String = display_name
                                     .split_whitespace()
                                     .take(2)
@@ -87,21 +87,21 @@ pub fn FollowingList() -> impl IntoView {
                                     .collect();
 
                                 view! {
-                                    <A 
+                                    <A
                                         href=format!("/profiles/{}", handle)
                                         attr:class="group flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-foreground/5 transition-colors"
                                     >
                                         // Avatar
                                         <div class="relative flex-shrink-0">
-                                            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-sky-500/20 to-sky-500/5 flex items-center justify-center">
-                                                <span class="text-sky-400 font-bold text-[10px]">{initials}</span>
+                                            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-info/20 to-info/5 flex items-center justify-center">
+                                                <span class="text-info font-bold text-[10px]">{initials}</span>
                                             </div>
                                             <div class=format!(
                                                 "absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-panel {}",
-                                                if is_online { "bg-emerald-500" } else { "bg-foreground/30" }
+                                                if is_online { "status-online" } else { "status-offline" }
                                             )></div>
                                         </div>
-                                        
+
                                         <div class="flex-1 min-w-0">
                                             <span class="text-xs text-foreground/70 group-hover:text-foreground truncate block">{display_name}</span>
                                         </div>

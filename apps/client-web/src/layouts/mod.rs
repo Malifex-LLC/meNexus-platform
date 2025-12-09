@@ -4,6 +4,8 @@
 pub mod dashboard_layout;
 pub mod login_layout;
 pub mod main_layout;
+pub mod messenger_layout;
+pub mod notifications_layout;
 pub mod profile_layout;
 pub mod register_layout;
 pub mod search_layout;

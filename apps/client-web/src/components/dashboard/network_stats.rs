@@ -20,22 +20,22 @@ pub fn NetworkStatsWidget() -> impl IntoView {
                     </div>
                     <h3 class="font-semibold text-sm text-foreground">"Network"</h3>
                 </div>
-                
+
                 // Sync status
                 <div class=format!(
                     "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium {}",
                     match stats.sync_status {
-                        SyncStatus::Synced => "bg-emerald-500/15 text-emerald-400",
-                        SyncStatus::Syncing => "bg-amber-500/15 text-amber-400",
-                        SyncStatus::Offline => "bg-rose-500/15 text-rose-400",
+                        SyncStatus::Synced => "bg-status-online/15 text-status-online",
+                        SyncStatus::Syncing => "bg-warning/15 text-warning",
+                        SyncStatus::Offline => "bg-error/15 text-error",
                     }
                 )>
                     <span class=format!(
                         "w-1.5 h-1.5 rounded-full {}",
                         match stats.sync_status {
-                            SyncStatus::Synced => "bg-emerald-400",
-                            SyncStatus::Syncing => "bg-amber-400 animate-pulse",
-                            SyncStatus::Offline => "bg-rose-400",
+                            SyncStatus::Synced => "status-online",
+                            SyncStatus::Syncing => "status-away animate-pulse",
+                            SyncStatus::Offline => "status-offline",
                         }
                     )></span>
                     {match stats.sync_status {
@@ -52,31 +52,31 @@ pub fn NetworkStatsWidget() -> impl IntoView {
                     label="Peers"
                     value=stats.connected_peers.to_string()
                     icon=r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>"#
-                    color="text-sky-400"
+                    color="text-stat-primary"
                 />
-                
+
                 // Online users
                 <StatCard
                     label="Online"
                     value=format_count(stats.online_users)
                     icon=r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>"#
-                    color="text-emerald-400"
+                    color="text-status-online"
                 />
-                
+
                 // Synapses
                 <StatCard
                     label="Synapses"
                     value=stats.total_synapses.to_string()
                     icon=r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>"#
-                    color="text-violet-400"
+                    color="text-stat-secondary"
                 />
-                
+
                 // Latency
                 <StatCard
                     label="Latency"
                     value=format!("{}ms", stats.latency_ms)
                     icon=r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>"#
-                    color="text-amber-400"
+                    color="text-stat-tertiary"
                 />
             </div>
 
@@ -87,7 +87,7 @@ pub fn NetworkStatsWidget() -> impl IntoView {
                     <span class="text-foreground font-mono">{format_count(stats.posts_today)}</span>
                 </div>
                 <div class="h-1.5 bg-foreground/10 rounded-full overflow-hidden">
-                    <div 
+                    <div
                         class="h-full bg-gradient-to-r from-brand to-brand/70 rounded-full"
                         style=format!("width: {}%", (stats.posts_today as f32 / 2000.0 * 100.0).min(100.0))
                     ></div>

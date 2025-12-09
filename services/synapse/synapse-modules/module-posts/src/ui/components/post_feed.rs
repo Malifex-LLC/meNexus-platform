@@ -133,8 +133,8 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                     <div class="mt-4 pt-4 border-t border-border/30">
                         <div class="flex items-center justify-between text-[10px]">
                             <span class="text-foreground/40 uppercase tracking-wider">"Status"</span>
-                            <span class="flex items-center gap-1 text-emerald-400">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="flex items-center gap-1 text-status-online">
+                                <span class="w-1.5 h-1.5 rounded-full status-online animate-pulse"></span>
                                 "Online"
                             </span>
                         </div>

@@ -33,14 +33,14 @@ pub fn ChannelHeader(
                     <div class=move || format!(
                         "w-10 h-10 rounded-xl flex items-center justify-center {}",
                         if room.is_private {
-                            "bg-amber-500/20"
+                            "bg-warning/20"
                         } else {
                             "bg-brand/20"
                         }
                     )>
                         {if room.is_private {
                             view! {
-                                <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg class="w-5 h-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                 </svg>
                             }.into_any()
@@ -58,7 +58,7 @@ pub fn ChannelHeader(
                         <div class="flex items-center gap-2">
                             <h1 class="text-lg font-bold text-foreground">
                                 {if room.is_private {
-                                    view! { <span class="text-amber-400 mr-1">"🔒"</span> }.into_any()
+                                    view! { <span class="text-warning mr-1">"🔒"</span> }.into_any()
                                 } else {
                                     view! { <span class="text-brand font-mono mr-1">"#"</span> }.into_any()
                                 }}
@@ -120,7 +120,7 @@ pub fn ChannelHeader(
                             
                             // Count
                             <span class="text-sm font-medium">
-                                <span class="text-emerald-400">{online_count}</span>
+                                <span class="text-success">{online_count}</span>
                                 <span class="text-foreground/40">" online"</span>
                             </span>
                             
@@ -141,7 +141,7 @@ pub fn ChannelHeader(
                                         <div class="px-3 py-2 border-b border-border/30 bg-foreground/5">
                                             <div class="flex items-center justify-between">
                                                 <span class="text-sm font-semibold text-foreground">"Online Members"</span>
-                                                <span class="text-xs text-emerald-400">{online_count}" online"</span>
+                                                <span class="text-xs text-success">{online_count}" online"</span>
                                             </div>
                                         </div>
                                         <div class="max-h-64 overflow-y-auto scrollbar-thin py-1">
@@ -159,7 +159,7 @@ pub fn ChannelHeader(
                                                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand/30 to-brand/10 flex items-center justify-center text-xs font-bold text-brand">
                                                                 {initials}
                                                             </div>
-                                                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-panel"></div>
+                                                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 status-online rounded-full border-2 border-panel"></div>
                                                         </div>
                                                         <div class="flex flex-col items-start">
                                                             <span class="text-sm font-medium text-foreground">{display_name}</span>
@@ -274,7 +274,7 @@ pub fn ChannelHeader(
                                             </svg>
                                             "Mute Channel"
                                         </button>
-                                        <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-rose-400 hover:bg-rose-500/10 transition-colors">
+                                        <button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                             </svg>
@@ -293,8 +293,8 @@ pub fn ChannelHeader(
             // Connection status bar
             <div class="flex items-center gap-4 px-4 py-1.5 border-t border-border/20 bg-background/30">
                 <div class="flex items-center gap-2 text-xs">
-                    <span class="flex items-center gap-1.5 text-emerald-400">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="flex items-center gap-1.5 text-success">
+                        <span class="w-1.5 h-1.5 rounded-full status-online animate-pulse"></span>
                         "Connected"
                     </span>
                     <span class="text-foreground/30">"|"</span>
@@ -306,7 +306,7 @@ pub fn ChannelHeader(
                 <div class="flex items-center gap-2 text-xs text-foreground/40">
                     <span class="font-mono">{room.member_count}" members"</span>
                     <span>"|"</span>
-                    <span class="font-mono text-emerald-400/70">{room.online_count}" online"</span>
+                    <span class="font-mono text-success/70">{room.online_count}" online"</span>
                 </div>
             </div>
         </header>

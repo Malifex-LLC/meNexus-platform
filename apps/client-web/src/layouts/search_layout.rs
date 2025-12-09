@@ -2,9 +2,8 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::components::search::{
-    BrowseByCategory, FeaturedSynapses, SearchBar, SearchCategory, SearchFilters,
-    SearchResults, SearchScope, SearchSortBy, SearchTimeRange, SuggestedUsers, TrendingPosts,
-    TrendingTags,
+    BrowseByCategory, FeaturedSynapses, SearchBar, SearchCategory, SearchFilters, SearchResults,
+    SearchScope, SearchSortBy, SearchTimeRange, SuggestedUsers, TrendingPosts, TrendingTags,
 };
 use crate::layouts::main_layout::MainLayout;
 use leptos::prelude::*;
@@ -147,7 +146,7 @@ fn DiscoveryView() -> impl IntoView {
     view! {
         <div class="space-y-8">
             // Quick stats banner
-            <div class="bg-gradient-to-r from-brand/10 via-violet-500/10 to-emerald-500/10 border border-border/50 rounded-2xl p-6">
+            <div class="bg-brand/30 border border-border/50 rounded-2xl p-6">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-semibold text-foreground mb-1">"Explore the Network"</h2>
@@ -165,7 +164,7 @@ fn DiscoveryView() -> impl IntoView {
                         </div>
                         <div class="w-px h-10 bg-border/50"></div>
                         <div class="text-center">
-                            <p class="text-2xl font-bold text-emerald-400">"2.3K"</p>
+                            <p class="text-2xl font-bold text-status-online">"2.3K"</p>
                             <p class="text-foreground/40">"Online"</p>
                         </div>
                     </div>

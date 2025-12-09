@@ -68,37 +68,68 @@ impl SettingsTab {
     }
 }
 
-/// Theme options
+/// User theme options - controls main app appearance
+/// This affects: Control Panel, Dashboard, Messages, Notifications, Search, Profile, Settings
+/// Does NOT affect: Synapse layouts and modules (those use Synapse themes)
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ThemeOption {
-    System,
+pub enum UserTheme {
+    Midnight,
+    Obsidian,
+    Slate,
+    Aurora,
+    Gruvbox,
     Light,
-    Dark,
-    GruvboxDark,
-    SalmonRoasted,
 }
 
-impl ThemeOption {
+impl UserTheme {
     pub fn label(&self) -> &'static str {
         match self {
-            ThemeOption::System => "System",
-            ThemeOption::Light => "Light",
-            ThemeOption::Dark => "Dark",
-            ThemeOption::GruvboxDark => "Gruvbox Dark",
-            ThemeOption::SalmonRoasted => "Salmon Roasted",
+            UserTheme::Midnight => "Midnight",
+            UserTheme::Obsidian => "Obsidian",
+            UserTheme::Slate => "Slate",
+            UserTheme::Aurora => "Aurora",
+            UserTheme::Gruvbox => "Gruvbox",
+            UserTheme::Light => "Light",
         }
     }
 
-    pub fn all() -> Vec<ThemeOption> {
+    pub fn description(&self) -> &'static str {
+        match self {
+            UserTheme::Midnight => "Deep blue with coral accents",
+            UserTheme::Obsidian => "Pure black with emerald accents",
+            UserTheme::Slate => "Cool gray with blue accents",
+            UserTheme::Aurora => "Purple tones with violet accents",
+            UserTheme::Gruvbox => "Retro warm with orange accents",
+            UserTheme::Light => "Clean light mode",
+        }
+    }
+
+    pub fn colors(&self) -> (&'static str, &'static str, &'static str) {
+        // Returns (background, card, accent)
+        match self {
+            UserTheme::Midnight => ("#1a1a2e", "#1f1f3a", "#ff6b6b"),
+            UserTheme::Obsidian => ("#0d0d0d", "#141414", "#10b981"),
+            UserTheme::Slate => ("#1e293b", "#1e293b", "#3b82f6"),
+            UserTheme::Aurora => ("#1a1625", "#1f1b2e", "#a855f7"),
+            UserTheme::Gruvbox => ("#282828", "#3c3836", "#fe8019"),
+            UserTheme::Light => ("#f8fafc", "#ffffff", "#6366f1"),
+        }
+    }
+
+    pub fn all() -> Vec<UserTheme> {
         vec![
-            ThemeOption::System,
-            ThemeOption::Light,
-            ThemeOption::Dark,
-            ThemeOption::GruvboxDark,
-            ThemeOption::SalmonRoasted,
+            UserTheme::Midnight,
+            UserTheme::Obsidian,
+            UserTheme::Slate,
+            UserTheme::Aurora,
+            UserTheme::Gruvbox,
+            UserTheme::Light,
         ]
     }
 }
+
+// Keep ThemeOption for backwards compatibility
+pub type ThemeOption = UserTheme;
 
 /// Font size options
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

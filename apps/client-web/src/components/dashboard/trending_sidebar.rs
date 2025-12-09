@@ -46,8 +46,8 @@ pub fn TrendingSidebar() -> impl IntoView {
                                 <span class=format!(
                                     "w-5 h-5 {}",
                                     match topic.trend_direction {
-                                        TrendDirection::Up => "text-emerald-400",
-                                        TrendDirection::Down => "text-rose-400",
+                                        TrendDirection::Up => "text-stat-positive",
+                                        TrendDirection::Down => "text-stat-negative",
                                         TrendDirection::Stable => "text-foreground/30",
                                     }
                                 )>
@@ -94,7 +94,7 @@ pub fn TrendingSidebar() -> impl IntoView {
                             .filter_map(|s| s.chars().next())
                             .collect::<String>()
                             .to_uppercase();
-                        
+
                         view! {
                             <div class="flex items-center gap-3 px-4 py-2.5">
                                 <A href=format!("/profiles/{}", user.handle) attr:class="flex-shrink-0">
@@ -112,7 +112,7 @@ pub fn TrendingSidebar() -> impl IntoView {
                                 </A>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-1">
-                                        <A 
+                                        <A
                                             href=format!("/profiles/{}", user.handle)
                                             attr:class="font-medium text-sm text-foreground hover:text-brand transition-colors truncate"
                                         >
@@ -130,7 +130,7 @@ pub fn TrendingSidebar() -> impl IntoView {
                                     </div>
                                     <div class="flex items-center gap-2 text-xs">
                                         <span class="text-brand/60 font-mono">{"@"}{user.handle}</span>
-                                        <span class="text-emerald-400">"+"{ user.follower_growth }</span>
+                                        <span class="text-stat-positive">"+"{ user.follower_growth }</span>
                                     </div>
                                 </div>
                                 <button class="px-3 py-1 rounded-lg bg-brand/15 text-brand text-xs font-medium hover:bg-brand/25 transition-colors">
@@ -156,7 +156,7 @@ pub fn TrendingSidebar() -> impl IntoView {
                 <div class="divide-y divide-border/30">
                     {synapses.into_iter().map(|synapse| {
                         let first_char = synapse.name.chars().next().unwrap_or('S').to_uppercase().to_string();
-                        
+
                         view! {
                             <A
                                 href=format!("/synapses/{}", synapse.id)
@@ -168,8 +168,8 @@ pub fn TrendingSidebar() -> impl IntoView {
                                 <div class="flex-1 min-w-0">
                                     <p class="font-medium text-sm text-foreground truncate">{synapse.name}</p>
                                     <div class="flex items-center gap-2 text-xs">
-                                        <span class="flex items-center gap-1 text-emerald-400">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                        <span class="flex items-center gap-1 text-status-online">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-status-online"></span>
                                             {format_count(synapse.online_count)}
                                         </span>
                                         <span class="text-foreground/30">"|"</span>

@@ -121,7 +121,7 @@ pub fn ChatFeed() -> impl IntoView {
                                     format!(
                                         "w-full group flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-all text-sm {}",
                                         if is_active {
-                                            if is_private { "bg-amber-500/15 text-amber-400" } else { "bg-brand/15 text-brand" }
+                                            if is_private { "bg-warning/15 text-warning" } else { "bg-brand/15 text-brand" }
                                         } else {
                                             "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
                                         }
@@ -135,7 +135,7 @@ pub fn ChatFeed() -> impl IntoView {
                                 <span class=move || format!(
                                     "flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-xs font-mono transition-colors {}",
                                     if active_room_id.get() == room_id_for_icon {
-                                        if is_private { "text-amber-400" } else { "text-brand" }
+                                        if is_private { "text-warning" } else { "text-brand" }
                                     } else {
                                         "text-foreground/40"
                                     }
@@ -147,7 +147,7 @@ pub fn ChatFeed() -> impl IntoView {
                                     view! {
                                         <span class=format!(
                                             "min-w-4 h-4 px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white {}",
-                                            if is_private { "bg-amber-500" } else { "bg-brand" }
+                                            if is_private { "bg-warning" } else { "bg-brand" }
                                         )>
                                             {unread}
                                         </span>
@@ -163,8 +163,8 @@ pub fn ChatFeed() -> impl IntoView {
                 // Sidebar footer
                 <div class="p-2 border-t border-border/50 bg-background/30">
                     <div class="flex items-center justify-between text-[10px]">
-                        <span class="flex items-center gap-1 text-emerald-400">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="flex items-center gap-1 text-success">
+                            <span class="w-1.5 h-1.5 rounded-full status-online animate-pulse"></span>
                             "Online"
                         </span>
                         <span class="text-foreground/30 font-mono">{rooms.len()}" rooms"</span>
@@ -203,7 +203,7 @@ pub fn ChatFeed() -> impl IntoView {
                         >
                             <span class=move || format!(
                                 "font-semibold text-sm {}",
-                                if active_room.get().is_private { "text-amber-400" } else { "text-brand" }
+                                if active_room.get().is_private { "text-warning" } else { "text-brand" }
                             )>
                                 {move || if active_room.get().is_private { "🔒 " } else { "# " }}
                                 {move || active_room.get().name}
@@ -266,7 +266,7 @@ pub fn ChatFeed() -> impl IntoView {
 
                     // Viewer/member count
                     <div class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-foreground/5 text-xs">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span class="w-1.5 h-1.5 rounded-full status-online"></span>
                         <span class="text-foreground/60">{move || active_room.get().online_count}" online"</span>
                     </div>
 

@@ -43,14 +43,14 @@ impl ReputationLevel {
 
     pub fn color_class(&self) -> &'static str {
         match self {
-            ReputationLevel::Newcomer => "text-foreground/60 bg-foreground/10 border-foreground/20",
-            ReputationLevel::Contributor => "text-sky-400 bg-sky-500/15 border-sky-500/30",
-            ReputationLevel::Established => "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-            ReputationLevel::Trusted => "text-violet-400 bg-violet-500/15 border-violet-500/30",
-            ReputationLevel::Respected => "text-amber-400 bg-amber-500/15 border-amber-500/30",
-            ReputationLevel::Distinguished => "text-rose-400 bg-rose-500/15 border-rose-500/30",
-            ReputationLevel::Elite => "text-fuchsia-400 bg-fuchsia-500/15 border-fuchsia-500/30",
-            ReputationLevel::Legendary => "text-brand bg-brand/15 border-brand/30",
+            ReputationLevel::Newcomer => "rep-newcomer bg-rep-newcomer/10 border-rep-newcomer/20",
+            ReputationLevel::Contributor => "rep-contributor bg-rep-contributor/15 border-rep-contributor/30",
+            ReputationLevel::Established => "rep-established bg-rep-established/15 border-rep-established/30",
+            ReputationLevel::Trusted => "rep-trusted bg-rep-trusted/15 border-rep-trusted/30",
+            ReputationLevel::Respected => "rep-respected bg-rep-respected/15 border-rep-respected/30",
+            ReputationLevel::Distinguished => "rep-distinguished bg-rep-distinguished/15 border-rep-distinguished/30",
+            ReputationLevel::Elite => "rep-elite bg-rep-elite/15 border-rep-elite/30",
+            ReputationLevel::Legendary => "rep-legendary bg-rep-legendary/15 border-rep-legendary/30",
         }
     }
 
@@ -118,21 +118,21 @@ pub enum CredentialRarity {
 impl CredentialRarity {
     pub fn color_class(&self) -> &'static str {
         match self {
-            CredentialRarity::Common => "from-slate-400 to-slate-600",
-            CredentialRarity::Uncommon => "from-emerald-400 to-emerald-600",
-            CredentialRarity::Rare => "from-sky-400 to-sky-600",
-            CredentialRarity::Epic => "from-violet-400 to-violet-600",
-            CredentialRarity::Legendary => "from-amber-400 to-amber-600",
+            CredentialRarity::Common => "from-foreground/40 to-foreground/60",
+            CredentialRarity::Uncommon => "from-success to-success/70",
+            CredentialRarity::Rare => "from-info to-info/70",
+            CredentialRarity::Epic => "from-secondary to-secondary/70",
+            CredentialRarity::Legendary => "from-warning to-warning/70",
         }
     }
 
     pub fn border_class(&self) -> &'static str {
         match self {
-            CredentialRarity::Common => "border-slate-500/30",
-            CredentialRarity::Uncommon => "border-emerald-500/30",
-            CredentialRarity::Rare => "border-sky-500/30",
-            CredentialRarity::Epic => "border-violet-500/30",
-            CredentialRarity::Legendary => "border-amber-500/30",
+            CredentialRarity::Common => "border-foreground/30",
+            CredentialRarity::Uncommon => "border-success/30",
+            CredentialRarity::Rare => "border-info/30",
+            CredentialRarity::Epic => "border-secondary/30",
+            CredentialRarity::Legendary => "border-warning/30",
         }
     }
 }

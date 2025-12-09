@@ -148,8 +148,8 @@ fn ShowcasedPostCard(#[prop(into)] post: ShowcasedPost) -> impl IntoView {
                 // Pin indicator
                 {if post.is_pinned {
                     view! {
-                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-warning/15 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
                             </svg>
                         </div>
@@ -221,8 +221,8 @@ fn FavoriteSynapseCard(#[prop(into)] synapse: FavoriteSynapse) -> impl IntoView 
             // Member stats
             <div class="text-right">
                 <p class="text-sm font-medium text-foreground">{format_count(synapse.member_count)}</p>
-                <p class="text-xs text-emerald-400 flex items-center gap-1 justify-end">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <p class="text-xs text-success flex items-center gap-1 justify-end">
+                    <span class="w-1.5 h-1.5 rounded-full status-online"></span>
                     {format_count(synapse.online_count)}" online"
                 </p>
             </div>
@@ -349,7 +349,7 @@ fn FeaturedBadgeCard(#[prop(into)] credential: Credential) -> impl IntoView {
             // Verified indicator
             {if credential.is_verified {
                 view! {
-                    <div class="mt-2 flex items-center justify-center gap-1 text-emerald-400 text-xs">
+                    <div class="mt-2 flex items-center justify-center gap-1 text-success text-xs">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/>
                         </svg>

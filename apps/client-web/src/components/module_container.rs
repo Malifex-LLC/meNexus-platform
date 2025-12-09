@@ -212,9 +212,9 @@ pub fn TabbedModules(
                 <div class="flex-1"></div>
 
                 // Connection status indicator
-                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-medium text-emerald-400">"Live"</span>
+                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-status-online/10 border border-status-online/20">
+                    <span class="w-2 h-2 rounded-full bg-status-online animate-pulse"></span>
+                    <span class="text-xs font-medium text-status-online">"Live"</span>
                 </div>
             </div>
 

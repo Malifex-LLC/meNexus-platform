@@ -11,9 +11,11 @@ pub fn MemberSection(
     #[prop(into)] role: MemberRole,
     #[prop(into)] members: Vec<Member>,
     /// Whether to show in compact mode
-    #[prop(into, optional)] compact: Option<bool>,
+    #[prop(into, optional)]
+    compact: Option<bool>,
     /// Whether the section starts collapsed
-    #[prop(into, optional)] default_collapsed: Option<bool>,
+    #[prop(into, optional)]
+    default_collapsed: Option<bool>,
 ) -> impl IntoView {
     let compact = compact.unwrap_or(false);
     let default_collapsed = default_collapsed.unwrap_or(false);
@@ -31,14 +33,14 @@ pub fn MemberSection(
                 on:click=move |_| set_is_collapsed.update(|v| *v = !*v)
             >
                 // Collapse indicator
-                <svg 
+                <svg
                     class=move || format!(
                         "w-3 h-3 text-foreground/40 transition-transform {}",
                         if is_collapsed.get() { "-rotate-90" } else { "" }
                     )
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                     stroke-width="2.5"
                 >
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -86,14 +88,16 @@ pub fn OnlineStatusSection(
     #[prop(into)] members_by_role: Vec<(MemberRole, Vec<Member>)>,
     #[prop(into)] is_online: bool,
     /// Whether to show in compact mode
-    #[prop(into, optional)] compact: Option<bool>,
+    #[prop(into, optional)]
+    compact: Option<bool>,
     /// Whether the section starts collapsed
-    #[prop(into, optional)] default_collapsed: Option<bool>,
+    #[prop(into, optional)]
+    default_collapsed: Option<bool>,
 ) -> impl IntoView {
     let compact = compact.unwrap_or(false);
     let default_collapsed = default_collapsed.unwrap_or(false);
     let (is_collapsed, set_is_collapsed) = signal(default_collapsed);
-    
+
     let total_count: usize = members_by_role.iter().map(|(_, m)| m.len()).sum();
 
     view! {
@@ -104,14 +108,14 @@ pub fn OnlineStatusSection(
                 on:click=move |_| set_is_collapsed.update(|v| *v = !*v)
             >
                 // Collapse indicator
-                <svg 
+                <svg
                     class=move || format!(
                         "w-4 h-4 text-foreground/40 transition-transform {}",
                         if is_collapsed.get() { "-rotate-90" } else { "" }
                     )
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                     stroke-width="2"
                 >
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -120,7 +124,7 @@ pub fn OnlineStatusSection(
                 // Online/Offline indicator
                 <span class=format!(
                     "w-2 h-2 rounded-full {}",
-                    if is_online { "bg-emerald-400" } else { "bg-foreground/30" }
+                    if is_online { "bg-status-online" } else { "bg-foreground/30" }
                 )></span>
 
                 // Title
@@ -134,10 +138,10 @@ pub fn OnlineStatusSection(
                 // Count badge
                 <span class=format!(
                     "px-1.5 py-0.5 rounded-full text-xs font-mono {}",
-                    if is_online { 
-                        "bg-emerald-500/15 text-emerald-400" 
-                    } else { 
-                        "bg-foreground/10 text-foreground/40" 
+                    if is_online {
+                        "bg-status-online/15 text-status-online"
+                    } else {
+                        "bg-foreground/10 text-foreground/40"
                     }
                 )>
                     {total_count}
@@ -155,10 +159,10 @@ pub fn OnlineStatusSection(
                 <div class="pl-4 pt-2">
                     {members_by_role.into_iter().map(|(role, members)| {
                         view! {
-                            <MemberSection 
-                                role=role 
-                                members=members 
-                                compact=compact 
+                            <MemberSection
+                                role=role
+                                members=members
+                                compact=compact
                             />
                         }
                     }).collect_view()}

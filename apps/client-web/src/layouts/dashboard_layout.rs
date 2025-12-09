@@ -11,7 +11,7 @@ pub fn DashboardLayout() -> impl IntoView {
         <MainLayout>
             <div class="h-full w-full flex overflow-hidden">
                 // Main content area with feed
-                <main class="flex-1 overflow-y-auto scrollbar-styled">
+                <main class="flex-1 overflow-y-auto scrollbar-styled bg-panel/50">
                     <div class="max-w-2xl mx-auto p-4 lg:p-6">
                         // Dashboard header
                         <header class="mb-6">
@@ -27,11 +27,11 @@ pub fn DashboardLayout() -> impl IntoView {
                                         <p class="text-sm text-foreground/50">"Your global network feed"</p>
                                     </div>
                                 </div>
-                                
+
                                 // Quick stats
                                 <div class="hidden md:flex items-center gap-4 text-sm">
-                                    <div class="flex items-center gap-1.5 text-emerald-400">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <div class="flex items-center gap-1.5 text-status-online">
+                                        <span class="w-2 h-2 rounded-full bg-status-online animate-pulse"></span>
                                         <span class="font-medium">"491"</span>
                                         <span class="text-foreground/40">"online"</span>
                                     </div>
@@ -45,7 +45,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             // Breadcrumb / context bar
                             <div class="flex items-center gap-2 text-xs text-foreground/40 mt-3">
                                 <span class="flex items-center gap-1.5">
@@ -65,11 +65,11 @@ pub fn DashboardLayout() -> impl IntoView {
                 </main>
 
                 // Right sidebar - trending, network stats
-                <aside class="hidden xl:block w-80 flex-shrink-0 border-l border-border/30 overflow-y-auto scrollbar-thin bg-panel/30">
+                <aside class="hidden xl:block w-80 flex-shrink-0 border-l border-border/30 overflow-y-auto scrollbar-thin bg-panel/50">
                     <div class="p-4 space-y-4">
                         // Network stats widget
                         <NetworkStatsWidget />
-                        
+
                         // Trending sidebar
                         <TrendingSidebar />
                     </div>

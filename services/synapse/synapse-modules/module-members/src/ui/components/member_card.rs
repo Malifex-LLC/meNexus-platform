@@ -75,8 +75,8 @@ pub fn MemberCard(
                         }}
                         {if is_streaming {
                             view! {
-                                <span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[10px] font-medium">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                                <span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-status-streaming/20 text-status-streaming text-[10px] font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full status-streaming animate-pulse"></span>
                                     "LIVE"
                                 </span>
                             }.into_any()
@@ -146,7 +146,7 @@ pub fn MemberCard(
                     // Streaming indicator
                     {if is_streaming {
                         view! {
-                            <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 ring-2 ring-card flex items-center justify-center">
+                            <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full status-streaming ring-2 ring-card flex items-center justify-center">
                                 <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
                             </div>
                         }.into_any()

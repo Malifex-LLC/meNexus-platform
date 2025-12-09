@@ -7,12 +7,23 @@ use leptos_router::components::A;
 /// Types of notifications
 #[derive(Clone)]
 pub enum NotificationType {
-    Like { post_preview: String },
-    Comment { post_preview: String, comment_preview: String },
+    Like {
+        post_preview: String,
+    },
+    Comment {
+        post_preview: String,
+        comment_preview: String,
+    },
     Follow,
-    Mention { post_preview: String },
-    Reply { comment_preview: String },
-    SynapseInvite { synapse_name: String },
+    Mention {
+        post_preview: String,
+    },
+    Reply {
+        comment_preview: String,
+    },
+    SynapseInvite {
+        synapse_name: String,
+    },
 }
 
 /// Represents a notification
@@ -84,14 +95,14 @@ fn get_mock_notifications() -> Vec<Notification> {
 pub fn NotificationsDropdown() -> impl IntoView {
     let notifications = get_mock_notifications();
     let (is_open, set_is_open) = signal(false);
-    
+
     let unread_count = notifications.iter().filter(|n| !n.is_read).count();
     let display_notifications = notifications.clone();
 
     view! {
-        <div class="relative">
+        <div class="relative z-[9999]">
             // Notification bell button
-            <button 
+            <button
                 class="relative p-2.5 rounded-xl bg-panel/50 hover:bg-panel border border-border/30 hover:border-border/50 transition-all"
                 on:click=move |_| set_is_open.update(|v| *v = !*v)
             >
@@ -110,9 +121,9 @@ pub fn NotificationsDropdown() -> impl IntoView {
                 }}
             </button>
 
-            // Dropdown panel
+            // Dropdown panel - positioned to the left to stay on screen
             <div class=move || format!(
-                "absolute right-0 top-full mt-2 w-80 rounded-xl border border-border/50 bg-panel shadow-xl shadow-black/20 z-50 transition-all duration-200 origin-top-right {}",
+                "absolute left-0 top-full mt-2 w-80 rounded-xl border border-border/50 bg-panel shadow-xl shadow-black/20 z-[9999] transition-all duration-200 origin-top-left {}",
                 if is_open.get() { "opacity-100 scale-100" } else { "opacity-0 scale-95 pointer-events-none" }
             )>
                 // Header
@@ -174,14 +185,16 @@ pub fn NotificationsDropdown() -> impl IntoView {
 
 #[component]
 fn NotificationItem(notification: Notification) -> impl IntoView {
-    let initials: String = notification.actor_handle
+    let initials: String = notification
+        .actor_handle
         .chars()
         .take(2)
         .collect::<String>()
         .to_uppercase();
-    
+
     let (icon_svg, icon_bg) = get_notification_icon(&notification.notification_type);
-    let message = get_notification_message(&notification.actor_handle, &notification.notification_type);
+    let message =
+        get_notification_message(&notification.actor_handle, &notification.notification_type);
 
     view! {
         <div class=format!(
@@ -192,7 +205,7 @@ fn NotificationItem(notification: Notification) -> impl IntoView {
             <div class="relative flex-shrink-0">
                 {if let Some(avatar_url) = notification.actor_avatar.clone() {
                     view! {
-                        <img 
+                        <img
                             src=avatar_url
                             alt=format!("{}'s avatar", notification.actor_handle)
                             class="w-10 h-10 rounded-full object-cover"
@@ -238,34 +251,34 @@ fn get_notification_icon(notification_type: &NotificationType) -> (&'static str,
     match notification_type {
         NotificationType::Like { .. } => (
             r#"<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>"#,
-            "bg-rose-500"
+            "bg-notif-like",
         ),
         NotificationType::Comment { .. } => (
             r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>"#,
-            "bg-violet-500"
+            "bg-notif-reply",
         ),
         NotificationType::Follow => (
             r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>"#,
-            "bg-sky-500"
+            "bg-notif-follow",
         ),
         NotificationType::Mention { .. } => (
             r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>"#,
-            "bg-amber-500"
+            "bg-notif-mention",
         ),
         NotificationType::Reply { .. } => (
             r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>"#,
-            "bg-indigo-500"
+            "bg-notif-reply",
         ),
         NotificationType::SynapseInvite { .. } => (
             r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>"#,
-            "bg-violet-500"
+            "bg-notif-system",
         ),
     }
 }
 
 fn get_notification_message(actor: &str, notification_type: &NotificationType) -> impl IntoView {
     let actor = actor.to_string();
-    
+
     match notification_type.clone() {
         NotificationType::Like { post_preview } => view! {
             <span>
@@ -309,7 +322,7 @@ fn get_notification_message(actor: &str, notification_type: &NotificationType) -
             <span>
                 <A href=format!("/profiles/{}", actor) attr:class="font-semibold text-brand hover:underline">{"@"}{actor.clone()}</A>
                 " invited you to join "
-                <span class="font-medium text-violet-400">{synapse_name.clone()}</span>
+                <span class="font-medium text-secondary">{synapse_name.clone()}</span>
             </span>
         }.into_any(),
     }
@@ -322,4 +335,3 @@ fn truncate(s: &str, max_len: usize) -> String {
         format!("{}…", &s[..max_len])
     }
 }
-

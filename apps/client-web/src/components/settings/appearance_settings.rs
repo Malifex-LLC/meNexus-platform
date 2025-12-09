@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use super::types::{FontSize, ThemeOption};
+use super::types::{FontSize, UserTheme};
 use leptos::prelude::*;
 
 /// Appearance settings panel
 #[component]
 pub fn AppearanceSettings() -> impl IntoView {
-    let (theme, set_theme) = signal(ThemeOption::GruvboxDark);
+    let (theme, set_theme) = signal(UserTheme::Midnight);
     let (font_size, set_font_size) = signal(FontSize::Medium);
     let (compact_mode, set_compact_mode) = signal(false);
     let (reduce_animations, set_reduce_animations) = signal(false);
     let (high_contrast, set_high_contrast) = signal(false);
     let (show_avatars, set_show_avatars) = signal(true);
     let (show_previews, set_show_previews) = signal(true);
-    let (accent_color, set_accent_color) = signal("#6366f1".to_string()); // Brand purple
+    let (accent_color, set_accent_color) = signal("#6366f1".to_string());
 
     view! {
         <div class="space-y-6">
@@ -24,24 +24,51 @@ pub fn AppearanceSettings() -> impl IntoView {
                 <p class="text-sm text-foreground/50">"Customize your visual experience"</p>
             </div>
 
-            // Theme Selection
-            <div class="bg-card border border-border/50 rounded-2xl p-6 space-y-5">
-                <h3 class="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                    </svg>
-                    "Theme"
-                </h3>
+            // Theme explanation banner
+            <div class="bg-gradient-to-r from-brand/10 via-violet-500/5 to-transparent border border-brand/20 rounded-2xl p-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand/15 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-foreground mb-1">"Two Theme Systems"</h3>
+                        <p class="text-sm text-foreground/60 mb-2">
+                            "Your app has two separate theme systems:"
+                        </p>
+                        <ul class="text-sm text-foreground/50 space-y-1">
+                            <li class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-brand"></span>
+                                <span><strong class="text-foreground/70">"User Theme"</strong>" — Controls your personal app experience (Dashboard, Messages, Settings, etc.)"</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-violet-400"></span>
+                                <span><strong class="text-foreground/70">"Synapse Theme"</strong>" — Set by each Synapse's host, creating unique community experiences"</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    {ThemeOption::all().into_iter().map(|option| {
-                        let (bg_class, fg_class, accent_class) = match option {
-                            ThemeOption::System => ("bg-gradient-to-br from-gray-800 to-gray-100", "bg-gray-400", "bg-blue-500"),
-                            ThemeOption::Light => ("bg-white", "bg-gray-200", "bg-blue-500"),
-                            ThemeOption::Dark => ("bg-gray-900", "bg-gray-700", "bg-blue-500"),
-                            ThemeOption::GruvboxDark => ("bg-[#282828]", "bg-[#3c3836]", "bg-[#fe8019]"),
-                            ThemeOption::SalmonRoasted => ("bg-[#1a1a2e]", "bg-[#16213e]", "bg-[#e94560]"),
-                        };
+            // User Theme Selection
+            <div class="bg-card border border-border/50 rounded-2xl p-6 space-y-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                        </svg>
+                        "Your Theme"
+                    </h3>
+                    <span class="text-xs text-foreground/40 bg-foreground/5 px-2 py-1 rounded-lg">"App-wide"</span>
+                </div>
+                <p class="text-xs text-foreground/50 -mt-3">
+                    "Applies to Control Panel, Dashboard, Messages, Notifications, Search, Profile, and Settings"
+                </p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {UserTheme::all().into_iter().map(|option| {
+                        let (bg, card, accent) = option.colors();
                         
                         view! {
                             <button
@@ -56,11 +83,23 @@ pub fn AppearanceSettings() -> impl IntoView {
                                 on:click=move |_| set_theme.set(option)
                             >
                                 // Theme preview
-                                <div class=format!("w-full aspect-[4/3] rounded-lg overflow-hidden {}", bg_class)>
+                                <div 
+                                    class="w-full aspect-[4/3] rounded-lg overflow-hidden"
+                                    style=format!("background-color: {}", bg)
+                                >
                                     <div class="p-2 space-y-1.5">
-                                        <div class=format!("h-2 w-8 rounded {}", fg_class)></div>
-                                        <div class=format!("h-2 w-12 rounded {}", fg_class)></div>
-                                        <div class=format!("h-2 w-6 rounded {}", accent_class)></div>
+                                        <div 
+                                            class="h-2 w-8 rounded"
+                                            style=format!("background-color: {}", card)
+                                        ></div>
+                                        <div 
+                                            class="h-2 w-12 rounded"
+                                            style=format!("background-color: {}", card)
+                                        ></div>
+                                        <div 
+                                            class="h-2 w-6 rounded"
+                                            style=format!("background-color: {}", accent)
+                                        ></div>
                                     </div>
                                 </div>
                                 <p class="text-xs text-center mt-2 text-foreground/70 font-medium">{option.label()}</p>
@@ -81,6 +120,53 @@ pub fn AppearanceSettings() -> impl IntoView {
                         }
                     }).collect_view()}
                 </div>
+
+                // Current theme info
+                <div class="p-3 bg-foreground/5 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-foreground">{move || theme.get().label()}</p>
+                            <p class="text-xs text-foreground/50">{move || theme.get().description()}</p>
+                        </div>
+                        <div class="flex gap-1">
+                            {move || {
+                                let (bg, card, accent) = theme.get().colors();
+                                view! {
+                                    <span class="w-6 h-6 rounded-lg border border-border/30" style=format!("background-color: {}", bg) title="Background"></span>
+                                    <span class="w-6 h-6 rounded-lg border border-border/30" style=format!("background-color: {}", card) title="Card"></span>
+                                    <span class="w-6 h-6 rounded-lg border border-border/30" style=format!("background-color: {}", accent) title="Accent"></span>
+                                }
+                            }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            // Synapse Theme Info
+            <div class="bg-card border border-border/50 rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        "Synapse Themes"
+                    </h3>
+                    <span class="text-xs text-violet-400 bg-violet-500/10 px-2 py-1 rounded-lg">"Per-Synapse"</span>
+                </div>
+                
+                <div class="p-4 bg-violet-500/5 border border-violet-500/20 rounded-xl">
+                    <p class="text-sm text-foreground/70 mb-3">
+                        "Each Synapse can have its own unique theme, configured by the Synapse host. When you visit different Synapses, they may look completely different!"
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"Cyberpunk"</span>
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"Nature"</span>
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"Ocean"</span>
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"Sunset"</span>
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"Retro"</span>
+                        <span class="px-2 py-1 text-xs bg-foreground/5 rounded-lg text-foreground/50">"+ more"</span>
+                    </div>
+                </div>
             </div>
 
             // Accent Color
@@ -89,8 +175,11 @@ pub fn AppearanceSettings() -> impl IntoView {
                     <svg class="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
                     </svg>
-                    "Accent Color"
+                    "Custom Accent Color"
                 </h3>
+                <p class="text-xs text-foreground/50 -mt-3">
+                    "Override the theme's accent color (optional)"
+                </p>
 
                 <div class="flex flex-wrap gap-3">
                     {[

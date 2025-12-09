@@ -26,10 +26,10 @@ impl MemberRole {
     /// Get badge styling classes for the role
     pub fn badge_classes(&self) -> &'static str {
         match self {
-            MemberRole::Owner => "bg-amber-500/20 text-amber-400 border-amber-500/30",
-            MemberRole::Admin => "bg-rose-500/20 text-rose-400 border-rose-500/30",
-            MemberRole::Moderator => "bg-violet-500/20 text-violet-400 border-violet-500/30",
-            MemberRole::Member => "bg-foreground/10 text-foreground/50 border-foreground/20",
+            MemberRole::Owner => "bg-role-owner text-role-owner border-role-owner/30",
+            MemberRole::Admin => "bg-role-admin text-role-admin border-role-admin/30",
+            MemberRole::Moderator => "bg-role-moderator text-role-moderator border-role-moderator/30",
+            MemberRole::Member => "bg-role-member text-role-member border-role-member/30",
         }
     }
 
@@ -67,10 +67,10 @@ impl OnlineStatus {
     /// Get the status indicator color class
     pub fn indicator_class(&self) -> &'static str {
         match self {
-            OnlineStatus::Online => "bg-emerald-400",
-            OnlineStatus::Away => "bg-amber-400",
-            OnlineStatus::DoNotDisturb => "bg-rose-400",
-            OnlineStatus::Offline => "bg-foreground/30",
+            OnlineStatus::Online => "status-online",
+            OnlineStatus::Away => "status-away",
+            OnlineStatus::DoNotDisturb => "status-busy",
+            OnlineStatus::Offline => "status-offline",
         }
     }
 

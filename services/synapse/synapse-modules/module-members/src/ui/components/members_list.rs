@@ -11,12 +11,15 @@ pub fn MembersList() -> impl IntoView {
     // Get mock data
     let members = Member::mock_members();
     let members_for_stats = members.clone();
-    
+
     let online_by_role = Member::get_online_by_role(&members);
     let offline_by_role = Member::get_offline_by_role(&members);
-    
+
     let total_count = members.len();
-    let online_count = members_for_stats.iter().filter(|m| m.status.is_online()).count();
+    let online_count = members_for_stats
+        .iter()
+        .filter(|m| m.status.is_online())
+        .count();
     let streaming_count = members_for_stats.iter().filter(|m| m.is_streaming).count();
 
     // Search state
@@ -57,10 +60,10 @@ pub fn MembersList() -> impl IntoView {
                         } else {
                             view! { <span></span> }.into_any()
                         }}
-                        
+
                         // Online count badge
-                        <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-online/15 text-status-online text-xs font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-status-online animate-pulse"></span>
                             {online_count}" online"
                         </span>
                     </div>
@@ -79,10 +82,10 @@ pub fn MembersList() -> impl IntoView {
                             <button
                                 class=move || format!(
                                     "p-1.5 rounded-lg transition-colors {}",
-                                    if show_search.get() { 
-                                        "text-brand bg-brand/10" 
-                                    } else { 
-                                        "text-foreground/50 hover:text-foreground hover:bg-foreground/5" 
+                                    if show_search.get() {
+                                        "text-brand bg-brand/10"
+                                    } else {
+                                        "text-foreground/50 hover:text-foreground hover:bg-foreground/5"
                                     }
                                 )
                                 on:click=move |_| {
@@ -96,7 +99,7 @@ pub fn MembersList() -> impl IntoView {
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
                                 </svg>
                             </button>
-                            
+
                             {move || {
                                 if show_search.get() {
                                     view! {
@@ -120,10 +123,10 @@ pub fn MembersList() -> impl IntoView {
                         <button
                             class=move || format!(
                                 "p-1.5 rounded transition-colors {}",
-                                if !compact_view.get() { 
-                                    "bg-brand/15 text-brand" 
-                                } else { 
-                                    "text-foreground/40 hover:text-foreground/60" 
+                                if !compact_view.get() {
+                                    "bg-brand/15 text-brand"
+                                } else {
+                                    "text-foreground/40 hover:text-foreground/60"
                                 }
                             )
                             on:click=move |_| set_compact_view.set(false)
@@ -136,10 +139,10 @@ pub fn MembersList() -> impl IntoView {
                         <button
                             class=move || format!(
                                 "p-1.5 rounded transition-colors {}",
-                                if compact_view.get() { 
-                                    "bg-brand/15 text-brand" 
-                                } else { 
-                                    "text-foreground/40 hover:text-foreground/60" 
+                                if compact_view.get() {
+                                    "bg-brand/15 text-brand"
+                                } else {
+                                    "text-foreground/40 hover:text-foreground/60"
                                 }
                             )
                             on:click=move |_| set_compact_view.set(true)
@@ -201,11 +204,11 @@ pub fn MembersList() -> impl IntoView {
                         </span>
                         <span class="text-foreground/20">"|"</span>
                         <span class="flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-status-online"></span>
                             {online_count}" active"
                         </span>
                     </div>
-                    
+
                     <button class="text-foreground/40 hover:text-brand transition-colors font-medium">
                         "Invite members"
                     </button>
@@ -221,7 +224,7 @@ pub fn MembersSidebar() -> impl IntoView {
     let members = Member::mock_members();
     let online_by_role = Member::get_online_by_role(&members);
     let offline_by_role = Member::get_offline_by_role(&members);
-    
+
     let online_count = members.iter().filter(|m| m.status.is_online()).count();
     let total_count = members.len();
 

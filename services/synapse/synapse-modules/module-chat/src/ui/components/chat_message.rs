@@ -46,9 +46,9 @@ pub fn ChatMessageCard(
 
     // Role badge
     let role_badge = match author.role {
-        UserRole::Owner => Some(("Owner", "bg-amber-500/20 text-amber-400 border-amber-500/30")),
-        UserRole::Admin => Some(("Admin", "bg-rose-500/20 text-rose-400 border-rose-500/30")),
-        UserRole::Moderator => Some(("Mod", "bg-violet-500/20 text-violet-400 border-violet-500/30")),
+        UserRole::Owner => Some(("Owner", "bg-role-owner text-role-owner border-role-owner/30")),
+        UserRole::Admin => Some(("Admin", "bg-role-admin text-role-admin border-role-admin/30")),
+        UserRole::Moderator => Some(("Mod", "bg-role-moderator text-role-moderator border-role-moderator/30")),
         UserRole::Member => None,
     };
 
@@ -95,7 +95,7 @@ pub fn ChatMessageCard(
                             // Online indicator
                             {if author_is_online {
                                 view! {
-                                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background"></div>
+                                    <div class="absolute bottom-0 right-0 w-3 h-3 status-online rounded-full border-2 border-background"></div>
                                 }.into_any()
                             } else {
                                 view! { <span></span> }.into_any()

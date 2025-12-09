@@ -60,12 +60,12 @@ pub fn SynapsesList() -> impl IntoView {
     view! {
         <div class="space-y-1">
             // Header
-            <button 
+            <button
                 class="w-full flex items-center justify-between px-1 py-1 text-[10px] font-medium text-foreground/40 uppercase tracking-wider hover:text-foreground/60 transition-colors"
                 on:click=move |_| set_is_expanded.update(|v| *v = !*v)
             >
                 <div class="flex items-center gap-1.5">
-                    <svg class="w-3 h-3 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-3 h-3 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                     <span>"Synapses"</span>
@@ -80,7 +80,7 @@ pub fn SynapsesList() -> impl IntoView {
                         view! { <span></span> }.into_any()
                     }}
                 </div>
-                <svg 
+                <svg
                     class=move || format!("w-3 h-3 transition-transform {}", if is_expanded.get() { "" } else { "-rotate-90" })
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
                 >
@@ -98,33 +98,33 @@ pub fn SynapsesList() -> impl IntoView {
                                 let public_key = synapse.public_key.clone();
                                 let unread = synapse.unread_count;
                                 let is_online = synapse.is_online;
-                                
+
                                 let first_char = name.chars().next().unwrap_or('S').to_uppercase().to_string();
 
                                 view! {
-                                    <A 
+                                    <A
                                         href=format!("/synapses/{}", public_key)
                                         attr:class="group flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-foreground/5 transition-colors"
                                     >
                                         // Icon
                                         <div class="relative flex-shrink-0">
-                                            <div class="w-6 h-6 rounded bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center">
-                                                <span class="text-violet-400 font-bold text-[10px]">{first_char}</span>
+                                            <div class="w-6 h-6 rounded bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center">
+                                                <span class="text-secondary font-bold text-[10px]">{first_char}</span>
                                             </div>
                                             {if is_online {
                                                 view! {
-                                                    <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-panel"></div>
+                                                    <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 status-online rounded-full border border-panel"></div>
                                                 }.into_any()
                                             } else {
                                                 view! { <span></span> }.into_any()
                                             }}
                                         </div>
-                                        
+
                                         <span class="flex-1 text-xs text-foreground/70 group-hover:text-foreground truncate">{name}</span>
-                                        
+
                                         {if unread > 0 {
                                             view! {
-                                                <span class="min-w-4 h-4 px-1 flex items-center justify-center rounded-full bg-violet-500 text-white text-[10px] font-bold">
+                                                <span class="min-w-4 h-4 px-1 flex items-center justify-center rounded-full bg-brand text-white text-[10px] font-bold">
                                                     {unread}
                                                 </span>
                                             }.into_any()
@@ -134,7 +134,7 @@ pub fn SynapsesList() -> impl IntoView {
                                     </A>
                                 }
                             }).collect_view()}
-                            
+
                             <A href="/synapses" attr:class="flex items-center gap-2 px-2 py-1 text-[10px] text-foreground/40 hover:text-brand transition-colors">
                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
