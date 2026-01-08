@@ -2,39 +2,83 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::{
-    server_fns::list_posts_for_channel_server, types::ListPostsForChannelRequest,
-    ui::components::compose_bar::ComposeBar, ui::components::post_card::PostCard,
+    server_fns::{
+        get_posts_config_server, get_remote_posts_config_server, list_posts_for_channel_server,
+        list_remote_posts_for_channel_server,
+    },
+    types::{ListPostsForChannelRequest, PostsModuleConfig},
+    ui::components::compose_bar::ComposeBar,
+    ui::components::post_card::PostCard,
 };
 use leptos::prelude::*;
 use synapse_core::domain::profiles::Profile;
 
 /// Main posts feed component - responsive with collapsible channel selector
+///
+/// When `synapse_public_key` is provided, fetches posts from the remote synapse.
+/// When `None`, fetches posts from the local synapse.
 #[component]
-pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
-    provide_context(session_user_profile);
+pub fn PostsFeed(
+    session_user_profile: Profile,
+    /// Optional synapse public key for viewing a remote synapse's posts
+    #[prop(into, optional)]
+    synapse_public_key: Option<String>,
+) -> impl IntoView {
+    provide_context(session_user_profile.clone());
 
-    let channels = vec![
-        "general".to_string(),
-        "memes".to_string(),
-        "support".to_string(),
-    ];
-    let channels_for_dropdown = channels.clone();
-    let channels_for_sidebar = channels.clone();
+    let is_remote = synapse_public_key.is_some();
+    let synapse_pk = synapse_public_key.clone();
+    let synapse_pk_for_posts = synapse_public_key.clone();
 
-    let (active_channel, set_active_channel) = signal(channels[0].clone());
+    // Fetch posts module config from the server (local or remote)
+    let config_resource = Resource::new(
+        move || synapse_pk.clone(),
+        |synapse_pk: Option<String>| async move {
+            match synapse_pk {
+                Some(pk) => get_remote_posts_config_server(pk).await.unwrap_or_default(),
+                None => get_posts_config_server().await.unwrap_or_default(),
+            }
+        },
+    );
+
+    let (active_channel, set_active_channel) = signal(String::new());
     let (show_channel_dropdown, set_show_channel_dropdown) = signal(false);
     let (show_sidebar, set_show_sidebar) = signal(false);
     let (refresh, set_refresh) = signal(0usize);
+    let (config_initialized, set_config_initialized) = signal(false);
+
+    // Initialize active channel when config loads
+    Effect::new(move |_| {
+        if let Some(config) = config_resource.get() {
+            if !config_initialized.get() {
+                set_active_channel.set(config.default_channel.clone());
+                set_config_initialized.set(true);
+            }
+        }
+    });
 
     let posts = Resource::new(
-        move || (active_channel.get(), refresh.get()),
-        |(channel, refresh_counter): (String, usize)| async move {
-            list_posts_for_channel_server(ListPostsForChannelRequest {
-                event_type: "posts:create_post".to_string(),
-                channel,
-            })
-            .await
-            .unwrap_or_default()
+        move || (
+            active_channel.get(),
+            refresh.get(),
+            config_initialized.get(),
+            synapse_pk_for_posts.clone(),
+        ),
+        |(channel, _refresh_counter, initialized, synapse_pk): (String, usize, bool, Option<String>)| async move {
+            if !initialized || channel.is_empty() {
+                return vec![];
+            }
+            match synapse_pk {
+                Some(pk) => list_remote_posts_for_channel_server(pk, channel)
+                    .await
+                    .unwrap_or_default(),
+                None => list_posts_for_channel_server(ListPostsForChannelRequest {
+                    event_type: "posts:create_post".to_string(),
+                    channel,
+                })
+                .await
+                .unwrap_or_default(),
+            }
         },
     );
 
@@ -43,6 +87,14 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
         Callback::new(move |_: ()| {
             set_refresh.update(|n| *n += 1);
         })
+    };
+
+    // Helper to get channels from config
+    let channels = move || {
+        config_resource
+            .get()
+            .map(|c| c.channels)
+            .unwrap_or_default()
     };
 
     view! {
@@ -89,7 +141,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
 
                     // Channel List
                     <nav class="space-y-0.5">
-                        {channels_for_sidebar.iter().map(|channel| {
+                        {move || channels().into_iter().map(|channel| {
                             let channel_for_button = channel.clone();
                             let channel_for_click = channel.clone();
                             let channel_for_indicator = channel.clone();
@@ -178,7 +230,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                             if show_channel_dropdown.get() {
                                 view! {
                                     <div class="absolute top-full left-0 mt-1 w-48 bg-panel border border-border/50 rounded-xl shadow-xl z-50 py-1">
-                                        {channels_for_dropdown.iter().map(|channel| {
+                                        {channels().into_iter().map(|channel| {
                                             let channel_id_for_class = channel.clone();
                                             let channel_id_for_click = channel.clone();
                                             let channel_name = channel.clone();
@@ -232,7 +284,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
 
                 // Posts List
                 <div class="flex-1 overflow-y-auto scrollbar-styled">
-                    <Suspense fallback=move || view! {
+                    <Transition fallback=move || view! {
                         <div class="p-3 space-y-3">
                             {(0..3).map(|_| view! {
                                 <div class="animate-pulse bg-panel rounded-xl p-4 border border-border/30">
@@ -251,7 +303,8 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                             }).collect_view()}
                         </div>
                     }>
-                        {move || posts.get().map(|posts_list| {
+                        {move || {
+                            let posts_list = posts.get().unwrap_or_default();
                             if posts_list.is_empty() {
                                 view! {
                                     <div class="flex flex-col items-center justify-center h-48 text-center p-4">
@@ -267,7 +320,7 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                             } else {
                                 view! {
                                     <div class="p-2 m-4 sm:p-3 space-y-8 sm:space-y-3">
-                                        {posts_list.iter().rev().map(|post| view! {
+                                        {posts_list.into_iter().rev().map(|post| view! {
                                             <PostCard
                                                 id=post.id.clone()
                                                 author_public_key=post.author_public_key.clone()
@@ -285,15 +338,21 @@ pub fn PostsFeed(session_user_profile: Profile) -> impl IntoView {
                                     </div>
                                 }.into_any()
                             }
-                        })}
-                    </Suspense>
+                        }}
+                    </Transition>
                 </div>
 
-                // Compose bar
-                <ComposeBar
-                    channel=active_channel
-                    on_post_created=on_post_created
-                />
+                // Compose bar (only shown for local synapse)
+                {if !is_remote {
+                    view! {
+                        <ComposeBar
+                            channel=active_channel
+                            on_post_created=on_post_created
+                        />
+                    }.into_any()
+                } else {
+                    view! { <span></span> }.into_any()
+                }}
             </main>
         </div>
     }

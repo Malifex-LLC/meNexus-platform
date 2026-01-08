@@ -19,13 +19,14 @@ use tracing::debug;
 
 use crate::{
     errors::ModulePostsError,
-    service::{create_post, list_posts},
+    service::{create_post, get_posts_config, list_posts},
 };
 use crate::{
     service::list_posts_for_channel,
     types::{
-        CreatePostRequest, ListPostsForChannelRequest, ListPostsForChannelResult, ListPostsRequest,
-        ListPostsResult, ListRemotePostsRequest, ListRemotePostsResult, Post, PostsDeps,
+        CreatePostRequest, GetPostsConfigResult, ListPostsForChannelRequest,
+        ListPostsForChannelResult, ListPostsRequest, ListPostsResult, ListRemotePostsRequest,
+        ListRemotePostsResult, Post, PostsDeps, PostsModuleConfig,
     },
 };
 
@@ -68,6 +69,39 @@ impl Module for PostsModule {
                     .unwrap();
                 Ok(posts)
             }
+            "posts:list_posts_for_channel" => {
+                // Extract channel from metadata
+                let channel = event
+                    .metadata
+                    .as_ref()
+                    .and_then(|m| m.get("channel"))
+                    .cloned()
+                    .unwrap_or_default();
+
+                let posts = self
+                    .repo
+                    .retrieve(EventFilter {
+                        event_type: Some("posts:create_post".to_string()),
+                        module_kind: None,
+                        module_slug: Some(channel),
+                    })
+                    .await
+                    .unwrap();
+                Ok(posts)
+            }
+            "posts:get_config" => {
+                let config = get_posts_config().map_err(|e| CoreError::Other(e.to_string()))?;
+                let config_bytes =
+                    serde_json::to_vec(&config).map_err(|e| CoreError::Other(e.to_string()))?;
+                let synapse_config = get_synapse_config().unwrap();
+                let res_event = Event::new()
+                    .with_event_type("posts:config")
+                    .with_module_kind("posts")
+                    .with_agent(synapse_config.identity.public_key.clone())
+                    .with_data(config_bytes)
+                    .build();
+                Ok(vec![res_event])
+            }
             _ => Ok(vec![]),
         }
     }
@@ -82,6 +116,7 @@ where
     axum::Router::new()
         .route("/posts", get(list_posts_http))
         .route("/posts", post(create_post_http))
+        .route("/posts/config", get(get_posts_config_http))
         .route("/posts/{channel}", get(list_posts_for_channel_http))
         .route(
             "/synapses/{synapse_public_key}/posts",
@@ -90,6 +125,14 @@ where
         .route(
             "/synapses/{synapse_public_key}/posts",
             post(create_post_remote),
+        )
+        .route(
+            "/synapses/{synapse_public_key}/posts/config",
+            get(get_posts_config_remote_http),
+        )
+        .route(
+            "/synapses/{synapse_public_key}/posts/{channel}",
+            get(list_posts_for_channel_remote_http),
         )
 }
 
@@ -185,6 +228,125 @@ async fn create_post_remote(
         .await
         .map_err(|_| axum::http::StatusCode::BAD_GATEWAY)?;
     Ok((axum::http::StatusCode::CREATED, axum::Json(res)))
+}
+
+/// Get posts module configuration (local)
+async fn get_posts_config_http() -> Result<(StatusCode, Json<GetPostsConfigResult>), ModulePostsError> {
+    let config = get_posts_config()?;
+    Ok((StatusCode::OK, Json(GetPostsConfigResult { config })))
+}
+
+/// Get posts module configuration from a remote synapse
+async fn get_posts_config_remote_http(
+    axum::extract::State(deps): axum::extract::State<PostsDeps>,
+    Path(synapse_public_key): Path<String>,
+) -> Result<(StatusCode, Json<GetPostsConfigResult>), ModulePostsError> {
+    let inner = CreateEventCommand {
+        event_type: "posts:get_config".to_string(),
+        module_kind: Some("posts".to_string()),
+        module_slug: None,
+        agent: "local-agent".to_string(),
+        target: None,
+        previous: None,
+        content: None,
+        artifacts: None,
+        metadata: None,
+        links: None,
+        data: None,
+        expiration: None,
+    };
+
+    let cmd = CreateRemoteEventCommand {
+        synapse_public_key,
+        event: inner,
+    };
+
+    let results = deps.create_remote_event.execute(cmd).await?;
+
+    // Parse the config from the first event's data field
+    if let Some(event) = results.first() {
+        if let Some(data) = &event.data {
+            if let Ok(config) = serde_json::from_slice::<PostsModuleConfig>(data) {
+                return Ok((StatusCode::OK, Json(GetPostsConfigResult { config })));
+            }
+        }
+    }
+
+    // Fallback to default config if remote didn't return valid config
+    Ok((
+        StatusCode::OK,
+        Json(GetPostsConfigResult {
+            config: PostsModuleConfig::default(),
+        }),
+    ))
+}
+
+/// List posts for a specific channel from a remote synapse
+async fn list_posts_for_channel_remote_http(
+    axum::extract::State(deps): axum::extract::State<PostsDeps>,
+    Path((synapse_public_key, channel)): Path<(String, String)>,
+) -> Result<(StatusCode, Json<Vec<Post>>), ModulePostsError> {
+    let mut metadata = std::collections::HashMap::new();
+    metadata.insert("channel".to_string(), channel);
+
+    let inner = CreateEventCommand {
+        event_type: "posts:list_posts_for_channel".to_string(),
+        module_kind: Some("posts".to_string()),
+        module_slug: None,
+        agent: "local-agent".to_string(),
+        target: None,
+        previous: None,
+        content: None,
+        artifacts: None,
+        metadata: Some(metadata),
+        links: None,
+        data: None,
+        expiration: None,
+    };
+
+    let cmd = CreateRemoteEventCommand {
+        synapse_public_key: synapse_public_key.clone(),
+        event: inner,
+    };
+
+    let events = deps.create_remote_event.execute(cmd).await?;
+
+    // Convert events to Posts
+    let mut posts = Vec::new();
+    for event in events {
+        // Try to get profile info for each post author
+        let (author_name, author_handle) =
+            if let Ok(Some(profile)) = deps.profile_repo.get_profile(&event.agent).await {
+                (
+                    profile.display_name.unwrap_or_else(|| "Unknown".to_string()),
+                    profile.handle.unwrap_or_else(|| "unknown".to_string()),
+                )
+            } else {
+                // Fallback: use truncated public key
+                let short_pk = if event.agent.len() > 8 {
+                    format!("{}...", &event.agent[..8])
+                } else {
+                    event.agent.clone()
+                };
+                (short_pk.clone(), short_pk)
+            };
+
+        posts.push(Post {
+            id: event.id.to_string(),
+            author_public_key: event.agent.clone(),
+            author_name,
+            author_handle,
+            author_avatar: "AvatarPath".to_string(),
+            timestamp: "TimeStamp".to_string(),
+            content: event.content.unwrap_or_default(),
+            posted_in: event.module_slug.unwrap_or_default(),
+            likes: 0,
+            comments: 0,
+            liked: false,
+        });
+    }
+
+    Ok((StatusCode::OK, Json(posts)))
 }
 
 async fn create_post_handler(event: &Event) -> Result<Vec<Event>, CoreError> {

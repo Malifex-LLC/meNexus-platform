@@ -3,3 +3,6 @@
 
 #[cfg(feature = "ssr")]
 pub mod posts_config;
+
+#[cfg(feature = "ssr")]
+pub use posts_config::{load_config, PostsConfig};

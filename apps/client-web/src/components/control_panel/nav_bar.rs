@@ -56,19 +56,22 @@ pub fn NavBar() -> impl IntoView {
         <nav class="space-y-0.5">
             {nav_items.into_iter().map(|item| {
                 let href = item.href;
-                let current_path = location.pathname.get();
-                let is_active = if href == "/" {
-                    current_path == "/"
-                } else {
-                    current_path.starts_with(href)
+                let pathname = location.pathname.clone();
+                let is_active = move || {
+                    let current_path = pathname.get();
+                    if href == "/" {
+                        current_path == "/"
+                    } else {
+                        current_path.starts_with(href)
+                    }
                 };
 
                 view! {
                     <A 
                         href=href
-                        attr:class=format!(
+                        attr:class=move || format!(
                             "group flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all text-sm {}",
-                            if is_active {
+                            if is_active() {
                                 "bg-brand/15 text-brand"
                             } else {
                                 "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
@@ -76,14 +79,14 @@ pub fn NavBar() -> impl IntoView {
                         )
                     >
                         <div 
-                            class=format!(
+                            class=move || format!(
                                 "w-4 h-4 transition-colors {}",
-                                if is_active { "text-brand" } else { "text-foreground/50 group-hover:text-foreground/70" }
+                                if is_active() { "text-brand" } else { "text-foreground/50 group-hover:text-foreground/70" }
                             )
                             inner_html=item.icon
                         ></div>
                         <span class="font-medium">{item.label}</span>
-                        {if is_active {
+                        {move || if is_active() {
                             view! {
                                 <span class="ml-auto w-1 h-1 rounded-full bg-brand"></span>
                             }.into_any()
