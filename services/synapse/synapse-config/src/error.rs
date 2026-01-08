@@ -10,6 +10,8 @@ pub enum SynapseConfigError {
     Io(#[from] std::io::Error),
     #[error("Libp2p error: {0}")]
     Libp2p(#[from] libp2p::identity::DecodingError),
+    #[error("Base64 decode error: {0}")]
+    Base64Decode(#[from] base64::DecodeError),
     #[error("parsing error: {0}")]
     ParseInt(#[from] std::num::ParseIntError),
     #[error("parse url error: {0}")]
@@ -29,6 +31,7 @@ impl From<SynapseConfigError> for ConfigError {
         match error {
             SynapseConfigError::Io(e) => ConfigError::Io(e),
             SynapseConfigError::Libp2p(e) => ConfigError::Other(e.to_string()),
+            SynapseConfigError::Base64Decode(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::ParseInt(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::Var(e) => ConfigError::Other(e.to_string()),
             SynapseConfigError::Convert(e) => ConfigError::Other(e.to_string()),

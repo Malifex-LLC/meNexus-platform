@@ -32,7 +32,7 @@ pub fn ContentGrid(
 }
 
 /// Helper function to generate content type icon
-fn content_type_icon(content_type: &ContentType) -> impl IntoView {
+fn content_type_icon(content_type: ContentType) -> impl IntoView {
     match content_type {
         ContentType::Image => view! {
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -133,7 +133,7 @@ fn ContentGridItem(
                 view! {
                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
                         <div class="text-foreground/30">
-                            {content_type_icon(&post_type_for_placeholder)}
+                            {content_type_icon(post_type_for_placeholder)}
                         </div>
                     </div>
                 }.into_any()
@@ -143,7 +143,7 @@ fn ContentGridItem(
             <div class="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
                 // Content type badge
                 <span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/50 backdrop-blur-sm text-white text-xs">
-                    {content_type_icon(&post_type_for_badge)}
+                    {content_type_icon(post_type_for_badge)}
                 </span>
 
                 // Access badge
@@ -151,10 +151,10 @@ fn ContentGridItem(
                     "px-1.5 py-0.5 rounded text-xs font-medium backdrop-blur-sm {} {}",
                     access_bg, access_text
                 )>
-                    {match &access_level {
-                        AccessLevel::Free => "Free",
-                        AccessLevel::Subscribers => "Sub",
-                        AccessLevel::Tier(t) => t.as_str(),
+                    {match access_level {
+                        AccessLevel::Free => "Free".to_string(),
+                        AccessLevel::Subscribers => "Sub".to_string(),
+                        AccessLevel::Tier(t) => t,
                     }}
                 </span>
             </div>

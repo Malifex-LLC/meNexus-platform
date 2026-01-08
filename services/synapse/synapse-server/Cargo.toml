@@ -19,8 +19,8 @@ adapter-postgres = { path = "../synapse-adapters/adapter-postgres" }
 adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p" }
 dashmap = { workspace = true }
 module-auth = { path = "../synapse-modules/module-auth", features = ["ssr"] }
-module-core = { path = "../synapse-modules/module-core" }
-module-profiles = { path = "../synapse-modules/module-profiles" }
+module-core = { path = "../synapse-modules/module-core", features = ["ssr"] }
+module-profiles = { path = "../synapse-modules/module-profiles", features = ["ssr"] }
 module-posts = { path = "../synapse-modules/module-posts", features = ["ssr"] }
 thiserror = { workspace = true }
 time = { workspace = true }

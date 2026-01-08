@@ -26,7 +26,9 @@ use leptos_axum::{LeptosRoutes, generate_route_list};
 use module_auth::http::AuthModule;
 use module_auth::http::routes as module_auth_routes;
 use module_auth::types::AuthDeps;
-use module_core::CoreModule;
+use module_core::http::CoreModule;
+use module_core::routes as module_core_routes;
+use module_core::CoreDeps;
 use module_posts::http::PostsModule;
 use module_posts::http::routes as module_posts_routes;
 use module_posts::types::PostsDeps;
@@ -78,6 +80,14 @@ impl axum::extract::FromRef<AppState> for PostsDeps {
             doc_store: app.profile_doc_store.clone(),
             profile_repo: app.profile_repo.clone(),
             profile_discovery: app.profile_discovery.clone(),
+        }
+    }
+}
+
+impl axum::extract::FromRef<AppState> for CoreDeps {
+    fn from_ref(app: &AppState) -> Self {
+        CoreDeps {
+            create_remote_event: app.create_remote_event.clone(),
         }
     }
 }
@@ -158,6 +168,7 @@ async fn main() -> anyhow::Result<()> {
         leptos_options: leptos_options.clone(),
     };
 
+    let core_deps = CoreDeps::from_ref(&state);
     let posts_deps = PostsDeps::from_ref(&state);
     let auth_deps = AuthDeps::from_ref(&state);
     let profile_deps = ProfilesDeps::from_ref(&state);
@@ -169,6 +180,7 @@ async fn main() -> anyhow::Result<()> {
     let static_site_dir = PathBuf::from(leptos_options.site_root.as_ref());
     let app = api::routes()
         .merge(module_auth_routes::<AppState>())
+        .merge(module_core_routes::<AppState>())
         .merge(module_posts_routes::<AppState>())
         .merge(module_profiles_routes::<AppState>())
         .leptos_routes_with_context(
@@ -177,6 +189,7 @@ async fn main() -> anyhow::Result<()> {
             {
                 move || {
                     // Provide deps to server functions via context
+                    provide_context(core_deps.clone());
                     provide_context(posts_deps.clone());
                     provide_context(auth_deps.clone());
                     provide_context(profile_deps.clone());

@@ -10,6 +10,7 @@ pub mod profile;
 pub mod search;
 pub mod settings;
 pub mod simple_counter;
+pub mod synapse;
 
 pub use dashboard::{
     FeedFilters, GlobalCompose, GlobalFeed, GlobalPostCard, NetworkStatsWidget, TrendingSidebar,
@@ -39,3 +40,4 @@ pub use messenger::{
     ConversationList, ConversationType, Message, MessageBubble, MessageComposer, MessageContent,
     MessageReaction, MessageStatus, MessageThread, Participant,
 };
+pub use synapse::{SynapseRenderer, RemoteSynapseRenderer, SynapseHeader, DynamicLayout, ModuleSlot};

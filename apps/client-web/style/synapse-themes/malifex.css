@@ -6,7 +6,7 @@
  * Make it darker.
  */
 
-.synapse-themed {
+.synapse-themed.synapse-theme-malifex {
     /* LAYOUT */
     --synapse-bg-window: #000000;
     --synapse-bg-panel: #000000;

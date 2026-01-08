@@ -6,7 +6,7 @@
  * Easy on the eyes with a salmon brand color.
  */
 
-.synapse-themed {
+.synapse-themed.synapse-theme-menexus-dark {
     /* LAYOUT */
     --synapse-bg-window: #282828;
     --synapse-bg-panel: #1a1a1a;

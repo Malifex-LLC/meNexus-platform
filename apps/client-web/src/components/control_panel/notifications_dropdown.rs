@@ -194,7 +194,7 @@ fn NotificationItem(notification: Notification) -> impl IntoView {
 
     let (icon_svg, icon_bg) = get_notification_icon(&notification.notification_type);
     let message =
-        get_notification_message(&notification.actor_handle, &notification.notification_type);
+        get_notification_message(notification.actor_handle.clone(), notification.notification_type.clone());
 
     view! {
         <div class=format!(
@@ -276,10 +276,8 @@ fn get_notification_icon(notification_type: &NotificationType) -> (&'static str,
     }
 }
 
-fn get_notification_message(actor: &str, notification_type: &NotificationType) -> impl IntoView {
-    let actor = actor.to_string();
-
-    match notification_type.clone() {
+fn get_notification_message(actor: String, notification_type: NotificationType) -> impl IntoView {
+    match notification_type {
         NotificationType::Like { post_preview } => view! {
             <span>
                 <A href=format!("/profiles/{}", actor) attr:class="font-semibold text-brand hover:underline">{"@"}{actor.clone()}</A>

@@ -2,7 +2,6 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 use crate::layouts::main_layout::MainLayout;
-use crate::layouts::three_column_module_layout::ThreeColumnModuleLayout;
 use leptos::prelude::*;
 use module_auth::ui::components::login_form::LoginForm;
 

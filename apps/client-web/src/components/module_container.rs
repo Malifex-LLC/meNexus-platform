@@ -7,7 +7,7 @@ use leptos::prelude::*;
 #[derive(Clone)]
 pub struct ModuleTab {
     /// Unique identifier for this module
-    pub id: &'static str,
+    pub id: String,
     /// Display name for the tab
     pub name: &'static str,
     /// SVG icon path (the d attribute for the path element)
@@ -17,9 +17,9 @@ pub struct ModuleTab {
 }
 
 impl ModuleTab {
-    pub fn new(id: &'static str, name: &'static str, icon: &'static str) -> Self {
+    pub fn new(id: impl Into<String>, name: &'static str, icon: &'static str) -> Self {
         Self {
-            id,
+            id: id.into(),
             name,
             icon,
             badge: None,
@@ -118,7 +118,7 @@ pub mod tabs {
 }
 
 /// Signal type for active tab - provided via context
-pub type ActiveTabSignal = RwSignal<&'static str>;
+pub type ActiveTabSignal = RwSignal<String>;
 
 /// Container component for tabbed modules
 #[component]
@@ -128,11 +128,13 @@ pub fn TabbedModules(
     tabs: Vec<ModuleTab>,
     /// Optional: starting active tab (defaults to first)
     #[prop(into, optional)]
-    default_active: Option<&'static str>,
+    default_active: Option<String>,
     /// The children - ModulePanel components
     children: Children,
 ) -> impl IntoView {
-    let default = default_active.unwrap_or_else(|| tabs.first().map(|t| t.id).unwrap_or(""));
+    let default = default_active
+        .or_else(|| tabs.first().map(|t| t.id.clone()))
+        .unwrap_or_default();
     let active_tab = RwSignal::new(default);
 
     // Provide context so ModulePanel can access active state
@@ -145,29 +147,35 @@ pub fn TabbedModules(
                 // Module tabs
                 <div class="flex items-center">
                     {tabs.iter().map(|tab| {
-                        let tab_id = tab.id;
+                        let tab_id = tab.id.clone();
                         let tab_name = tab.name;
                         let tab_icon = tab.icon;
                         let tab_badge = tab.badge;
+                        let tab_id_for_class = tab_id.clone();
+                        let tab_id_for_click = tab_id.clone();
+                        let tab_id_for_icon = tab_id.clone();
+                        let tab_id_for_name = tab_id.clone();
 
                         view! {
                             <button
                                 class=move || format!(
                                     "group relative flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200 -mb-px {}",
-                                    if active_tab.get() == tab_id {
+                                    if active_tab.with(|a| a == &tab_id_for_class) {
                                         "bg-background text-brand border border-border/50 border-b-background z-10"
                                     } else {
                                         "text-foreground/50 hover:text-foreground bg-transparent border border-transparent"
                                     }
                                 )
-                                on:click=move |_| active_tab.set(tab_id)
+                                on:click={
+                                    move |_| active_tab.set(tab_id_for_click.clone())
+                                }
                                 title=tab_name
                             >
                                 // Icon
                                 <svg
                                     class=move || format!(
                                         "w-5 h-5 transition-all {}",
-                                        if active_tab.get() == tab_id {
+                                        if active_tab.with(|a| a == &tab_id_for_icon) {
                                             "text-brand scale-110"
                                         } else {
                                             "text-foreground/40 group-hover:text-foreground/60"
@@ -184,7 +192,7 @@ pub fn TabbedModules(
                                     // Name
                                     <span class=move || format!(
                                         "transition-colors {}",
-                                        if active_tab.get() == tab_id { "text-brand" } else { "" }
+                                        if active_tab.with(|a| a == &tab_id_for_name) { "text-brand" } else { "" }
                                     )>
                                         {tab_name}
                                     </span>
@@ -231,13 +239,14 @@ pub fn TabbedModules(
 pub fn ModulePanel(
     /// The module ID this panel is for (must match a tab id)
     #[prop(into)]
-    id: &'static str,
+    id: String,
     /// The module content
     children: Children,
 ) -> impl IntoView {
     let active_tab =
         use_context::<ActiveTabSignal>().expect("ModulePanel must be used inside TabbedModules");
 
+    let id = id.clone();
     view! {
         <div
             class=move || format!(

@@ -14,7 +14,7 @@ pub fn SettingsLayout() -> impl IntoView {
 
     view! {
         <MainLayout>
-            <div class="h-full w-full flex flex-col bg-background">
+            <div class="h-full w-full flex flex-col bg-panel">
                 // Header - fixed at top
                 <header class="flex-shrink-0 bg-background/95 backdrop-blur-lg border-b border-border/50 z-10">
                     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,9 +78,7 @@ pub fn SettingsLayout() -> impl IntoView {
 
 /// Mobile-friendly tab selector dropdown
 #[component]
-fn MobileTabSelector(
-    #[prop(into)] active_tab: RwSignal<SettingsTab>,
-) -> impl IntoView {
+fn MobileTabSelector(#[prop(into)] active_tab: RwSignal<SettingsTab>) -> impl IntoView {
     let (is_open, set_is_open) = signal(false);
     let tabs = SettingsTab::all();
 
