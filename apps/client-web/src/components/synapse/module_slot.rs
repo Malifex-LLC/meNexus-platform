@@ -10,6 +10,7 @@ use leptos::prelude::*;
 use module_core::ClientManifest;
 
 use crate::app::SessionUserProfile;
+use super::remote_synapse_renderer::RemoteSynapseContext;
 
 // Module UI imports
 use module_activity::ui::components::activity_feed::ActivityFeed;
@@ -55,13 +56,22 @@ fn PostsModule() -> impl IntoView {
     let session_user =
         use_context::<SessionUserProfile>().expect("SessionUserProfile context not found");
 
+    // Check if we're rendering a remote synapse
+    let remote_synapse_ctx = use_context::<RemoteSynapseContext>();
+
     view! {
         <Suspense fallback=move || view! { <ModuleLoadingState/> }>
             {move || {
                 session_user.get().map(|result| {
                     match result {
                         Ok(Some(profile)) => {
-                            view! { <PostsFeed session_user_profile=profile/> }.into_any()
+                            // Conditionally render based on whether we have a remote synapse context
+                            if let Some(ref ctx) = remote_synapse_ctx {
+                                let pk = ctx.synapse_public_key.clone();
+                                view! { <PostsFeed session_user_profile=profile.clone() synapse_public_key=pk/> }.into_any()
+                            } else {
+                                view! { <PostsFeed session_user_profile=profile.clone()/> }.into_any()
+                            }
                         }
                         Ok(None) => {
                             view! { <ModuleAuthRequired module_name="Posts"/> }.into_any()

@@ -17,7 +17,7 @@ mod dynamic_layout;
 mod module_slot;
 
 pub use synapse_renderer::SynapseRenderer;
-pub use remote_synapse_renderer::RemoteSynapseRenderer;
+pub use remote_synapse_renderer::{RemoteSynapseRenderer, RemoteSynapseContext};
 pub use synapse_header::SynapseHeader;
 pub use dynamic_layout::DynamicLayout;
 pub use module_slot::ModuleSlot;

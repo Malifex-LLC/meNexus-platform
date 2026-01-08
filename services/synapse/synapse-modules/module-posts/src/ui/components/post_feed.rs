@@ -41,33 +41,43 @@ pub fn PostsFeed(
         },
     );
 
-    let (active_channel, set_active_channel) = signal(String::new());
+    // Use a signal to track the user-selected channel (can be changed by clicking)
+    // Initialize with empty string - will be updated from config
+    let (user_selected_channel, set_user_selected_channel) = signal::<Option<String>>(None);
     let (show_channel_dropdown, set_show_channel_dropdown) = signal(false);
     let (show_sidebar, set_show_sidebar) = signal(false);
     let (refresh, set_refresh) = signal(0usize);
-    let (config_initialized, set_config_initialized) = signal(false);
 
-    // Initialize active channel when config loads
-    Effect::new(move |_| {
-        if let Some(config) = config_resource.get() {
-            if !config_initialized.get() {
-                set_active_channel.set(config.default_channel.clone());
-                set_config_initialized.set(true);
-            }
+    // Derive the active channel from either user selection or config default
+    // This works during SSR because it reads from config_resource directly
+    let active_channel = Memo::new(move |_| -> Option<String> {
+        // If user has selected a channel, use that
+        if let Some(selected) = user_selected_channel.get() {
+            return Some(selected);
         }
+        // Otherwise, use the default from config (None if config not loaded)
+        config_resource
+            .get()
+            .map(|c| c.default_channel.clone())
     });
+
+    // Create a setter function that sets the user-selected channel
+    let set_active_channel = move |channel: String| {
+        set_user_selected_channel.set(Some(channel));
+    };
 
     let posts = Resource::new(
         move || (
             active_channel.get(),
             refresh.get(),
-            config_initialized.get(),
             synapse_pk_for_posts.clone(),
         ),
-        |(channel, _refresh_counter, initialized, synapse_pk): (String, usize, bool, Option<String>)| async move {
-            if !initialized || channel.is_empty() {
-                return vec![];
-            }
+        |(channel, _refresh_counter, synapse_pk): (Option<String>, usize, Option<String>)| async move {
+            // Wait for channel to be available (config loaded)
+            let channel = match channel {
+                Some(ch) if !ch.is_empty() => ch,
+                _ => return vec![],
+            };
             match synapse_pk {
                 Some(pk) => list_remote_posts_for_channel_server(pk, channel)
                     .await
@@ -150,7 +160,7 @@ pub fn PostsFeed(
                             view! {
                                 <button
                                     class=move || {
-                                        let is_active = active_channel.get() == channel_for_button;
+                                        let is_active = active_channel.get() == Some(channel_for_button.clone());
                                         format!(
                                             "w-full group flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-all text-sm {}",
                                             if is_active {
@@ -161,14 +171,14 @@ pub fn PostsFeed(
                                         )
                                     }
                                     on:click=move |_| {
-                                        set_active_channel.set(channel_for_click.clone());
+                                        set_active_channel(channel_for_click.clone());
                                         set_show_sidebar.set(false);
                                     }
                                 >
                                     <span class="text-foreground/40 font-mono text-xs">"#"</span>
                                     <span class="flex-1 font-medium truncate">{channel_display}</span>
                                     {move || {
-                                        if active_channel.get() == channel_for_indicator {
+                                        if active_channel.get() == Some(channel_for_indicator.clone()) {
                                             view! {
                                                 <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
                                             }.into_any()
@@ -215,7 +225,7 @@ pub fn PostsFeed(
                             on:click=move |_| set_show_channel_dropdown.update(|v| *v = !*v)
                         >
                             <span class="font-semibold text-sm text-brand">
-                                "# "{move || active_channel.get()}
+                                "# "{move || active_channel.get().unwrap_or_else(|| String::new())}
                             </span>
                             <svg class=move || format!(
                                 "w-4 h-4 text-foreground/40 transition-transform {}",
@@ -238,14 +248,14 @@ pub fn PostsFeed(
                                                 <button
                                                     class=move || format!(
                                                         "w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors {}",
-                                                        if active_channel.get() == channel_id_for_class {
+                                                        if active_channel.get() == Some(channel_id_for_class.clone()) {
                                                             "bg-brand/10 text-brand"
                                                         } else {
                                                             "text-foreground/70 hover:bg-foreground/5"
                                                         }
                                                     )
                                                     on:click=move |_| {
-                                                        set_active_channel.set(channel_id_for_click.clone());
+                                                        set_active_channel(channel_id_for_click.clone());
                                                         set_show_channel_dropdown.set(false);
                                                     }
                                                 >
@@ -284,7 +294,7 @@ pub fn PostsFeed(
 
                 // Posts List
                 <div class="flex-1 overflow-y-auto scrollbar-styled">
-                    <Transition fallback=move || view! {
+                    <Suspense fallback=move || view! {
                         <div class="p-3 space-y-3">
                             {(0..3).map(|_| view! {
                                 <div class="animate-pulse bg-panel rounded-xl p-4 border border-border/30">
@@ -339,14 +349,16 @@ pub fn PostsFeed(
                                 }.into_any()
                             }
                         }}
-                    </Transition>
+                    </Suspense>
                 </div>
 
                 // Compose bar (only shown for local synapse)
                 {if !is_remote {
+                    // Create a Signal<String> for ComposeBar from the Memo<Option<String>>
+                    let channel_signal = Signal::derive(move || active_channel.get().unwrap_or_default());
                     view! {
                         <ComposeBar
-                            channel=active_channel
+                            channel=channel_signal
                             on_post_created=on_post_created
                         />
                     }.into_any()

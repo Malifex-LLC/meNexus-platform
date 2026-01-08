@@ -24,7 +24,7 @@ pub fn RemoteSynapseRenderer(
     /// The public key of the remote Synapse to render
     synapse_public_key: Signal<String>,
 ) -> impl IntoView {
-    // Fetch the remote manifest
+    // Fetch the remote manifest using the signal as a reactive dependency
     let manifest_resource = Resource::new(
         move || synapse_public_key.get(),
         |pk| async move {
@@ -41,7 +41,10 @@ pub fn RemoteSynapseRenderer(
             {move || {
                 manifest_resource.get().map(|result| {
                     match result {
-                        Ok(manifest) => view! { <RemoteSynapseContent manifest=manifest/> }.into_any(),
+                        Ok(manifest) => {
+                            let pk = synapse_public_key.get();
+                            view! { <RemoteSynapseContent manifest=manifest synapse_public_key=pk/> }.into_any()
+                        },
                         Err(e) => view! {
                             <RemoteSynapseErrorState
                                 error=e.to_string()
@@ -55,9 +58,23 @@ pub fn RemoteSynapseRenderer(
     }
 }
 
+/// Context for remote synapse rendering - provides the synapse public key to child components
+#[derive(Clone, Debug)]
+pub struct RemoteSynapseContext {
+    pub synapse_public_key: String,
+}
+
 /// The remote Synapse content once manifest is loaded
 #[component]
-fn RemoteSynapseContent(manifest: ClientManifest) -> impl IntoView {
+fn RemoteSynapseContent(
+    manifest: ClientManifest,
+    synapse_public_key: String,
+) -> impl IntoView {
+    // Provide the remote synapse context to all child components
+    provide_context(RemoteSynapseContext {
+        synapse_public_key: synapse_public_key.clone(),
+    });
+
     // Generate theme CSS variables from manifest
     let theme_style = generate_theme_style(&manifest);
     let theme_class = get_theme_class(&manifest);
