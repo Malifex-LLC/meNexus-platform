@@ -4,6 +4,8 @@
 use crate::layouts::three_column_module_layout::ThreeColumnModuleLayout;
 use crate::pages::dashboard_page::DashboardPage;
 use crate::pages::login_page::LoginPage;
+use crate::pages::messenger_page::MessengerPage;
+use crate::pages::notifications_page::NotificationsPage;
 use crate::pages::profile_page::ProfilePage;
 use crate::pages::register_page::RegisterPage;
 use crate::pages::settings_page::SettingsPage;
@@ -65,6 +67,8 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/profile") view=ProfilePage/>
                 <Route path=path!("/search") view=SearchPage/>
                 <Route path=path!("/settings") view=SettingsPage/>
+                <Route path=path!("/notifications") view=NotificationsPage/>
+                <Route path=path!("/messages") view=MessengerPage/>
             </Routes>
         </Router>
     }

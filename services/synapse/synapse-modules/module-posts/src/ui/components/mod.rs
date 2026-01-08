@@ -2,6 +2,8 @@
 // Copyright © 2025 Malifex LLC and contributors
 
 #[cfg(feature = "hydrate")]
+pub mod compose_bar;
+#[cfg(feature = "hydrate")]
 pub mod post_card;
 #[cfg(feature = "hydrate")]
 pub mod post_feed;

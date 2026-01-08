@@ -613,7 +613,12 @@ dependencies = [
  "leptos_icons",
  "leptos_meta",
  "leptos_router",
+ "module-activity",
  "module-auth",
+ "module-chat",
+ "module-creator",
+ "module-livestream",
+ "module-members",
  "module-posts",
  "module-profiles",
  "synapse-core",
@@ -3146,6 +3151,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-activity"
+version = "0.1.0"
+dependencies = [
+ "leptos",
+ "leptos_router",
+ "serde",
+]
+
+[[package]]
 name = "module-auth"
 version = "0.1.0"
 dependencies = [
@@ -3175,6 +3189,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-chat"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "axum-extra",
+ "leptos",
+ "leptos_axum",
+ "leptos_router",
+ "reqwasm",
+ "serde",
+ "serde_json",
+ "synapse-application",
+ "synapse-config",
+ "synapse-core",
+ "thiserror 2.0.17",
+ "time",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "module-core"
 version = "0.1.0"
 dependencies = [
@@ -3189,6 +3225,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-creator"
+version = "0.1.0"
+dependencies = [
+ "leptos",
+ "leptos_router",
+ "serde",
+ "time",
+ "uuid",
+]
+
+[[package]]
+name = "module-livestream"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "leptos",
+ "leptos_axum",
+ "leptos_router",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tracing",
+]
+
+[[package]]
+name = "module-members"
+version = "0.1.0"
+dependencies = [
+ "leptos",
+ "leptos_router",
+ "serde",
+]
+
+[[package]]
 name = "module-posts"
 version = "0.1.0"
 dependencies = [
@@ -3197,6 +3268,7 @@ dependencies = [
  "axum-extra",
  "leptos",
  "leptos_axum",
+ "leptos_meta",
  "reqwasm",
  "serde",
  "serde_json",

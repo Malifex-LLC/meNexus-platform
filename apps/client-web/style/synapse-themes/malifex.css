@@ -1,0 +1,102 @@
+/*
+ * malifex SYNAPSE THEME
+ * ====================
+ * 
+ * malifex theme.
+ * Make it darker.
+ */
+
+.synapse-themed {
+    /* LAYOUT */
+    --synapse-bg-window: #000000;
+    --synapse-bg-panel: #000000;
+    --synapse-bg-surface: #282828;
+    --synapse-bg-elevated: #504945;
+    --synapse-bg-input: #141810;
+    --synapse-bg-overlay: rgba(0, 0, 0, 0.6);
+    
+    /* BORDERS */
+    --synapse-border: #3a3a3a;
+    --synapse-border-subtle: #3C3836;
+    --synapse-border-strong: #665c54;
+    
+    /* TEXT */
+    --synapse-text-primary: #f2e5bc;
+    --synapse-text-secondary: #8a9a7a;
+    --synapse-text-subtle: #5a6b4c;
+    --synapse-text-disabled: #3d4a32;
+    
+    /* ACCENT */
+    --synapse-accent: #ff6b6b;
+    --synapse-accent-hover: #fabd2f;
+    --synapse-accent-muted: rgba(254, 128, 25, 0.15);
+    --synapse-accent-text: #1d2021;
+    --synapse-secondary: #83a598;
+    --synapse-secondary-hover: #8ec07c;
+    
+    /* INTERACTIVE */
+    --synapse-hover: rgba(34, 197, 94, 0.05);
+    --synapse-active: rgba(34, 197, 94, 0.1);
+    --synapse-focus: #22c55e;
+    
+    /* STATUS */
+    --synapse-status-online: #537a5a;
+    --synapse-status-offline: #5a6b4c;
+    --synapse-status-busy: #ed254e;
+    --synapse-status-away: #f9dc5c;
+    --synapse-status-streaming: #f43f5e;
+    
+    /* SEMANTIC */
+    --synapse-success: #34c300;
+    --synapse-success-muted: rgba(34, 197, 94, 0.15);
+    --synapse-warning: #facc15;
+    --synapse-warning-muted: rgba(234, 179, 8, 0.15);
+    --synapse-error: #fb4934;
+    --synapse-error-muted: rgba(239, 68, 68, 0.15);
+    --synapse-info: #83a598;
+    --synapse-info-muted: rgba(14, 165, 233, 0.15);
+    
+    /* ROLES */
+    --synapse-role-owner: #fabd2f;
+    --synapse-role-owner-bg: rgba(234, 179, 8, 0.15);
+    --synapse-role-admin: #fb4934;
+    --synapse-role-admin-bg: rgba(244, 63, 94, 0.15);
+    --synapse-role-moderator: #fa5914;
+    --synapse-role-moderator-bg: rgba(132, 204, 22, 0.15);
+    --synapse-role-member: #928374;
+    --synapse-role-member-bg: rgba(90, 107, 76, 0.15);
+    
+    /* MESSAGES */
+    --synapse-msg-own-bg: #22c55e;
+    --synapse-msg-own-text: #ffffff;
+    --synapse-msg-other-bg: #1f2619;
+    --synapse-msg-other-text: #e8f0e0;
+    --synapse-msg-system-bg: rgba(34, 197, 94, 0.05);
+    --synapse-msg-system-text: #8a9a7a;
+    
+    /* STATS */
+    --synapse-stat-primary: #0ea5e9;
+    --synapse-stat-secondary: #84cc16;
+    --synapse-stat-tertiary: #eab308;
+    --synapse-stat-positive: #22c55e;
+    --synapse-stat-negative: #ef4444;
+    
+    /* REPUTATION */
+    --synapse-rep-newcomer: #5a6b4c;
+    --synapse-rep-contributor: #0ea5e9;
+    --synapse-rep-established: #22c55e;
+    --synapse-rep-trusted: #84cc16;
+    --synapse-rep-respected: #eab308;
+    --synapse-rep-distinguished: #f43f5e;
+    --synapse-rep-elite: #d946ef;
+    --synapse-rep-legendary: #22c55e;
+    
+    /* NOTIFICATIONS */
+    --synapse-notif-mention: #0ea5e9;
+    --synapse-notif-like: #f43f5e;
+    --synapse-notif-follow: #84cc16;
+    --synapse-notif-reply: #22c55e;
+    --synapse-notif-system: #5a6b4c;
+}
+
+

@@ -13,12 +13,28 @@ leptos = { version = "0.8.14" }
 leptos_icons = "0.7.0"
 leptos_router = { version = "0.8.10" }
 leptos_meta = { version = "0.8.5" }
-module-posts = { path = "../../services/synapse/synapse-modules/module-posts", features = [
+module-activity = { path = "../../services/synapse/synapse-modules/module-activity", features = [
   "hydrate",
 ] }
 module-auth = { path = "../../services/synapse/synapse-modules/module-auth", features = [
   "hydrate",
 ] }
+module-chat = { path = "../../services/synapse/synapse-modules/module-chat", features = [
+  "hydrate",
+] }
+module-creator = { path = "../../services/synapse/synapse-modules/module-creator", features = [
+  "hydrate",
+] }
+module-livestream = { path = "../../services/synapse/synapse-modules/module-livestream", features = [
+  "hydrate",
+] }
+module-members = { path = "../../services/synapse/synapse-modules/module-members", features = [
+  "hydrate",
+] }
+module-posts = { path = "../../services/synapse/synapse-modules/module-posts", features = [
+  "hydrate",
+] }
+
 module-profiles = { path = "../../services/synapse/synapse-modules/module-profiles", features = [
   "hydrate",
 ] }

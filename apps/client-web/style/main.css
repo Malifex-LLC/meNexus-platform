@@ -1,0 +1,42 @@
+/*
+ * meNexus Main CSS Entry Point
+ * ============================
+ * 
+ * This is the primary CSS file that imports:
+ * 1. Base utilities and theme system
+ * 2. User theme (controls app-wide UI)
+ * 3. Synapse theme (controls Synapse content)
+ * 
+ * To change themes, modify the imports below.
+ */
+
+/* Base utilities, animations, and theme variable system */
+@import "./base.css";
+
+/* 
+ * USER THEME
+ * ----------
+ * Controls: Control Panel, Dashboard, Messages, Notifications,
+ *           Search, Profile, Settings, and other app-wide UI
+ * 
+ * Available themes:
+ * - midnight.css  (Coral accent, deep blue)
+ * - obsidian.css  (Emerald accent, pure black)
+ * - gruvbox.css   (Orange accent, retro warm)
+ * - light.css     (Indigo accent, light mode)
+ */
+@import "./user-themes/meNexus_dark.css";
+
+/* 
+ * SYNAPSE THEME
+ * -------------
+ * Controls: Synapse layouts and modules (feeds, chat, members, etc.)
+ * Applied within the .synapse-themed wrapper class
+ * 
+ * Available themes:
+ * - default.css   (Neutral dark, indigo accent)
+ * - cyberpunk.css (Neon cyan/magenta)
+ * - nature.css    (Forest green)
+ * - ocean.css     (Deep blue)
+ */
+@import "./synapse-themes/meNexus_dark.css";

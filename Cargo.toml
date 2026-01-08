@@ -7,8 +7,13 @@ members = [
   "services/synapse/synapse-application",
   "services/synapse/synapse-config",
   "services/synapse/synapse-core",
+  "services/synapse/synapse-modules/module-activity",
   "services/synapse/synapse-modules/module-auth",
+  "services/synapse/synapse-modules/module-chat",
   "services/synapse/synapse-modules/module-core",
+  "services/synapse/synapse-modules/module-creator",
+  "services/synapse/synapse-modules/module-livestream",
+  "services/synapse/synapse-modules/module-members",
   "services/synapse/synapse-modules/module-posts",
   "services/synapse/synapse-modules/module-profiles",
   "services/synapse/synapse-protocols/protocol-snp",
@@ -31,7 +36,7 @@ lib-features = ["hydrate"]
 # Bind to 0.0.0.0 for Docker
 site-addr = "0.0.0.0:3000"
 # Tailwind CSS input file
-tailwind-input-file = "apps/client-web/style/SalmonRoasted.css"
+tailwind-input-file = "apps/client-web/style/main.css"
 tailwind-config-file = "tailwind.config.js"
 
 [workspace.dependencies]

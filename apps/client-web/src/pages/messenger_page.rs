@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Malifex LLC and contributors
+
+use crate::layouts::messenger_layout::MessengerLayout;
+use leptos::prelude::*;
+
+#[component]
+pub fn MessengerPage() -> impl IntoView {
+    view! {
+        <MessengerLayout />
+    }
+}
