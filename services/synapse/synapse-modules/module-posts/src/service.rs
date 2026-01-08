@@ -188,6 +188,74 @@ pub async fn get_remote_posts_config(
     Ok(PostsModuleConfig::default())
 }
 
+/// Create a post on a remote synapse
+pub async fn create_remote_post(
+    deps: PostsDeps,
+    synapse_public_key: String,
+    request: CreatePostRequest,
+) -> Result<Post, ModulePostsError> {
+    let inner = CreateEventCommand {
+        event_type: "posts:create_post".to_string(),
+        module_kind: Some("posts".to_string()),
+        module_slug: request.module_slug,
+        agent: request.agent.clone(),
+        target: request.target,
+        previous: request.previous,
+        content: request.content,
+        artifacts: request.artifacts,
+        metadata: request.metadata,
+        links: request.links,
+        data: request.data,
+        expiration: request.expiration,
+        agent_signature: request.agent_signature, // Required for remote post authentication
+    };
+
+    let cmd = CreateRemoteEventCommand {
+        synapse_public_key,
+        event: inner,
+    };
+
+    let events = deps.create_remote_event.execute(cmd).await?;
+
+    // The remote synapse should return the created event
+    if let Some(event) = events.first() {
+        // Try to get profile info for the author
+        let (author_name, author_handle) =
+            if let Ok(Some(profile)) = deps.profile_repo.get_profile(&event.agent).await {
+                (
+                    profile.display_name.unwrap_or_else(|| "Unknown".to_string()),
+                    profile.handle.unwrap_or_else(|| "unknown".to_string()),
+                )
+            } else {
+                // Fallback: use truncated public key
+                let short_pk = if event.agent.len() > 8 {
+                    format!("{}...", &event.agent[..8])
+                } else {
+                    event.agent.clone()
+                };
+                (short_pk.clone(), short_pk)
+            };
+
+        Ok(Post {
+            id: event.id.to_string(),
+            author_public_key: event.agent.clone(),
+            author_name,
+            author_handle,
+            author_avatar: "AvatarPath".to_string(),
+            timestamp: "TimeStamp".to_string(),
+            content: event.content.clone().unwrap_or_default(),
+            posted_in: event.module_slug.clone().unwrap_or_default(),
+            likes: 0,
+            comments: 0,
+            liked: false,
+        })
+    } else {
+        Err(ModulePostsError::Internal(
+            "Remote synapse did not return created post".to_string(),
+        ))
+    }
+}
+
 /// List posts for a specific channel from a remote synapse
 pub async fn list_remote_posts_for_channel(
     deps: PostsDeps,

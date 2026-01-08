@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::server_fns::create_post_server;
+use crate::server_fns::{create_post_server, create_remote_post_server};
 use crate::types::CreatePostRequest;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -20,6 +20,9 @@ pub fn ComposeBar(
     #[prop(into, optional)]
     user_initials: Option<String>,
     #[prop(into, optional)] on_post_created: Option<Callback<()>>,
+    /// Optional synapse public key for posting to a remote synapse
+    #[prop(into, optional)]
+    synapse_public_key: Option<String>,
 ) -> impl IntoView {
     use module_auth::signing::sign_event_payload;
     use synapse_core::domain::profiles::Profile;
@@ -32,6 +35,7 @@ pub fn ComposeBar(
     let textarea_ref = NodeRef::<leptos::html::Textarea>::new();
 
     let initials = user_initials.unwrap_or_else(|| "?".to_string());
+    let is_remote = synapse_public_key.is_some();
 
     let resize_textarea = move || {
         if let Some(textarea) = textarea_ref.get() {
@@ -47,6 +51,7 @@ pub fn ComposeBar(
         let channel = channel.clone();
         let textarea_ref = textarea_ref.clone();
         let session_user_profile = session_user_profile.clone();
+        let synapse_public_key = synapse_public_key.clone();
 
         Rc::new(move || {
             let post_content = content.get();
@@ -59,8 +64,10 @@ pub fn ComposeBar(
             let agent = session_user_profile.public_key.clone();
             let channel_slug = channel.get();
             let textarea_ref = textarea_ref.clone();
+            let synapse_pk = synapse_public_key.clone();
 
             // Sign the event payload with the user's private key
+            // This is required for remote posts and optional for local posts
             let agent_signature = sign_event_payload(
                 "posts:create_post",
                 &agent,
@@ -69,24 +76,33 @@ pub fn ComposeBar(
                 Some(&channel_slug),
             );
 
-            // Spawn async server call
+            let request = CreatePostRequest {
+                event_type: "posts:create_post".to_string(),
+                agent,
+                module_kind: Some("posts".to_string()),
+                module_slug: Some(channel_slug),
+                target: None,
+                previous: None,
+                content: Some(post_content),
+                artifacts: None,
+                metadata: None,
+                links: None,
+                data: None,
+                expiration: None,
+                agent_signature, // Signed event for federated auth
+            };
+
+            // Spawn async server call - use remote or local based on synapse_public_key
             spawn_local(async move {
-                let _ = create_post_server(CreatePostRequest {
-                    event_type: "posts:create_post".to_string(),
-                    agent,
-                    module_kind: Some("posts".to_string()),
-                    module_slug: Some(channel_slug),
-                    target: None,
-                    previous: None,
-                    content: Some(post_content),
-                    artifacts: None,
-                    metadata: None,
-                    links: None,
-                    data: None,
-                    expiration: None,
-                    agent_signature, // Signed event for federated auth
-                })
-                .await;
+                let result = if let Some(pk) = synapse_pk {
+                    create_remote_post_server(pk, request).await
+                } else {
+                    create_post_server(request).await
+                };
+
+                if let Err(e) = result {
+                    leptos::logging::error!("Failed to create post: {:?}", e);
+                }
 
                 if let Some(callback) = &on_post_created {
                     callback.run(());
@@ -134,7 +150,7 @@ pub fn ComposeBar(
                         <div class="relative bg-background border border-border/50 rounded-lg focus-within:border-brand/50 transition-all">
                             <textarea
                                 node_ref=textarea_ref
-                                placeholder=move || format!("Post to #{}", channel.get())
+                                placeholder=move || if is_remote { format!("Post to #{} (remote)", channel.get()) } else { format!("Post to #{}", channel.get()) }
                                 class="w-full px-3 py-2 pr-20 bg-transparent text-sm text-foreground placeholder-foreground/30 focus:outline-none resize-none overflow-y-auto leading-relaxed scrollbar-thin"
                                 style="min-height: 36px; max-height: 120px;"
                                 prop:value=move || content.get()

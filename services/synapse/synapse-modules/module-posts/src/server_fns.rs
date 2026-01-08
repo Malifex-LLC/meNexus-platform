@@ -73,3 +73,17 @@ pub async fn list_remote_posts_for_channel_server(
         .map_err(|e| ServerFnError::new(e.to_string()))?;
     Ok(posts)
 }
+
+/// Create a post on a remote synapse
+#[server(CreateRemotePostServer, "/api/posts")]
+pub async fn create_remote_post_server(
+    synapse_public_key: String,
+    request: CreatePostRequest,
+) -> Result<Post, ServerFnError> {
+    use crate::service::create_remote_post;
+    let deps: PostsDeps = expect_context();
+    let post = create_remote_post(deps, synapse_public_key, request)
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
+    Ok(post)
+}

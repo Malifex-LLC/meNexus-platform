@@ -26,7 +26,6 @@ pub fn PostsFeed(
 ) -> impl IntoView {
     provide_context(session_user_profile.clone());
 
-    let is_remote = synapse_public_key.is_some();
     let synapse_pk = synapse_public_key.clone();
     let synapse_pk_for_posts = synapse_public_key.clone();
 
@@ -352,19 +351,28 @@ pub fn PostsFeed(
                     </Suspense>
                 </div>
 
-                // Compose bar (only shown for local synapse)
-                {if !is_remote {
+                // Compose bar - shown for both local and remote synapses
+                {
                     // Create a Signal<String> for ComposeBar from the Memo<Option<String>>
                     let channel_signal = Signal::derive(move || active_channel.get().unwrap_or_default());
-                    view! {
-                        <ComposeBar
-                            channel=channel_signal
-                            on_post_created=on_post_created
-                        />
-                    }.into_any()
-                } else {
-                    view! { <span></span> }.into_any()
-                }}
+                    let synapse_pk_for_compose = synapse_public_key.clone();
+                    if let Some(pk) = synapse_pk_for_compose {
+                        view! {
+                            <ComposeBar
+                                channel=channel_signal
+                                on_post_created=on_post_created
+                                synapse_public_key=pk
+                            />
+                        }.into_any()
+                    } else {
+                        view! {
+                            <ComposeBar
+                                channel=channel_signal
+                                on_post_created=on_post_created
+                            />
+                        }.into_any()
+                    }
+                }
             </main>
         </div>
     }
