@@ -21,6 +21,7 @@ pub fn ComposeBar(
     user_initials: Option<String>,
     #[prop(into, optional)] on_post_created: Option<Callback<()>>,
 ) -> impl IntoView {
+    use module_auth::signing::sign_event_payload;
     use synapse_core::domain::profiles::Profile;
 
     let session_user_profile =
@@ -59,6 +60,15 @@ pub fn ComposeBar(
             let channel_slug = channel.get();
             let textarea_ref = textarea_ref.clone();
 
+            // Sign the event payload with the user's private key
+            let agent_signature = sign_event_payload(
+                "posts:create_post",
+                &agent,
+                Some(&post_content),
+                Some("posts"),
+                Some(&channel_slug),
+            );
+
             // Spawn async server call
             spawn_local(async move {
                 let _ = create_post_server(CreatePostRequest {
@@ -74,6 +84,7 @@ pub fn ComposeBar(
                     links: None,
                     data: None,
                     expiration: None,
+                    agent_signature, // Signed event for federated auth
                 })
                 .await;
 

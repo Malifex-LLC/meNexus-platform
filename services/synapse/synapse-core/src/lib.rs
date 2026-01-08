@@ -10,3 +10,11 @@ pub use domain::events::CoreEvent;
 pub use errors::CoreError;
 pub use ports::federation::errors::TransportError;
 pub use ports::persistence::errors::PersistenceError;
+
+// Re-export signature verification utilities
+pub use domain::crypto::signature::{
+    SignatureVerificationResult,
+    verify_event_signature,
+    verify_event_authentication,
+    requires_authentication,
+};

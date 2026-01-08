@@ -118,4 +118,8 @@ pub struct CreatePostRequest {
     pub links: Option<Vec<String>>,
     pub data: Option<Vec<u8>>,
     pub expiration: Option<OffsetDateTime>,
+    /// Optional agent signature for federated authentication.
+    /// Required when creating posts on remote Synapses.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_signature: Option<String>,
 }

@@ -25,6 +25,9 @@ pub struct CreateEventCommand {
     pub links: Option<Vec<String>>,
     pub data: Option<Vec<u8>>,
     pub expiration: Option<OffsetDateTime>,
+    /// Optional signature of the event by the agent.
+    /// Required for write operations to remote Synapses.
+    pub agent_signature: Option<String>,
 }
 
 #[derive(Clone, Debug, Default)]

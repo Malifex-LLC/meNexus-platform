@@ -106,6 +106,7 @@ pub async fn create_post(
         links: request.links,
         data: request.data,
         expiration: request.expiration,
+        agent_signature: request.agent_signature,
     };
     let event = deps.create_local_event.execute(cmd).await?;
 
@@ -155,7 +156,7 @@ pub async fn get_remote_posts_config(
         event_type: "posts:get_config".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: None,
-        agent: "local-agent".to_string(),
+        agent: "guest".to_string(), // Read operations don't require specific identity
         target: None,
         previous: None,
         content: None,
@@ -164,6 +165,7 @@ pub async fn get_remote_posts_config(
         links: None,
         data: None,
         expiration: None,
+        agent_signature: None, // Read operations don't require signature
     };
 
     let cmd = CreateRemoteEventCommand {
@@ -199,7 +201,7 @@ pub async fn list_remote_posts_for_channel(
         event_type: "posts:list_posts_for_channel".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: None,
-        agent: "local-agent".to_string(),
+        agent: "guest".to_string(), // Read operations don't require specific identity
         target: None,
         previous: None,
         content: None,
@@ -208,6 +210,7 @@ pub async fn list_remote_posts_for_channel(
         links: None,
         data: None,
         expiration: None,
+        agent_signature: None, // Read operations don't require signature
     };
 
     let cmd = CreateRemoteEventCommand {

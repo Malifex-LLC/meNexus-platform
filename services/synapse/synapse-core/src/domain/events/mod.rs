@@ -22,6 +22,11 @@ pub struct Event {
     pub links: Option<Vec<String>>,
     pub data: Option<Vec<u8>>,
     pub expiration: Option<OffsetDateTime>,
+    /// Cryptographic signature of the event by the agent.
+    /// Used for federated authentication - remote Synapses can verify
+    /// that an action was authorized by the agent without needing a session.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_signature: Option<String>,
 }
 
 pub struct EventBuilder {
@@ -37,6 +42,7 @@ pub struct EventBuilder {
     links: Option<Vec<String>>,
     data: Option<Vec<u8>>,
     expiration: Option<OffsetDateTime>,
+    agent_signature: Option<String>,
 }
 
 impl Event {
@@ -54,6 +60,7 @@ impl Event {
             links: None,
             data: None,
             expiration: None,
+            agent_signature: None,
         }
     }
 
@@ -61,6 +68,42 @@ impl Event {
     pub fn new() -> EventBuilder {
         Self::builder()
     }
+
+    /// Returns the canonical bytes used for signing/verification.
+    /// This excludes the signature field itself to avoid circular dependency.
+    pub fn signing_payload(&self) -> Vec<u8> {
+        // Create a deterministic representation for signing
+        // We use a simplified struct that excludes the signature
+        let payload = SigningPayload {
+            id: self.id,
+            created_at: self.created_at,
+            event_type: &self.event_type,
+            module_kind: self.module_kind.as_deref(),
+            module_slug: self.module_slug.as_deref(),
+            agent: &self.agent,
+            target: &self.target,
+            previous: self.previous,
+            content: self.content.as_deref(),
+            metadata: &self.metadata,
+        };
+        // Use JSON for deterministic serialization
+        serde_json::to_vec(&payload).unwrap_or_default()
+    }
+}
+
+/// Internal struct for creating deterministic signing payload
+#[derive(Serialize)]
+struct SigningPayload<'a> {
+    id: Uuid,
+    created_at: OffsetDateTime,
+    event_type: &'a str,
+    module_kind: Option<&'a str>,
+    module_slug: Option<&'a str>,
+    agent: &'a str,
+    target: &'a Option<ObjectRef>,
+    previous: Option<Uuid>,
+    content: Option<&'a str>,
+    metadata: &'a Option<HashMap<String, String>>,
 }
 
 impl EventBuilder {
@@ -124,6 +167,11 @@ impl EventBuilder {
         self
     }
 
+    pub fn with_agent_signature(mut self, signature: impl Into<String>) -> Self {
+        self.agent_signature = Some(signature.into());
+        self
+    }
+
     pub fn build(self) -> Event {
         Event {
             id: Uuid::new_v4(),
@@ -140,6 +188,7 @@ impl EventBuilder {
             links: self.links,
             data: self.data,
             expiration: self.expiration,
+            agent_signature: self.agent_signature,
         }
     }
 }

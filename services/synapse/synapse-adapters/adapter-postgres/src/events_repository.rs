@@ -29,6 +29,7 @@ struct EventRow {
     module_kind: Option<String>,
     module_slug: Option<String>,
     agent: String,
+    agent_signature: Option<String>,
     // the alias `"target?: JsonValue"` maps to this field
     target: Option<JsonValue>,
     previous: Option<Uuid>,
@@ -79,11 +80,11 @@ impl EventRepository for PostgresEventsRepository {
         let row = sqlx::query!(
             r#"
             INSERT INTO events
-                (id, created_at, event_type, module_kind, module_slug, agent,
+                (id, created_at, event_type, module_kind, module_slug, agent, agent_signature,
                  target, previous, content, artifacts, metadata, links, data, expiration)
             VALUES
-                ($1, $2, $3, $4, $5, $6,
-                 $7, $8, $9, $10, $11, $12, $13, $14)
+                ($1, $2, $3, $4, $5, $6, $7,
+                 $8, $9, $10, $11, $12, $13, $14, $15)
             RETURNING
                 id,
                 created_at,
@@ -91,6 +92,7 @@ impl EventRepository for PostgresEventsRepository {
                 module_kind,
                 module_slug,
                 agent,
+                agent_signature,
                 target      as "target?: JsonValue",     -- nullable JSON -> Option<JsonValue>
                 previous,
                 content,
@@ -106,6 +108,7 @@ impl EventRepository for PostgresEventsRepository {
             event.module_kind,
             event.module_slug,
             event.agent,
+            event.agent_signature,
             target_json, // Option<JsonValue>
             event.previous,
             event.content,
@@ -137,6 +140,7 @@ impl EventRepository for PostgresEventsRepository {
             module_kind: row.module_kind,
             module_slug: row.module_slug,
             agent: row.agent,
+            agent_signature: row.agent_signature,
             target,
             previous: row.previous,
             content: row.content,
@@ -171,6 +175,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -197,6 +202,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -225,6 +231,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -253,6 +260,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -281,6 +289,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -311,6 +320,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -341,6 +351,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -371,6 +382,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind,
                     module_slug,
                     agent,
+                    agent_signature,
                     target      as "target?: JsonValue",
                     previous,
                     content,
@@ -416,6 +428,7 @@ impl EventRepository for PostgresEventsRepository {
                     module_kind: row.module_kind,
                     module_slug: row.module_slug,
                     agent: row.agent,
+                    agent_signature: row.agent_signature,
                     target,
                     previous: row.previous,
                     content: row.content,

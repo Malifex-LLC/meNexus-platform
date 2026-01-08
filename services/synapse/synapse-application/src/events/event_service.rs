@@ -56,6 +56,7 @@ impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> CreateLo
             links: cmd.links,
             data: cmd.data,
             expiration: cmd.expiration,
+            agent_signature: cmd.agent_signature,
         };
 
         Ok(self.ingest.ingest(event).await?)
@@ -144,6 +145,7 @@ impl<T: FederationTransport + Send + Sync> CreateRemoteEventUseCase for RemoteEv
             links: cmd.event.links,
             data: cmd.event.data,
             expiration: cmd.event.expiration,
+            agent_signature: cmd.event.agent_signature,
         };
 
         Ok(self

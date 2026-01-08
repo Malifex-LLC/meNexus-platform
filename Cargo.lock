@@ -622,6 +622,7 @@ dependencies = [
  "module-posts",
  "module-profiles",
  "synapse-core",
+ "time",
  "tokio",
  "wasm-bindgen",
 ]
@@ -3261,6 +3262,7 @@ dependencies = [
  "leptos",
  "leptos_axum",
  "leptos_meta",
+ "module-auth",
  "reqwasm",
  "serde",
  "serde_json",
@@ -5021,9 +5023,12 @@ version = "0.3.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "hex",
+ "k256",
  "log",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
  "thiserror 2.0.17",
  "time",
  "tracing",

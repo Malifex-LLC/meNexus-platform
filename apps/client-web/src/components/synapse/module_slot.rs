@@ -58,6 +58,7 @@ fn PostsModule() -> impl IntoView {
 
     // Check if we're rendering a remote synapse
     let remote_synapse_ctx = use_context::<RemoteSynapseContext>();
+    let is_remote = remote_synapse_ctx.is_some();
 
     view! {
         <Suspense fallback=move || view! { <ModuleLoadingState/> }>
@@ -65,7 +66,7 @@ fn PostsModule() -> impl IntoView {
                 session_user.get().map(|result| {
                     match result {
                         Ok(Some(profile)) => {
-                            // Conditionally render based on whether we have a remote synapse context
+                            // User is logged in - render with their profile
                             if let Some(ref ctx) = remote_synapse_ctx {
                                 let pk = ctx.synapse_public_key.clone();
                                 view! { <PostsFeed session_user_profile=profile.clone() synapse_public_key=pk/> }.into_any()
@@ -74,7 +75,31 @@ fn PostsModule() -> impl IntoView {
                             }
                         }
                         Ok(None) => {
-                            view! { <ModuleAuthRequired module_name="Posts"/> }.into_any()
+                            // User is not logged in
+                            if is_remote {
+                                // For remote Synapses: allow read-only viewing with a guest profile
+                                // The compose bar is already hidden for remote Synapses
+                                let guest_profile = synapse_core::domain::profiles::Profile {
+                                    public_key: "guest".to_string(),
+                                    handle: Some("guest".to_string()),
+                                    display_name: Some("Guest".to_string()),
+                                    bio: None,
+                                    location: None,
+                                    avatar_url: None,
+                                    created_at: time::OffsetDateTime::now_utc(),
+                                    updated_at: time::OffsetDateTime::now_utc(),
+                                    signature: None,
+                                };
+                                if let Some(ref ctx) = remote_synapse_ctx {
+                                    let pk = ctx.synapse_public_key.clone();
+                                    view! { <PostsFeed session_user_profile=guest_profile synapse_public_key=pk/> }.into_any()
+                                } else {
+                                    view! { <PostsFeed session_user_profile=guest_profile/> }.into_any()
+                                }
+                            } else {
+                                // For local Synapse: require auth to view posts
+                                view! { <ModuleAuthRequired module_name="Posts"/> }.into_any()
+                            }
                         }
                         Err(e) => {
                             view! { <ModuleErrorState error=e.to_string()/> }.into_any()

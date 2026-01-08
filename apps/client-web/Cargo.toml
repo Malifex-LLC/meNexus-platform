@@ -39,6 +39,7 @@ module-profiles = { path = "../../services/synapse/synapse-modules/module-profil
   "hydrate",
 ] }
 synapse-core = { path = "../../services/synapse/synapse-core" }
+time = { version = "0.3", features = ["serde"] }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.105", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }

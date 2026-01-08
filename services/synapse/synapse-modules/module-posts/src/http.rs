@@ -14,6 +14,7 @@ use synapse_core::{
     domain::events::Event,
     ports::events::event_repository::{EventFilter, EventRepository},
     ports::modules::Module,
+    verify_event_authentication,
 };
 use tracing::debug;
 
@@ -55,6 +56,10 @@ impl Module for PostsModule {
         Ok(self.version.clone())
     }
     async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError> {
+        // Verify authentication for events that require it (federated requests)
+        verify_event_authentication(event)
+            .map_err(|e| CoreError::Authentication(e))?;
+            
         match event.event_type.as_str() {
             "posts:create_post" => create_post_handler(event).await,
             "posts:list_posts" => {
@@ -164,7 +169,7 @@ async fn list_remote_events(
         event_type: "posts:list_posts".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: None,
-        agent: "100".to_string(),
+        agent: "guest".to_string(), // Read operations don't require specific identity
         target: None,
         previous: None,
         content: None,
@@ -173,6 +178,7 @@ async fn list_remote_events(
         links: None,
         data: None,
         expiration: None,
+        agent_signature: None, // Read operations don't require signature
     };
 
     let cmd = CreateRemoteEventCommand {
@@ -207,7 +213,7 @@ async fn create_post_remote(
         event_type: "posts:create_post".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: body.module_slug,
-        agent: "local-agent".to_string(), // TODO set real agent public key
+        agent: body.agent, // Use the actual agent public key from the request
         target: body.target,
         previous: body.previous,
         content: body.content,
@@ -216,6 +222,7 @@ async fn create_post_remote(
         links: body.links,
         data: body.data,
         expiration: body.expiration,
+        agent_signature: body.agent_signature, // Pass through the signature for federated auth
     };
     let cmd = CreateRemoteEventCommand {
         synapse_public_key,
@@ -245,7 +252,7 @@ async fn get_posts_config_remote_http(
         event_type: "posts:get_config".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: None,
-        agent: "local-agent".to_string(),
+        agent: "guest".to_string(), // Read operations don't require specific identity
         target: None,
         previous: None,
         content: None,
@@ -254,6 +261,7 @@ async fn get_posts_config_remote_http(
         links: None,
         data: None,
         expiration: None,
+        agent_signature: None, // Read operations don't require signature
     };
 
     let cmd = CreateRemoteEventCommand {
@@ -293,7 +301,7 @@ async fn list_posts_for_channel_remote_http(
         event_type: "posts:list_posts_for_channel".to_string(),
         module_kind: Some("posts".to_string()),
         module_slug: None,
-        agent: "local-agent".to_string(),
+        agent: "guest".to_string(), // Read operations don't require specific identity
         target: None,
         previous: None,
         content: None,
@@ -302,6 +310,7 @@ async fn list_posts_for_channel_remote_http(
         links: None,
         data: None,
         expiration: None,
+        agent_signature: None, // Read operations don't require signature
     };
 
     let cmd = CreateRemoteEventCommand {
