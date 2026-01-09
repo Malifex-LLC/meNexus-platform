@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO challenges (id, agent, nonce, created_at, expires_at)\n        VALUES ($1, $2, $3, $4, $5)\n        RETURNING id, agent, nonce, created_at, expires_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "agent",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "nonce",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "expires_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "9b2cd7d914835d39ec0db7f03f48c201ca367504b7aaf5f696fb4991f7805747"
+}

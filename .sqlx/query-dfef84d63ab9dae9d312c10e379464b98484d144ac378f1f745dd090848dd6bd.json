@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT doc_bytes, created_at, updated_at FROM profiles WHERE public_key = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "doc_bytes",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "dfef84d63ab9dae9d312c10e379464b98484d144ac378f1f745dd090848dd6bd"
+}

@@ -16,6 +16,9 @@ ARG VERSION
 ARG VCS_REF
 ARG BUILD_DATE
 
+# Enable SQLx offline mode - uses pre-generated .sqlx cache instead of live DB
+ENV SQLX_OFFLINE=true
+
 # Install system dependencies for building
 RUN apt-get update && apt-get install -y \
     pkg-config \
@@ -47,6 +50,12 @@ COPY services/synapse/synapse-modules/module-posts/Cargo.toml services/synapse/s
 COPY services/synapse/synapse-modules/module-profiles/Cargo.toml services/synapse/synapse-modules/module-profiles/
 COPY services/synapse/synapse-protocols/protocol-snp/Cargo.toml services/synapse/synapse-protocols/protocol-snp/
 COPY services/synapse/synapse-server/Cargo.toml services/synapse/synapse-server/
+
+# Copy SQLx offline cache (generated via: cargo sqlx prepare --workspace)
+COPY .sqlx/ .sqlx/
+
+# Copy migrations directory for sqlx::migrate! macro
+COPY services/synapse/synapse-adapters/adapter-postgres/migrations/ services/synapse/synapse-adapters/adapter-postgres/migrations/
 
 # Create stub lib.rs files for dependency caching
 RUN mkdir -p apps/client-web/src && echo "fn main() {}" > apps/client-web/src/lib.rs

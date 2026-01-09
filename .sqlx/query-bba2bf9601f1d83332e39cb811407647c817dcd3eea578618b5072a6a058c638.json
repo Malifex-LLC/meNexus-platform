@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT doc_bytes FROM profiles WHERE public_key = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "doc_bytes",
+        "type_info": "Bytea"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "bba2bf9601f1d83332e39cb811407647c817dcd3eea578618b5072a6a058c638"
+}

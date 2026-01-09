@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM profiles WHERE public_key = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cd91c10b3a886e4fc8ff207ccbb6a043b52605f904580f8f7da66342e8a7d6f4"
+}

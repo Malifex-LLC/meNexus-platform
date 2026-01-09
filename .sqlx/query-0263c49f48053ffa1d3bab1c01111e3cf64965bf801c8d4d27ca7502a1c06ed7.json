@@ -1,0 +1,120 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO events\n                (id, created_at, event_type, module_kind, module_slug, agent, agent_signature,\n                 target, previous, content, artifacts, metadata, links, data, expiration)\n            VALUES\n                ($1, $2, $3, $4, $5, $6, $7,\n                 $8, $9, $10, $11, $12, $13, $14, $15)\n            RETURNING\n                id,\n                created_at,\n                event_type,\n                module_kind,\n                module_slug,\n                agent,\n                agent_signature,\n                target      as \"target?: JsonValue\",     -- nullable JSON -> Option<JsonValue>\n                previous,\n                content,\n                artifacts   as \"artifacts?: Vec<String>\",-- nullable TEXT[] -> Option<Vec<String>>\n                metadata    as \"metadata?: JsonValue\",    -- nullable JSON -> Option<JsonValue>\n                links       as \"links?: Vec<String>\",     -- nullable TEXT[] -> Option<Vec<String>>\n                data        as \"data?: Vec<u8>\",          -- nullable BYTEA  -> Option<Vec<u8>>\n                expiration\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "event_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "module_kind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "module_slug",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "agent",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "agent_signature",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "target?: JsonValue",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "previous",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "artifacts?: Vec<String>",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 11,
+        "name": "metadata?: JsonValue",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 12,
+        "name": "links?: Vec<String>",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 13,
+        "name": "data?: Vec<u8>",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 14,
+        "name": "expiration",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Timestamptz",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Uuid",
+        "Text",
+        "TextArray",
+        "Jsonb",
+        "TextArray",
+        "Bytea",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "0263c49f48053ffa1d3bab1c01111e3cf64965bf801c8d4d27ca7502a1c06ed7"
+}
