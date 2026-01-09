@@ -1,31 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PUB_URL="${PUBLIC_URL:-http://localhost}"
-EMAIL="${EMAIL:-admin@example.com}"
+# Configuration from environment
+SYNAPSE_HOST="${SYNAPSE_HOST:-synapse}"
+SYNAPSE_PORT="${SYNAPSE_PORT:-3000}"
+DOMAIN="${DOMAIN:-localhost}"
+EMAIL="${LETSENCRYPT_EMAIL:-admin@example.com}"
+ENABLE_SSL="${ENABLE_SSL:-false}"
 
-scheme="$(echo "$PUB_URL" | sed -E 's#^([a-z]+)://.*#\1#')"
-# drop scheme, path, and any :port
-DOMAIN="$(echo "$PUB_URL" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:[0-9]+$##')"
+export SYNAPSE_HOST SYNAPSE_PORT DOMAIN
 
 is_localhost() { [[ -z "$DOMAIN" || "$DOMAIN" == "localhost" || "$DOMAIN" == "127.0.0.1" || "$DOMAIN" == "::1" ]]; }
 is_ip()        { [[ "$DOMAIN" =~ ^[0-9.]+$ || "$DOMAIN" =~ : ]]; }  # IPv4 or IPv6
 
-wait_for_client() {
-  # Wait until the client container responds (API can come up later)
-  for i in {1..60}; do
-    if curl -fsS http://client:80/ >/dev/null 2>&1; then
+wait_for_synapse() {
+  echo "[proxy] waiting for synapse at ${SYNAPSE_HOST}:${SYNAPSE_PORT}..."
+  for i in {1..120}; do
+    if curl -fsS "http://${SYNAPSE_HOST}:${SYNAPSE_PORT}/" >/dev/null 2>&1; then
+      echo "[proxy] synapse is ready"
       return 0
     fi
-    echo "[proxy] waiting for client container..."
     sleep 1
   done
-  echo "[proxy] warning: client not responding yet; continuing"
+  echo "[proxy] warning: synapse not responding yet; starting anyway"
+}
+
+render_template() {
+  local template="$1"
+  local output="$2"
+  envsubst '${SYNAPSE_HOST} ${SYNAPSE_PORT} ${DOMAIN}' < "$template" > "$output"
 }
 
 start_nginx_http() {
   echo "[proxy] starting Nginx in HTTP-only mode"
-  cp /etc/nginx/templates/nginx.http.conf.template /etc/nginx/nginx.conf
+  render_template /etc/nginx/templates/nginx.http.conf.template /etc/nginx/nginx.conf
   exec nginx -g 'daemon off;'
 }
 
@@ -38,7 +46,7 @@ issue_cert_if_needed() {
 
   echo "[proxy] obtaining certificate for ${DOMAIN} via HTTP-01"
   # Serve ACME challenge over HTTP temporarily
-  cp /etc/nginx/templates/nginx.http.conf.template /etc/nginx/nginx.conf
+  render_template /etc/nginx/templates/nginx.http.conf.template /etc/nginx/nginx.conf
   nginx
 
   certbot certonly --agree-tos --no-eff-email --email "${EMAIL}" \
@@ -50,9 +58,7 @@ issue_cert_if_needed() {
 
 start_nginx_https() {
   echo "[proxy] starting Nginx in HTTPS mode for ${DOMAIN}"
-  sed -e "s/\${DOMAIN}/${DOMAIN}/g" \
-      /etc/nginx/templates/nginx.https.conf.template \
-      > /etc/nginx/nginx.conf
+  render_template /etc/nginx/templates/nginx.https.conf.template /etc/nginx/nginx.conf
 
   # background renew loop
   ( while true; do
@@ -64,18 +70,18 @@ start_nginx_https() {
 }
 
 main() {
-  if is_localhost || is_ip || [[ "$scheme" != "https" ]]; then
-    if [[ "$scheme" == "http" && ! ( "$DOMAIN" == "localhost" || "$DOMAIN" == "127.0.0.1" || "$DOMAIN" == "::1" ) ]]; then
-      echo "[proxy][WARN] PUBLIC_URL is http on a non-localhost host ($DOMAIN)."
-      echo "[proxy][WARN] Browsers will treat this as insecure; WebCrypto will be unavailable and login will fail."
-    fi
-    echo "[proxy] PUBLIC_URL='${PUB_URL}' -> HTTP-only (local/IP/plain-http)"
-    wait_for_client
-    start_nginx_http
-  else
-    echo "[proxy] PUBLIC_URL='${PUB_URL}' -> ACME domain mode"
+  wait_for_synapse
+  
+  if [[ "$ENABLE_SSL" == "true" ]] && ! is_localhost && ! is_ip; then
+    echo "[proxy] SSL enabled for domain: ${DOMAIN}"
     issue_cert_if_needed
     start_nginx_https
+  else
+    if [[ "$ENABLE_SSL" == "true" ]]; then
+      echo "[proxy][WARN] SSL requested but domain is localhost/IP - using HTTP"
+    fi
+    echo "[proxy] Starting in HTTP-only mode"
+    start_nginx_http
   fi
 }
 main

@@ -15,8 +15,8 @@ LABEL org.opencontainers.image.title="meNexus Proxy" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}"
 
-# Tools for bootstrapping + trust store
-RUN apk add --no-cache bash curl grep sed coreutils certbot ca-certificates
+# Tools for bootstrapping + trust store + envsubst for template rendering
+RUN apk add --no-cache bash curl grep sed coreutils certbot ca-certificates gettext
 
 # Ensure certbot dir exists
 RUN mkdir -p /var/www/certbot
