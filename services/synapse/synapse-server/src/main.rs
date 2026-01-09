@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+#![recursion_limit = "512"]
+
 pub mod api;
 pub mod errors;
 pub mod middleware;
@@ -26,9 +28,9 @@ use leptos_axum::{LeptosRoutes, generate_route_list};
 use module_auth::http::AuthModule;
 use module_auth::http::routes as module_auth_routes;
 use module_auth::types::AuthDeps;
+use module_core::CoreDeps;
 use module_core::http::CoreModule;
 use module_core::routes as module_core_routes;
-use module_core::CoreDeps;
 use module_posts::http::PostsModule;
 use module_posts::http::routes as module_posts_routes;
 use module_posts::types::PostsDeps;
