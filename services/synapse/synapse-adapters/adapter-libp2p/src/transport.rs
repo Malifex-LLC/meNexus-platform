@@ -124,6 +124,9 @@ impl FederationTransport for Libp2pTransport {
         let peer_id = peer_id_from_urlsafe_b64_pk(&synapse_public_key)
             .map_err(|e| TransportError::Other(e.to_string()))?;
 
+        // Extract signature from event for the SNP message envelope
+        let event_signature = event.agent_signature.clone().unwrap_or_default();
+        
         let req = SnpMessage {
             version: "1.0.0".to_string(),
             id: Uuid::new_v4(),
@@ -131,13 +134,15 @@ impl FederationTransport for Libp2pTransport {
             destination: Synapse {
                 id: peer_id.to_string(),
             },
-            agent_public_key: "agent_public_key".to_string(),
+            // Use the actual agent public key from the event
+            agent_public_key: event.agent.clone(),
             timestamp: OffsetDateTime::now_utc(),
             payload: Command {
                 action: event.event_type.clone(),
                 event: event.clone(),
             },
-            signature: "signature".to_string(),
+            // Use the event's signature for the message envelope
+            signature: event_signature,
         };
 
         let (ret_tx, ret_rx) = oneshot::channel();

@@ -10,6 +10,7 @@ CREATE TABLE events (
   module_slug   TEXT,
 
   agent         TEXT NOT NULL,
+  agent_signature TEXT,                  -- Optional signature for federated auth
 
   target        JSONB,
 

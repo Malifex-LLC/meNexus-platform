@@ -103,7 +103,7 @@ pub fn SynapsesList() -> impl IntoView {
 
                                 view! {
                                     <A
-                                        href=format!("/synapses/{}", public_key)
+                                        href=format!("/synapse/{}", public_key)
                                         attr:class="group flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-foreground/5 transition-colors"
                                     >
                                         // Icon

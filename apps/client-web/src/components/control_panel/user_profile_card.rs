@@ -113,7 +113,7 @@ pub fn UserProfileCard() -> impl IntoView {
                                         </A>
                                     </div>
                                 </div>
-                            }
+                            }.into_any()
                         }
 
                         // No profile or error → treat as not logged in
@@ -124,7 +124,7 @@ pub fn UserProfileCard() -> impl IntoView {
                                     "Sign in"
                                 </A>
                             </div>
-                        },
+                        }.into_any(),
                     }
                 }}
             </Suspense>

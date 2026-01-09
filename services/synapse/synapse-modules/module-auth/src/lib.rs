@@ -17,4 +17,7 @@ pub mod server_fns;
 pub mod types;
 
 #[cfg(feature = "hydrate")]
+pub mod signing;
+
+#[cfg(feature = "hydrate")]
 pub mod ui;

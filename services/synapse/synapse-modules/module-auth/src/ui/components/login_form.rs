@@ -64,8 +64,14 @@ pub fn LoginForm() -> impl IntoView {
 
             match verify_challenge_result {
                 Ok(resp) => {
-                    // Full page reload to ensure SSR picks up the new session cookie
+                    // Store the private key in sessionStorage for event signing
+                    // This is cleared when the browser tab is closed
                     let window = web_sys::window().expect("no window");
+                    if let Ok(Some(storage)) = window.session_storage() {
+                        let _ = storage.set_item("menexus_signing_key", private_key_hex);
+                    }
+                    
+                    // Full page reload to ensure SSR picks up the new session cookie
                     window.location().set_href("/").expect("failed to redirect");
                 }
                 Err(err) => {

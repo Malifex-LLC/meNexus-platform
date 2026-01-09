@@ -56,6 +56,7 @@ impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> CreateLo
             links: cmd.links,
             data: cmd.data,
             expiration: cmd.expiration,
+            agent_signature: cmd.agent_signature,
         };
 
         Ok(self.ingest.ingest(event).await?)
@@ -83,9 +84,13 @@ impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> MessageH
     for EventIngestService<R, T>
 {
     async fn handle_message(&self, event: Event) -> Result<Vec<Event>, CoreError> {
+        let event_type = event.event_type.clone();
+        
         let replies = match event.module_kind.as_deref() {
             Some(kind) => {
-                let module = self.registry.get(kind).unwrap();
+                let module = self.registry.get(kind).ok_or_else(|| {
+                    CoreError::Validation(format!("module '{}' not registered", kind))
+                })?;
                 module.handle_event(&event).await?
             }
             None => {
@@ -95,7 +100,16 @@ impl<R: EventRepository + Send + Sync, T: ModuleRegistry + Send + Sync> MessageH
             }
         };
 
-        self.ingest(event).await?;
+        // Only ingest write events, not read queries or system events.
+        // Read queries (list_, get_) and system events (synapse:) should not be stored.
+        let is_read_or_system = event_type.contains(":list_")
+            || event_type.contains(":get_")
+            || event_type.starts_with("synapse:");
+
+        if !is_read_or_system {
+            self.ingest(event).await?;
+        }
+
         Ok(replies)
     }
 }
@@ -144,6 +158,7 @@ impl<T: FederationTransport + Send + Sync> CreateRemoteEventUseCase for RemoteEv
             links: cmd.event.links,
             data: cmd.event.data,
             expiration: cmd.event.expiration,
+            agent_signature: cmd.event.agent_signature,
         };
 
         Ok(self

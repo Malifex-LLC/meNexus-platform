@@ -28,15 +28,17 @@
 @import "./user-themes/meNexus_dark.css";
 
 /* 
- * SYNAPSE THEME
- * -------------
- * Controls: Synapse layouts and modules (feeds, chat, members, etc.)
- * Applied within the .synapse-themed wrapper class
+ * SYNAPSE THEMES
+ * --------------
+ * All synapse themes are imported here. The active theme is selected
+ * via the SYNAPSE_THEME_PRESET environment variable, which adds a class
+ * like "synapse-theme-malifex" to the synapse container.
  * 
- * Available themes:
- * - default.css   (Neutral dark, indigo accent)
- * - cyberpunk.css (Neon cyan/magenta)
- * - nature.css    (Forest green)
- * - ocean.css     (Deep blue)
+ * Available presets:
+ * - default       (Neutral dark, indigo accent)
+ * - malifex       (Deep black, coral accent)
+ * - meNexus_dark  (Dark with green tones)
  */
+@import "./synapse-themes/default.css";
+@import "./synapse-themes/malifex.css";
 @import "./synapse-themes/meNexus_dark.css";

@@ -3,18 +3,14 @@
  * =====================
  * 
  * A neutral dark theme that works well as a starting point.
- * Synapse hosts can copy this to create custom themes.
+ * This also serves as the FALLBACK for all synapse-themed containers,
+ * ensuring variables are always defined.
  * 
  * IMPORTANT: Synapse themes use --synapse-* prefix.
  * The base.css file maps these to --theme-* within .synapse-themed
- * 
- * Structure is IDENTICAL to user themes for easy adaptation.
- * To convert a user theme to synapse theme:
- *   1. Copy the user theme file
- *   2. Replace all --theme- with --synapse-
- *   3. Replace :root with .synapse-themed
  */
 
+/* Base fallback + explicit default selection */
 .synapse-themed {
     /* ========================================
        LAYOUT COLORS

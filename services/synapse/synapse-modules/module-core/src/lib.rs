@@ -1,85 +1,43 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use async_trait::async_trait;
-use std::sync::Arc;
-use synapse_config::get_synapse_config;
-use synapse_core::{
-    CoreError,
-    domain::events::{self, Event},
-    ports::{
-        events::event_repository::{EventFilter, EventRepository},
-        modules::Module,
-    },
+//! # Module Core
+//!
+//! Core functionality shared across all Synapse modules.
+//!
+//! ## HTTP Routes
+//!
+//! - `GET /api/core/manifest` - Get the local Synapse manifest
+//! - `GET /api/synapses/{synapse_public_key}/core/manifest` - Get a remote Synapse's manifest
+
+#[cfg(feature = "ssr")]
+pub mod http;
+
+#[cfg(feature = "ssr")]
+pub mod service;
+
+#[cfg(any(feature = "ssr", feature = "hydrate"))]
+pub mod server_fns;
+
+pub mod types;
+
+// Re-export types
+pub use types::{
+    ClientManifest,
+    ClientIdentity,
+    ClientTheme,
+    ClientLayout,
+    ClientCapabilities,
+    LayoutTemplate,
+    SlotConfig,
+    known_modules,
 };
 
-pub struct CoreModule {
-    kind: String,
-    version: String,
-    repo: Arc<dyn EventRepository>,
-}
+#[cfg(feature = "ssr")]
+pub use types::CoreDeps;
 
-impl CoreModule {
-    pub fn new(repo: Arc<dyn EventRepository>) -> Self {
-        Self {
-            kind: "core".to_string(),
-            version: "1.0.0".to_string(),
-            repo,
-        }
-    }
-}
+#[cfg(feature = "ssr")]
+pub use http::routes;
 
-#[async_trait]
-impl Module for CoreModule {
-    fn kind(&self) -> Result<String, CoreError> {
-        Ok(self.kind.clone())
-    }
-    fn version(&self) -> Result<String, CoreError> {
-        Ok(self.version.clone())
-    }
-    async fn handle_event(&self, event: &Event) -> Result<Vec<Event>, CoreError> {
-        match event.event_type.as_str() {
-            "synapse:get_public_key" => {
-                let config = get_synapse_config().unwrap();
-                let public_key = config.identity.public_key;
-                let res_event = Event::new()
-                    .with_event_type("synapse:return_public_key")
-                    .with_module_kind("core")
-                    .with_agent(public_key.clone())
-                    .with_content(public_key.clone())
-                    .build();
-                let events = vec![res_event];
-                Ok(events)
-            }
-            "synapse:create_event" => {
-                let config = get_synapse_config().unwrap();
-                let public_key = config.identity.public_key;
-                let res_event = Event::new()
-                    .with_event_type("synapse:event_created")
-                    .with_module_kind("core")
-                    .with_agent(public_key.clone())
-                    .with_content(public_key.clone())
-                    .build();
-                let events = vec![res_event];
-                Ok(events)
-            }
-            "synapse:list_all_events" => {
-                let events = self
-                    .repo
-                    .retrieve(EventFilter {
-                        event_type: None,
-                        module_kind: None,
-                        module_slug: None,
-                    })
-                    .await
-                    .unwrap();
-                Ok(events)
-            }
-
-            _ => {
-                let events: Vec<Event> = vec![];
-                Ok(events)
-            }
-        }
-    }
-}
+#[cfg(any(feature = "ssr", feature = "hydrate"))]
+pub use server_fns::{get_local_manifest, get_remote_manifest};

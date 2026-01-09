@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
-use crate::layouts::three_column_module_layout::ThreeColumnModuleLayout;
 use crate::pages::dashboard_page::DashboardPage;
 use crate::pages::login_page::LoginPage;
 use crate::pages::messenger_page::MessengerPage;
 use crate::pages::notifications_page::NotificationsPage;
 use crate::pages::profile_page::ProfilePage;
 use crate::pages::register_page::RegisterPage;
+use crate::pages::remote_synapse_page::RemoteSynapsePage;
 use crate::pages::settings_page::SettingsPage;
 use crate::pages::synapse_page::SynapsePage;
 use crate::{layouts::main_layout::MainLayout, pages::search_page::SearchPage};
@@ -64,6 +64,7 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/login") view=LoginPage/>
                 <Route path=path!("/") view=DashboardPage/>
                 <Route path=path!("/synapse") view=SynapsePage/>
+                <Route path=path!("/synapses/:synapse_public_key") view=RemoteSynapsePage/>
                 <Route path=path!("/profile") view=ProfilePage/>
                 <Route path=path!("/search") view=SearchPage/>
                 <Route path=path!("/settings") view=SettingsPage/>

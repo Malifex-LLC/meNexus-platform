@@ -616,12 +616,13 @@ dependencies = [
  "module-activity",
  "module-auth",
  "module-chat",
- "module-creator",
+ "module-core",
  "module-livestream",
  "module-members",
  "module-posts",
  "module-profiles",
  "synapse-core",
+ "time",
  "tokio",
  "wasm-bindgen",
 ]
@@ -3215,23 +3216,15 @@ name = "module-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "axum",
+ "leptos",
  "serde",
  "serde_json",
+ "synapse-application",
  "synapse-config",
  "synapse-core",
  "time",
  "tracing",
- "uuid",
-]
-
-[[package]]
-name = "module-creator"
-version = "0.1.0"
-dependencies = [
- "leptos",
- "leptos_router",
- "serde",
- "time",
  "uuid",
 ]
 
@@ -3269,6 +3262,7 @@ dependencies = [
  "leptos",
  "leptos_axum",
  "leptos_meta",
+ "module-auth",
  "reqwasm",
  "serde",
  "serde_json",
@@ -5029,9 +5023,12 @@ version = "0.3.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "hex",
+ "k256",
  "log",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
  "thiserror 2.0.17",
  "time",
  "tracing",
