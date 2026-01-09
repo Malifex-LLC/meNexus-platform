@@ -71,7 +71,7 @@ impl Module for PostsModule {
                         module_slug: None,
                     })
                     .await
-                    .unwrap();
+                    .map_err(|e| CoreError::Other(format!("Failed to retrieve posts: {}", e)))?;
                 Ok(posts)
             }
             "posts:list_posts_for_channel" => {
@@ -91,14 +91,15 @@ impl Module for PostsModule {
                         module_slug: Some(channel),
                     })
                     .await
-                    .unwrap();
+                    .map_err(|e| CoreError::Other(format!("Failed to retrieve posts: {}", e)))?;
                 Ok(posts)
             }
             "posts:get_config" => {
                 let config = get_posts_config().map_err(|e| CoreError::Other(e.to_string()))?;
                 let config_bytes =
                     serde_json::to_vec(&config).map_err(|e| CoreError::Other(e.to_string()))?;
-                let synapse_config = get_synapse_config().unwrap();
+                let synapse_config = get_synapse_config()
+                    .map_err(|e| CoreError::Other(format!("Failed to get synapse config: {}", e)))?;
                 let res_event = Event::new()
                     .with_event_type("posts:config")
                     .with_module_kind("posts")
