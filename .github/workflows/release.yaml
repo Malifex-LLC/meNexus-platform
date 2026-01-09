@@ -1,0 +1,174 @@
+# ============================================================================
+# meNexus Release Workflow
+# ============================================================================
+# Builds and publishes Docker images to GitHub Container Registry (GHCR)
+# when a version tag is pushed.
+#
+# Trigger: Push a tag like v0.1.0, v0.2.0-alpha.1, v1.0.0-rc.1
+#   git tag v0.1.0
+#   git push origin v0.1.0
+#
+# Images published:
+#   - ghcr.io/<owner>/menexus-synapse:<version>
+#   - ghcr.io/<owner>/menexus-proxy:<version>
+# ============================================================================
+
+name: Release meNexus
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build-and-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: menexus-synapse
+            dockerfile: services/synapse/Dockerfile.prod
+            context: .
+          - image: menexus-proxy
+            dockerfile: services/proxy/Dockerfile
+            context: services/proxy
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Derive version and channel
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Determine release channel
+          if [[ "$VERSION" == *"-alpha."* ]]; then
+            CHANNEL=alpha
+          elif [[ "$VERSION" == *"-beta."* ]]; then
+            CHANNEL=beta
+          elif [[ "$VERSION" == *"-rc."* ]]; then
+            CHANNEL=rc
+          else
+            CHANNEL=stable
+          fi
+          echo "channel=$CHANNEL" >> $GITHUB_OUTPUT
+          
+          # Extract minor version for X.Y tags
+          MINOR=$(echo "$VERSION" | cut -d. -f1,2 | sed 's/-.*//')
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+
+      - name: Compute metadata
+        id: meta
+        run: |
+          echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+          echo "owner_lc=${OWNER,,}" >> $GITHUB_OUTPUT
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker tags
+        id: tags
+        run: |
+          IMAGE="ghcr.io/${{ steps.meta.outputs.owner_lc }}/${{ matrix.image }}"
+          TAGS="${IMAGE}:${{ steps.version.outputs.version }}"
+          TAGS="${TAGS},${IMAGE}:${{ steps.version.outputs.minor }}"
+          TAGS="${TAGS},${IMAGE}:${{ steps.version.outputs.channel }}"
+          
+          # Add 'latest' tag only for stable releases
+          if [[ "${{ steps.version.outputs.channel }}" == "stable" ]]; then
+            TAGS="${TAGS},${IMAGE}:latest"
+          fi
+          
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build and push ${{ matrix.image }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ steps.meta.outputs.date }}
+          tags: ${{ steps.tags.outputs.tags }}
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Derive version info
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ "$VERSION" == *"-alpha."* ]] || [[ "$VERSION" == *"-beta."* ]] || [[ "$VERSION" == *"-rc."* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+          generate_release_notes: true
+          body: |
+            ## Docker Images
+            
+            Pull the images from GitHub Container Registry:
+            
+            ```bash
+            # Synapse Server
+            docker pull ghcr.io/${{ github.repository_owner }}/menexus-synapse:${{ steps.version.outputs.version }}
+            
+            # Nginx Proxy
+            docker pull ghcr.io/${{ github.repository_owner }}/menexus-proxy:${{ steps.version.outputs.version }}
+            ```
+            
+            ## Quick Start
+            
+            1. Create a `.env` file from the example:
+               ```bash
+               cp env.example .env
+               echo "MENEXUS_VERSION=${{ steps.version.outputs.version }}" >> .env
+               ```
+            
+            2. Start the services:
+               ```bash
+               docker compose up -d
+               ```

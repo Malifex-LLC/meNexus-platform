@@ -1,0 +1,130 @@
+# ============================================================================
+# meNexus Synapse - Production Multi-Stage Build
+# ============================================================================
+# This Dockerfile creates a lean production image for the Synapse server
+# including the compiled WASM frontend.
+#
+# Build: docker build -f services/synapse/Dockerfile.prod -t menexus-synapse .
+# Run:   docker run -p 3000:3000 menexus-synapse
+# ============================================================================
+
+# --- Stage 1: Build Environment ---
+FROM rust:1-bookworm AS builder
+
+# OCI build arguments
+ARG VERSION
+ARG VCS_REF
+ARG BUILD_DATE
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust tooling for Leptos builds
+RUN rustup target add wasm32-unknown-unknown
+RUN cargo install cargo-leptos --locked
+
+WORKDIR /build
+
+# Copy Cargo workspace files first for dependency caching
+COPY Cargo.toml Cargo.lock ./
+COPY apps/client-web/Cargo.toml apps/client-web/
+COPY services/synapse/synapse-adapters/adapter-libp2p/Cargo.toml services/synapse/synapse-adapters/adapter-libp2p/
+COPY services/synapse/synapse-adapters/adapter-postgres/Cargo.toml services/synapse/synapse-adapters/adapter-postgres/
+COPY services/synapse/synapse-application/Cargo.toml services/synapse/synapse-application/
+COPY services/synapse/synapse-config/Cargo.toml services/synapse/synapse-config/
+COPY services/synapse/synapse-core/Cargo.toml services/synapse/synapse-core/
+COPY services/synapse/synapse-modules/module-activity/Cargo.toml services/synapse/synapse-modules/module-activity/
+COPY services/synapse/synapse-modules/module-auth/Cargo.toml services/synapse/synapse-modules/module-auth/
+COPY services/synapse/synapse-modules/module-chat/Cargo.toml services/synapse/synapse-modules/module-chat/
+COPY services/synapse/synapse-modules/module-core/Cargo.toml services/synapse/synapse-modules/module-core/
+COPY services/synapse/synapse-modules/module-livestream/Cargo.toml services/synapse/synapse-modules/module-livestream/
+COPY services/synapse/synapse-modules/module-members/Cargo.toml services/synapse/synapse-modules/module-members/
+COPY services/synapse/synapse-modules/module-posts/Cargo.toml services/synapse/synapse-modules/module-posts/
+COPY services/synapse/synapse-modules/module-profiles/Cargo.toml services/synapse/synapse-modules/module-profiles/
+COPY services/synapse/synapse-protocols/protocol-snp/Cargo.toml services/synapse/synapse-protocols/protocol-snp/
+COPY services/synapse/synapse-server/Cargo.toml services/synapse/synapse-server/
+
+# Create stub lib.rs files for dependency caching
+RUN mkdir -p apps/client-web/src && echo "fn main() {}" > apps/client-web/src/lib.rs
+RUN mkdir -p services/synapse/synapse-adapters/adapter-libp2p/src && echo "" > services/synapse/synapse-adapters/adapter-libp2p/src/lib.rs
+RUN mkdir -p services/synapse/synapse-adapters/adapter-postgres/src && echo "" > services/synapse/synapse-adapters/adapter-postgres/src/lib.rs
+RUN mkdir -p services/synapse/synapse-application/src && echo "" > services/synapse/synapse-application/src/lib.rs
+RUN mkdir -p services/synapse/synapse-config/src && echo "" > services/synapse/synapse-config/src/lib.rs
+RUN mkdir -p services/synapse/synapse-core/src && echo "" > services/synapse/synapse-core/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-activity/src && echo "" > services/synapse/synapse-modules/module-activity/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-auth/src && echo "" > services/synapse/synapse-modules/module-auth/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-chat/src && echo "" > services/synapse/synapse-modules/module-chat/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-core/src && echo "" > services/synapse/synapse-modules/module-core/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-livestream/src && echo "" > services/synapse/synapse-modules/module-livestream/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-members/src && echo "" > services/synapse/synapse-modules/module-members/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-posts/src && echo "" > services/synapse/synapse-modules/module-posts/src/lib.rs
+RUN mkdir -p services/synapse/synapse-modules/module-profiles/src && echo "" > services/synapse/synapse-modules/module-profiles/src/lib.rs
+RUN mkdir -p services/synapse/synapse-protocols/protocol-snp/src && echo "" > services/synapse/synapse-protocols/protocol-snp/src/lib.rs
+RUN mkdir -p services/synapse/synapse-server/src && echo "fn main() {}" > services/synapse/synapse-server/src/main.rs
+
+# Copy tailwind config and CSS for the frontend build
+COPY tailwind.config.js ./
+COPY apps/client-web/style/ apps/client-web/style/
+
+# Copy all source code
+COPY apps/ apps/
+COPY services/synapse/ services/synapse/
+
+# Build the release version with cargo-leptos
+# This compiles both the server binary and WASM frontend
+RUN cargo leptos build --release --project client-web
+
+# --- Stage 2: Runtime Image ---
+FROM debian:bookworm-slim AS runtime
+
+# OCI labels
+ARG VERSION
+ARG VCS_REF
+ARG BUILD_DATE
+
+LABEL org.opencontainers.image.title="meNexus Synapse" \
+      org.opencontainers.image.description="meNexus Synapse server with Leptos frontend" \
+      org.opencontainers.image.url="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.source="https://github.com/malifex-llc/menexus-platform" \
+      org.opencontainers.image.documentation="https://github.com/malifex-llc/menexus-platform#readme" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.created="${BUILD_DATE}"
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd -m -u 1000 -s /bin/bash synapse
+WORKDIR /app
+
+# Copy the compiled binary and static assets from builder
+COPY --from=builder /build/target/release/synapse-server /app/synapse-server
+COPY --from=builder /build/target/site /app/site
+
+# Create data directory with correct permissions
+RUN mkdir -p /data && chown -R synapse:synapse /app /data
+
+USER synapse
+
+# Default environment variables
+ENV RUST_LOG=info
+ENV LEPTOS_SITE_ROOT=/app/site
+ENV LEPTOS_SITE_PKG_DIR=pkg
+ENV LEPTOS_SITE_ADDR=0.0.0.0:3000
+ENV CONFIG_PATH=/data/synapse_config.json
+ENV PRIVATE_KEY_PATH=/data/key.path
+
+EXPOSE 3000 4000
+
+VOLUME ["/data"]
+
+CMD ["/app/synapse-server"]
