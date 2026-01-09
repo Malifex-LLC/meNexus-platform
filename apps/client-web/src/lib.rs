@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright © 2025 Malifex LLC and contributors
 
+#![recursion_limit = "512"]
+
 pub mod app;
 pub mod components;
 pub mod layouts;
