@@ -24,7 +24,12 @@ pub fn RemoteSynapseRenderer(
     /// The public key of the remote Synapse to render
     synapse_public_key: Signal<String>,
 ) -> impl IntoView {
-    // Fetch the remote manifest using the signal as a reactive dependency
+    // Capture the public key value ONCE at component creation time
+    // This prevents re-fetching when signals are read inside reactive closures
+    let initial_pk = synapse_public_key.get_untracked();
+
+    // Fetch the remote manifest using the captured value
+    // Only refetch if the URL actually changes (navigating to different synapse)
     let manifest_resource = Resource::new(
         move || synapse_public_key.get(),
         |pk| async move {
@@ -39,20 +44,28 @@ pub fn RemoteSynapseRenderer(
     view! {
         <Suspense fallback=move || view! { <RemoteSynapseLoadingState synapse_public_key=synapse_public_key/> }>
             {move || {
-                manifest_resource.get().map(|result| {
-                    match result {
-                        Ok(manifest) => {
-                            let pk = synapse_public_key.get();
-                            view! { <RemoteSynapseContent manifest=manifest synapse_public_key=pk/> }.into_any()
-                        },
-                        Err(e) => view! {
+                // Use the captured pk to avoid reactive re-subscription
+                let pk = initial_pk.clone();
+                // Always return a view, don't use .map() which returns None during loading
+                match manifest_resource.get() {
+                    // Resource still loading
+                    None => view! { <RemoteSynapseLoadingState synapse_public_key=synapse_public_key/> }.into_any(),
+                    
+                    // Manifest loaded successfully
+                    Some(Ok(manifest)) => {
+                        view! { <RemoteSynapseContent manifest=manifest synapse_public_key=pk/> }.into_any()
+                    }
+                    
+                    // Error loading manifest
+                    Some(Err(e)) => {
+                        view! {
                             <RemoteSynapseErrorState
                                 error=e.to_string()
                                 synapse_public_key=synapse_public_key
                             />
-                        }.into_any(),
+                        }.into_any()
                     }
-                })
+                }
             }}
         </Suspense>
     }
