@@ -1,0 +1,37 @@
+[package]
+name = "adapter-libp2p"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+base64 = { workspace = true }
+dashmap = { workspace = true }
+futures = { workspace = true }
+libp2p = { version = "0.56.0", features = [
+  "noise",
+  "ping",
+  "tcp",
+  "tokio",
+  "yamux",
+  "secp256k1",
+  "serde",
+  "identify",
+  "request-response",
+  "json",
+] }
+libp2p-identity = { version = "0.2.12", features = ["peerid"] }
+libp2p-kad = "0.48.0"
+libp2p-mdns = { version = "0.48.0", features = ["tokio"] }
+libp2p-swarm-derive = "0.35.1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+synapse-core = { path = "../../synapse-core" }
+synapse-config = { path = "../../synapse-config" }
+protocol-snp = { path = "../../synapse-protocols/protocol-snp" }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+uuid = { workspace = true }
+time = { workspace = true }

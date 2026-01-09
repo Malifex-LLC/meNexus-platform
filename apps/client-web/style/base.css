@@ -1,0 +1,603 @@
+/* 
+ * meNexus Base CSS
+ * ================
+ * 
+ * This file contains shared utilities and the theme variable system.
+ * Both User Themes and Synapse Themes use the same variable structure
+ * for easy theme creation and adaptation.
+ * 
+ * THEME ARCHITECTURE:
+ * - User Theme: Applied to Control Panel, Dashboard, Messages, Notifications, 
+ *               Search, Profile, Settings, and other app-wide UI
+ * - Synapse Theme: Applied within .synapse-themed wrapper for Synapse content
+ *                  (modules, feeds, members, etc.)
+ */
+
+@import "tailwindcss";
+
+
+/* ============================================
+   THEME VARIABLE SYSTEM
+   
+   To create a theme, define these CSS variables.
+   User themes define them at :root
+   Synapse themes define them in .synapse-themed
+   ============================================ */
+
+@theme {
+    /* ----------------------------------------
+       LAYOUT COLORS
+       Main structural backgrounds
+       ---------------------------------------- */
+    --color-background: var(--theme-bg-window);           /* Main window/app background */
+    --color-panel: var(--theme-bg-panel);                 /* Sidebar, nav panels */
+    --color-surface: var(--theme-bg-surface);             /* Cards, dropdowns, elevated surfaces */
+    --color-card: var(--theme-bg-surface);                /* Alias for surface (backwards compat) */
+    --color-elevated: var(--theme-bg-elevated);           /* Higher elevation (modals, popovers) */
+    --color-input: var(--theme-bg-input);                 /* Input field backgrounds */
+    --color-overlay: var(--theme-bg-overlay);             /* Modal overlay/backdrop */
+    
+    /* ----------------------------------------
+       BORDER COLORS
+       ---------------------------------------- */
+    --color-border: var(--theme-border);                  /* Standard borders */
+    --color-border-subtle: var(--theme-border-subtle);    /* Very subtle borders */
+    --color-border-strong: var(--theme-border-strong);    /* Emphasized borders */
+    
+    /* ----------------------------------------
+       TEXT/TYPOGRAPHY COLORS
+       ---------------------------------------- */
+    --color-foreground: var(--theme-text-primary);        /* Primary text */
+    --color-muted: var(--theme-text-secondary);           /* Secondary/muted text */
+    --color-subtle: var(--theme-text-subtle);             /* Placeholder, hints */
+    --color-disabled: var(--theme-text-disabled);         /* Disabled state text */
+    
+    /* ----------------------------------------
+       BRAND/ACCENT COLORS
+       ---------------------------------------- */
+    --color-brand: var(--theme-accent);                   /* Primary accent/brand */
+    --color-brand-hover: var(--theme-accent-hover);       /* Accent hover state */
+    --color-brand-muted: var(--theme-accent-muted);       /* Muted accent (backgrounds) */
+    --color-brand-text: var(--theme-accent-text);         /* Text on accent backgrounds */
+    --color-secondary: var(--theme-secondary);            /* Secondary accent */
+    --color-secondary-hover: var(--theme-secondary-hover);
+    
+    /* ----------------------------------------
+       INTERACTIVE STATE COLORS
+       ---------------------------------------- */
+    --color-hover: var(--theme-hover);                    /* General hover background */
+    --color-active: var(--theme-active);                  /* Active/pressed state */
+    --color-focus: var(--theme-focus);                    /* Focus ring color */
+    
+    /* ----------------------------------------
+       STATUS INDICATOR COLORS
+       Online/offline, streaming, etc.
+       ---------------------------------------- */
+    --color-status-online: var(--theme-status-online);
+    --color-status-offline: var(--theme-status-offline);
+    --color-status-busy: var(--theme-status-busy);
+    --color-status-away: var(--theme-status-away);
+    --color-status-streaming: var(--theme-status-streaming);
+    
+    /* ----------------------------------------
+       SEMANTIC COLORS
+       Success, warning, error, info
+       ---------------------------------------- */
+    --color-success: var(--theme-success);
+    --color-success-muted: var(--theme-success-muted);
+    --color-warning: var(--theme-warning);
+    --color-warning-muted: var(--theme-warning-muted);
+    --color-error: var(--theme-error);
+    --color-error-muted: var(--theme-error-muted);
+    --color-info: var(--theme-info);
+    --color-info-muted: var(--theme-info-muted);
+    
+    /* ----------------------------------------
+       ROLE COLORS
+       User roles within communities
+       ---------------------------------------- */
+    --color-role-owner: var(--theme-role-owner);
+    --color-role-owner-bg: var(--theme-role-owner-bg);
+    --color-role-admin: var(--theme-role-admin);
+    --color-role-admin-bg: var(--theme-role-admin-bg);
+    --color-role-moderator: var(--theme-role-moderator);
+    --color-role-moderator-bg: var(--theme-role-moderator-bg);
+    --color-role-member: var(--theme-role-member);
+    --color-role-member-bg: var(--theme-role-member-bg);
+    
+    /* ----------------------------------------
+       MESSAGE COLORS
+       Chat/DM message styling
+       ---------------------------------------- */
+    --color-msg-own-bg: var(--theme-msg-own-bg);          /* Your message bubble */
+    --color-msg-own-text: var(--theme-msg-own-text);      /* Your message text */
+    --color-msg-other-bg: var(--theme-msg-other-bg);      /* Others' message bubble */
+    --color-msg-other-text: var(--theme-msg-other-text);  /* Others' message text */
+    --color-msg-system-bg: var(--theme-msg-system-bg);    /* System message bg */
+    --color-msg-system-text: var(--theme-msg-system-text);/* System message text */
+    
+    /* ----------------------------------------
+       STAT/METRIC COLORS
+       Analytics, reputation, counters
+       ---------------------------------------- */
+    --color-stat-primary: var(--theme-stat-primary);
+    --color-stat-secondary: var(--theme-stat-secondary);
+    --color-stat-tertiary: var(--theme-stat-tertiary);
+    --color-stat-positive: var(--theme-stat-positive);
+    --color-stat-negative: var(--theme-stat-negative);
+    
+    /* ----------------------------------------
+       REPUTATION LEVEL COLORS
+       ELO-based trust system
+       ---------------------------------------- */
+    --color-rep-newcomer: var(--theme-rep-newcomer);
+    --color-rep-contributor: var(--theme-rep-contributor);
+    --color-rep-established: var(--theme-rep-established);
+    --color-rep-trusted: var(--theme-rep-trusted);
+    --color-rep-respected: var(--theme-rep-respected);
+    --color-rep-distinguished: var(--theme-rep-distinguished);
+    --color-rep-elite: var(--theme-rep-elite);
+    --color-rep-legendary: var(--theme-rep-legendary);
+    
+    /* ----------------------------------------
+       NOTIFICATION COLORS
+       Different notification types
+       ---------------------------------------- */
+    --color-notif-mention: var(--theme-notif-mention);
+    --color-notif-like: var(--theme-notif-like);
+    --color-notif-follow: var(--theme-notif-follow);
+    --color-notif-reply: var(--theme-notif-reply);
+    --color-notif-system: var(--theme-notif-system);
+}
+
+/* ============================================
+   SYNAPSE THEME SCOPING
+   Content inside .synapse-themed uses synapse theme
+   by remapping --theme-* vars to --synapse-* vars
+   ============================================ */
+
+.synapse-themed {
+    /* ----------------------------------------
+       REMAP --theme-* to --synapse-* VALUES
+       ---------------------------------------- */
+    
+    /* Layout */
+    --theme-bg-window: var(--synapse-bg-window);
+    --theme-bg-panel: var(--synapse-bg-panel);
+    --theme-bg-surface: var(--synapse-bg-surface);
+    --theme-bg-elevated: var(--synapse-bg-elevated);
+    --theme-bg-input: var(--synapse-bg-input);
+    --theme-bg-overlay: var(--synapse-bg-overlay);
+    
+    /* Borders */
+    --theme-border: var(--synapse-border);
+    --theme-border-subtle: var(--synapse-border-subtle);
+    --theme-border-strong: var(--synapse-border-strong);
+    
+    /* Text */
+    --theme-text-primary: var(--synapse-text-primary);
+    --theme-text-secondary: var(--synapse-text-secondary);
+    --theme-text-subtle: var(--synapse-text-subtle);
+    --theme-text-disabled: var(--synapse-text-disabled);
+    
+    /* Accent */
+    --theme-accent: var(--synapse-accent);
+    --theme-accent-hover: var(--synapse-accent-hover);
+    --theme-accent-muted: var(--synapse-accent-muted);
+    --theme-accent-text: var(--synapse-accent-text);
+    --theme-secondary: var(--synapse-secondary);
+    --theme-secondary-hover: var(--synapse-secondary-hover);
+    
+    /* Interactive */
+    --theme-hover: var(--synapse-hover);
+    --theme-active: var(--synapse-active);
+    --theme-focus: var(--synapse-focus);
+    
+    /* Status */
+    --theme-status-online: var(--synapse-status-online);
+    --theme-status-offline: var(--synapse-status-offline);
+    --theme-status-busy: var(--synapse-status-busy);
+    --theme-status-away: var(--synapse-status-away);
+    --theme-status-streaming: var(--synapse-status-streaming);
+    
+    /* Semantic */
+    --theme-success: var(--synapse-success);
+    --theme-success-muted: var(--synapse-success-muted);
+    --theme-warning: var(--synapse-warning);
+    --theme-warning-muted: var(--synapse-warning-muted);
+    --theme-error: var(--synapse-error);
+    --theme-error-muted: var(--synapse-error-muted);
+    --theme-info: var(--synapse-info);
+    --theme-info-muted: var(--synapse-info-muted);
+    
+    /* Roles */
+    --theme-role-owner: var(--synapse-role-owner);
+    --theme-role-owner-bg: var(--synapse-role-owner-bg);
+    --theme-role-admin: var(--synapse-role-admin);
+    --theme-role-admin-bg: var(--synapse-role-admin-bg);
+    --theme-role-moderator: var(--synapse-role-moderator);
+    --theme-role-moderator-bg: var(--synapse-role-moderator-bg);
+    --theme-role-member: var(--synapse-role-member);
+    --theme-role-member-bg: var(--synapse-role-member-bg);
+    
+    /* Messages */
+    --theme-msg-own-bg: var(--synapse-msg-own-bg);
+    --theme-msg-own-text: var(--synapse-msg-own-text);
+    --theme-msg-other-bg: var(--synapse-msg-other-bg);
+    --theme-msg-other-text: var(--synapse-msg-other-text);
+    --theme-msg-system-bg: var(--synapse-msg-system-bg);
+    --theme-msg-system-text: var(--synapse-msg-system-text);
+    
+    /* Stats */
+    --theme-stat-primary: var(--synapse-stat-primary);
+    --theme-stat-secondary: var(--synapse-stat-secondary);
+    --theme-stat-tertiary: var(--synapse-stat-tertiary);
+    --theme-stat-positive: var(--synapse-stat-positive);
+    --theme-stat-negative: var(--synapse-stat-negative);
+    
+    /* Reputation */
+    --theme-rep-newcomer: var(--synapse-rep-newcomer);
+    --theme-rep-contributor: var(--synapse-rep-contributor);
+    --theme-rep-established: var(--synapse-rep-established);
+    --theme-rep-trusted: var(--synapse-rep-trusted);
+    --theme-rep-respected: var(--synapse-rep-respected);
+    --theme-rep-distinguished: var(--synapse-rep-distinguished);
+    --theme-rep-elite: var(--synapse-rep-elite);
+    --theme-rep-legendary: var(--synapse-rep-legendary);
+    
+    /* Notifications */
+    --theme-notif-mention: var(--synapse-notif-mention);
+    --theme-notif-like: var(--synapse-notif-like);
+    --theme-notif-follow: var(--synapse-notif-follow);
+    --theme-notif-reply: var(--synapse-notif-reply);
+    --theme-notif-system: var(--synapse-notif-system);
+    
+    /* ----------------------------------------
+       ALSO REMAP Tailwind --color-* VARIABLES
+       These are what Tailwind utilities actually use
+       ---------------------------------------- */
+    
+    /* Layout Colors */
+    --color-background: var(--synapse-bg-window);
+    --color-panel: var(--synapse-bg-panel);
+    --color-surface: var(--synapse-bg-surface);
+    --color-card: var(--synapse-bg-surface);
+    --color-elevated: var(--synapse-bg-elevated);
+    --color-input: var(--synapse-bg-input);
+    --color-overlay: var(--synapse-bg-overlay);
+    
+    /* Border Colors */
+    --color-border: var(--synapse-border);
+    --color-border-subtle: var(--synapse-border-subtle);
+    --color-border-strong: var(--synapse-border-strong);
+    
+    /* Text Colors */
+    --color-foreground: var(--synapse-text-primary);
+    --color-muted: var(--synapse-text-secondary);
+    --color-subtle: var(--synapse-text-subtle);
+    --color-disabled: var(--synapse-text-disabled);
+    
+    /* Brand/Accent Colors */
+    --color-brand: var(--synapse-accent);
+    --color-brand-hover: var(--synapse-accent-hover);
+    --color-brand-muted: var(--synapse-accent-muted);
+    --color-brand-text: var(--synapse-accent-text);
+    --color-secondary: var(--synapse-secondary);
+    --color-secondary-hover: var(--synapse-secondary-hover);
+    
+    /* Interactive States */
+    --color-hover: var(--synapse-hover);
+    --color-active: var(--synapse-active);
+    --color-focus: var(--synapse-focus);
+    
+    /* Status Indicators */
+    --color-status-online: var(--synapse-status-online);
+    --color-status-offline: var(--synapse-status-offline);
+    --color-status-busy: var(--synapse-status-busy);
+    --color-status-away: var(--synapse-status-away);
+    --color-status-streaming: var(--synapse-status-streaming);
+    
+    /* Semantic Colors */
+    --color-success: var(--synapse-success);
+    --color-success-muted: var(--synapse-success-muted);
+    --color-warning: var(--synapse-warning);
+    --color-warning-muted: var(--synapse-warning-muted);
+    --color-error: var(--synapse-error);
+    --color-error-muted: var(--synapse-error-muted);
+    --color-info: var(--synapse-info);
+    --color-info-muted: var(--synapse-info-muted);
+    
+    /* Role Colors */
+    --color-role-owner: var(--synapse-role-owner);
+    --color-role-owner-bg: var(--synapse-role-owner-bg);
+    --color-role-admin: var(--synapse-role-admin);
+    --color-role-admin-bg: var(--synapse-role-admin-bg);
+    --color-role-moderator: var(--synapse-role-moderator);
+    --color-role-moderator-bg: var(--synapse-role-moderator-bg);
+    --color-role-member: var(--synapse-role-member);
+    --color-role-member-bg: var(--synapse-role-member-bg);
+    
+    /* Message Colors */
+    --color-msg-own-bg: var(--synapse-msg-own-bg);
+    --color-msg-own-text: var(--synapse-msg-own-text);
+    --color-msg-other-bg: var(--synapse-msg-other-bg);
+    --color-msg-other-text: var(--synapse-msg-other-text);
+    --color-msg-system-bg: var(--synapse-msg-system-bg);
+    --color-msg-system-text: var(--synapse-msg-system-text);
+    
+    /* Stat Colors */
+    --color-stat-primary: var(--synapse-stat-primary);
+    --color-stat-secondary: var(--synapse-stat-secondary);
+    --color-stat-tertiary: var(--synapse-stat-tertiary);
+    --color-stat-positive: var(--synapse-stat-positive);
+    --color-stat-negative: var(--synapse-stat-negative);
+    
+    /* Reputation Colors */
+    --color-rep-newcomer: var(--synapse-rep-newcomer);
+    --color-rep-contributor: var(--synapse-rep-contributor);
+    --color-rep-established: var(--synapse-rep-established);
+    --color-rep-trusted: var(--synapse-rep-trusted);
+    --color-rep-respected: var(--synapse-rep-respected);
+    --color-rep-distinguished: var(--synapse-rep-distinguished);
+    --color-rep-elite: var(--synapse-rep-elite);
+    --color-rep-legendary: var(--synapse-rep-legendary);
+    
+    /* Notification Colors */
+    --color-notif-mention: var(--synapse-notif-mention);
+    --color-notif-like: var(--synapse-notif-like);
+    --color-notif-follow: var(--synapse-notif-follow);
+    --color-notif-reply: var(--synapse-notif-reply);
+    --color-notif-system: var(--synapse-notif-system);
+}
+
+/* ============================================
+   SCROLLBAR UTILITIES
+   ============================================ */
+
+/* Standard styled scrollbar */
+.scrollbar-styled::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollbar-styled::-webkit-scrollbar-track {
+    background: var(--theme-bg-input, rgba(58, 58, 58, 0.3));
+    border-radius: 4px;
+}
+
+.scrollbar-styled::-webkit-scrollbar-thumb {
+    background: var(--theme-accent, #6366f1);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.scrollbar-styled::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-accent-hover, #818cf8);
+    background-clip: padding-box;
+}
+
+.scrollbar-styled::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Thin scrollbar variant */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: var(--theme-bg-input, rgba(58, 58, 58, 0.2));
+    border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--theme-accent, #6366f1) 60%, transparent);
+    border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--theme-accent, #6366f1) 90%, transparent);
+}
+
+/* Minimal scrollbar - subtle until hover */
+.scrollbar-minimal::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--theme-accent, #6366f1) 30%, transparent);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+}
+
+.scrollbar-minimal:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--theme-accent, #6366f1) 60%, transparent);
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--theme-accent, #6366f1) 90%, transparent);
+}
+
+/* Firefox scrollbar support */
+.scrollbar-styled {
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-accent, #6366f1) var(--theme-bg-input, rgba(58, 58, 58, 0.3));
+}
+
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--theme-accent, #6366f1) 60%, transparent) var(--theme-bg-input, rgba(58, 58, 58, 0.2));
+}
+
+.scrollbar-minimal {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--theme-accent, #6366f1) 30%, transparent) transparent;
+}
+
+/* ============================================
+   STATUS INDICATOR CLASSES
+   Use these for online/offline/etc indicators
+   ============================================ */
+
+.status-online { background-color: var(--color-status-online); }
+.status-offline { background-color: var(--color-status-offline); }
+.status-busy { background-color: var(--color-status-busy); }
+.status-away { background-color: var(--color-status-away); }
+.status-streaming { background-color: var(--color-status-streaming); }
+
+/* ============================================
+   SEMANTIC COLOR CLASSES
+   ============================================ */
+
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+
+.bg-success { background-color: var(--color-success); }
+.bg-success-muted { background-color: var(--color-success-muted); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-warning-muted { background-color: var(--color-warning-muted); }
+.bg-error { background-color: var(--color-error); }
+.bg-error-muted { background-color: var(--color-error-muted); }
+.bg-info { background-color: var(--color-info); }
+.bg-info-muted { background-color: var(--color-info-muted); }
+
+/* ============================================
+   ROLE COLOR CLASSES
+   ============================================ */
+
+.text-role-owner { color: var(--color-role-owner); }
+.bg-role-owner { background-color: var(--color-role-owner-bg); }
+.text-role-admin { color: var(--color-role-admin); }
+.bg-role-admin { background-color: var(--color-role-admin-bg); }
+.text-role-moderator { color: var(--color-role-moderator); }
+.bg-role-moderator { background-color: var(--color-role-moderator-bg); }
+.text-role-member { color: var(--color-role-member); }
+.bg-role-member { background-color: var(--color-role-member-bg); }
+
+/* ============================================
+   STAT/METRIC COLOR CLASSES
+   ============================================ */
+
+.text-stat-primary { color: var(--color-stat-primary); }
+.text-stat-secondary { color: var(--color-stat-secondary); }
+.text-stat-positive { color: var(--color-stat-positive); }
+.text-stat-negative { color: var(--color-stat-negative); }
+
+/* ============================================
+   MESSAGE COLOR CLASSES
+   ============================================ */
+
+.msg-own {
+    background-color: var(--color-msg-own-bg);
+    color: var(--color-msg-own-text);
+}
+
+.msg-other {
+    background-color: var(--color-msg-other-bg);
+    color: var(--color-msg-other-text);
+}
+
+.msg-system {
+    background-color: var(--color-msg-system-bg);
+    color: var(--color-msg-system-text);
+}
+
+/* ============================================
+   REPUTATION LEVEL CLASSES
+   ============================================ */
+
+.rep-newcomer { color: var(--color-rep-newcomer); }
+.rep-contributor { color: var(--color-rep-contributor); }
+.rep-established { color: var(--color-rep-established); }
+.rep-trusted { color: var(--color-rep-trusted); }
+.rep-respected { color: var(--color-rep-respected); }
+.rep-distinguished { color: var(--color-rep-distinguished); }
+.rep-elite { color: var(--color-rep-elite); }
+.rep-legendary { color: var(--color-rep-legendary); }
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+@keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-in-left {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scale-in {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+}
+
+/* ============================================
+   FOCUS & ACCESSIBILITY
+   ============================================ */
+
+.focus-ring {
+    outline: none;
+}
+
+.focus-ring:focus-visible {
+    outline: 2px solid var(--color-focus, var(--color-brand));
+    outline-offset: 2px;
+}
+
+/* ============================================
+   GLASS MORPHISM UTILITIES
+   ============================================ */
+
+.glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}

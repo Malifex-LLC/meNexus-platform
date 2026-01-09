@@ -1,0 +1,35 @@
+[package]
+name = "synapse-server"
+version = "0.3.0"
+edition = "2024"
+
+[dependencies]
+axum = { workspace = true }
+client-web = { path = "../../../apps/client-web", features = ["ssr"] }
+dotenvy = { workspace = true }
+anyhow = "1.0.100"
+leptos = { version = "0.8.14", features = ["ssr"] }
+leptos_axum = "0.8.7"
+serde = { workspace = true }
+serde_json = { workspace = true }
+synapse-core = { path = "../synapse-core" }
+synapse-application = { path = "../synapse-application" }
+synapse-config = { path = "../synapse-config" }
+adapter-postgres = { path = "../synapse-adapters/adapter-postgres" }
+adapter-libp2p = { path = "../synapse-adapters/adapter-libp2p" }
+dashmap = { workspace = true }
+module-auth = { path = "../synapse-modules/module-auth", features = ["ssr"] }
+module-core = { path = "../synapse-modules/module-core", features = ["ssr"] }
+module-profiles = { path = "../synapse-modules/module-profiles", features = ["ssr"] }
+module-posts = { path = "../synapse-modules/module-posts", features = ["ssr"] }
+thiserror = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true }
+tower-http = { version = "0.6.6", features = ["cors", "trace"] }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3.20", features = [
+  "fmt",
+  "local-time",
+  "env-filter",
+] }
+uuid = { workspace = true }

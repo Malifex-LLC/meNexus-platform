@@ -1,0 +1,62 @@
+[workspace]
+resolver = "3"
+members = [
+  "apps/client-web",
+  "services/synapse/synapse-adapters/adapter-libp2p",
+  "services/synapse/synapse-adapters/adapter-postgres",
+  "services/synapse/synapse-application",
+  "services/synapse/synapse-config",
+  "services/synapse/synapse-core",
+  "services/synapse/synapse-modules/module-activity",
+  "services/synapse/synapse-modules/module-auth",
+  "services/synapse/synapse-modules/module-chat",
+  "services/synapse/synapse-modules/module-core",
+  "services/synapse/synapse-modules/module-livestream",
+  "services/synapse/synapse-modules/module-members",
+  "services/synapse/synapse-modules/module-posts",
+  "services/synapse/synapse-modules/module-profiles",
+  "services/synapse/synapse-protocols/protocol-snp",
+  "services/synapse/synapse-server",
+]
+
+[workspace.package]
+edition = "2024"
+
+
+[[workspace.metadata.leptos]]
+name = "client-web"
+lib-package = "client-web"
+bin-package = "synapse-server"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+output-name = "client-web"
+# Features for frontend (WASM hydration)
+lib-features = ["hydrate"]
+# Bind to 0.0.0.0 for Docker
+site-addr = "0.0.0.0:3000"
+# Tailwind CSS input file
+tailwind-input-file = "apps/client-web/style/main.css"
+tailwind-config-file = "tailwind.config.js"
+
+[workspace.dependencies]
+anyhow = "1.0.100"
+async-trait = "0.1.89"
+axum = "0.8.6"
+base64 = "0.22.1"
+dashmap = { version = "6.1.0", features = ["serde"] }
+dotenvy = "0.15.7"
+futures = "0.3.31"
+getrandom = { version = "0.3", features = ["wasm_js"] }
+log = "0.4.28"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+thiserror = "2.0.17"
+time = { version = "0.3.44", features = [
+  "formatting",
+  "serde",
+  "serde-well-known",
+] }
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "sync"] }
+tracing = "0.1.41"
+url = "2.5.7"
+uuid = { version = "1.18.1", features = ["serde", "v4", "js"] }

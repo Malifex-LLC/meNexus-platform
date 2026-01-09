@@ -1,0 +1,22 @@
+[package]
+name = "module-core"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+axum = { workspace = true, optional = true }
+leptos = { version = "0.8.14", optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+synapse-application = { path = "../../synapse-application", optional = true }
+synapse-config = { path = "../../synapse-config", optional = true }
+uuid = { workspace = true }
+time = { workspace = true }
+synapse-core = { path = "../../synapse-core" }
+tracing = { workspace = true }
+
+[features]
+default = []
+ssr = ["dep:leptos", "dep:synapse-config", "dep:synapse-application", "dep:axum", "leptos/ssr"]
+hydrate = ["dep:leptos", "leptos/hydrate"]

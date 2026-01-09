@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright © 2025 Malifex LLC and contributors
+#
+# Development Docker Compose configuration.
+#
+# SETUP:
+#   1. Copy the example config:  cp env.example .env
+#   2. Edit .env with your settings
+#   3. Run: docker compose -f compose.dev.yaml up
+#
+# The .env file is gitignored - your settings survive git pull.
+
+name: meNexus-dev
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-example}
+      POSTGRES_DB: ${POSTGRES_DB:-menexus_dev}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-menexus_dev}"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - ./services/synapse/synapse-adapters/adapter-postgres/db/init:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+
+  synapse:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: services/synapse/Dockerfile
+    working_dir: /workspace
+    command: ["cargo", "leptos", "watch", "--project", "client-web"]
+    volumes:
+      - .:/workspace
+      - synapse-data:/data
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+      - synapse-target:/workspace/target
+    ports:
+      - "${AXUM_PORT:-3000}:${AXUM_PORT:-3000}"
+      - "${LIBP2P_PORT:-4000}:${LIBP2P_PORT:-4000}"
+    environment:
+      # Build
+      RUST_LOG: ${RUST_LOG:-debug}
+      LEPTOS_WASM_BINDGEN_VERSION: ${LEPTOS_WASM_BINDGEN_VERSION:-0.2.105}
+      LEPTOS_TAILWIND_VERSION: ${LEPTOS_TAILWIND_VERSION:-v4.1.5}
+
+      # Infrastructure
+      CONFIG_PATH: ${CONFIG_PATH:-/data/synapse_config.json}
+      PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH:-/data/key.path}
+      AXUM_PORT: ${AXUM_PORT:-3000}
+      LIBP2P_PORT: ${LIBP2P_PORT:-4000}
+      ANNOUNCE: ${ANNOUNCE:-}
+      BOOTSTRAP_LIST: ${BOOTSTRAP_LIST:-}
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:example@db:5432/menexus_dev}
+
+      # Identity
+      SYNAPSE_NAME: ${SYNAPSE_NAME:-My Synapse}
+      SYNAPSE_DESCRIPTION: ${SYNAPSE_DESCRIPTION:-A meNexus community}
+      SYNAPSE_PUBLIC_URL: ${SYNAPSE_PUBLIC_URL:-http://localhost:3000}
+      SYNAPSE_AVATAR_URL: ${SYNAPSE_AVATAR_URL:-}
+      SYNAPSE_BANNER_URL: ${SYNAPSE_BANNER_URL:-}
+      SYNAPSE_TAGS: ${SYNAPSE_TAGS:-community,development}
+
+      # Theme
+      SYNAPSE_THEME_PRESET: ${SYNAPSE_THEME_PRESET:-default}
+      SYNAPSE_ACCENT_COLOR: ${SYNAPSE_ACCENT_COLOR:-}
+      SYNAPSE_DARK_MODE: ${SYNAPSE_DARK_MODE:-true}
+
+      # Modules & Layout
+      SYNAPSE_MODULES: ${SYNAPSE_MODULES:-posts,chat,members,activity}
+      SYNAPSE_LAYOUT: ${SYNAPSE_LAYOUT:-TwoColumn}
+      SYNAPSE_LAYOUT_LEFT: ${SYNAPSE_LAYOUT_LEFT:-}
+      SYNAPSE_LAYOUT_CENTER: ${SYNAPSE_LAYOUT_CENTER:-}
+      SYNAPSE_LAYOUT_RIGHT: ${SYNAPSE_LAYOUT_RIGHT:-}
+      SYNAPSE_LAYOUT_MAIN: ${SYNAPSE_LAYOUT_MAIN:-}
+      SYNAPSE_SHOW_HEADER: ${SYNAPSE_SHOW_HEADER:-false}
+
+      # Capabilities
+      SYNAPSE_FEDERATION: ${SYNAPSE_FEDERATION:-true}
+      SYNAPSE_GUEST_ACCESS: ${SYNAPSE_GUEST_ACCESS:-false}
+      SYNAPSE_OPEN_MEMBERSHIP: ${SYNAPSE_OPEN_MEMBERSHIP:-true}
+      SYNAPSE_REALTIME: ${SYNAPSE_REALTIME:-true}
+
+      # Advanced
+      SYNAPSE_MANIFEST_JSON: ${SYNAPSE_MANIFEST_JSON:-}
+
+volumes:
+  pgdata:
+  cargo-registry:
+  cargo-git:
+  synapse-data:
+  synapse-target:

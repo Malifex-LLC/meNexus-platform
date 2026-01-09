@@ -1,0 +1,61 @@
+[package]
+name = "client-web"
+version = "0.1.0"
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+getrandom = { workspace = true }
+icondata = "0.6.0"
+leptos = { version = "0.8.14" }
+leptos_icons = "0.7.0"
+leptos_router = { version = "0.8.10" }
+leptos_meta = { version = "0.8.5" }
+module-activity = { path = "../../services/synapse/synapse-modules/module-activity", features = [
+  "hydrate",
+] }
+module-auth = { path = "../../services/synapse/synapse-modules/module-auth", features = [
+  "hydrate",
+] }
+module-chat = { path = "../../services/synapse/synapse-modules/module-chat", features = [
+  "hydrate",
+] }
+module-core = { path = "../../services/synapse/synapse-modules/module-core", features = [
+  "hydrate",
+] }
+module-livestream = { path = "../../services/synapse/synapse-modules/module-livestream", features = [
+  "hydrate",
+] }
+module-members = { path = "../../services/synapse/synapse-modules/module-members", features = [
+  "hydrate",
+] }
+module-posts = { path = "../../services/synapse/synapse-modules/module-posts", features = [
+  "hydrate",
+] }
+
+module-profiles = { path = "../../services/synapse/synapse-modules/module-profiles", features = [
+  "hydrate",
+] }
+synapse-core = { path = "../../services/synapse/synapse-core" }
+time = { version = "0.3", features = ["serde"] }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+wasm-bindgen = { version = "=0.2.105", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+[features]
+default = []
+ssr = [
+  "dep:tokio",
+  "leptos/ssr",
+  "module-activity/ssr",
+  "module-auth/ssr",
+  "module-chat/ssr",
+  "module-core/ssr",
+  "module-livestream/ssr",
+  "module-members/ssr",
+  "module-posts/ssr",
+  "module-profiles/ssr",
+]
+hydrate = ["dep:wasm-bindgen", "dep:console_error_panic_hook", "leptos/hydrate"]

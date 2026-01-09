@@ -1,0 +1,46 @@
+[package]
+name = "module-auth"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+async-trait = { workspace = true, optional = true }
+axum = { workspace = true, optional = true }
+leptos = { version = "0.8.14", optional = true }
+leptos_axum = { version = "0.8.7", optional = true }
+leptos_meta = { version = "0.8.5" }
+leptos_router = { version = "0.8.10" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+time = { workspace = true }
+synapse-application = { path = "../../synapse-application", optional = true }
+synapse-config = { path = "../../synapse-config", optional = true }
+synapse-core = { path = "../../synapse-core" }
+thiserror = { workspace = true, optional = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+base64 = { workspace = true }
+hex = { version = "0.4.3" }
+k256 = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
+sha2 = { version = "0.10.9" }
+rand = { version = "0.9.2", optional = true }
+rand_core = { version = "0.9.3", optional = true }
+getrandom = { workspace = true }
+web-sys = { version = "0.3", features = ["Window", "Location", "Storage"], optional = true }
+
+[features]
+default = []
+
+ssr = [
+  "leptos/ssr",
+  "dep:async-trait",
+  "dep:axum",
+  "dep:leptos_axum",
+  "dep:synapse-application",
+  "dep:synapse-config",
+  "dep:thiserror",
+  "dep:rand",
+  "dep:rand_core",
+]
+
+hydrate = ["leptos/hydrate", "dep:web-sys"]
