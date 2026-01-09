@@ -1,16 +1,154 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright © 2025 Malifex LLC and contributors
+#
+# =============================================================================
+# meNexus Production Docker Compose
+# =============================================================================
+#
+# This configuration uses pre-built images from GitHub Container Registry.
+# Use this for production deployments (e.g., on EC2, DigitalOcean, etc.)
+#
+# SETUP:
+#   1. Copy and configure your environment:
+#      cp env.example .env
+#
+#   2. Set your image version in .env:
+#      MENEXUS_VERSION=0.1.0
+#
+#   3. Configure your domain and other settings in .env
+#
+#   4. Start the services:
+#      docker compose up -d
+#
+# For local development, use compose.dev.yaml instead:
+#   docker compose -f compose.dev.yaml up
+#
+# =============================================================================
 
 name: meNexus
+
 services:
-  bootstrap:
+  # ---------------------------------------------------------------------------
+  # Database
+  # ---------------------------------------------------------------------------
   db:
-    image: postgres
-    restart: always
+    image: postgres:17-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-menexus}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-menexus}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  # ---------------------------------------------------------------------------
+  # Synapse Server (Backend + Frontend)
+  # ---------------------------------------------------------------------------
   synapse:
-  client:
+    image: ghcr.io/${GHCR_OWNER:-malifex}/menexus-synapse:${MENEXUS_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Runtime
+      RUST_LOG: ${RUST_LOG:-info}
+
+      # Database
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-menexus}
+
+      # Infrastructure
+      CONFIG_PATH: ${CONFIG_PATH:-/data/synapse_config.json}
+      PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH:-/data/key.path}
+      AXUM_PORT: ${AXUM_PORT:-3000}
+      LIBP2P_PORT: ${LIBP2P_PORT:-4000}
+      ANNOUNCE: ${ANNOUNCE:-}
+      BOOTSTRAP_LIST: ${BOOTSTRAP_LIST:-}
+
+      # Leptos
+      LEPTOS_SITE_ROOT: /app/site
+      LEPTOS_SITE_PKG_DIR: pkg
+      LEPTOS_SITE_ADDR: 0.0.0.0:3000
+
+      # Identity
+      SYNAPSE_NAME: ${SYNAPSE_NAME:-My Synapse}
+      SYNAPSE_DESCRIPTION: ${SYNAPSE_DESCRIPTION:-A meNexus community}
+      SYNAPSE_PUBLIC_URL: ${SYNAPSE_PUBLIC_URL:-http://localhost:3000}
+      SYNAPSE_AVATAR_URL: ${SYNAPSE_AVATAR_URL:-}
+      SYNAPSE_BANNER_URL: ${SYNAPSE_BANNER_URL:-}
+      SYNAPSE_TAGS: ${SYNAPSE_TAGS:-community}
+
+      # Theme
+      SYNAPSE_THEME_PRESET: ${SYNAPSE_THEME_PRESET:-default}
+      SYNAPSE_ACCENT_COLOR: ${SYNAPSE_ACCENT_COLOR:-}
+      SYNAPSE_DARK_MODE: ${SYNAPSE_DARK_MODE:-true}
+
+      # Modules & Layout
+      SYNAPSE_MODULES: ${SYNAPSE_MODULES:-posts,chat,members,activity}
+      SYNAPSE_LAYOUT: ${SYNAPSE_LAYOUT:-TwoColumn}
+      SYNAPSE_LAYOUT_LEFT: ${SYNAPSE_LAYOUT_LEFT:-}
+      SYNAPSE_LAYOUT_CENTER: ${SYNAPSE_LAYOUT_CENTER:-}
+      SYNAPSE_LAYOUT_RIGHT: ${SYNAPSE_LAYOUT_RIGHT:-}
+      SYNAPSE_LAYOUT_MAIN: ${SYNAPSE_LAYOUT_MAIN:-}
+      SYNAPSE_SHOW_HEADER: ${SYNAPSE_SHOW_HEADER:-false}
+
+      # Capabilities
+      SYNAPSE_FEDERATION: ${SYNAPSE_FEDERATION:-true}
+      SYNAPSE_GUEST_ACCESS: ${SYNAPSE_GUEST_ACCESS:-false}
+      SYNAPSE_OPEN_MEMBERSHIP: ${SYNAPSE_OPEN_MEMBERSHIP:-true}
+      SYNAPSE_REALTIME: ${SYNAPSE_REALTIME:-true}
+
+      # Module config
+      MODULE_POSTS_CHANNELS: ${MODULE_POSTS_CHANNELS:-general}
+      MODULE_POSTS_DEFAULT_CHANNEL: ${MODULE_POSTS_DEFAULT_CHANNEL:-general}
+      MODULE_POSTS_MAX_POST_LENGTH: ${MODULE_POSTS_MAX_POST_LENGTH:-5000}
+    volumes:
+      - synapse-data:/data
+    networks:
+      - internal
+      - proxy
+    expose:
+      - "3000"
+      - "4000"
+
+  # ---------------------------------------------------------------------------
+  # Nginx Reverse Proxy (SSL/TLS termination)
+  # ---------------------------------------------------------------------------
   proxy:
-secrets:
+    image: ghcr.io/${GHCR_OWNER:-malifex}/menexus-proxy:${MENEXUS_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      - synapse
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      SYNAPSE_HOST: synapse
+      SYNAPSE_PORT: 3000
+      ENABLE_SSL: ${ENABLE_SSL:-false}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-}
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    networks:
+      - proxy
+
 volumes:
+  pgdata:
+  synapse-data:
+  certbot-conf:
+  certbot-www:
+
+networks:
+  internal:
+    driver: bridge
+  proxy:
+    driver: bridge
