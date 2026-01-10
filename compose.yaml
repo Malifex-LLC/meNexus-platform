@@ -39,7 +39,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:-menexus}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-menexus}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-menexus}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -114,9 +118,9 @@ services:
     networks:
       - internal
       - proxy
-    expose:
-      - "3000"
-      - "4000"
+    ports:
+      - "3000:3000"
+      - "4000:4000"
 
   # ---------------------------------------------------------------------------
   # Nginx Reverse Proxy (SSL/TLS termination)
@@ -152,3 +156,4 @@ networks:
     driver: bridge
   proxy:
     driver: bridge
+
