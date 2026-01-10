@@ -19,9 +19,14 @@ pub fn hydrate() {
 }
 
 pub fn leptos_options() -> LeptosOptions {
+    // Use LEPTOS_SITE_ROOT env var for production, fallback to target/site for dev
+    let site_root = std::env::var("LEPTOS_SITE_ROOT").unwrap_or_else(|_| "target/site".to_string());
+    let site_pkg_dir =
+        std::env::var("LEPTOS_SITE_PKG_DIR").unwrap_or_else(|_| "pkg".to_string());
+
     LeptosOptions::builder()
-        .site_root("target/site")
-        .site_pkg_dir("pkg")
+        .site_root(site_root)
+        .site_pkg_dir(site_pkg_dir)
         .output_name("client-web")
         .build()
 }
