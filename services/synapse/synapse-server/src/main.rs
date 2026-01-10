@@ -24,7 +24,7 @@ use dashmap::DashMap;
 use leptos::config::LeptosOptions;
 use leptos::prelude::provide_context;
 use leptos::view;
-use leptos_axum::{LeptosRoutes, generate_route_list};
+use leptos_axum::{LeptosRoutes, file_and_error_handler, generate_route_list};
 use module_auth::http::AuthModule;
 use module_auth::http::routes as module_auth_routes;
 use module_auth::types::AuthDeps;
@@ -38,7 +38,6 @@ use module_profiles::http::{ProfilesModule, routes as module_profiles_routes};
 use module_profiles::types::ProfilesDeps;
 use std::env;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use std::path::PathBuf;
 use std::sync::Arc;
 use synapse_application::events::CreateLocalEventUseCase;
 use synapse_application::events::event_service::EventIngestService;
@@ -48,7 +47,6 @@ use synapse_application::profiles::profile_service::ProfileDiscoveryTransport;
 use synapse_config::get_synapse_config;
 use synapse_core::ports::modules::ModuleRegistry;
 use synapse_core::ports::profiles::profile_repository::ProfileDiscovery;
-use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
@@ -179,7 +177,6 @@ async fn main() -> anyhow::Result<()> {
         let opts = leptos_options.clone();
         move || view! { <Shell options=opts.clone()/> }
     });
-    let static_site_dir = PathBuf::from(leptos_options.site_root.as_ref());
     let app = api::routes()
         .merge(module_auth_routes::<AppState>())
         .merge(module_core_routes::<AppState>())
@@ -202,7 +199,9 @@ async fn main() -> anyhow::Result<()> {
                 move || view! { <Shell options=opts.clone()/> }
             },
         )
-        .fallback_service(ServeDir::new(static_site_dir))
+        .fallback(file_and_error_handler::<AppState, _>(|options| {
+            view! { <Shell options=options.clone()/> }
+        }))
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
