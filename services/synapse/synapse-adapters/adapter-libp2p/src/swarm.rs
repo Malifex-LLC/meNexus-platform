@@ -11,7 +11,7 @@ use futures::StreamExt;
 use libp2p::StreamProtocol;
 use libp2p::request_response::OutboundRequestId;
 use libp2p::request_response::ProtocolSupport;
-use libp2p::request_response::json;
+use libp2p::request_response::{json, Config as ReqResConfig};
 use libp2p::request_response::{Event as ReqResEvent, Message as ReqResMessage};
 use libp2p::{
     noise, ping,
@@ -59,8 +59,11 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
                 StreamProtocol::new("/menexus/snp/1.0.0"),
                 ProtocolSupport::Full,
             )];
+            // Use a longer request timeout to allow for network latency and handler I/O
+            let req_res_config = ReqResConfig::default()
+                .with_request_timeout(Duration::from_secs(120));
             let req_res =
-                json::Behaviour::<SnpMessage, SnpMessage>::new(protocols, Default::default());
+                json::Behaviour::<SnpMessage, SnpMessage>::new(protocols, req_res_config);
             Ok(Libp2pBehaviour {
                 //ping: ping::Behaviour::default(),
                 kad,
@@ -85,6 +88,7 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
 pub async fn run_swarm(
     mut swarm: Swarm<Libp2pBehaviour>,
     mut rx: mpsc::Receiver<Control>,
+    ctrl_tx: mpsc::Sender<Control>,
     handler: Arc<dyn MessageHandler + Send + Sync>,
     known_peers: Arc<DashMap<String, String>>,
 ) -> Result<(), Libp2pAdapterError> {
@@ -103,6 +107,9 @@ pub async fn run_swarm(
                     Control::SendSnp { peer, request, ret } => {
                         let req_id = swarm.behaviour_mut().req_res.send_request(&peer, request);
                         pending.insert(req_id, ret);
+                    }
+                    Control::SendResponse { channel, response } => {
+                        let _ = swarm.behaviour_mut().req_res.send_response(channel, response);
                     }
                     Control::Provide {key} => {
                         if let Err(e) = swarm.behaviour_mut().kad.start_providing(key.into()) {
@@ -179,48 +186,53 @@ pub async fn run_swarm(
                     SwarmEvent::Behaviour(Libp2pEvent::ReqRes(ev)) => match ev {
                         ReqResEvent::Message { peer, message, .. } => match message {
                             ReqResMessage::Request { request, channel, .. } => {
-                                // Inbound request: handle and reply
-                                info!("Recieved incoming message: {:?}", request);
+                                // Inbound request: spawn handler task to avoid blocking the swarm
+                                info!("Received incoming message: {:?}", request);
                                 match request.payload {
                                     Command { action: _, event } => {
-                                        match handler.handle_message(event).await {
-                                            Ok(saved) => {
-                                                let resp = SnpMessage {
-                                                    version: "1.0.0".to_string(),
-                                                    id: Uuid::new_v4(),
-                                                    correlation_id: Uuid::new_v4(),
-                                                    destination: Synapse { id: peer.to_string() },
-                                                    agent_public_key: "agent_public_key".to_string(),
-                                                    timestamp: OffsetDateTime::now_utc(),
-                                                    payload: Reply {
-                                                        ok: true,
-                                                        events: saved,
-                                                        error: None,
-                                                    },
-                                                    signature: "signature".to_string(),
-                                                };
-                                                info!("Sending outbound response: {:?}", resp);
-                                                let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
-                                            }
-                                            Err(err) => {
-                                                tracing::warn!("ingest/handle failed: {err:?}");
-                                                let resp = SnpMessage {
-                                                    version: "1.0.0".to_string(),
-                                                    id: Uuid::new_v4(),
-                                                    correlation_id: Uuid::new_v4(),
-                                                    destination: Synapse { id: peer.to_string() },
-                                                    agent_public_key: "agent_public_key".to_string(),
-                                                    timestamp: OffsetDateTime::now_utc(),
-                                                    payload: Reply {
-                                                        ok: false,
-                                                        events: vec![],
-                                                        error: Some(err.to_string()),
-                                                    },
-                                                    signature: "signature".to_string(),
-                                                };
-                                                let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
-                                            }
-                                        }
+                                        // Spawn handler in background task to prevent blocking the swarm event loop
+                                        let handler = handler.clone();
+                                        let ctrl_tx = ctrl_tx.clone();
+                                        let peer_str = peer.to_string();
+                                        tokio::spawn(async move {
+                                            let response = match handler.handle_message(event).await {
+                                                Ok(saved) => {
+                                                    SnpMessage {
+                                                        version: "1.0.0".to_string(),
+                                                        id: Uuid::new_v4(),
+                                                        correlation_id: Uuid::new_v4(),
+                                                        destination: Synapse { id: peer_str },
+                                                        agent_public_key: "agent_public_key".to_string(),
+                                                        timestamp: OffsetDateTime::now_utc(),
+                                                        payload: Reply {
+                                                            ok: true,
+                                                            events: saved,
+                                                            error: None,
+                                                        },
+                                                        signature: "signature".to_string(),
+                                                    }
+                                                }
+                                                Err(err) => {
+                                                    tracing::warn!("ingest/handle failed: {err:?}");
+                                                    SnpMessage {
+                                                        version: "1.0.0".to_string(),
+                                                        id: Uuid::new_v4(),
+                                                        correlation_id: Uuid::new_v4(),
+                                                        destination: Synapse { id: peer_str },
+                                                        agent_public_key: "agent_public_key".to_string(),
+                                                        timestamp: OffsetDateTime::now_utc(),
+                                                        payload: Reply {
+                                                            ok: false,
+                                                            events: vec![],
+                                                            error: Some(err.to_string()),
+                                                        },
+                                                        signature: "signature".to_string(),
+                                                    }
+                                                }
+                                            };
+                                            info!("Sending outbound response: {:?}", response);
+                                            let _ = ctrl_tx.send(Control::SendResponse { channel, response }).await;
+                                        });
                                     }
                                     _ => {
                                         let resp = SnpMessage {
@@ -237,7 +249,7 @@ pub async fn run_swarm(
                                             },
                                             signature: "signature".to_string(),
                                         };
-                                        let _ = swarm.behaviour_mut().req_res.send_response(channel, resp);
+                                        let _ = ctrl_tx.send(Control::SendResponse { channel, response: resp }).await;
                                     }
                                 }
                             }

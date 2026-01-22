@@ -61,11 +61,12 @@ impl Libp2pTransport {
     pub async fn start(&mut self) -> Result<(), Libp2pAdapterError> {
         let swarm = create_swarm(self.config.clone())?;
         let rx = self.rx.take().expect("transport already started");
+        let ctrl_tx = self.tx.clone();
         let handler = self.inbound_handler.clone();
         let known_peers = self.known_peers.clone();
 
         tokio::spawn(async move {
-            if let Err(e) = run_swarm(swarm, rx, handler, known_peers).await {
+            if let Err(e) = run_swarm(swarm, rx, ctrl_tx, handler, known_peers).await {
                 warn!("libp2p swarm exited with error: {e:?}");
             }
         });
