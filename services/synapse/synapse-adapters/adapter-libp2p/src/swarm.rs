@@ -70,6 +70,13 @@ pub fn create_swarm(config: TransportConfig) -> Result<Swarm<Libp2pBehaviour>, L
         .with_swarm_config(|cfg| cfg.with_idle_connection_timeout(Duration::from_secs(u64::MAX)))
         .build();
     swarm.listen_on(config.listen_addr)?;
+
+    // Add external/announce addresses so peers can reach us
+    for addr in config.announce_addrs {
+        info!("Adding external address: {addr}");
+        swarm.add_external_address(addr);
+    }
+
     setup_bootstrap(&mut swarm, config.bootstrap_addrs);
     info!("Libp2p swarm created");
     Ok(swarm)

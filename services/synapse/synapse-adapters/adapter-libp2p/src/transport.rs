@@ -39,6 +39,7 @@ pub struct TransportConfig {
     pub keypair: Keypair,
     pub bootstrap_addrs: Vec<Multiaddr>,
     pub listen_addr: Multiaddr,
+    pub announce_addrs: Vec<Multiaddr>,
 }
 
 impl Libp2pTransport {

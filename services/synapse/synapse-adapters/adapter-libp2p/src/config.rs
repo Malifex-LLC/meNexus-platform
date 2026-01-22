@@ -61,11 +61,18 @@ pub fn parse_config(config: &SynapseConfig) -> Result<TransportConfig, Libp2pAda
         bootstrap_addrs.push(addr);
     }
 
+    let mut announce_addrs: Vec<Multiaddr> = Vec::new();
+    for s in config.p2p.announce.clone() {
+        let addr: Multiaddr = s.parse().expect("Invalid Multiaddr in ANNOUNCE");
+        announce_addrs.push(addr);
+    }
+
     let listen_addr: Multiaddr = config.p2p.listen_addrs.clone();
 
     Ok(TransportConfig {
         keypair,
         bootstrap_addrs,
         listen_addr,
+        announce_addrs,
     })
 }
