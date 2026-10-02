@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-leptos = { version = "0.8.14", optional = true }
-leptos_router = { version = "0.8.10", optional = true }
+leptos = { version = "0.8.21", optional = true }
+leptos_router = { version = "0.8.16", optional = true }
 serde = { workspace = true }
 
 [features]

@@ -14,7 +14,7 @@ name: meNexus-dev
 
 services:
   db:
-    image: postgres:18-alpine
+    image: postgres:18.6-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -29,7 +29,7 @@ services:
       retries: 10
     volumes:
       - ./services/synapse/synapse-adapters/adapter-postgres/db/init:/docker-entrypoint-initdb.d:ro
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
 
   synapse:
     depends_on:
@@ -52,8 +52,9 @@ services:
     environment:
       # Build
       RUST_LOG: ${RUST_LOG:-debug}
-      LEPTOS_WASM_BINDGEN_VERSION: ${LEPTOS_WASM_BINDGEN_VERSION:-0.2.105}
-      LEPTOS_TAILWIND_VERSION: ${LEPTOS_TAILWIND_VERSION:-v4.1.5}
+      LEPTOS_WASM_BINDGEN_VERSION: ${LEPTOS_WASM_BINDGEN_VERSION:-0.2.108}
+      LEPTOS_TAILWIND_VERSION: ${LEPTOS_TAILWIND_VERSION:-v4.3.3}
+      LEPTOS_WASM_OPT_VERSION: ${LEPTOS_WASM_OPT_VERSION:-version_133}
 
       # Infrastructure
       CONFIG_PATH: ${CONFIG_PATH:-/data/synapse_config.json}

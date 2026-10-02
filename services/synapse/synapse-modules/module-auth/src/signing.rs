@@ -18,12 +18,12 @@ pub fn get_signing_key() -> Option<SigningKey> {
     let window = web_sys::window()?;
     let storage = window.session_storage().ok()??;
     let key_hex = storage.get_item("menexus_signing_key").ok()??;
-    
+
     let key_bytes = hex::decode(key_hex.trim()).ok()?;
     if key_bytes.len() != 32 {
         return None;
     }
-    
+
     SigningKey::from_slice(&key_bytes).ok()
 }
 
@@ -38,13 +38,13 @@ pub fn has_signing_key() -> bool {
 #[cfg(feature = "hydrate")]
 pub fn sign_bytes(payload: &[u8]) -> Option<String> {
     let signing_key = get_signing_key()?;
-    let digest = Sha256::new_with_prefix(payload);
-    let signature: Signature = signing_key.sign_digest(digest);
+    let signature: Signature =
+        signing_key.sign_digest(|digest: &mut Sha256| digest.update(payload));
     Some(hex::encode(signature.to_bytes()))
 }
 
 /// Sign an event payload and return the hex-encoded signature.
-/// 
+///
 /// This creates a canonical representation of the event for signing.
 /// The signature can be verified by any Synapse that has the agent's public key.
 #[cfg(feature = "hydrate")]
@@ -56,7 +56,7 @@ pub fn sign_event_payload(
     module_slug: Option<&str>,
 ) -> Option<String> {
     use serde::Serialize;
-    
+
     #[derive(Serialize)]
     struct SigningPayload<'a> {
         event_type: &'a str,
@@ -65,7 +65,7 @@ pub fn sign_event_payload(
         module_kind: Option<&'a str>,
         module_slug: Option<&'a str>,
     }
-    
+
     let payload = SigningPayload {
         event_type,
         agent,
@@ -73,7 +73,7 @@ pub fn sign_event_payload(
         module_kind,
         module_slug,
     };
-    
+
     let payload_bytes = serde_json::to_vec(&payload).ok()?;
     sign_bytes(&payload_bytes)
 }
@@ -93,6 +93,6 @@ pub fn clear_signing_key() {
 pub fn get_public_key() -> Option<String> {
     let signing_key = get_signing_key()?;
     let verifying_key = signing_key.verifying_key();
-    let encoded = verifying_key.to_encoded_point(true);
+    let encoded = verifying_key.to_sec1_point(true);
     Some(hex::encode(encoded.as_bytes()))
 }

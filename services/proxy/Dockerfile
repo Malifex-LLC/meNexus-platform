@@ -1,4 +1,4 @@
-FROM nginx:1.29.1-alpine
+FROM nginx:1.31.6-alpine
 
 # ---- OCI labels ----
 ARG VERSION

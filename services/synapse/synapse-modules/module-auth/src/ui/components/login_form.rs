@@ -40,7 +40,7 @@ pub fn LoginForm() -> impl IntoView {
 
             let verifying_key = signing_key.verifying_key();
 
-            let encoded = verifying_key.to_encoded_point(true);
+            let encoded = verifying_key.to_sec1_point(true);
             let public_key_hex = hex::encode(encoded.as_bytes());
             leptos::logging::log!("public_key_hex: {}", public_key_hex);
             let crypto_challenge = request_challenge_server(ChallengeRequest {
@@ -51,8 +51,8 @@ pub fn LoginForm() -> impl IntoView {
 
             let nonce = crypto_challenge.challenge.nonce.clone();
             let nonce_bytes = BASE64_URL_SAFE_NO_PAD.decode(nonce).unwrap();
-            let digest = Sha256::new_with_prefix(&nonce_bytes);
-            let signature: Signature = signing_key.sign_digest(digest);
+            let signature: Signature =
+                signing_key.sign_digest(|digest: &mut Sha256| digest.update(&nonce_bytes));
             let signature_hex = hex::encode(signature.to_bytes());
 
             let verify_challenge_result = verify_challenge_server(VerifyChallengeRequest {
@@ -70,7 +70,7 @@ pub fn LoginForm() -> impl IntoView {
                     if let Ok(Some(storage)) = window.session_storage() {
                         let _ = storage.set_item("menexus_signing_key", private_key_hex);
                     }
-                    
+
                     // Full page reload to ensure SSR picks up the new session cookie
                     window.location().set_href("/").expect("failed to redirect");
                 }

@@ -50,9 +50,14 @@ pub async fn verify_challenge(
     let nonce_bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
         .decode(challenge_nonce)
         .unwrap();
-    let digest = Sha256::new_with_prefix(&nonce_bytes);
     verifying_key
-        .verify_digest(digest, &signature)
+        .verify_digest(
+            |digest: &mut Sha256| {
+                digest.update(&nonce_bytes);
+                Ok(())
+            },
+            &signature,
+        )
         .map_err(|_| ModuleAuthError::BadRequest("signature verification failed".into()))?;
     let expires_at = OffsetDateTime::now_utc() + Duration::from_hours(4);
     let session = Session {

@@ -7,9 +7,9 @@ edition = "2024"
 axum = { workspace = true }
 client-web = { path = "../../../apps/client-web", features = ["ssr"] }
 dotenvy = { workspace = true }
-anyhow = "1.0.100"
-leptos = { version = "0.8.14", features = ["ssr"] }
-leptos_axum = "0.8.7"
+anyhow = "1.0.104"
+leptos = { version = "0.8.21", features = ["ssr"] }
+leptos_axum = "0.8.10"
 serde = { workspace = true }
 serde_json = { workspace = true }
 synapse-core = { path = "../synapse-core" }
@@ -25,9 +25,9 @@ module-posts = { path = "../synapse-modules/module-posts", features = ["ssr"] }
 thiserror = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }
-tower-http = { version = "0.6.6", features = ["cors", "trace"] }
+tower-http = { version = "0.7.1", features = ["cors", "trace"] }
 tracing = { workspace = true }
-tracing-subscriber = { version = "0.3.20", features = [
+tracing-subscriber = { version = "0.3.23", features = [
   "fmt",
   "local-time",
   "env-filter",

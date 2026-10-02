@@ -9,7 +9,7 @@
 # ============================================================================
 
 # --- Stage 1: Build Environment ---
-FROM rust:1-bookworm AS builder
+FROM rust:1.98.1-trixie AS builder
 
 # OCI build arguments
 ARG VERSION
@@ -28,7 +28,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install Rust tooling for Leptos builds
 RUN rustup target add wasm32-unknown-unknown
-RUN cargo install cargo-leptos --locked
+RUN cargo install cargo-leptos --version 0.3.10 --locked
+ENV LEPTOS_WASM_BINDGEN_VERSION=0.2.108
+ENV LEPTOS_TAILWIND_VERSION=v4.3.3
+ENV LEPTOS_WASM_OPT_VERSION=version_133
 
 WORKDIR /build
 
@@ -88,7 +91,7 @@ COPY services/synapse/ services/synapse/
 RUN cargo leptos build --release --project client-web
 
 # --- Stage 2: Runtime Image ---
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 
 # OCI labels
 ARG VERSION
@@ -108,7 +111,7 @@ LABEL org.opencontainers.image.title="meNexus Synapse" \
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl3 \
+    libssl3t64 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security

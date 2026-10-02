@@ -8,11 +8,11 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 getrandom = { workspace = true }
-icondata = "0.6.0"
-leptos = { version = "0.8.14" }
-leptos_icons = "0.7.0"
-leptos_router = { version = "0.8.10" }
-leptos_meta = { version = "0.8.5" }
+icondata = "0.7.0"
+leptos = { version = "0.8.21" }
+leptos_icons = "0.7.1"
+leptos_router = { version = "0.8.16" }
+leptos_meta = { version = "0.8.7" }
 module-activity = { path = "../../services/synapse/synapse-modules/module-activity", features = [
   "hydrate",
 ] }
@@ -39,9 +39,10 @@ module-profiles = { path = "../../services/synapse/synapse-modules/module-profil
   "hydrate",
 ] }
 synapse-core = { path = "../../services/synapse/synapse-core" }
-time = { version = "0.3", features = ["serde"] }
-tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
-wasm-bindgen = { version = "=0.2.105", optional = true }
+time = { version = "0.3.55", features = ["serde"] }
+tokio = { version = "1.53.1", features = ["rt-multi-thread"], optional = true }
+# libp2p-swarm 0.48 pins wasm-bindgen-futures 0.4.58 to this binding ABI.
+wasm-bindgen = { version = "=0.2.108", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
 
 [features]

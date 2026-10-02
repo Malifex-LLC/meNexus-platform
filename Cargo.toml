@@ -39,24 +39,24 @@ tailwind-input-file = "apps/client-web/style/main.css"
 tailwind-config-file = "tailwind.config.js"
 
 [workspace.dependencies]
-anyhow = "1.0.100"
-async-trait = "0.1.89"
-axum = "0.8.6"
-base64 = "0.22.1"
-dashmap = { version = "6.1.0", features = ["serde"] }
+anyhow = "1.0.104"
+async-trait = "0.1.92"
+axum = "0.8.9"
+base64 = "0.23.1"
+dashmap = { version = "6.2.1", features = ["serde"] }
 dotenvy = "0.15.7"
-futures = "0.3.31"
-getrandom = { version = "0.3", features = ["wasm_js"] }
-log = "0.4.28"
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
-thiserror = "2.0.17"
-time = { version = "0.3.44", features = [
+futures = "0.3.34"
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
+log = "0.4.34"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.21"
+time = { version = "0.3.55", features = [
   "formatting",
   "serde",
   "serde-well-known",
 ] }
-tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "sync"] }
-tracing = "0.1.41"
-url = "2.5.7"
-uuid = { version = "1.18.1", features = ["serde", "v4", "js"] }
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "sync"] }
+tracing = "0.1.44"
+url = { version = "2.5.8", features = ["serde"] }
+uuid = { version = "1.26.1", features = ["serde", "v4", "js"] }

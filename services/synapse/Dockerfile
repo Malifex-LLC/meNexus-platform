@@ -1,11 +1,11 @@
-FROM rust:1-bookworm
+FROM rust:1.98.1-trixie
 
 WORKDIR /workspace/services/synapse
 
 # Tooling shared by backend runtime and frontend watcher
 RUN rustup target add wasm32-unknown-unknown \
-  && cargo install watchexec-cli \
-  && cargo install cargo-leptos --locked
+  && cargo install watchexec-cli --version 2.7.3 --locked \
+  && cargo install cargo-leptos --version 0.3.10 --locked
 
 EXPOSE 3000
 
